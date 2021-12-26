@@ -24,7 +24,7 @@ def colour_wheel(samples=1024, clip_circle=True, method="Colour"):
     HSV = colour.utilities.tstack([H, S, np.ones(H.shape)])
     RGB = colour.HSV_to_RGB(HSV)
 
-    if clip_circle == True:
+    if clip_circle:
         RGB[S > 1] = 0
         A = np.where(S > 1, 0, 1)
     else:

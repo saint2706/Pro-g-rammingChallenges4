@@ -1,5 +1,5 @@
 import socket
-from datetime import date, datetime
+from datetime import datetime
 
 target = socket.gethostbyname("www.duckduckgo.com")
 print("Scanning started at:", str(datetime.now()))

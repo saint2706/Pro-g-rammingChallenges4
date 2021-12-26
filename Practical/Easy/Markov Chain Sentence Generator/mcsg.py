@@ -17,11 +17,11 @@ for word in token_text[1:]:
     last_word = word
 
 
-def gen_sentence(dict, distance, start=None):
+def gen_sentence(mark_dict, distance, start=None):
     if distance <= 0:
         return []
     if not start:
-        start = random.choice(list(dict.keys()))
+        start = random.choice(list(mark_dict.keys()))
     weights = np.array(list(markov_dict[start].values()), dtype=np.float64)
     weights = weights / weights.sum()
     choices = list(markov_dict[start].keys())

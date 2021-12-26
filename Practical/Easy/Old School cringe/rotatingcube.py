@@ -53,7 +53,7 @@ def crazy_rotation(ind, Nind):
     )
 
 
-def project(D, vecs):
+def project(D):
     return vvs[:, :2] / (vvs[:, [2, 2]] - D)
 
 
@@ -80,7 +80,7 @@ for ind in range(Nind):
 
     vvs = dot(vs, rotM)
 
-    pt = project(D, vvs)
+    pt = project(D)
 
     for j, k in ed:
         ax.plot(pt[[j, k], 0], pt[[j, k], 1], "g-", lw=3)

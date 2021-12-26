@@ -61,10 +61,11 @@ def delete(id):
             f.truncate()
         print(f"Removed #{id}")
 
-    except Exception as e:
+    except Exception:
         print(f"#{id} does not exist. Nothing deleted.")
 
 
+# noinspection PyBroadException
 def done(id):
     try:
 
@@ -87,6 +88,7 @@ def done(id):
         print(f"#{id} does not exist.")
 
 
+# noinspection PyBroadException
 def report():
     test()
     try:
@@ -106,35 +108,34 @@ def report():
         )
 
 
-if __name__ == "__main__":
-    try:
-        d = {}
-        done = {}
-        args = sys.argv
-        if args[1] == "add" and not len(args[2:]):
-            sys.stdout.buffer.write(
-                "Error: Missing todo string. Nothing added!".encode("utf8")
-            )
+try:
+    d = {}
+    done = {}
+    args = sys.argv
+    if args[1] == "add" and not len(args[2:]):
+        sys.stdout.buffer.write(
+            "Error: Missing todo string. Nothing added!".encode("utf8")
+        )
 
-        elif args[1] == "done" and not len(args[2:]):
-            sys.stdout.buffer.write(
-                "Error: Missing id for marking todo as done.".encode("utf8")
-            )
+    elif args[1] == "done" and not len(args[2:]):
+        sys.stdout.buffer.write(
+            "Error: Missing id for marking todo as done.".encode("utf8")
+        )
 
-        elif args[1] == "delete" and not len(args[2:]):
-            sys.stdout.buffer.write(
-                "Error: Missing NUMBER for deleteeting todo.".encode("utf8")
-            )
-        else:
-            globals()[args[1]](*args[2:])
+    elif args[1] == "delete" and not len(args[2:]):
+        sys.stdout.buffer.write(
+            "Error: Missing id for deleting todo.".encode("utf8")
+        )
+    else:
+        globals()[args[1]](*args[2:])
 
-    except Exception as e:
+except Exception as e:
 
-        hs = """How to Use :-
-$ ./todo add "item"     # Add a new item to the to do list
-$ ./todo show           # Show remaining todos
-$ ./todo delete "id"    # Delete a todo
-$ ./todo fin "id"       # Complete a todo
-$ ./todo help           # Show usage
-$ ./todo stats          # Statistics"""
-        sys.stdout.buffer.write(hs.encode("utf8"))
+    hs = """How to Use :-
+    $ ./todo add "item"     # Add a new item to the to do list
+    $ ./todo show           # Show remaining todos
+    $ ./todo delete "id"    # Delete a todo
+    $ ./todo fin "id"       # Complete a todo
+    $ ./todo help           # Show usage
+    $ ./todo stats          # Statistics"""
+    sys.stdout.buffer.write(hs.encode("utf8"))
