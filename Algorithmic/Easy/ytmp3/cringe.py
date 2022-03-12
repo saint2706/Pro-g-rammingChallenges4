@@ -5,7 +5,7 @@ while 1:
     try:
         url = input("Enter youtube url:\n")
         audio.extract_info(url)
-    except:
+    except Exception:
         print("Couldn't download")
     finally:
         again = int(input("try again? (1/0):\n"))

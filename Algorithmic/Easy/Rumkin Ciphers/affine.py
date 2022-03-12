@@ -27,7 +27,10 @@ def enc(text, key):
 def dec(text, key):
     return "".join(
         [
-            chr(((inv(key[0], 26) * (ord(c) - ord("A") - key[1])) % 26) + ord("A"))
+            chr(
+                ((inv(key[0], 26) * (ord(c) - ord("A") - key[1])) % 26)
+                + ord("A")
+            )
             for c in text
         ]
     )

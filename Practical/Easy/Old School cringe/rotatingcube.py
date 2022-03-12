@@ -23,33 +23,30 @@ def quaternion_to_matrix(myx):
     assert a >= -1
     assert a <= 1
 
-    return (
-        np.array(
+    return np.array(
+        [
             [
-                [
-                    (a * a + b * b - c * c - d * d),
-                    (2 * b * c - 2 * a * d),
-                    (2 * b * d + 2 * a * c),
-                ],
-                [
-                    (2 * b * c + 2 * a * d),
-                    (a * a - b * b + c * c - d * d),
-                    (2 * c * d - 2 * a * b),
-                ],
-                [
-                    (2 * b * d - 2 * a * c),
-                    (2 * c * d + 2 * a * b),
-                    (a * a - b * b - c * c + d * d),
-                ],
-            ]
-        ).T
-        / (a * a + b * b + c * c + d * d)
-    )
+                (a * a + b * b - c * c - d * d),
+                (2 * b * c - 2 * a * d),
+                (2 * b * d + 2 * a * c),
+            ],
+            [
+                (2 * b * c + 2 * a * d),
+                (a * a - b * b + c * c - d * d),
+                (2 * c * d - 2 * a * b),
+            ],
+            [
+                (2 * b * d - 2 * a * c),
+                (2 * c * d + 2 * a * b),
+                (a * a - b * b - c * c + d * d),
+            ],
+        ]
+    ).T / (a * a + b * b + c * c + d * d)
 
 
 def crazy_rotation(ind, Nind):
     return quaternion_to_matrix(
-        0.5 * sin(pi * 2 * ind * Nind ** -1.0 * array([1, 2, 3]))
+        0.5 * sin(pi * 2 * ind * Nind**-1.0 * array([1, 2, 3]))
     )
 
 
@@ -59,7 +56,12 @@ def project(D):
 
 vs = reshape(mgrid[-1:2:2, -1:2:2, -1:2:2].T, (8, 3))
 
-ed = [(j, k) for j in range(8) for k in range(j, 8) if sum(abs(vs[j] - vs[k])) == 2]
+ed = [
+    (j, k)
+    for j in range(8)
+    for k in range(j, 8)
+    if sum(abs(vs[j] - vs[k])) == 2
+]
 
 
 D = -5
@@ -100,7 +102,12 @@ fp_out = r"Practical\Easy\Old School cringe\image.gif"
 
 img, *imgs = [Image.open(f) for f in sorted(glob.glob(fp_in))]
 img.save(
-    fp=fp_out, format="GIF", append_images=imgs, save_all=True, duration=8.3, loop=0
+    fp=fp_out,
+    format="GIF",
+    append_images=imgs,
+    save_all=True,
+    duration=8.3,
+    loop=0,
 )
 
 shutil.rmtree(r"Practical\Easy\Old School cringe\rotatingcubepngs")

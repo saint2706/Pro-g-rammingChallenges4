@@ -22,7 +22,7 @@ def test():
             line = line.strip("\n")
             d.update({c: line})
             c += 1
-    except:
+    except Exception:
         sys.stdout.buffer.write("There are no pending todos!".encode("utf8"))
 
 
@@ -38,11 +38,11 @@ def show():
     try:
 
         test()
-        l = len(d)
+        length = len(d)
         for _ in d:
-            sys.stdout.buffer.write(f"[{l}]-{d[l]}".encode("utf8"))
+            sys.stdout.buffer.write(f"[{length}]-{d[length]}".encode("utf8"))
             sys.stdout.buffer.write("\n".encode("utf8"))
-            l -= 1
+            length -= 1
 
     except Exception as e:
         raise e
@@ -84,7 +84,7 @@ def done(id):
                 if i.strip("\n") != d[id]:
                     f.write(i)
             f.truncate()
-    except:
+    except Exception:
         print(f"#{id} does not exist.")
 
 
@@ -97,20 +97,20 @@ def report():
         c = 1
         for line in f:
             line = line.strip("\n")
-            done.update({c: line})
+            don.update({c: line})
             c += 1
         print(
-            f"{str(datetime.datetime.today()).split()[0]} ToDo : {len(d)} Completed : {len(done)}"
+            f"{str(datetime.datetime.today()).split()[0]} ToDo : {len(d)} Completed : {len(don)}"
         )
-    except:
+    except Exception:
         print(
-            f"{str(datetime.datetime.today()).split()[0]} ToDo : {len(d)} Completed : {len(done)}"
+            f"{str(datetime.datetime.today()).split()[0]} ToDo : {len(d)} Completed : {len(don)}"
         )
 
 
 try:
     d = {}
-    done = {}
+    don = {}
     args = sys.argv
     if args[1] == "add" and not len(args[2:]):
         sys.stdout.buffer.write(
@@ -129,7 +129,7 @@ try:
     else:
         globals()[args[1]](*args[2:])
 
-except Exception as e:
+except Exception:
 
     hs = """How to Use :-
     $ ./todo add "item"     # Add a new item to the to do list

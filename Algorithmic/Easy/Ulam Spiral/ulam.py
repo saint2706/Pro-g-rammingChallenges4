@@ -21,12 +21,12 @@ edgeSize = 13
 primes = np.array(
     [
         n
-        for n in range(2, edgeSize ** 2 + 1)
+        for n in range(2, edgeSize**2 + 1)
         if all((n % m) != 0 for m in range(2, int(np.sqrt(n)) + 1))
     ]
 )
 
-array = np.zeros(edgeSize ** 2, dtype="u1")
+array = np.zeros(edgeSize**2, dtype="u1")
 array[primes - 1] = 1
 array = makeSpiral(array.reshape((edgeSize, edgeSize)))
 plt.matshow(array, cmap=cm.binary)
