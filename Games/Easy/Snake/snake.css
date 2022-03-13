@@ -1,0 +1,59 @@
+html,
+body {
+    height: 100%;
+    margin: 0;
+}
+
+body {
+    background: black;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+canvas {
+    border: 1px solid white;
+    background-color: gold;
+}
+
+#p1 {
+    color: red;
+    position: absolute;
+    left: 100px;
+    top: 10px;
+}
+
+#p2 {
+    color: red;
+    position: absolute;
+    left: 100px;
+    top: 30px;
+}
+
+#score {
+    color: yellow;
+    position: absolute;
+    left: 155px;
+    top: 10px;
+}
+
+#high {
+    color: yellow;
+    position: absolute;
+    left: 195px;
+    top: 30px;
+}
+
+#btn_stop {
+    color: brown;
+    position: absolute;
+    left: 100px;
+    top: 80px;
+}
+
+#end_msg {
+    color: brown;
+    position: absolute;
+    left: 100px;
+    top: 100px;
+}
