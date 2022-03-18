@@ -3,7 +3,7 @@ import random
 import re
 from collections import defaultdict
 
-fpath = r"Python\Markov Chain Sentence Generator\crime_and_punishment"
+fpath = r"Practical\Easy\Markov Chain Sentence Generator\crime_and_punishment"
 with open(fpath, encoding="utf8") as f:
     model_text = f.read()
     token_text = [word for word in re.split("\W+", model_text) if word != ""]
