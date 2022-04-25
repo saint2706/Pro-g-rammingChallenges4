@@ -1,5 +1,6 @@
 key = int(input("Enter shift key: "))
 
+# noinspection DuplicatedCode
 encrypt_dict = {chr(a % 26 + 97): chr((a + key) % 26 + 97) for a in range(27)}
 decrypt_dict = {v: k for k, v in encrypt_dict.items()}
 

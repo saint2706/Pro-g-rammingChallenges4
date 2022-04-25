@@ -1,8 +1,8 @@
-def evaluatePostfix(givenExp):
+def evaluate_postfix(given_exp):
 
     stack = []
 
-    for character in givenExp:
+    for character in given_exp:
 
         if character.isdigit():
             stack.append(int(character))
@@ -24,5 +24,5 @@ def evaluatePostfix(givenExp):
 
 print(
     "The value of the given postfix expression =",
-    evaluatePostfix(input("Enter some random postfix Expression = ")),
+    evaluate_postfix(input("Enter some random postfix Expression = ")),
 )

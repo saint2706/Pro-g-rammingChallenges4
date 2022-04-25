@@ -77,9 +77,9 @@ def draw_screen(g=green, r=red, y=yellow, b=blue):
 
 
 def show_pattern():
-    time_delay = 500 - 100 * int(len(pattern) / 5)
-    if time_delay <= 100:
-        time_delay = 100
+    t_delay = 500 - 100 * int(len(pattern) / 5)
+    if t_delay <= 100:
+        t_delay = 100
 
     draw_screen()
     pygame.time.delay(1000)
@@ -92,29 +92,29 @@ def show_pattern():
         if x == 1:
             draw_screen(g=light_green)
             green_sound.play()
-            pygame.time.delay(time_delay)
+            pygame.time.delay(t_delay)
             draw_screen()
             green_sound.stop()
         elif x == 2:
             draw_screen(r=light_red)
             red_sound.play()
-            pygame.time.delay(time_delay)
+            pygame.time.delay(t_delay)
             draw_screen()
             red_sound.stop()
         elif x == 3:
             draw_screen(y=light_yellow)
             yellow_sound.play()
-            pygame.time.delay(time_delay)
+            pygame.time.delay(t_delay)
             draw_screen()
             yellow_sound.stop()
         elif x == 4:
             draw_screen(b=light_blue)
             blue_sound.play()
-            pygame.time.delay(time_delay)
+            pygame.time.delay(t_delay)
             draw_screen()
             blue_sound.stop()
 
-        pygame.time.delay(time_delay)
+        pygame.time.delay(t_delay)
 
 
 def new_pattern():
@@ -178,12 +178,12 @@ def click_listen():
                     check_pattern(player_pattern)
                     turn_time = time.time()
 
-    if not time.time() <= turn_time + 3:
-        lose_screen()
+    if time.time() <= turn_time + 3:
+        return
+    lose_screen()
 
 
 def quit_game():
-    running = False
     pygame.display.quit()
     pygame.quit()
     sys.exit()

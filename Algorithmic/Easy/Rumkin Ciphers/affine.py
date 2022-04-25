@@ -15,23 +15,23 @@ def inv(a, m):
         return x % m
 
 
-def enc(text, key):
+def enc(txt, k):
     return "".join(
         [
-            chr(((key[0] * (ord(t) - ord("A")) + key[1]) % 26) + ord("A"))
-            for t in text.upper().replace(" ", "")
+            chr(((k[0] * (ord(t) - ord("A")) + k[1]) % 26) + ord("A"))
+            for t in txt.upper().replace(" ", "")
         ]
     )
 
 
-def dec(text, key):
+def dec(txt, k):
     return "".join(
         [
             chr(
-                ((inv(key[0], 26) * (ord(c) - ord("A") - key[1])) % 26)
+                ((inv(k[0], 26) * (ord(c) - ord("A") - k[1])) % 26)
                 + ord("A")
             )
-            for c in text
+            for c in txt
         ]
     )
 

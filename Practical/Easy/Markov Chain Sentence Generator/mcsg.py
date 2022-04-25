@@ -17,16 +17,16 @@ for word in token_text[1:]:
     last_word = word
 
 
-def gen_sentence(mark_dict, distance, start=None):
-    if distance <= 0:
+def gen_sentence(mark_dict, dist, begin=None):
+    if dist <= 0:
         return []
-    if not start:
-        start = random.choice(list(mark_dict.keys()))
-    weights = np.array(list(markov_dict[start].values()), dtype=np.float64)
+    if not begin:
+        begin = random.choice(list(mark_dict.keys()))
+    weights = np.array(list(markov_dict[begin].values()), dtype=np.float64)
     weights = weights / weights.sum()
-    choices = list(markov_dict[start].keys())
+    choices = list(markov_dict[begin].keys())
     chosen = np.random.choice(choices, None, p=weights)
-    return [chosen] + gen_sentence(markov_dict, distance - 1, chosen)
+    return [chosen] + gen_sentence(markov_dict, dist - 1, chosen)
 
 
 distance = int(input("How many word long sentences to generate?\n"))

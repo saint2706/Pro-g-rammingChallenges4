@@ -21,7 +21,7 @@ width = -2 * InitX
 height = -2 * InitY
 
 
-def SymbolA(x, y, w, h, color):
+def symbol_a(x, y, w, h, color):
     turtle.up()
     turtle.goto(x, y)
     turtle.seth(0)
@@ -39,7 +39,7 @@ def SymbolA(x, y, w, h, color):
     turtle.end_fill()
 
 
-def SymbolB(x, y, r, color):
+def symbol_b(x, y, r, color):
     turtle.up()
     turtle.goto(x, y - r)
     turtle.seth(0)
@@ -50,133 +50,133 @@ def SymbolB(x, y, r, color):
     turtle.end_fill()
 
 
-def showBoard():
-    SymbolA(InitX, InitY, width, height, "white")
+def show_board():
+    symbol_a(InitX, InitY, width, height, "white")
 
 
-def makeMoves():
+def make_moves():
     global board
     row_gap = height / rows
     col_gap = width / cols
-    Y = InitY + row_gap / 2
+    y = InitY + row_gap / 2
     for i in range(rows):
-        X = InitX + col_gap / 2
+        x = InitX + col_gap / 2
         for j in range(cols):
             if board[i][j] == 0:
-                SymbolB(X, Y, row_gap / 3, "yellow")
+                symbol_b(x, y, row_gap / 3, "yellow")
             elif board[i][j] == 1:
-                SymbolB(X, Y, row_gap / 3, "blue")
+                symbol_b(x, y, row_gap / 3, "blue")
             else:
-                SymbolB(X, Y, row_gap / 3, "red")
-            X += col_gap
-        Y += row_gap
+                symbol_b(x, y, row_gap / 3, "red")
+            x += col_gap
+        y += row_gap
 
 
 def draw():
-    showBoard()
-    makeMoves()
+    show_board()
+    make_moves()
     screen.update()
 
 
-def game_over_lastmove(board, turn, row, col):
+def game_over_lastmove(brd, chance, row, col):
     counter = 1
     i = col + 1
-    while i < cols and board[row][i] == turn:
+    while i < cols and brd[row][i] == chance:
         counter, i = counter + 1, i + 1
     i = col - 1
-    while i >= 0 and board[row][i] == turn:
+    while i >= 0 and brd[row][i] == chance:
         counter, i = counter + 1, i - 1
     if counter >= 4:
-        return turn
+        return chance
 
     if (
         row >= 3
-        and board[row - 1][col] == turn
-        and board[row - 2][col] == turn
-        and board[row - 3][col] == turn
+        and brd[row - 1][col] == chance
+        and brd[row - 2][col] == chance
+        and brd[row - 3][col] == chance
     ):
-        return turn
+        return chance
 
     counter = 1
     i = 1
-    while row + i < rows and col + i < cols and board[row + i][col + i] == turn:
+    while row + i < rows and col + i < cols and brd[row + i][col + i] == chance:
         counter, i = counter + 1, i + 1
     i = -1
-    while row + i >= 0 and col + i >= 0 and board[row + i][col + i] == turn:
+    while row + i >= 0 and col + i >= 0 and brd[row + i][col + i] == chance:
         counter, i = counter + 1, i - 1
     if counter >= 4:
-        return turn
+        return chance
 
     counter = 1
     i = 1
-    while row + i < rows and col - i >= 0 and board[row + i][col - i] == turn:
+    while row + i < rows and col - i >= 0 and brd[row + i][col - i] == chance:
         counter, i = counter + 1, i + 1
     i = -1
-    while row + i >= 0 and col - i < cols and board[row + i][col - i] == turn:
+    while row + i >= 0 and col - i < cols and brd[row + i][col - i] == chance:
         counter, i = counter + 1, i - 1
     if counter >= 4:
-        return turn
+        return chance
 
     for i in range(cols):
-        if board[rows - 1][i] == 0:
+        if brd[rows - 1][i] == 0:
             return -2
     return 0
 
 
-def makeMove(board, turn, col):
+def make_move(brd, chance, col):
     for i in range(rows):
-        if board[i][col] == 0:
-            board[i][col] = turn
+        if brd[i][col] == 0:
+            brd[i][col] = chance
             return i
 
 
-def makeBoard():
+def make_board():
     global board
-    for i in range(rows):
+    for _ in range(rows):
         row = []
-        for j in range(cols):
+        for _ in range(cols):
             row.append(0)
         board.append(row)
 
 
-def makeMoveAndDraw(board, turn, col):
-    row = makeMove(board, turn, col)
+def make_move_and_draw(brd, chance, col):
+    row = make_move(brd, chance, col)
     row_gap = height / rows
     col_gap = width / cols
-    Y = InitY + row_gap * row + row_gap / 2
-    X = InitX + col_gap * col + col_gap / 2
+    y = InitY + row_gap * row + row_gap / 2
+    x = InitX + col_gap * col + col_gap / 2
     i = row
     j = col
-    if board[i][j] == 0:
-        SymbolB(X, Y, row_gap / 3, "yellow")
-    elif board[i][j] == 1:
-        for k in range(5):
-            SymbolB(X, Y, row_gap / 3, "yellow")
+    if brd[i][j] == 0:
+        symbol_b(x, y, row_gap / 3, "yellow")
+    elif brd[i][j] == 1:
+        for _ in range(5):
+            symbol_b(x, y, row_gap / 3, "yellow")
             screen.update()
             time.sleep(0.05)
-            SymbolB(X, Y, row_gap / 3, "blue")
+            symbol_b(x, y, row_gap / 3, "blue")
             screen.update()
             time.sleep(0.05)
     else:
-        for k in range(5):
-            SymbolB(X, Y, row_gap / 3, "yellow")
+        for _ in range(5):
+            symbol_b(x, y, row_gap / 3, "yellow")
             screen.update()
             time.sleep(0.05)
-            SymbolB(X, Y, row_gap / 3, "red")
+            symbol_b(x, y, row_gap / 3, "red")
             screen.update()
             time.sleep(0.05)
     return row
 
 
-def play(x, y):
+def play(x):
     global turn, working
     if working:
         return
     working = True
-    cols = [900 / 7 * i - 450 + 900 / 14 for i in range(7)]
-    for i in range(len(cols)):
-        if abs(x - cols[i]) < 900 / 14 * 2 / 3 and board[rows - 1][i] == 0:
-            rn = makeMoveAndDraw(board, turn, i)
+    columns = [900 / 7 * i - 450 + 900 / 14 for i in range(7)]
+    for i in range(len(columns)):
+        if abs(x - columns[i]) < 900 / 14 * 2 / 3 and board[rows - 1][i] == 0:
+            rn = make_move_and_draw(board, turn, i)
             r = game_over_lastmove(board, turn, rn, i)
             if r == 0:
                 screen.textinput("Game over", "tie")
@@ -191,9 +191,9 @@ def play(x, y):
 
 
 board = []
-makeBoard()
-showBoard()
-makeMoves()
+make_board()
+show_board()
+make_moves()
 turn = 1
 working = False
 screen.onclick(play)

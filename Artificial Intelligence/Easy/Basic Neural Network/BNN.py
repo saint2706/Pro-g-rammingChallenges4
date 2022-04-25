@@ -7,28 +7,31 @@ inps = np.array(
 outs = np.array([[0], [1], [1], [0], [1], [0]])
 
 
+def sigmoid(x, der=False):
+    if der:
+        return x * (1 - x)
+    return 1 / (1 + np.exp(-x))
+
+
 class NeuralNetwork:
-    def __init__(self, inps, outs):
-        self.inps = inps
-        self.outs = outs
+    def __init__(self, inputs, outputs):
+        self.hidden = None
+        self.inps = inputs
+        self.outs = outputs
         self.weights = np.array([[0.50], [0.50], [0.50]])
         self.error = []
         self.epochs = []
 
     # S(x) = 1/1+e^(-x)
-    def sigmoid(self, x, der=False):
-        if der:
-            return x * (1 - x)
-        return 1 / (1 + np.exp(-x))
 
     # Forward Propagation
     def forward(self):
-        self.hidden = self.sigmoid(np.dot(self.inps, self.weights))
+        self.hidden = sigmoid(np.dot(self.inps, self.weights))
 
     # Backward Propagation
     def backward(self):
         self.error = self.outs - self.hidden
-        delta = self.error * self.sigmoid(self.hidden, der=True)
+        delta = self.error * sigmoid(self.hidden, der=True)
         self.weights += np.dot(self.inps.T, delta)
 
     # Train the Neural Network
@@ -41,7 +44,7 @@ class NeuralNetwork:
 
     # Predict the output
     def predict(self, inp):
-        return self.sigmoid(np.dot(inp, self.weights))
+        return sigmoid(np.dot(inp, self.weights))
 
 
 neuralNetwork = NeuralNetwork(inps, outs)

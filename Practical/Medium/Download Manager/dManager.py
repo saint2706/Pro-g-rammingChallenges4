@@ -8,7 +8,7 @@ def Handler(start, end, url, filename):
     r = requests.get(url, headers=headers, stream=True)
     with open(filename, "r+b") as f:
         f.seek(start)
-        var = f.tell()
+        f.tell()
         f.write(r.content)
 
 
@@ -17,7 +17,7 @@ def Handler(start, end, url, filename):
 @click.option("--name", type=click.Path(), help="Name of the file to download")
 @click.argument("url", type=click.Path(), required=True)
 @click.pass_context
-def download(ctx, number_of_threads, name, url):
+def download(number_of_threads, name, url):
     r = requests.head(url)
     if name:
         file_name = name

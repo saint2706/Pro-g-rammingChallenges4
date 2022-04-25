@@ -35,14 +35,14 @@ def complement(r, g, b):
     return tuple(temp - u for u in (r, g, b))
 
 
-def complementImage(inpName, outName):
+def complement_image(input_name, output_name):
     """Function to generate complimentary image
 
     Args:
-        inpName (image path): path to input image
-        outName (image path): path to output image
+        input_name (image path): path to input image
+        output_name (image path): path to output image
     """
-    img = Image.open(inpName)
+    img = Image.open(input_name)
     in_data = np.asarray(img)
 
     lo = np.amin(in_data, axis=2, keepdims=True)
@@ -50,13 +50,13 @@ def complementImage(inpName, outName):
 
     out_data = (lo + hi) - in_data
     out_img = Image.fromarray(out_data)
-    out_img.save(outName)
+    out_img.save(output_name)
 
 
 def main():
     """Function to run the program"""
     if len(sys.argv) == 3:
-        complementImage(sys.argv[1], sys.argv[2])
+        complement_image(sys.argv[1], sys.argv[2])
     else:
         print("Usage: python comp.py <input file> <output file>")
         print("Example: python comp.py in.png out.png")

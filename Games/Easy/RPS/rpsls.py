@@ -19,7 +19,7 @@ wins = {
 }
 
 
-def userMove():
+def user_mv():
     choices = [f"{i} - {Move(i).name}" for i in range(5)]
     print(", ".join(choices))
     sel = int(input("Choose your move: "))
@@ -27,25 +27,25 @@ def userMove():
     return act
 
 
-def compMove():
+def comp_mv():
     return Move(random.randint(0, 4))
 
 
-def getWinner(user, comp):
-    if user == comp:
+def get_winner(usr, cmp):
+    if usr == cmp:
         return "Tie"
-    for i in wins[user]:
-        if i == comp:
+    for i in wins[usr]:
+        if i == cmp:
             return "User"
     return "Comp"
 
 
 while True:
-    user = userMove()
-    comp = compMove()
+    user = user_mv()
+    comp = comp_mv()
     print(f"You chose {user.name}")
     print(f"Computer chose {comp.name}")
-    print(getWinner(user, comp))
+    print(get_winner(user, comp))
     cont = input("Continue? (y/n): ")
     if cont.lower() == "n":
         break

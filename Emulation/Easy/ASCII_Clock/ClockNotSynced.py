@@ -1,4 +1,5 @@
-import time, os
+import os
+import time
 
 s = " "
 p = "."
@@ -32,8 +33,8 @@ while 1:
             if i == 2 & (j == 4):
                 break
             for k in B:
-                for l in A:
+                for v in A:
                     for m in C:
-                        print(z[i][m] + s + z[j][m] + P[m] + z[k][m] + z[l][m])
+                        print(z[i][m] + s + z[j][m] + P[m] + z[k][m] + z[v][m])
                     time.sleep(1)
                     os.system("cls" if os.name == "nt" else "clear")

@@ -1,7 +1,10 @@
 from random import randint
 
+stat = None
+
 
 def singleGame():
+    global stat
     roll1 = roll()
     print(format("You rolled: ", "64s"), roll1)
     print("")
@@ -74,7 +77,7 @@ def swap(diceList):
         else:
             valid = False
 
-    while valid == False:
+    while not valid:
         print("")
         print("INCORRECT INPUT")
         print("")
@@ -140,9 +143,9 @@ def rollType(diceList):
         print(format("NOTHING SPECIAL", ">80s"))
     elif len(diceListNew) == 4:
         if (
-            diceListNew[-2] == diceListNew[-1] - 1
-            and diceListNew[-3] == diceListNew[-2] - 1
-            and diceListNew[-4] == diceListNew[-3] - 1
+                diceListNew[-2] == diceListNew[-1] - 1
+                and diceListNew[-3] == diceListNew[-2] - 1
+                and diceListNew[-4] == diceListNew[-3] - 1
         ):
             smallStraight = True
             print(format("SMALL STRAIGHT", ">80s"))
@@ -150,24 +153,24 @@ def rollType(diceList):
             print(format("NOTHING SPECIAL", ">80s"))
     elif len(diceListNew) == 5:
         if (
-            diceListNew[-2] == diceListNew[-1] - 1
-            and diceListNew[-3] == diceListNew[-2] - 1
-            and diceListNew[-4] == diceListNew[-3] - 1
-            and diceListNew[-5] == diceListNew[-4] - 1
+                diceListNew[-2] == diceListNew[-1] - 1
+                and diceListNew[-3] == diceListNew[-2] - 1
+                and diceListNew[-4] == diceListNew[-3] - 1
+                and diceListNew[-5] == diceListNew[-4] - 1
         ):
             largeStraight = True
             print(format("LARGE STRAIGHT", ">80s"))
         elif (
-            diceListNew[-2] == diceListNew[-1] - 1
-            and diceListNew[-3] == diceListNew[-2] - 1
-            and diceListNew[-4] == diceListNew[-3] - 1
+                diceListNew[-2] == diceListNew[-1] - 1
+                and diceListNew[-3] == diceListNew[-2] - 1
+                and diceListNew[-4] == diceListNew[-3] - 1
         ):
             smallStraight = True
             print(format("SMALL STRAIGHT", ">80s"))
         elif (
-            diceListNew[-3] == diceListNew[-2] - 1
-            and diceListNew[-4] == diceListNew[-3] - 1
-            and diceListNew[-5] == diceListNew[-4] - 1
+                diceListNew[-3] == diceListNew[-2] - 1
+                and diceListNew[-4] == diceListNew[-3] - 1
+                and diceListNew[-5] == diceListNew[-4] - 1
         ):
             smallStraight = True
             print(format("SMALL STRAIGHT", ">80s"))
@@ -194,12 +197,6 @@ def main():
     fourOfKind = 0
     threeOfKind = 0
     statIndex = 0
-    yahtzeePer = 0
-    fullHousePer = 0
-    smallStraightPer = 0
-    largeStraightPer = 0
-    fourOfKindPer = 0
-    threeOfKindPer = 0
 
     print("")
     print("-" * 80)
@@ -213,7 +210,7 @@ def main():
     game = singleGame()
     game = list(game)
     for x in game:
-        if x == True:
+        if x:
             statIndex = game.index(x)
     if statIndex == 0:
         yahtzee += 1
@@ -255,7 +252,7 @@ def main():
         game = singleGame()
         game = list(game)
         for x in game:
-            if x == True:
+            if x:
                 statIndex = game.index(x)
         if statIndex == 0:
             yahtzee += 1

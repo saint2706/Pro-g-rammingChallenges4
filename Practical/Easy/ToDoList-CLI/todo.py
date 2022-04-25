@@ -2,7 +2,7 @@ import sys
 import datetime
 
 
-def help():
+def help_func():
     helpstring = """How to Use :-
 $ ./todo add "item"     # Add a new item to the to do list
 $ ./todo show           # Show remaining todos
@@ -22,7 +22,8 @@ def test():
             line = line.strip("\n")
             d.update({c: line})
             c += 1
-    except Exception:
+    except Exception as msg:
+        print(msg)
         sys.stdout.buffer.write("There are no pending todos!".encode("utf8"))
 
 
@@ -44,48 +45,49 @@ def show():
             sys.stdout.buffer.write("\n".encode("utf8"))
             length -= 1
 
-    except Exception as e:
-        raise e
+    except Exception as msg:
+        raise msg
 
 
-def delete(id):
+def delete(identity):
     try:
-        id = int(id)
+        identity = int(identity)
         test()
         with open("todo.txt", "r+") as f:
             lines = f.readlines()
             f.seek(0)
             for i in lines:
-                if i.strip("\n") != d[id]:
+                if i.strip("\n") != d[identity]:
                     f.write(i)
             f.truncate()
-        print(f"Removed #{id}")
+        print(f"Removed #{identity}")
 
-    except Exception:
-        print(f"#{id} does not exist. Nothing deleted.")
+    except Exception as msg:
+        print(msg)
+        print(f"#{identity} does not exist. Nothing deleted.")
 
 
 # noinspection PyBroadException
-def done(id):
+def done(identity):
     try:
 
         test()
-        id = int(id)
+        identity = int(identity)
         with open("done.txt", "a") as f:
-            st = "x " + str(datetime.datetime.today()).split()[0] + " " + d[id]
+            st = "x " + str(datetime.datetime.today()).split()[0] + " " + d[identity]
             f.write(st)
             f.write("\n")
-        print(f"Completed #{id}.")
+        print(f"Completed #{identity}.")
 
         with open("todo.txt", "r+") as f:
             lines = f.readlines()
             f.seek(0)
             for i in lines:
-                if i.strip("\n") != d[id]:
+                if i.strip("\n") != d[identity]:
                     f.write(i)
             f.truncate()
     except Exception:
-        print(f"#{id} does not exist.")
+        print(f"#{identity} does not exist.")
 
 
 # noinspection PyBroadException
@@ -129,8 +131,8 @@ try:
     else:
         globals()[args[1]](*args[2:])
 
-except Exception:
-
+except Exception as e:
+    print(e)
     hs = """How to Use :-
     $ ./todo add "item"     # Add a new item to the to do list
     $ ./todo show           # Show remaining todos

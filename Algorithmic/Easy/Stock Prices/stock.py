@@ -4,21 +4,21 @@ import pandas as pd
 df = pd.read_csv(
     "https://raw.githubusercontent.com/plotly/datasets/master/finance-charts-apple.csv"
 )
+mode = "markers+lines"
 
 fig = go.Figure()
 fig.add_trace(
     go.Scatter(
         name="Raw Data",
-        mode="markers+lines",
+        mode=mode,
         x=df["Date"],
-        y=df["AAPL.Open"],
-        marker_symbol="star",
+        y=df["AAPL.Open"]
     )
 )
 fig.add_trace(
     go.Scatter(
         name="Start-aligned",
-        mode="markers+lines",
+        mode=mode,
         x=df["Date"],
         y=df["AAPL.High"],
         xperiod="M1",
@@ -28,7 +28,7 @@ fig.add_trace(
 fig.add_trace(
     go.Scatter(
         name="Middle-aligned",
-        mode="markers+lines",
+        mode=mode,
         x=df["Date"],
         y=df["AAPL.Adjusted"],
         xperiod="M1",
@@ -38,7 +38,7 @@ fig.add_trace(
 fig.add_trace(
     go.Scatter(
         name="End-aligned",
-        mode="markers+lines",
+        mode=mode,
         x=df["Date"],
         y=df["AAPL.Low"],
         xperiod="M1",

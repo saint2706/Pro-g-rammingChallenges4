@@ -1,7 +1,6 @@
 import os
 import time
 
-
 zero = [
     "  ___    ",
     " / _ \\   ",

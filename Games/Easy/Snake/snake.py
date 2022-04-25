@@ -1,7 +1,6 @@
-from re import S
-import turtle
-import time
 import random
+import time
+import turtle
 
 delay = 0.2
 score = 0
@@ -42,6 +41,7 @@ pen.write(
     "Score: 0  Personal Best: 0", align="center", font=("Courier", 24, "normal")
 )
 
+
 # Movement
 def go_up():
     if head.direction != "down":
@@ -65,20 +65,20 @@ def go_right():
 
 def move():
     if head.direction == "up":
-        y = head.ycor()
-        head.sety(y + 20)
+        ycord = head.ycor()
+        head.sety(ycord + 20)
 
     if head.direction == "down":
-        y = head.ycor()
-        head.sety(y - 20)
+        ycord = head.ycor()
+        head.sety(ycord - 20)
 
     if head.direction == "left":
-        x = head.xcor()
-        head.setx(x - 20)
+        xcord = head.xcor()
+        head.setx(xcord - 20)
 
     if head.direction == "right":
-        x = head.xcor()
-        head.setx(x + 20)
+        xcord = head.xcor()
+        head.setx(xcord + 20)
 
 
 # Keyboard bindings
@@ -94,11 +94,12 @@ segs = []
 while True:
     wn.update()
     if (
-        head.xcor() > 290
-        or head.xcor() < -290
-        or head.ycor() > 290
-        or head.ycor() < -290
+            head.xcor() > 290
+            or head.xcor() < -290
+            or head.ycor() > 290
+            or head.ycor() < -290
     ):
+        # noinspection DuplicatedCode
         time.sleep(1)
         head.goto(0, 0)
         head.direction = "stop"
@@ -151,6 +152,7 @@ while True:
             time.sleep(1)
             head.goto(0, 0)
             head.direction = "stop"
+            # noinspection PyAssignmentToLoopOrWithParameter
             for seg in segs:
                 seg.goto(1000, 1000)
             segs.clear()

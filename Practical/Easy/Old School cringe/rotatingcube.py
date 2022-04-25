@@ -44,14 +44,14 @@ def quaternion_to_matrix(myx):
     ).T / (a * a + b * b + c * c + d * d)
 
 
-def crazy_rotation(ind, Nind):
+def crazy_rotation(index, n_index):
     return quaternion_to_matrix(
-        0.5 * sin(pi * 2 * ind * Nind**-1.0 * array([1, 2, 3]))
+        0.5 * sin(pi * 2 * index * n_index ** -1.0 * array([1, 2, 3]))
     )
 
 
-def project(D):
-    return vvs[:, :2] / (vvs[:, [2, 2]] - D)
+def project(d):
+    return vvs[:, :2] / (vvs[:, [2, 2]] - d)
 
 
 vs = reshape(mgrid[-1:2:2, -1:2:2, -1:2:2].T, (8, 3))
