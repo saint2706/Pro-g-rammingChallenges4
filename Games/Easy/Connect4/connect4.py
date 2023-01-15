@@ -89,12 +89,7 @@ def game_over_lastmove(brd, chance, row, col):
     if counter >= 4:
         return chance
 
-    if (
-        row >= 3
-        and brd[row - 1][col] == chance
-        and brd[row - 2][col] == chance
-        and brd[row - 3][col] == chance
-    ):
+    if row >= 3 and brd[row - 1][col] == chance and brd[row - 2][col] == chance and brd[row - 3][col] == chance:
         return chance
 
     counter = 1

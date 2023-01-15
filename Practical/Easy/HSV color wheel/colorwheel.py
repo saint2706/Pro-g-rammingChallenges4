@@ -16,9 +16,7 @@ colour.utilities.filter_warnings(*[True] * 4)
 
 
 def colour_wheel(samples=1024, clip_circle=True, method="Colour"):
-    xx, yy = np.meshgrid(
-        np.linspace(-1, 1, samples), np.linspace(-1, 1, samples)
-    )
+    xx, yy = np.meshgrid(np.linspace(-1, 1, samples), np.linspace(-1, 1, samples))
 
     S = np.sqrt(xx**2 + yy**2)
     H = (np.arctan2(xx, yy) + np.pi) / (np.pi * 2)

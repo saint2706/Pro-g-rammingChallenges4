@@ -31,9 +31,7 @@ def imageToAscii(image, new_width=25):
     img = resize(image, new_width)
     img = img.convert("L")
     pChars = pixelsToAscii(img)
-    finImg = [
-        pChars[i: i + new_width] for i in range(0, len(pChars), new_width)
-    ]
+    finImg = [pChars[i : i + new_width] for i in range(0, len(pChars), new_width)]
     return "\n".join(finImg)
 
 

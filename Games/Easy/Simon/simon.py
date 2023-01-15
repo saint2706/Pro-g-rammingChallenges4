@@ -30,26 +30,18 @@ title_font = pygame.font.Font(gameplay_font_dir, 50)
 
 logo = pygame.image.load(r"Games\Easy\Simon\Assets\Images\simon_logo.png")
 big_logo = pygame.transform.scale(logo, (300, 300))
-start_button = pygame.image.load(
-    r"Games\Easy\Simon\Assets\Images\start_button.png"
-)
+start_button = pygame.image.load(r"Games\Easy\Simon\Assets\Images\start_button.png")
 start_button = pygame.transform.scale(start_button, (240, 90))
-again_button = pygame.image.load(
-    r"Games\Easy\Simon\Assets\Images\again_button.png"
-)
+again_button = pygame.image.load(r"Games\Easy\Simon\Assets\Images\again_button.png")
 again_button = pygame.transform.scale(again_button, (240, 90))
-exit_button = pygame.image.load(
-    r"Games\Easy\Simon\Assets\Images\exit_button.png"
-)
+exit_button = pygame.image.load(r"Games\Easy\Simon\Assets\Images\exit_button.png")
 exit_button = pygame.transform.scale(exit_button, (240, 90))
 
 green_sound = pygame.mixer.Sound(r"Games\Easy\Simon\Assets\Audio\green.wav")
 red_sound = pygame.mixer.Sound(r"Games\Easy\Simon\Assets\Audio\red.wav")
 yellow_sound = pygame.mixer.Sound(r"Games\Easy\Simon\Assets\Audio\yellow.wav")
 blue_sound = pygame.mixer.Sound(r"Games\Easy\Simon\Assets\Audio\blue.wav")
-lose_sound = pygame.mixer.Sound(
-    r"Games\Easy\Simon\Assets\Audio\Fail-sound-effect.wav"
-)
+lose_sound = pygame.mixer.Sound(r"Games\Easy\Simon\Assets\Audio\Fail-sound-effect.wav")
 menu_music = pygame.mixer.Sound(r"Games\Easy\Simon\Assets\Audio\wethands.ogg")
 
 screen = pygame.display.set_mode((600, 700))

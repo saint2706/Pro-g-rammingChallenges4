@@ -1,9 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-inps = np.array(
-    [[0, 1, 0], [0, 1, 1], [1, 0, 0], [1, 1, 0], [1, 1, 1], [1, 0, 1]]
-)
+inps = np.array([[0, 1, 0], [0, 1, 1], [1, 0, 0], [1, 1, 0], [1, 1, 1], [1, 0, 1]])
 outs = np.array([[0], [1], [1], [0], [1], [0]])
 
 

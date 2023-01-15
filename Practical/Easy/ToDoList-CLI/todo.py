@@ -101,13 +101,9 @@ def report():
             line = line.strip("\n")
             don.update({c: line})
             c += 1
-        print(
-            f"{str(datetime.datetime.today()).split()[0]} ToDo : {len(d)} Completed : {len(don)}"
-        )
+        print(f"{str(datetime.datetime.today()).split()[0]} ToDo : {len(d)} Completed : {len(don)}")
     except Exception:
-        print(
-            f"{str(datetime.datetime.today()).split()[0]} ToDo : {len(d)} Completed : {len(don)}"
-        )
+        print(f"{str(datetime.datetime.today()).split()[0]} ToDo : {len(d)} Completed : {len(don)}")
 
 
 try:
@@ -115,19 +111,13 @@ try:
     don = {}
     args = sys.argv
     if args[1] == "add" and not len(args[2:]):
-        sys.stdout.buffer.write(
-            "Error: Missing todo string. Nothing added!".encode("utf8")
-        )
+        sys.stdout.buffer.write("Error: Missing todo string. Nothing added!".encode("utf8"))
 
     elif args[1] == "done" and not len(args[2:]):
-        sys.stdout.buffer.write(
-            "Error: Missing id for marking todo as done.".encode("utf8")
-        )
+        sys.stdout.buffer.write("Error: Missing id for marking todo as done.".encode("utf8"))
 
     elif args[1] == "delete" and not len(args[2:]):
-        sys.stdout.buffer.write(
-            "Error: Missing id for deleting todo.".encode("utf8")
-        )
+        sys.stdout.buffer.write("Error: Missing id for deleting todo.".encode("utf8"))
     else:
         globals()[args[1]](*args[2:])
 

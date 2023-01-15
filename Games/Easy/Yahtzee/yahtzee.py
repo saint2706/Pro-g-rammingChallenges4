@@ -329,9 +329,7 @@ def main():
             print("Threes of a kind:", threeOfKind, int(threeOfKindPer), "%")
             print("")
         else:
-            print(
-                "Three of a kind:", threeOfKind, round(threeOfKindPer, 2), "%"
-            )
+            print("Three of a kind:", threeOfKind, round(threeOfKindPer, 2), "%")
             print("")
 
 

@@ -37,9 +37,7 @@ pen.color("white")
 pen.penup()
 pen.hideturtle()
 pen.goto(0, 260)
-pen.write(
-    "Score: 0  Personal Best: 0", align="center", font=("Courier", 24, "normal")
-)
+pen.write("Score: 0  Personal Best: 0", align="center", font=("Courier", 24, "normal"))
 
 
 # Movement
@@ -93,12 +91,7 @@ segs = []
 # Game
 while True:
     wn.update()
-    if (
-            head.xcor() > 290
-            or head.xcor() < -290
-            or head.ycor() > 290
-            or head.ycor() < -290
-    ):
+    if head.xcor() > 290 or head.xcor() < -290 or head.ycor() > 290 or head.ycor() < -290:
         # noinspection DuplicatedCode
         time.sleep(1)
         head.goto(0, 0)

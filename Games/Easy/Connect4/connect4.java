@@ -23,7 +23,7 @@ public class connect4 {
         do {
           display(board);
           System.out.println("Player " + player +
-                             ": Enter a column number (1-7): ");
+              ": Enter a column number (1-7): ");
           play = inp.nextInt();
 
           if (play < 1 || play > 7) {
