@@ -143,9 +143,9 @@ def rollType(diceList):
         print(format("NOTHING SPECIAL", ">80s"))
     elif len(diceListNew) == 4:
         if (
-                diceListNew[-2] == diceListNew[-1] - 1
-                and diceListNew[-3] == diceListNew[-2] - 1
-                and diceListNew[-4] == diceListNew[-3] - 1
+            diceListNew[-2] == diceListNew[-1] - 1
+            and diceListNew[-3] == diceListNew[-2] - 1
+            and diceListNew[-4] == diceListNew[-3] - 1
         ):
             smallStraight = True
             print(format("SMALL STRAIGHT", ">80s"))
@@ -153,24 +153,24 @@ def rollType(diceList):
             print(format("NOTHING SPECIAL", ">80s"))
     elif len(diceListNew) == 5:
         if (
-                diceListNew[-2] == diceListNew[-1] - 1
-                and diceListNew[-3] == diceListNew[-2] - 1
-                and diceListNew[-4] == diceListNew[-3] - 1
-                and diceListNew[-5] == diceListNew[-4] - 1
+            diceListNew[-2] == diceListNew[-1] - 1
+            and diceListNew[-3] == diceListNew[-2] - 1
+            and diceListNew[-4] == diceListNew[-3] - 1
+            and diceListNew[-5] == diceListNew[-4] - 1
         ):
             largeStraight = True
             print(format("LARGE STRAIGHT", ">80s"))
         elif (
-                diceListNew[-2] == diceListNew[-1] - 1
-                and diceListNew[-3] == diceListNew[-2] - 1
-                and diceListNew[-4] == diceListNew[-3] - 1
+            diceListNew[-2] == diceListNew[-1] - 1
+            and diceListNew[-3] == diceListNew[-2] - 1
+            and diceListNew[-4] == diceListNew[-3] - 1
         ):
             smallStraight = True
             print(format("SMALL STRAIGHT", ">80s"))
         elif (
-                diceListNew[-3] == diceListNew[-2] - 1
-                and diceListNew[-4] == diceListNew[-3] - 1
-                and diceListNew[-5] == diceListNew[-4] - 1
+            diceListNew[-3] == diceListNew[-2] - 1
+            and diceListNew[-4] == diceListNew[-3] - 1
+            and diceListNew[-5] == diceListNew[-4] - 1
         ):
             smallStraight = True
             print(format("SMALL STRAIGHT", ">80s"))
@@ -208,7 +208,7 @@ def main():
     print(format("Game 1", ">43s"))
     print("")
     game = singleGame()
-    game = list(game)
+    game = list(game)  # type: ignore
     for x in game:
         if x:
             statIndex = game.index(x)
@@ -250,7 +250,7 @@ def main():
         print(format("Game", ">43s"), gameCount)
         print("")
         game = singleGame()
-        game = list(game)
+        game = list(game)  # type: ignore
         for x in game:
             if x:
                 statIndex = game.index(x)

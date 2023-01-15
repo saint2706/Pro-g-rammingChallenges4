@@ -3,10 +3,10 @@
     width: 300px;
     height: 300px;
     margin-left: 120px;
-    perspective: 1600px;
     -webkit-perspective: 1600px;
-    perspective-origin: 50% -240px;
+    perspective: 1600px;
     -webkit-perspective-origin: 50% -240px;
+    perspective-origin: 50% -240px;
 }
 
 /* Setting the cube*/
@@ -16,19 +16,19 @@ figure {
     width: 300px;
     height: 300px;
     background-color: #678f9c;
-    transform-origin: 50% 50% 0;
     -webkit-transform-origin: 50% 50% 0;
-    -webkit-box-reflect: below 0 -webkit-gradient(linear, left top, left bottom, from(transparent), color-stop(70%, transparent), to(rgba(0, 0, 0, 0.1)));
+    transform-origin: 50% 50% 0;
+    /* -webkit-box-reflect: below 0  -ms-gradient -webkit-gradient(linear, left top, left bottom, from(transparent), color-stop(70%, transparent), to(rgba(0, 0, 0, 0.1))); */
 }
 
 .cube {
-    transform-style: preserve-3d;
     -webkit-transform-style: preserve-3d;
+    transform-style: preserve-3d;
 }
 
 .front {
-    transform: translateZ(150px);
     -webkit-transform: translateZ(150px);
+    transform: translateZ(150px);
 }
 
 .back {
