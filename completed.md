@@ -57,7 +57,7 @@
 | 52  | Given an Array of Stocks's values over time  find the period of time where the stocks could have made the most money                                                                      | ✅ |
 | 53  | Highest Prime Factor Calculator                                                                                                                                                           | ✅ |
 | 54  | Hide and Extract Data in images (Basic Steganography) (Bonus: Include .gif support)                                                                                                       | ✅ |
-| 55  | Web Page Crawler                                                                                                                                                                          |   |
+| 55  | Web Page Crawler                                                                                                                                                                          | ✅ |
 | 56  | Password Generator (Let User Choose Options)                                                                                                                                              | ✅ |
 | 57  | VignÃ©re cipher encryption/decryption                                                                                                                                                     | ✅ |
 | 58  | Game Of Life                                                                                                                                                                              | ✅ |
@@ -68,7 +68,7 @@
 | 63  | Random Name Picker                                                                                                                                                                        | ✅ |
 | 64  | Encrypt/Decrypt Text: Implement at least one from http://rumkin.com/tools/cipher/collection                                                                                               | ✅ |
 | 65  | Youtube To MP3                                                                                                                                                                            |✅  |
-| 66  | Text to Hexadecimal/Binary                                                                                                                                                                |   |
+| 66  | Text to Hexadecimal/Binary                                                                                                                                                                | ✅ |
 | 67  | Calculate the first 1 000 digits of pi iteratively                                                                                                                                        | ✅ |
 | 68  | Sierpinski Triangle                                                                                                                                                                       |✅  |
 | 69  | Mandlebrot Set                                                                                                                                                                            |✅  |
