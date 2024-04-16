@@ -7,7 +7,7 @@
 | 2   | Make an elastic producer/consumer task queue.                                                                                                                                             | ✅ |
 | 3   | IRC Client                                                                                                                                                                                |  |
 | 4   | Markov Chain Sentence Generator (Include Shitposting Capabilities)                                                                                                                        | ✅ |
-| 5   | English Sentence Parser that Points to the Context of a Sentence                                                                                                                          |   |
+| 5   | English Sentence Parser that Points to the Context of a Sentence                                                                                                                          | ✅ |
 | 6   | MIDI Player + Editor                                                                                                                                                                      |   |
 | 7   | Stock Market Simulator Using Yahoo Spreadsheet Data                                                                                                                                       | ✅ |
 | 8   | Parametric/Graphic Equalizer for .wav files (Make it real-time)                                                                                                                           |   |
@@ -19,7 +19,7 @@
 | 14  | Shazam                                                                                                                                                                                    |   |
 | 15  | Chatbot (with conversation retention)                                                                                                                                                     |   |
 | 16  | Curses Text Editor (with Emacs /Vim Keybindings)                                                                                                                                          |   |
-| 17  | Paint Clone                                                                                                                                                                               |   |
+| 17  | Paint Clone                                                                                                                                                                               | ✅ |
 | 18  | Image to ASCII Art                                                                                                                                                                        | ✅ |
 | 19  | Booru (Image Board) Image Downloader                                                                                                                                                      |   |
 | 20  | Image Converter                                                                                                                                                                           |   |
@@ -56,10 +56,10 @@
 | 51  | Least Squares Fitting Algorithm                                                                                                                                                           | ✅ |
 | 52  | Given an Array of Stocks's values over time  find the period of time where the stocks could have made the most money                                                                      |   |
 | 53  | Highest Prime Factor Calculator                                                                                                                                                           | ✅ |
-| 54  | Hide and Extract Data in images (Basic Steganography) (Bonus: Include .gif support)                                                                                                       |   |
+| 54  | Hide and Extract Data in images (Basic Steganography) (Bonus: Include .gif support)                                                                                                       | ✅ |
 | 55  | Web Page Crawler                                                                                                                                                                          |   |
 | 56  | Password Generator (Let User Choose Options)                                                                                                                                              | ✅ |
-| 57  | VignÃ©re cipher encryption/decryption                                                                                                                                                     |   |
+| 57  | VignÃ©re cipher encryption/decryption                                                                                                                                                     | ✅ |
 | 58  | Game Of Life                                                                                                                                                                              |   |
 | 59  | Caesar Cipher Cracker                                                                                                                                                                     |  ✅ |
 | 60  | Dijkstra's Algorithm                                                                                                                                                                      |   |
