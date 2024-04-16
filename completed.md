@@ -50,7 +50,7 @@
 | 45  | RPN Calculator                                                                                                                                                                            | ✅ |
 | 46  | Counts occurrences of characters in a Given String (include support for unicode characters)                                                                                               | ✅ |
 | 47  | Towers of Hanoi                                                                                                                                                                           | ✅ |
-| 48  | Music Visualizer                                                                                                                                                                          |   |
+| 48  | Music Visualizer                                                                                                                                                                          | ✅ |
 | 49  | Unicode Converter (Support for UTF-8  16LE  32LE  and 32BE)                                                                                                                               | ✅ |
 | 50  | Calculate the first (n) digits of pi                                                                                                                                                      | ✅ |
 | 51  | Least Squares Fitting Algorithm                                                                                                                                                           | ✅ |
