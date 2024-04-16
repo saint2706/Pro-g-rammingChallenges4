@@ -60,18 +60,18 @@
 | 55  | Web Page Crawler                                                                                                                                                                          |   |
 | 56  | Password Generator (Let User Choose Options)                                                                                                                                              | ✅ |
 | 57  | VignÃ©re cipher encryption/decryption                                                                                                                                                     | ✅ |
-| 58  | Game Of Life                                                                                                                                                                              |   |
+| 58  | Game Of Life                                                                                                                                                                              | ✅ |
 | 59  | Caesar Cipher Cracker                                                                                                                                                                     |  ✅ |
-| 60  | Dijkstra's Algorithm                                                                                                                                                                      |   |
+| 60  | Dijkstra's Algorithm                                                                                                                                                                      | ✅ |
 | 61  | ROT 13                                                                                                                                                                                    | ✅ |
-| 62  | Program that displays MBR Contents                                                                                                                                                        |   |
-| 63  | Random Name Picker                                                                                                                                                                        |   |
+| 62  | Program that displays MBR Contents                                                                                                                                                        | ✅ |
+| 63  | Random Name Picker                                                                                                                                                                        | ✅ |
 | 64  | Encrypt/Decrypt Text: Implement at least one from http://rumkin.com/tools/cipher/collection                                                                                               | ✅ |
 | 65  | Youtube To MP3                                                                                                                                                                            |✅  |
 | 66  | Text to Hexadecimal/Binary                                                                                                                                                                |   |
-| 67  | Calculate the first 1 000 digits of pi iteratively                                                                                                                                        |   |
+| 67  | Calculate the first 1 000 digits of pi iteratively                                                                                                                                        | ✅ |
 | 68  | Sierpinski Triangle                                                                                                                                                                       |✅  |
-| 69  | Mandlebrot Set                                                                                                                                                                            |   |
+| 69  | Mandlebrot Set                                                                                                                                                                            |✅  |
 | 70  | OpenAl Gym Project                                                                                                                                                                        |   |
 | 71  | Al for Roguelikes                                                                                                                                                                         |   |
 | 72  | Sudoku/n-Puzzle Solver using A* algorithm                                                                                                                                                 |   |
