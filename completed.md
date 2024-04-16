@@ -9,7 +9,7 @@
 | 4   | Markov Chain Sentence Generator (Include Shitposting Capabilities)                                                                                                                        | ✅ |
 | 5   | English Sentence Parser that Points to the Context of a Sentence                                                                                                                          | ✅ |
 | 6   | MIDI Player + Editor                                                                                                                                                                      |   |
-| 7   | Stock Market Simulator Using Yahoo Spreadsheet Data                                                                                                                                       | ✅ |
+| 7   | Stock Market Simulator Using Yahoo Spreadsheet Data                                                                                                                                       |   |
 | 8   | Parametric/Graphic Equalizer for .wav files (Make it real-time)                                                                                                                           |   |
 | 9   | Graphing Calculator (BONUS: Graph the Function's Derivatives)                                                                                                                             |   |
 | 10  | To-Do List Application (Web app or CLI)                                                                                                                                                   | ✅ |
@@ -51,10 +51,10 @@
 | 46  | Counts occurrences of characters in a Given String (include support for unicode characters)                                                                                               | ✅ |
 | 47  | Towers of Hanoi                                                                                                                                                                           | ✅ |
 | 48  | Music Visualizer                                                                                                                                                                          |   |
-| 49  | Unicode Converter (Support for UTF-8  16LE  32LE  and 32BE)                                                                                                                               |   |
+| 49  | Unicode Converter (Support for UTF-8  16LE  32LE  and 32BE)                                                                                                                               | ✅ |
 | 50  | Calculate the first (n) digits of pi                                                                                                                                                      | ✅ |
 | 51  | Least Squares Fitting Algorithm                                                                                                                                                           | ✅ |
-| 52  | Given an Array of Stocks's values over time  find the period of time where the stocks could have made the most money                                                                      |   |
+| 52  | Given an Array of Stocks's values over time  find the period of time where the stocks could have made the most money                                                                      | ✅ |
 | 53  | Highest Prime Factor Calculator                                                                                                                                                           | ✅ |
 | 54  | Hide and Extract Data in images (Basic Steganography) (Bonus: Include .gif support)                                                                                                       | ✅ |
 | 55  | Web Page Crawler                                                                                                                                                                          |   |
