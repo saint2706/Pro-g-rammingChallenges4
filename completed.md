@@ -74,8 +74,8 @@
 | 69  | Mandlebrot Set                                                                                                                                                                            |✅  |
 | 70  | OpenAl Gym Project                                                                                                                                                                        |   |
 | 71  | Al for Roguelikes                                                                                                                                                                         |   |
-| 72  | Sudoku/n-Puzzle Solver using A* algorithm                                                                                                                                                 |   |
-| 73  | Connect-4 Al Player using Alpha-Beta Pruning                                                                                                                                              |   |
+| 72  | Sudoku/n-Puzzle Solver using A* algorithm                                                                                                                                                 | ✅ |
+| 73  | Connect-4 Al Player using Alpha-Beta Pruning                                                                                                                                              | ✅ |
 | 74  | Basic Neural Network - Simulate individual neurons and their connections                                                                                                                  | ✅ |
 | 75  | Real Neural Network - Implement a basic feed-forward neural network using matrices for entire layers along with matrix operations for computations.                                       |   |
 | 76  | Convolutional Neural Network: Implement a convolutional N.N. for a handwritten digit recognition  test on MNIST dataset (Use TensorFlow  Theano  etc...)                                  |   |
