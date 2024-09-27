@@ -11,7 +11,7 @@
 | 6   | MIDI Player + Editor                                                                                                                                                                      |   |
 | 7   | Stock Market Simulator Using Yahoo Spreadsheet Data                                                                                                                                       |   |
 | 8   | Parametric/Graphic Equalizer for .wav files (Make it real-time)                                                                                                                           |   |
-| 9   | Graphing Calculator (BONUS: Graph the Function's Derivatives)                                                                                                                             |   |
+| 9   | Graphing Calculator (BONUS: Graph the Function's Derivatives)                                                                                                                             | ✅ |
 | 10  | To-Do List Application (Web app or CLI)                                                                                                                                                   | ✅ |
 | 11  | Verlet Integration (Verlet Cloth)                                                                                                                                                         |   |
 | 12  | TCP/UDP Chat Server + Client                                                                                                                                                              |   |
@@ -21,7 +21,7 @@
 | 16  | Curses Text Editor (with Emacs /Vim Keybindings)                                                                                                                                          |   |
 | 17  | Paint Clone                                                                                                                                                                               | ✅ |
 | 18  | Image to ASCII Art                                                                                                                                                                        | ✅ |
-| 19  | Booru (Image Board) Image Downloader                                                                                                                                                      |   |
+| 19  | Booru (Image Board) Image Downloader                                                                                                                                                      | ✅ |
 | 20  | Image Converter                                                                                                                                                                           |   |
 | 21  | ID3 Reader                                                                                                                                                                                |   |
 | 22  | Sound Synthesis (Sine  square  sawtooth  etc...) ("Fuck You" mode: Realtime MIDI Playback with Custom instruments)                                                                        |   |
@@ -33,17 +33,17 @@
 | 28  | Booru Client                                                                                                                                                                              |   |
 | 29  | Key Press Bot                                                                                                                                                                             |   |
 | 30  | IP/URL Obsucrification (http://www.pc-help.org/obscure.htm)                                                                                                                               |   |
-| 31  | Radix Base Converter (Given a radix base  convert it to decimal)                                                                                                                          |   |
+| 31  | Radix Base Converter (Given a radix base  convert it to decimal)                                                                                                                          | ✅ |
 | 32  | Chan aggregator (Let's user view various boards from different 'chans') (Bonus: Add 4ChanX and Archiving Functionality)                                                                   |   |
 | 33  | Encrypt a File  and Upload it online                                                                                                                                                      |   |
-| 34  | Make a Text Editor that autosaves and includes the date in the filename                                                                                                                   |   |
+| 34  | Make a Text Editor that autosaves and includes the date in the filename                                                                                                                   | ✅ |
 | 35  | Create an HSV Color Representation                                                                                                                                                        | ✅ |
 | 36  | Window Manager                                                                                                                                                                            |   |
 | 37  | Basic Relational Database Software (SQL Support  Handle Relationships  Focus on Efficiency)                                                                                               |   |
 | 38  | Pixel Editor                                                                                                                                                                              |   |
 | 39  | Trivial File Transfer Protocol (TFTP): Allow a client to put a file onto a remote host                                                                                                    |   |
 | 40  | Markdown (HTML/XML) Editor                                                                                                                                                                |   |
-| 41  | IP Tracking Visualization                                                                                                                                                                 |   |
+| 41  | IP Tracking Visualization                                                                                                                                                                 | ✅ |
 | 42  | Port Scanner                                                                                                                                                                              | ✅ |
 | 43  | Old School Demo Effect (Plasma  Tunnel  Scrollers  Zoomers  etc...)                                                                                                                       |   |
 | 44  | Fizzbuzz (BONUS: In Assembly)                                                                                                                                                             | ✅ |
