@@ -1,3 +1,4 @@
 /.idea
 /.vscode
 /.jshintrc
+__pycache__/
