@@ -2,115 +2,134 @@ import pygame
 import numpy as np
 from scipy.signal import convolve2d
 import sys
+from typing import Tuple
 
-# --- Constants ---
-WIDTH, HEIGHT = 800, 600
-CELL_SIZE = 10
-ROWS, COLS = HEIGHT // CELL_SIZE, WIDTH // CELL_SIZE
+# --- Pattern Library ---
+# A dictionary of classic Game of Life patterns.
+PATTERNS = {
+    "glider": np.array([
+        [0, 1, 0],
+        [0, 0, 1],
+        [1, 1, 1]
+    ]),
+    "gosper_glider_gun": np.array([
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,1],
+        [0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,1],
+        [1,1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [1,1,0,0,0,0,0,0,0,0,1,0,0,0,1,0,1,1,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+        [0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+    ])
+}
 
-# --- Colors ---
-BG_COLOR = (20, 20, 40)  # A darker blue for the background
-CELL_COLOR = (255, 255, 0) # Bright yellow for live cells
-GRID_COLOR = (40, 40, 60) # A color for the grid lines
-
-# --- Pygame Setup ---
-pygame.init()
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Conway's Game of Life (Optimized)")
-clock = pygame.time.Clock()
-
-
-def create_grid():
-    """Creates a random initial grid."""
-    # Start with a lower probability of live cells for more interesting patterns
-    return np.random.choice([0, 1], size=(ROWS, COLS), p=[0.8, 0.2])
-
-
-def update_grid(grid):
+class GameOfLife:
     """
-    Updates the grid based on Conway's rules using convolution for performance.
+    An object-oriented implementation of Conway's Game of Life.
+    Uses Pygame for visualization and NumPy/SciPy for high-performance computation.
     """
-    # The kernel for convolution defines the neighborhood.
-    kernel = np.array([[1, 1, 1],
-                       [1, 0, 1],
-                       [1, 1, 1]])
+    def __init__(self, width: int = 800, height: int = 600, cell_size: int = 10):
+        pygame.init()
+        self.width, self.height, self.cell_size = width, height, cell_size
+        self.rows, self.cols = height // cell_size, width // cell_size
 
-    # Use convolution to efficiently count neighbors for each cell.
-    # 'same' mode ensures the output is the same size as the input.
-    # 'wrap' handles the boundaries by wrapping around (toroidal array).
-    neighbors = convolve2d(grid, kernel, mode='same', boundary='wrap')
+        # --- Colors ---
+        self.bg_color = (20, 20, 40)
+        self.cell_color = (255, 255, 0)
 
-    # Apply Conway's rules using fast NumPy boolean logic:
-    # 1. A cell is born if it's dead (0) and has exactly 3 neighbors.
-    born = (grid == 0) & (neighbors == 3)
-    # 2. A cell survives if it's alive (1) and has 2 or 3 neighbors.
-    survives = (grid == 1) & ((neighbors == 2) | (neighbors == 3))
+        self.screen = pygame.display.set_mode((self.width, self.height))
+        pygame.display.set_caption("Conway's Game of Life | Press SPACE to Pause, R to Reset, G for Glider, P for Gun")
+        self.clock = pygame.time.Clock()
 
-    # The new grid contains only the cells that were born or survived.
-    new_grid = np.zeros_like(grid)
-    new_grid[born | survives] = 1
+        self.grid = self.create_grid()
+        self.paused = False
 
-    return new_grid
+    def create_grid(self, random: bool = True) -> np.ndarray:
+        """Creates a new grid, either random or empty."""
+        if random:
+            return np.random.choice([0, 1], size=(self.rows, self.cols), p=[0.8, 0.2])
+        else:
+            return np.zeros((self.rows, self.cols), dtype=int)
 
+    def place_pattern(self, pattern_name: str, offset: Tuple[int, int] = (10, 10)):
+        """Places a pattern from the library onto the grid."""
+        pattern = PATTERNS.get(pattern_name)
+        if pattern is None:
+            print(f"Pattern '{pattern_name}' not found.")
+            return
 
-def draw_grid(grid):
-    """
-    Draws the grid efficiently. It fills the background, then only draws rectangles
-    for the live cells. This is much faster than drawing every cell.
-    """
-    screen.fill(BG_COLOR)
+        self.grid = self.create_grid(random=False)
+        p_rows, p_cols = pattern.shape
+        row_off, col_off = offset
 
-    # Get the coordinates of all live cells.
-    live_cells = np.argwhere(grid == 1)
+        if row_off + p_rows < self.rows and col_off + p_cols < self.cols:
+            self.grid[row_off:row_off + p_rows, col_off:col_off + p_cols] = pattern
 
-    # Draw a rectangle for each live cell.
-    for row, col in live_cells:
-        pygame.draw.rect(
-            screen,
-            CELL_COLOR,
-            (col * CELL_SIZE, row * CELL_SIZE, CELL_SIZE, CELL_SIZE)
-        )
+    def update(self):
+        """Updates the grid based on Conway's rules using convolution."""
+        if self.paused:
+            return
 
-    pygame.display.flip()
+        kernel = np.array([[1, 1, 1], [1, 0, 1], [1, 1, 1]])
+        neighbors = convolve2d(self.grid, kernel, mode='same', boundary='wrap')
 
+        born = (self.grid == 0) & (neighbors == 3)
+        survives = (self.grid == 1) & ((neighbors == 2) | (neighbors == 3))
 
-def main():
-    """Main game loop."""
-    grid = create_grid()
-    running = True
-    paused = False
+        self.grid = np.zeros_like(self.grid)
+        self.grid[born | survives] = 1
 
-    while running:
+    def draw(self):
+        """Draws the grid of cells to the screen."""
+        self.screen.fill(self.bg_color)
+        live_cells = np.argwhere(self.grid == 1)
+
+        for row, col in live_cells:
+            pygame.draw.rect(
+                self.screen,
+                self.cell_color,
+                (col * self.cell_size, row * self.cell_size, self.cell_size, self.cell_size)
+            )
+        pygame.display.flip()
+
+    def handle_events(self):
+        """Handles user input and other events."""
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                running = False
+                return False
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_r:
-                    # Reset the grid with a new random configuration.
-                    grid = create_grid()
-                if event.key == pygame.K_SPACE:
-                    # Pause or unpause the simulation.
-                    paused = not paused
-                if event.key == pygame.K_q or event.key == pygame.K_ESCAPE:
-                    running = False
+                    self.grid = self.create_grid()
+                elif event.key == pygame.K_SPACE:
+                    self.paused = not self.paused
+                elif event.key == pygame.K_g:
+                    self.place_pattern("glider")
+                elif event.key == pygame.K_p:
+                    self.place_pattern("gosper_glider_gun")
+                elif event.key == pygame.K_q or event.key == pygame.K_ESCAPE:
+                    return False
+        return True
 
-        screen.fill(BG_COLOR)
+    def run(self):
+        """Main game loop."""
+        running = True
+        while running:
+            running = self.handle_events()
+            self.update()
+            self.draw()
 
-        if not paused:
-            grid = update_grid(grid)
+            status = "Paused" if self.paused else "Running"
+            pygame.display.set_caption(f"Conway's Game of Life | {status} | FPS: {int(self.clock.get_fps())}")
+            self.clock.tick(15) # Increased frame rate slightly
 
-        draw_grid(grid)
+        pygame.quit()
+        sys.exit()
 
-        # Set the window title to show status
-        status = "Paused" if paused else "Running"
-        pygame.display.set_caption(f"Conway's Game of Life (Optimized) - {status}")
-
-        # Limit the frame rate to 10 FPS
-        clock.tick(10)
-
-    pygame.quit()
-    sys.exit()
-
+def main():
+    game = GameOfLife()
+    game.run()
 
 if __name__ == "__main__":
     main()
