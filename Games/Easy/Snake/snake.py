@@ -1,162 +1,165 @@
-import random
 import time
 import turtle
+from typing import List
 
-delay = 0.2
-score = 0
-personal_best = 0
+# --- Constants ---
+SCREEN_WIDTH = 600
+SCREEN_HEIGHT = 600
+MOVE_DISTANCE = 20
+STARTING_POSITIONS = [(0, 0), (-20, 0), (-40, 0)]
+UP, DOWN, LEFT, RIGHT = 90, 270, 180, 0
 
-# Creating window
-wn = turtle.Screen()
-wn.title("Snake Game")
-wn.bgcolor("black")
-wn.setup(width=600, height=600)
-wn.tracer(0)
+class Snake:
+    """Manages the snake's body, movement, and direction."""
+    def __init__(self):
+        self.segments: List[turtle.Turtle] = []
+        self.create_snake()
+        self.head = self.segments[0]
 
-# Snake head
-head = turtle.Turtle()
-head.shape("square")
-head.color("white")
-head.penup()
-head.goto(0, 0)
-head.direction = "stop"
+    def create_snake(self):
+        """Creates the initial snake body."""
+        for position in STARTING_POSITIONS:
+            self.add_segment(position)
 
-# Snake food
-food = turtle.Turtle()
-food.speed(0)
-food.shape("circle")
-food.color("red")
-food.penup()
-food.goto(0, 100)
+    def add_segment(self, position: tuple):
+        """Adds a new segment to the snake."""
+        new_segment = turtle.Turtle("square")
+        new_segment.color("white")
+        new_segment.penup()
+        new_segment.goto(position)
+        self.segments.append(new_segment)
 
-# Pen
-pen = turtle.Turtle()
-pen.speed(0)
-pen.shape("square")
-pen.color("white")
-pen.penup()
-pen.hideturtle()
-pen.goto(0, 260)
-pen.write("Score: 0  Personal Best: 0", align="center", font=("Courier", 24, "normal"))
+    def extend(self):
+        """Adds a new segment to the end of the snake."""
+        self.add_segment(self.segments[-1].position())
 
+    def move(self):
+        """Moves the snake forward by one segment."""
+        for seg_num in range(len(self.segments) - 1, 0, -1):
+            new_x = self.segments[seg_num - 1].xcor()
+            new_y = self.segments[seg_num - 1].ycor()
+            self.segments[seg_num].goto(new_x, new_y)
+        self.head.forward(MOVE_DISTANCE)
 
-# Movement
-def go_up():
-    if head.direction != "down":
-        head.direction = "up"
+    def reset(self):
+        """Resets the snake to its initial state."""
+        for seg in self.segments:
+            seg.goto(1000, 1000) # Move segments off-screen
+        self.segments.clear()
+        self.create_snake()
+        self.head = self.segments[0]
 
+    # --- Direction Control ---
+    def up(self):
+        if self.head.heading() != DOWN:
+            self.head.setheading(UP)
+    def down(self):
+        if self.head.heading() != UP:
+            self.head.setheading(DOWN)
+    def left(self):
+        if self.head.heading() != RIGHT:
+            self.head.setheading(LEFT)
+    def right(self):
+        if self.head.heading() != LEFT:
+            self.head.setheading(RIGHT)
 
-def go_down():
-    if head.direction != "up":
-        head.direction = "down"
+class Food(turtle.Turtle):
+    """Manages the food item in the game."""
+    def __init__(self):
+        super().__init__()
+        self.shape("circle")
+        self.penup()
+        self.shapesize(stretch_len=0.5, stretch_wid=0.5)
+        self.color("red")
+        self.speed("fastest")
+        self.refresh()
 
+    def refresh(self):
+        """Moves the food to a new random location on the screen."""
+        random_x = turtle.randint(-280, 280)
+        random_y = turtle.randint(-280, 280)
+        self.goto(random_x, random_y)
 
-def go_left():
-    if head.direction != "right":
-        head.direction = "left"
+class Scoreboard(turtle.Turtle):
+    """Manages the score display."""
+    def __init__(self):
+        super().__init__()
+        self.score = 0
+        self.high_score = 0
+        self.color("white")
+        self.penup()
+        self.goto(0, SCREEN_HEIGHT/2 - 40)
+        self.hideturtle()
+        self.update_scoreboard()
 
+    def update_scoreboard(self):
+        """Clears and redraws the scoreboard."""
+        self.clear()
+        self.write(f"Score: {self.score}  High Score: {self.high_score}", align="center", font=("Courier", 24, "normal"))
 
-def go_right():
-    if head.direction != "left":
-        head.direction = "right"
+    def increase_score(self):
+        """Increments the score."""
+        self.score += 1
+        self.update_scoreboard()
 
+    def reset(self):
+        """Resets the score and updates the high score if needed."""
+        if self.score > self.high_score:
+            self.high_score = self.score
+        self.score = 0
+        self.update_scoreboard()
 
-def move():
-    if head.direction == "up":
-        ycord = head.ycor()
-        head.sety(ycord + 20)
+class SnakeGame:
+    """Manages the main game screen, objects, and game loop."""
+    def __init__(self):
+        self.screen = turtle.Screen()
+        self.screen.setup(width=SCREEN_WIDTH, height=SCREEN_HEIGHT)
+        self.screen.bgcolor("black")
+        self.screen.title("Snake Game")
+        self.screen.tracer(0) # Turns off automatic screen updates
 
-    if head.direction == "down":
-        ycord = head.ycor()
-        head.sety(ycord - 20)
+        self.snake = Snake()
+        self.food = Food()
+        self.scoreboard = Scoreboard()
 
-    if head.direction == "left":
-        xcord = head.xcor()
-        head.setx(xcord - 20)
+        self.setup_key_listeners()
+        self.game_is_on = True
 
-    if head.direction == "right":
-        xcord = head.xcor()
-        head.setx(xcord + 20)
+    def setup_key_listeners(self):
+        """Sets up the keyboard bindings."""
+        self.screen.listen()
+        self.screen.onkey(self.snake.up, "w")
+        self.screen.onkey(self.snake.down, "s")
+        self.screen.onkey(self.snake.left, "a")
+        self.screen.onkey(self.snake.right, "d")
 
+    def run(self):
+        """Starts and runs the main game loop."""
+        while self.game_is_on:
+            self.screen.update()
+            time.sleep(0.1)
+            self.snake.move()
 
-# Keyboard bindings
-wn.listen()
-wn.onkeypress(go_up, "w")
-wn.onkeypress(go_down, "s")
-wn.onkeypress(go_left, "a")
-wn.onkeypress(go_right, "d")
+            # Detect collision with food
+            if self.snake.head.distance(self.food) < 15:
+                self.food.refresh()
+                self.snake.extend()
+                self.scoreboard.increase_score()
 
-segs = []
+            # Detect collision with wall
+            if not (-SCREEN_WIDTH/2 < self.snake.head.xcor() < SCREEN_WIDTH/2 and
+                    -SCREEN_HEIGHT/2 < self.snake.head.ycor() < SCREEN_HEIGHT/2):
+                self.scoreboard.reset()
+                self.snake.reset()
 
-# Game
-while True:
-    wn.update()
-    if head.xcor() > 290 or head.xcor() < -290 or head.ycor() > 290 or head.ycor() < -290:
-        # noinspection DuplicatedCode
-        time.sleep(1)
-        head.goto(0, 0)
-        head.direction = "stop"
-        for seg in segs:
-            seg.goto(1000, 1000)
-        segs.clear()
-        score = 0
-        delay = 0.2
-        pen.clear()
-        pen.write(
-            "Score: {}  Personal Best: {}".format(score, personal_best),
-            align="center",
-            font=("Courier", 24, "normal"),
-        )
-    if head.distance(food) < 20:
-        x = random.randint(-270, 270)
-        y = random.randint(-270, 270)
-        food.goto(x, y)
+            # Detect collision with tail
+            for segment in self.snake.segments[1:]:
+                if self.snake.head.distance(segment) < 10:
+                    self.scoreboard.reset()
+                    self.snake.reset()
 
-        # Add a segment
-        new_seg = turtle.Turtle()
-        new_seg.speed(0)
-        new_seg.shape("square")
-        new_seg.color("grey")
-        new_seg.penup()
-        segs.append(new_seg)
-        delay -= 0.001
-        score += 1
-        if score > personal_best:
-            personal_best = score
-        pen.clear()
-        pen.write(
-            "Score: {}  Personal Best: {}".format(score, personal_best),
-            align="center",
-            font=("Courier", 24, "normal"),
-        )
+        self.screen.exitonclick()
 
-    # Collision
-    for indx in range(len(segs) - 1, 0, -1):
-        x = segs[indx - 1].xcor()
-        y = segs[indx - 1].ycor()
-        segs[indx].goto(x, y)
-    if len(segs) > 0:
-        x = head.xcor()
-        y = head.ycor()
-        segs[0].goto(x, y)
-    move()
-    for seg in segs:
-        if seg.distance(head) < 20:
-            time.sleep(1)
-            head.goto(0, 0)
-            head.direction = "stop"
-            # noinspection PyAssignmentToLoopOrWithParameter
-            for seg in segs:
-                seg.goto(1000, 1000)
-            segs.clear()
-            score = 0
-            delay = 0.2
-            pen.clear()
-            pen.write(
-                "Score: {}  Personal Best: {}".format(score, personal_best),
-                align="center",
-                font=("Courier", 24, "normal"),
-            )
-    time.sleep(delay)
-
-wn.mainloop()
+if __name__ == "__main__":
+    game = SnakeGame()
+    game.run()

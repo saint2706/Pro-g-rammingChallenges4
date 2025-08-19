@@ -1,336 +1,145 @@
-from random import randint
+import random
+from collections import Counter
+from typing import List, Dict
 
-stat = None
+class Hand:
+    """Represents a hand of five dice in a Yahtzee-like game."""
+    def __init__(self):
+        self.dice: List[int] = [random.randint(1, 6) for _ in range(5)]
+
+    def __str__(self) -> str:
+        return " ".join(map(str, self.dice))
+
+    def reroll(self, indices_to_reroll: List[int]):
+        """
+        Rerolls the dice at the specified indices.
+        Indices are 0-based.
+        """
+        for index in indices_to_reroll:
+            if 0 <= index < 5:
+                self.dice[index] = random.randint(1, 6)
+
+    def evaluate(self) -> str:
+        """
+        Evaluates the hand and returns the name of the combination.
+        """
+        counts = Counter(self.dice)
+        vals = sorted(counts.values(), reverse=True)
+
+        if 5 in vals:
+            return "Yahtzee"
+        if 4 in vals:
+            return "Four of a Kind"
+        if vals == [3, 2]:
+            return "Full House"
+        if 3 in vals:
+            return "Three of a Kind"
+
+        # Check for straights
+        unique_dice = sorted(list(set(self.dice)))
+        is_straight = (len(unique_dice) >= 4 and
+                       (unique_dice[-1] - unique_dice[0] == 3 or
+                        (len(unique_dice) > 1 and unique_dice[-2] - unique_dice[0] == 3) or
+                        (len(unique_dice) > 1 and unique_dice[-1] - unique_dice[1] == 3)))
+
+        if len(unique_dice) == 5 and (unique_dice[4] - unique_dice[0] == 4):
+            return "Large Straight"
+        if len(unique_dice) >= 4 and self._is_subsequence([1,2,3,4], unique_dice) or \
+           self._is_subsequence([2,3,4,5], unique_dice) or \
+           self._is_subsequence([3,4,5,6], unique_dice):
+            return "Small Straight"
+
+        if vals == [2, 2, 1]:
+            return "Two Pair"
+        if 2 in vals:
+            return "One Pair"
+
+        return "Nothing Special"
+
+    def _is_subsequence(self, sub, main):
+        return all(elem in main for elem in sub)
 
 
-def singleGame():
-    global stat
-    roll1 = roll()
-    print(format("You rolled: ", "64s"), roll1)
-    print("")
-    holdPrompt = input("Swap any dice? (y for HITME, n for HOLD): ")
-    print("")
-    holdPrompt.replace(" ", "")
-    holdPrompt.lower()
-    while holdPrompt != "y" and holdPrompt != "n":
-        print("INCORRECT INPUT\n")
-        holdPrompt = input("Swap any dice? (y for HITME, n for HOLD): ")
-        print("")
-        holdPrompt.replace(" ", "")
-        holdPrompt.lower()
+class Game:
+    """Manages the Yahtzee game flow and statistics."""
+    def __init__(self):
+        self.stats: Dict[str, int] = Counter()
+        self.game_count = 0
 
-    if holdPrompt == "y":
-        roll2 = swap(roll1)
-        print("")
-        print("Swapping:", roll2[1])
-        print("")
-        print(format("You rolled: ", "64s"), roll2[0])
-        print("")
-        holdPrompt2 = input("Swap any dice? (y for HITME, n for HOLD): ")
-        print("")
-        while holdPrompt2 != "y" and holdPrompt2 != "n":
-            print("INCORRECT INPUT\n")
-            holdPrompt2 = input("Swap any dice? (y for HITME, n for HOLD): ")
-            print("")
-            holdPrompt2.replace(" ", "")
-            holdPrompt2.lower()
-        if holdPrompt2 == "y":
-            roll3 = swap(roll2[0])
-            print("")
-            print("Swapping:", roll3[1])
-            print("")
-            print(format("You rolled: ", "64s"), roll3[0])
-            print("")
-            stat = rollType(roll3[0])
-        else:
-            stat = rollType(roll2[0])
-    elif holdPrompt == "n":
-        stat = rollType(roll1)
-    else:
-        pass
-    return stat
+    def play_round(self):
+        """Plays a single round of the game (up to 3 rolls)."""
+        self.game_count += 1
+        print(f"\n--- Game {self.game_count} ---")
+        hand = Hand()
 
+        for i in range(2): # Allow up to two rerolls
+            print(f"\nRoll {i+1}: {hand}")
 
-def roll():
-    dice = []
-    for _ in range(5):
-        dice.append(randint(1, 6))
-    return dice
+            wants_to_reroll = self.get_validated_input("Reroll any dice? (y/n): ", ['y', 'n'])
+            if wants_to_reroll == 'n':
+                break
 
+            indices = self.get_reroll_indices()
+            hand.reroll(indices)
 
-def swap(diceList):
-    valid = True
-    swapDice = input("Type position of each die you'd like to swap (1-5): ")
-    swapDice = swapDice.replace(",", "")
-    swapDice = swapDice.replace(" ", "")
-    swapDiceList = []
-    for x in swapDice:
-        swapDiceList.append(x)
-    for x in swapDiceList:
-        x = str(x)
-        if x.isdigit():
-            x = int(x)
-            if x in range(1, 6):
-                valid = True
-            else:
-                valid = False
-        else:
-            valid = False
+        print(f"\nFinal Hand: {hand}")
+        result = hand.evaluate()
+        print(f"Result: {result}!")
+        self.stats[result] += 1
 
-    while not valid:
-        print("")
-        print("INCORRECT INPUT")
-        print("")
-        swapDice = input("Type position of each die you'd like to swap (1-5): ")
-        swapDice = swapDice.replace(",", "")
-        swapDice = swapDice.replace(" ", "")
-        swapDiceList = []
-        for x in swapDice:
-            swapDiceList.append(x)
-        for x in swapDiceList:
-            x = str(x)
-            if x.isdigit():
-                x = int(x)
-                if x in range(1, 6):
-                    valid = True
+    def get_reroll_indices(self) -> List[int]:
+        """Gets and validates the user's input for which dice to reroll."""
+        while True:
+            try:
+                prompt = "Enter positions of dice to reroll (e.g., '1 3 4'): "
+                response = input(prompt).strip()
+                if not response:
+                    return []
+                # Convert 1-based positions to 0-based indices
+                indices = [int(pos) - 1 for pos in response.split()]
+                if all(0 <= i < 5 for i in indices):
+                    return indices
                 else:
-                    valid = False
-            else:
-                valid = False
+                    print("Invalid position. Please enter numbers between 1 and 5.")
+            except ValueError:
+                print("Invalid input. Please enter numbers separated by spaces.")
 
-    swapIndex = []
+    def get_validated_input(self, prompt: str, valid_options: List[str]) -> str:
+        """Gets user input and validates it against a list of options."""
+        while True:
+            response = input(prompt).lower().strip()
+            if response in valid_options:
+                return response
+            print(f"Invalid input. Please enter one of: {', '.join(valid_options)}")
 
-    for x in swapDiceList:
-        swapIndex.append(int(x) - 1)
+    def print_stats(self):
+        """Prints the final statistics after all games are played."""
+        print("\n--- Final Stats ---")
+        if self.game_count == 0:
+            print("No games were played.")
+            return
 
-    for x in swapIndex:
-        x = int(x)
-        x -= 1
+        print(f"In {self.game_count} game(s), you rolled:")
+        for hand_type, count in sorted(self.stats.items()):
+            percentage = (count / self.game_count) * 100
+            print(f"  - {hand_type+':':<18} {count} time(s) ({percentage:.1f}%)")
 
-    for x in swapIndex:
-        diceList.pop(x)
-        diceList.insert(x, randint(1, 6))
+    def run(self):
+        """Runs the main game loop."""
+        print("\n" + "-"*40)
+        print("Welcome to Refactored Yahtzee!")
+        print("-" * 40)
 
-    return diceList, swapDiceList
+        while True:
+            self.play_round()
+            play_again = self.get_validated_input("\nPlay another game? (y/n): ", ['y', 'n'])
+            if play_again == 'n':
+                break
 
-
-def rollType(diceList):
-    counts = []
-    for x in diceList:
-        counts.append(diceList.count(x))
-    diceListNew = sorted(diceList)
-    diceListNew = list(set(diceListNew))
-    yahtzee = False
-    fullHouse = False
-    smallStraight = False
-    largeStraight = False
-    fourOfKind = False
-    threeOfKind = False
-
-    if 5 in counts:
-        yahtzee = True
-        print(format("YAHTZEE", ">80s"))
-    elif 3 in counts and 2 in counts:
-        fullHouse = True
-        print(format("FULL HOUSE", ">80s"))
-    elif 3 in counts and 2 not in counts:
-        threeOfKind = True
-        print(format("THREE OF A KIND", ">80s"))
-    elif 4 in counts:
-        fourOfKind = True
-        print(format("FOUR OF A KIND", ">80s"))
-    elif len(diceListNew) == 3:
-        print(format("NOTHING SPECIAL", ">80s"))
-    elif len(diceListNew) == 4:
-        if (
-            diceListNew[-2] == diceListNew[-1] - 1
-            and diceListNew[-3] == diceListNew[-2] - 1
-            and diceListNew[-4] == diceListNew[-3] - 1
-        ):
-            smallStraight = True
-            print(format("SMALL STRAIGHT", ">80s"))
-        else:
-            print(format("NOTHING SPECIAL", ">80s"))
-    elif len(diceListNew) == 5:
-        if (
-            diceListNew[-2] == diceListNew[-1] - 1
-            and diceListNew[-3] == diceListNew[-2] - 1
-            and diceListNew[-4] == diceListNew[-3] - 1
-            and diceListNew[-5] == diceListNew[-4] - 1
-        ):
-            largeStraight = True
-            print(format("LARGE STRAIGHT", ">80s"))
-        elif (
-            diceListNew[-2] == diceListNew[-1] - 1
-            and diceListNew[-3] == diceListNew[-2] - 1
-            and diceListNew[-4] == diceListNew[-3] - 1
-        ):
-            smallStraight = True
-            print(format("SMALL STRAIGHT", ">80s"))
-        elif (
-            diceListNew[-3] == diceListNew[-2] - 1
-            and diceListNew[-4] == diceListNew[-3] - 1
-            and diceListNew[-5] == diceListNew[-4] - 1
-        ):
-            smallStraight = True
-            print(format("SMALL STRAIGHT", ">80s"))
-        else:
-            print(format("NOTHING SPECIAL", ">80s"))
-    else:
-        pass
-    result = (
-        yahtzee,
-        fullHouse,
-        smallStraight,
-        largeStraight,
-        fourOfKind,
-        threeOfKind,
-    )
-    return result
+        self.print_stats()
+        print("\nThanks for playing!")
 
 
-def main():
-    yahtzee = 0
-    fullHouse = 0
-    smallStraight = 0
-    largeStraight = 0
-    fourOfKind = 0
-    threeOfKind = 0
-    statIndex = 0
-
-    print("")
-    print("-" * 80)
-    print("")
-    print(format("Welcome to Fake Yahtzee!", "61s"), "Written by Coleo94")
-    print("")
-    print("-" * 80)
-    print("")
-    print(format("Game 1", ">43s"))
-    print("")
-    game = singleGame()
-    game = list(game)  # type: ignore
-    for x in game:
-        if x:
-            statIndex = game.index(x)
-    if statIndex == 0:
-        yahtzee += 1
-    elif statIndex == 1:
-        fullHouse += 1
-    elif statIndex == 2:
-        smallStraight += 1
-    elif statIndex == 3:
-        largeStraight += 1
-    elif statIndex == 4:
-        fourOfKind += 1
-    elif statIndex == 5:
-        threeOfKind += 1
-    else:
-        pass
-    print("")
-    gameCount = 1
-    print("END OF GAME", gameCount)
-    print("-" * 80)
-    print("")
-    gamesPrompt = input("Play another game? (y for yes, n for no): ")
-    gamesPrompt.strip()
-    gamesPrompt.lower()
-    while gamesPrompt != "y" and gamesPrompt != "n":
-        print("")
-        print("INCORRECT INPUT")
-        print("")
-        gamesPrompt = input("Play another game? (y for yes, n for no): ")
-        gamesPrompt.strip()
-        gamesPrompt.lower()
-    print("")
-
-    while gamesPrompt == "y":
-        gameCount += 1
-        print("-" * 80)
-        print("")
-        print(format("Game", ">43s"), gameCount)
-        print("")
-        game = singleGame()
-        game = list(game)  # type: ignore
-        for x in game:
-            if x:
-                statIndex = game.index(x)
-        if statIndex == 0:
-            yahtzee += 1
-        elif statIndex == 1:
-            fullHouse += 1
-        elif statIndex == 2:
-            smallStraight += 1
-        elif statIndex == 3:
-            largeStraight += 1
-        elif statIndex == 4:
-            fourOfKind += 1
-        elif statIndex == 5:
-            threeOfKind += 1
-        else:
-            pass
-        print("")
-        print(format("END OF GAME"), gameCount)
-        print("-" * 80)
-        print("")
-        gamesPrompt = input("Play another game? (y for yes, n for no): ")
-        gamesPrompt.strip()
-        gamesPrompt.lower()
-        while gamesPrompt != "y" and gamesPrompt != "n":
-            print("")
-            print("INCORRECT INPUT")
-            print("")
-            gamesPrompt = input("Play another game? (y for yes, n for no): ")
-            gamesPrompt.strip()
-            gamesPrompt.lower()
-        print("")
-    if gamesPrompt == "n":
-        yahtzeePer = (yahtzee / gameCount) * 100
-        fullHousePer = (fullHouse / gameCount) * 100
-        smallStraightPer = (smallStraight / gameCount) * 100
-        largeStraightPer = (largeStraight / gameCount) * 100
-        fourOfKindPer = (fourOfKind / gameCount) * 100
-        threeOfKindPer = (threeOfKind / gameCount) * 100
-        print("-" * 80)
-        print("")
-        print(format("STATS", ">43s"))
-        print("")
-        print("In", gameCount, "games, you rolled:\n")
-        if yahtzee > 1 or yahtzee == 0:
-            print("Yahtzees:", yahtzee, int(yahtzeePer), "%")
-            print("")
-        else:
-            print("Yahtzee:", yahtzee, int(yahtzeePer), "%")
-            print("")
-        if fullHouse > 1 or fullHouse == 0:
-            print("Full houses:", fullHouse, int(fullHousePer), "%")
-            print("")
-        else:
-            print("Full house:", fullHouse, int(fullHousePer), "%")
-            print("")
-        if smallStraight > 1 or smallStraight == 0:
-            print("Small straights:", smallStraight, int(smallStraightPer), "%")
-            print("")
-        else:
-            print("Small straight:", smallStraight, int(smallStraightPer), "%")
-            print("")
-        if largeStraight > 1 or largeStraight == 0:
-            print("Large straights:", largeStraight, int(largeStraightPer), "%")
-            print("")
-        else:
-            print("Large straight:", largeStraight, int(largeStraightPer), "%")
-            print("")
-        if fourOfKind > 1 or fourOfKind == 0:
-            print("Fours of a kind:", fourOfKind, int(fourOfKindPer), "%")
-            print("")
-        else:
-            print("Four of a kind:", fourOfKind, int(fourOfKindPer), "%")
-            print("")
-        if threeOfKind > 1 or threeOfKind == 0:
-            print("Threes of a kind:", threeOfKind, int(threeOfKindPer), "%")
-            print("")
-        else:
-            print("Three of a kind:", threeOfKind, round(threeOfKindPer, 2), "%")
-            print("")
-
-
-main()
+if __name__ == "__main__":
+    game = Game()
+    game.run()
