@@ -1,121 +1,183 @@
 import tkinter as tk
+from tkinter import messagebox
 import random
+import numpy as np
+from typing import Optional, Tuple, List
 
-class SudokuGUI:
-    def __init__(self, master):
-        self.master = master
-        self.master.title("Sudoku Solver")
+class SudokuLogic:
+    """Handles the internal logic of generating and solving Sudoku puzzles."""
+    def __init__(self):
+        self.board = np.zeros((9, 9), dtype=int)
+        self.solution_count = 0
 
-        self.board = [[tk.StringVar() for _ in range(9)] for _ in range(9)]
+    def get_board(self) -> np.ndarray:
+        return self.board
 
-        self.create_widgets()
+    def set_board(self, new_board: List[List[int]]):
+        self.board = np.array(new_board, dtype=int)
 
-    def create_widgets(self):
-        for i in range(9):
-            for j in range(9):
-                entry = tk.Entry(self.master, textvariable=self.board[i][j], width=3, font=('Arial', 16))
-                entry.grid(row=i, column=j)
-        
-        solve_button = tk.Button(self.master, text="Solve", command=self.solve)
-        solve_button.grid(row=9, columnspan=9)
-
-        generate_button = tk.Button(self.master, text="Generate Puzzle", command=self.generate_puzzle)
-        generate_button.grid(row=10, columnspan=9)
-
-    def solve(self):
-        sudoku_board = [[0 for _ in range(9)] for _ in range(9)]
-
-        for i in range(9):
-            for j in range(9):
-                value = self.board[i][j].get()
-                if value.isdigit():
-                    sudoku_board[i][j] = int(value)
-                else:
-                    sudoku_board[i][j] = 0
-        
-        if self.solve_sudoku(sudoku_board):
-            for i in range(9):
-                for j in range(9):
-                    self.board[i][j].set(str(sudoku_board[i][j]))
-        else:
-            print("No solution exists for the given Sudoku puzzle.")
-
-    def solve_sudoku(self, board):
-        empty_cell = self.find_empty_cell(board)
-        if not empty_cell:
-            return True
-
-        row, col = empty_cell
-        for num in range(1, 10):
-            if self.is_valid_move(board, row, col, num):
-                board[row][col] = num
-                if self.solve_sudoku(board):
-                    return True
-                board[row][col] = 0
-        
-        return False
-
-    def find_empty_cell(self, board):
-        for i in range(9):
-            for j in range(9):
-                if board[i][j] == 0:
-                    return (i, j)
+    def find_empty_cell(self) -> Optional[Tuple[int, int]]:
+        """Finds the first empty cell (0) in the board."""
+        for r in range(9):
+            for c in range(9):
+                if self.board[r, c] == 0:
+                    return (r, c)
         return None
 
-    def is_valid_move(self, board, row, col, num):
-        return not self.used_in_row(board, row, num) and \
-               not self.used_in_col(board, col, num) and \
-               not self.used_in_box(board, row - row % 3, col - col % 3, num)
+    def is_valid_move(self, num: int, pos: Tuple[int, int]) -> bool:
+        """Checks if placing a number in a given position is valid."""
+        r, c = pos
+        # Check row, column, and 3x3 box
+        if num in self.board[r, :] or num in self.board[:, c]:
+            return False
+        box_r, box_c = r // 3 * 3, c // 3 * 3
+        if num in self.board[box_r:box_r + 3, box_c:box_c + 3]:
+            return False
+        return True
 
-    def used_in_row(self, board, row, num):
-        return num in board[row]
-
-    def used_in_col(self, board, col, num):
-        return num in [board[i][col] for i in range(9)]
-
-    def used_in_box(self, board, start_row, start_col, num):
-        for i in range(3):
-            for j in range(3):
-                if board[i + start_row][j + start_col] == num:
+    def solve(self) -> bool:
+        """Solves the current board using recursive backtracking."""
+        empty = self.find_empty_cell()
+        if not empty:
+            return True  # Solved
+        
+        r, c = empty
+        for num in range(1, 10):
+            if self.is_valid_move(num, (r, c)):
+                self.board[r, c] = num
+                if self.solve():
                     return True
+                self.board[r, c] = 0 # Backtrack
         return False
 
-    def generate_puzzle(self):
-        self.clear_board()
-        sudoku_board = self.generate_valid_board()
-        for i in range(9):
-            for j in range(9):
-                if random.random() < 0.5:  # Randomly remove some numbers to make it a puzzle
-                    self.board[i][j].set(str(sudoku_board[i][j]))
-                else:
-                    self.board[i][j].set('')
+    def count_solutions(self):
+        """Counts the number of solutions for the current board."""
+        empty = self.find_empty_cell()
+        if not empty:
+            self.solution_count += 1
+            return
 
-    def generate_valid_board(self):
-        base = 3
-        side = base * base
+        r, c = empty
+        for num in range(1, 10):
+            if self.is_valid_move(num, (r, c)):
+                self.board[r, c] = num
+                self.count_solutions()
+                self.board[r, c] = 0 # Backtrack to find all solutions
+                if self.solution_count > 1: # Optimization: stop if more than one solution is found
+                    return
 
-        def pattern(r, c):
-            return (base * (r % base) + r // base + c) % side
+    def generate_puzzle(self, difficulty: float = 0.5):
+        """Generates a new puzzle with a guaranteed unique solution."""
+        # 1. Create a fully solved board
+        self.board = np.zeros((9, 9), dtype=int)
+        self.solve()
 
-        def shuffle(s):
-            return random.sample(s, len(s))
+        # 2. Poke holes in the board
+        while True:
+            puzzle = self.board.copy()
+            # Randomly remove numbers
+            for r in range(9):
+                for c in range(9):
+                    if random.random() < difficulty:
+                        puzzle[r, c] = 0
 
-        r_base = range(base)
-        rows = [g * base + r for g in shuffle(r_base) for r in shuffle(r_base)]
-        cols = [g * base + c for g in shuffle(r_base) for c in shuffle(r_base)]
-        nums = shuffle(range(1, base * base + 1))
+            # 3. Check if the puzzle has a unique solution
+            self.board = puzzle.copy()
+            self.solution_count = 0
+            self.count_solutions()
 
-        # Produce board using randomized baseline pattern
-        board = [[nums[pattern(r, c)] for c in cols] for r in rows]
+            if self.solution_count == 1:
+                self.board = puzzle
+                return # Found a valid puzzle
 
-        return board
+class SudokuGUI:
+    """Handles the Tkinter GUI for the Sudoku game."""
+    def __init__(self, master: tk.Tk):
+        self.master = master
+        self.master.title("Sudoku")
+        self.logic = SudokuLogic()
+
+        self.cells: List[List[tk.Entry]] = []
+        self.create_widgets()
+        self.draw_grid_lines()
+
+    def create_widgets(self):
+        """Creates the main GUI components (grid, buttons, status bar)."""
+        frame = tk.Frame(self.master)
+        frame.pack()
+
+        for r in range(9):
+            row_entries = []
+            for c in range(9):
+                entry = tk.Entry(frame, width=3, font=('Arial', 18, 'bold'), justify='center')
+                entry.grid(row=r, column=c, padx=1, pady=1)
+                row_entries.append(entry)
+            self.cells.append(row_entries)
+
+        button_frame = tk.Frame(self.master)
+        button_frame.pack(pady=10)
+
+        tk.Button(button_frame, text="Solve", command=self.solve_puzzle).pack(side=tk.LEFT, padx=5)
+        tk.Button(button_frame, text="Generate Puzzle", command=self.generate_new_puzzle).pack(side=tk.LEFT, padx=5)
+        tk.Button(button_frame, text="Clear", command=self.clear_board).pack(side=tk.LEFT, padx=5)
+
+        self.status_bar = tk.Label(self.master, text="Welcome to Sudoku!", bd=1, relief=tk.SUNKEN, anchor=tk.W)
+        self.status_bar.pack(side=tk.BOTTOM, fill=tk.X)
+
+    def draw_grid_lines(self):
+        """Draws the thicker lines for the 3x3 subgrids."""
+        for i in range(10):
+            width = 3 if i % 3 == 0 else 1
+            # Horizontal lines
+            self.master.children['!frame'].grid_rowconfigure(i, weight=1)
+            # Vertical lines
+            self.master.children['!frame'].grid_columnconfigure(i, weight=1)
+        # This is a bit of a hack for tkinter grid lines, a canvas would be better but more complex
+        for i in range(3, 10, 3):
+            tk.Frame(self.master.children['!frame'], height=2, bg='black').grid(row=i, columnspan=9, sticky='ew')
+            tk.Frame(self.master.children['!frame'], width=2, bg='black').grid(column=i, rowspan=9, sticky='ns')
+
+    def update_gui_from_board(self):
+        """Updates the Tkinter entry widgets with the values from the logic board."""
+        board = self.logic.get_board()
+        for r in range(9):
+            for c in range(9):
+                self.cells[r][c].delete(0, tk.END)
+                if board[r, c] != 0:
+                    self.cells[r][c].insert(0, str(board[r, c]))
+
+    def read_board_from_gui(self):
+        """Reads the values from the GUI and updates the logic board."""
+        new_board = np.zeros((9, 9), dtype=int)
+        for r in range(9):
+            for c in range(9):
+                val = self.cells[r][c].get()
+                if val.isdigit() and 1 <= int(val) <= 9:
+                    new_board[r, c] = int(val)
+        self.logic.set_board(new_board)
+
+    def solve_puzzle(self):
+        self.read_board_from_gui()
+        self.status_bar.config(text="Solving...")
+        if self.logic.solve():
+            self.update_gui_from_board()
+            self.status_bar.config(text="Puzzle Solved!")
+        else:
+            self.status_bar.config(text="No solution exists for this puzzle.")
+            messagebox.showerror("Solver", "No solution found.")
+
+    def generate_new_puzzle(self):
+        self.status_bar.config(text="Generating new puzzle...")
+        self.logic.generate_puzzle()
+        self.update_gui_from_board()
+        self.status_bar.config(text="New puzzle generated. Good luck!")
 
     def clear_board(self):
-        for i in range(9):
-            for j in range(9):
-                self.board[i][j].set('')
+        self.logic.set_board(np.zeros((9, 9), dtype=int))
+        self.update_gui_from_board()
+        self.status_bar.config(text="Board cleared.")
 
 if __name__ == "__main__":
     root = tk.Tk()
-    sudoku_gui = SudokuGUI(root)
+    app = SudokuGUI(root)
     root.mainloop()

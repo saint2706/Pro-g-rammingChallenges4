@@ -1,64 +1,93 @@
-import numpy as np
+import random
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
-from matplotlib.animation import FuncAnimation
-import random
+from typing import List, Tuple, NamedTuple
 
-# Define card suits and ranks
-suits = ['♠️', '♣️', '♦️', '♥️']
-ranks = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K']
+class Card(NamedTuple):
+    """Represents a single playing card with a rank and a suit."""
+    rank: str
+    suit: str
 
-def create_deck():
-    """Create a standard deck of 52 cards"""
-    deck = []
-    for suit in suits:
-        for rank in ranks:
-            deck.append((rank, suit))
-    return deck
+class Deck:
+    """Represents a deck of 52 playing cards."""
+    SUITS = ['♠️', '♣️', '♦️', '♥️']
+    RANKS = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K']
 
-def draw_card(ax, card, pos):
-    """Draw a card at the specified position"""
-    x, y = pos
-    rect = patches.Rectangle((x, y), 4, 6, linewidth=1, edgecolor='black', facecolor='white')
-    ax.add_patch(rect)
-    ax.text(x + 2, y + 5, card[0], ha='center', va='center', fontsize=12)
-    ax.text(x + 2, y + 3, card[1], ha='center', va='center', fontsize=12)
+    def __init__(self):
+        self.cards: List[Card] = [Card(rank, suit) for suit in self.SUITS for rank in self.RANKS]
 
-def shuffle_deck(deck):
-    """Shuffle the deck of cards"""
-    random.shuffle(deck)
+    def shuffle(self):
+        """Shuffles the deck in place."""
+        random.shuffle(self.cards)
 
-def display_deck(deck, ax):
-    """Display the deck of cards"""
-    ax.clear()
-    ax.set_xlim(0, 56)
-    ax.set_ylim(0, 24)
-    ax.axis('off')
-    for i, card in enumerate(deck):
-        x = i % 13 * 4
-        y = (i // 13) * 6
-        draw_card(ax, card, (x, y))
-    plt.draw()
+    def __len__(self) -> int:
+        return len(self.cards)
 
-# Create a deck of cards
-deck = create_deck()
+    def __str__(self) -> str:
+        return f"Deck of {len(self.cards)} cards"
 
-# Create the plot
-fig, ax = plt.subplots(figsize=(15, 8))
+class DeckVisualizer:
+    """Manages the matplotlib visualization of a deck of cards."""
+    def __init__(self, deck: Deck):
+        self.deck = deck
+        self.fig, self.ax = plt.subplots(figsize=(14, 8))
+        plt.subplots_adjust(bottom=0.2) # Make space for the button
 
-# Display the initial deck
-display_deck(deck, ax)
+        self.setup_plot()
+        self.add_shuffle_button()
+        self.display_deck()
 
-# Create a shuffle button
-button_ax = plt.axes([0.85, 0.05, 0.1, 0.05])
-button = plt.Button(button_ax, 'Shuffle')
+    def setup_plot(self):
+        """Sets up the main plot area."""
+        self.ax.set_xlim(0, 13 * 4)
+        self.ax.set_ylim(0, 4 * 6 + 2)
+        self.ax.axis('off')
 
-def shuffle_and_display(event):
-    """Callback function to shuffle the deck and update the display"""
-    shuffle_deck(deck)
-    display_deck(deck, ax)
+    def draw_card(self, card: Card, pos: Tuple[float, float]):
+        """Draws a single card at a specified position on the axis."""
+        x, y = pos
+        card_color = 'red' if card.suit in ['♦️', '♥️'] else 'black'
 
-# Connect the button to the callback function
-button.on_clicked(shuffle_and_display)
+        rect = patches.Rectangle((x, y), 4, 6, linewidth=1, edgecolor='black', facecolor='white', zorder=2)
+        self.ax.add_patch(rect)
 
-plt.show()
+        self.ax.text(x + 0.5, y + 5, card.rank, ha='left', va='top', fontsize=12, color=card_color, weight='bold', zorder=3)
+        self.ax.text(x + 2, y + 3, card.suit, ha='center', va='center', fontsize=20, zorder=3)
+
+    def display_deck(self):
+        """Clears the axis and displays the current state of the deck."""
+        self.ax.clear()
+        self.setup_plot()
+
+        for i, card in enumerate(self.deck.cards):
+            col = i % 13
+            row = 3 - (i // 13) # Draw from top to bottom
+            x_pos = col * 4.2
+            y_pos = row * 6.5
+            self.draw_card(card, (x_pos, y_pos))
+
+        plt.draw()
+
+    def add_shuffle_button(self):
+        """Adds a 'Shuffle' button to the plot."""
+        button_ax = plt.axes([0.45, 0.05, 0.1, 0.075]) # [left, bottom, width, height]
+        shuffle_button = plt.Button(button_ax, 'Shuffle')
+        shuffle_button.on_clicked(self.shuffle_callback)
+        # Keep a reference to the button so it doesn't get garbage collected
+        self.shuffle_button = shuffle_button
+
+    def shuffle_callback(self, event):
+        """Callback function to shuffle the deck and update the display."""
+        print("Shuffling deck...")
+        self.deck.shuffle()
+        self.display_deck()
+
+def main():
+    """Main function to create and display the deck visualizer."""
+    print("--- Deck Shuffling Visualizer ---")
+    deck = Deck()
+    visualizer = DeckVisualizer(deck)
+    plt.show()
+
+if __name__ == "__main__":
+    main()

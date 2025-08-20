@@ -1,3 +1,8 @@
-from pandas import Series
+import collections
 
-print(Series(list(input("Enter sentence:"))).value_counts().to_string())
+sentence = input("Enter sentence: ")
+counts = collections.Counter(sentence)
+
+print("Character counts:")
+for char, count in sorted(counts.items()):
+    print(f"'{char}': {count}")

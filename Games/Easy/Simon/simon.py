@@ -2,272 +2,209 @@ import pygame
 import random
 import time
 import sys
+import os
+from enum import Enum
+from typing import List, Tuple
 
+# --- Constants ---
+# Colors
+BLACK = (0, 0, 0)
+WHITE = (255, 255, 255)
+# Each button has a normal and a light color for flashing
+BUTTON_COLORS = {
+    'GREEN': ((0, 100, 0), (0, 255, 0)),
+    'RED': ((100, 0, 0), (255, 0, 0)),
+    'YELLOW': ((150, 150, 0), (255, 255, 0)),
+    'BLUE': ((0, 0, 100), (0, 0, 255)),
+}
 
-pygame.init()
-pygame.mixer.init()
-clock = pygame.time.Clock()
+class GameState(Enum):
+    """Enumeration for the different states of the game."""
+    MENU = 1
+    PLAYING = 2
+    GAME_OVER = 3
 
-red = (100, 0, 0)
-light_red = (255, 0, 0)
-green = (0, 100, 0)
-light_green = (0, 255, 0)
-yellow = (100, 100, 0)
-light_yellow = (255, 255, 0)
-blue = (0, 0, 100)
-light_blue = (0, 0, 255)
-white = (255, 255, 255)
-black = (0, 0, 0)
+class SimonGame:
+    """A class to encapsulate the entire Simon game logic and state."""
+    def __init__(self, screen_width: int = 600, screen_height: int = 700):
+        pygame.init()
+        pygame.mixer.init()
 
-green_color = green
-red_color = red
-yellow_color = yellow
-blue_color = blue
+        self.screen = pygame.display.set_mode((screen_width, screen_height))
+        pygame.display.set_caption("Simon")
+        self.clock = pygame.time.Clock()
 
-gameplay_font_dir = r"Games\Easy\Simon\Assets\Fonts\vermin_vibes.ttf"
-font = pygame.font.Font(gameplay_font_dir, 20)
-title_font = pygame.font.Font(gameplay_font_dir, 50)
+        self.game_state = GameState.MENU
+        self.score = 0
+        self.pattern: List[str] = []
+        self.player_input: List[str] = []
 
-logo = pygame.image.load(r"Games\Easy\Simon\Assets\Images\simon_logo.png")
-big_logo = pygame.transform.scale(logo, (300, 300))
-start_button = pygame.image.load(r"Games\Easy\Simon\Assets\Images\start_button.png")
-start_button = pygame.transform.scale(start_button, (240, 90))
-again_button = pygame.image.load(r"Games\Easy\Simon\Assets\Images\again_button.png")
-again_button = pygame.transform.scale(again_button, (240, 90))
-exit_button = pygame.image.load(r"Games\Easy\Simon\Assets\Images\exit_button.png")
-exit_button = pygame.transform.scale(exit_button, (240, 90))
+        self.load_assets()
+        self.create_buttons()
 
-green_sound = pygame.mixer.Sound(r"Games\Easy\Simon\Assets\Audio\green.wav")
-red_sound = pygame.mixer.Sound(r"Games\Easy\Simon\Assets\Audio\red.wav")
-yellow_sound = pygame.mixer.Sound(r"Games\Easy\Simon\Assets\Audio\yellow.wav")
-blue_sound = pygame.mixer.Sound(r"Games\Easy\Simon\Assets\Audio\blue.wav")
-lose_sound = pygame.mixer.Sound(r"Games\Easy\Simon\Assets\Audio\Fail-sound-effect.wav")
-menu_music = pygame.mixer.Sound(r"Games\Easy\Simon\Assets\Audio\wethands.ogg")
+    def load_assets(self):
+        """Loads all game assets (fonts, images, sounds) using cross-platform paths."""
+        base_asset_path = os.path.join("Games", "Easy", "Simon", "Assets")
+        font_path = os.path.join(base_asset_path, "Fonts", "vermin_vibes.ttf")
+        img_path = os.path.join(base_asset_path, "Images")
+        audio_path = os.path.join(base_asset_path, "Audio")
 
-screen = pygame.display.set_mode((600, 700))
-pygame.display.set_icon(logo)
-pygame.display.set_caption("Simon")
+        self.font = pygame.font.Font(font_path, 20)
+        self.title_font = pygame.font.Font(font_path, 50)
 
-score = 0
-pattern = []
-time_delay = 500
-running = True
+        icon_img = pygame.image.load(os.path.join(img_path, "simon_logo.png"))
+        pygame.display.set_icon(icon_img)
 
+        self.images = {
+            'logo': pygame.transform.scale(icon_img, (300, 300)),
+            'start': pygame.transform.scale(pygame.image.load(os.path.join(img_path, "start_button.png")), (240, 90)),
+            'again': pygame.transform.scale(pygame.image.load(os.path.join(img_path, "again_button.png")), (240, 90)),
+            'exit': pygame.transform.scale(pygame.image.load(os.path.join(img_path, "exit_button.png")), (240, 90)),
+        }
 
-def draw_screen(g=green, r=red, y=yellow, b=blue):
-    screen.fill(black)
+        self.sounds = {
+            'GREEN': pygame.mixer.Sound(os.path.join(audio_path, "green.wav")),
+            'RED': pygame.mixer.Sound(os.path.join(audio_path, "red.wav")),
+            'YELLOW': pygame.mixer.Sound(os.path.join(audio_path, "yellow.wav")),
+            'BLUE': pygame.mixer.Sound(os.path.join(audio_path, "blue.wav")),
+            'LOSE': pygame.mixer.Sound(os.path.join(audio_path, "Fail-sound-effect.wav")),
+            'MENU': pygame.mixer.Sound(os.path.join(audio_path, "wethands.ogg")),
+        }
 
-    score_text = font.render("Score: " + str(score), True, white)
-    screen.blit(score_text, (450, 50))
+    def create_buttons(self):
+        """Creates Rect objects for all clickable areas."""
+        self.buttons = {
+            'GREEN': pygame.Rect(50, 150, 250, 250),
+            'RED': pygame.Rect(300, 150, 250, 250),
+            'YELLOW': pygame.Rect(50, 400, 250, 250),
+            'BLUE': pygame.Rect(300, 400, 250, 250),
+            'START_MENU': pygame.Rect(180, 530, 240, 90),
+            'AGAIN_GAMEOVER': pygame.Rect(180, 300, 240, 90),
+            'EXIT_GAMEOVER': pygame.Rect(180, 450, 240, 90),
+        }
 
-    pygame.draw.rect(screen, g, pygame.Rect(50, 150, 250, 250))
-    pygame.draw.rect(screen, r, pygame.Rect(300, 150, 250, 250))
-    pygame.draw.rect(screen, y, pygame.Rect(50, 400, 250, 250))
-    pygame.draw.rect(screen, b, pygame.Rect(300, 400, 250, 250))
+    def run(self):
+        """The main game loop, managed by a state machine."""
+        while True:
+            if self.game_state == GameState.MENU:
+                self.run_menu()
+            elif self.game_state == GameState.PLAYING:
+                self.run_playing()
+            elif self.game_state == GameState.GAME_OVER:
+                self.run_game_over()
 
-    pygame.display.update()
+    def run_menu(self):
+        self.sounds['MENU'].play(-1)
+        while self.game_state == GameState.MENU:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT: self.quit_game()
+                if event.type == pygame.MOUSEBUTTONUP and self.buttons['START_MENU'].collidepoint(event.pos):
+                    self.sounds['MENU'].stop()
+                    self.game_state = GameState.PLAYING
+                    return
 
+            self.screen.fill(BLACK)
+            self.screen.blit(self.images['logo'], (150, 150))
+            self.screen.blit(self.images['start'], (180, 530))
+            pygame.display.update()
+            self.clock.tick(60)
 
-def show_pattern():
-    t_delay = 500 - 100 * int(len(pattern) / 5)
-    if t_delay <= 100:
-        t_delay = 100
+    def run_playing(self):
+        self.score = 0
+        self.pattern = []
+        self.player_input = []
+        turn = "COMPUTER" # Computer shows pattern first
 
-    draw_screen()
-    pygame.time.delay(1000)
+        while self.game_state == GameState.PLAYING:
+            self.draw_game_screen()
 
-    for x in pattern:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                quit_game()
+            if turn == "COMPUTER":
+                self.player_input = []
+                pygame.time.delay(1000)
+                self.pattern.append(random.choice(list(BUTTON_COLORS.keys())))
+                self.show_pattern()
+                turn = "PLAYER"
 
-        if x == 1:
-            draw_screen(g=light_green)
-            green_sound.play()
-            pygame.time.delay(t_delay)
-            draw_screen()
-            green_sound.stop()
-        elif x == 2:
-            draw_screen(r=light_red)
-            red_sound.play()
-            pygame.time.delay(t_delay)
-            draw_screen()
-            red_sound.stop()
-        elif x == 3:
-            draw_screen(y=light_yellow)
-            yellow_sound.play()
-            pygame.time.delay(t_delay)
-            draw_screen()
-            yellow_sound.stop()
-        elif x == 4:
-            draw_screen(b=light_blue)
-            blue_sound.play()
-            pygame.time.delay(t_delay)
-            draw_screen()
-            blue_sound.stop()
+            else: # Player's turn
+                self.handle_player_turn()
+                if len(self.player_input) == len(self.pattern):
+                    self.score = len(self.pattern)
+                    turn = "COMPUTER"
 
-        pygame.time.delay(t_delay)
+    def handle_player_turn(self):
+        start_time = time.time()
+        while time.time() - start_time < 3: # 3 seconds to make a move
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT: self.quit_game()
+                if event.type == pygame.MOUSEBUTTONUP:
+                    for color, rect in self.buttons.items():
+                        if color in BUTTON_COLORS and rect.collidepoint(event.pos):
+                            self.flash_color(color)
+                            self.player_input.append(color)
+                            if not self.check_player_input():
+                                self.game_state = GameState.GAME_OVER
+                                return
+                            start_time = time.time() # Reset timer after each correct press
+                            # If sequence is complete, return to computer's turn
+                            if len(self.player_input) == len(self.pattern):
+                                return
+            # Allows screen to update while waiting for input
+            self.draw_game_screen()
 
+        # If the loop finishes due to timeout
+        self.game_state = GameState.GAME_OVER
 
-def new_pattern():
-    global score
-    score = len(pattern)
-    pattern.append(random.randint(1, 4))
+    def check_player_input(self) -> bool:
+        return self.pattern[:len(self.player_input)] == self.player_input
 
+    def run_game_over(self):
+        self.sounds['LOSE'].play()
+        while self.game_state == GameState.GAME_OVER:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT: self.quit_game()
+                if event.type == pygame.MOUSEBUTTONUP:
+                    if self.buttons['AGAIN_GAMEOVER'].collidepoint(event.pos):
+                        self.game_state = GameState.MENU
+                        return
+                    if self.buttons['EXIT_GAMEOVER'].collidepoint(event.pos):
+                        self.quit_game()
 
-def check_pattern(player_pattern):
-    if player_pattern != pattern[: len(player_pattern)]:
-        lose_screen()
+            self.screen.fill(BLACK)
+            lose_text = self.title_font.render("You Lose", True, WHITE)
+            score_text = self.title_font.render(f"Score: {self.score}", True, WHITE)
+            self.screen.blit(lose_text, (lose_text.get_rect(center=(self.screen.get_width()/2, 100))))
+            self.screen.blit(score_text, (score_text.get_rect(center=(self.screen.get_width()/2, 170))))
+            self.screen.blit(self.images['again'], self.buttons['AGAIN_GAMEOVER'].topleft)
+            self.screen.blit(self.images['exit'], self.buttons['EXIT_GAMEOVER'].topleft)
+            pygame.display.update()
 
+    def show_pattern(self):
+        delay = max(100, 500 - 20 * self.score)
+        for color in self.pattern:
+            self.flash_color(color, delay)
+            pygame.time.delay(delay // 2)
 
-def click_listen():
-    turn_time = time.time()
-    player_pattern = []
+    def flash_color(self, color: str, delay: int = 250):
+        self.sounds[color].play()
+        self.draw_game_screen({color: BUTTON_COLORS[color][1]}) # Draw with light color
+        pygame.time.delay(delay)
+        self.draw_game_screen() # Draw with normal colors
 
-    while time.time() <= turn_time + 3 and len(player_pattern) < len(pattern):
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                quit_game()
-            if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
-                pos = pygame.mouse.get_pos()
-                x = pos[0]
-                y = pos[1]
-
-                if 50 < x < 300 and 150 < y < 400:
-                    draw_screen(g=light_green)
-                    green_sound.play()
-                    pygame.time.delay(time_delay)
-                    green_sound.stop()
-                    draw_screen()
-                    player_pattern.append(1)
-                    check_pattern(player_pattern)
-                    turn_time = time.time()
-                elif 300 < x < 550 and 150 < y < 400:
-                    draw_screen(r=light_red)
-                    red_sound.play()
-                    pygame.time.delay(time_delay)
-                    red_sound.stop()
-                    draw_screen()
-                    player_pattern.append(2)
-                    check_pattern(player_pattern)
-                    turn_time = time.time()
-                elif 50 < x < 300 and 400 < y < 650:
-                    draw_screen(y=light_yellow)
-                    yellow_sound.play()
-                    pygame.time.delay(time_delay)
-                    yellow_sound.stop()
-                    draw_screen()
-                    player_pattern.append(3)
-                    check_pattern(player_pattern)
-                    turn_time = time.time()
-                elif 300 < x < 550 and 400 < y < 650:
-                    draw_screen(b=light_blue)
-                    blue_sound.play()
-                    pygame.time.delay(time_delay)
-                    blue_sound.stop()
-                    draw_screen()
-                    player_pattern.append(4)
-                    check_pattern(player_pattern)
-                    turn_time = time.time()
-
-    if time.time() <= turn_time + 3:
-        return
-    lose_screen()
-
-
-def quit_game():
-    pygame.display.quit()
-    pygame.quit()
-    sys.exit()
-
-
-def lose_screen():
-    lose_sound.play()
-
-    global score
-
-    screen.fill(black)
-    lose_text = title_font.render("You Lose", True, white)
-    score_text = title_font.render("Score: " + str(score), True, white)
-    screen.blit(lose_text, (161.5, 50))
-    screen.blit(
-        score_text,
-        (((600 - title_font.size("Score: " + str(score))[0]) / 2), 120),
-    )
-    screen.blit(again_button, (180, 300))
-    screen.blit(exit_button, (180, 450))
-
-    pygame.display.update()
-
-    score = 0
-    global pattern
-    pattern = []
-    global time_delay
-    time_delay = 500
-    global running
-    running = True
-
-    waiting = True
-    while waiting:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                quit_game()
-            if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
-                pos = pygame.mouse.get_pos()
-                x = pos[0]
-                y = pos[1]
-
-                if 180 <= x <= 420 and 300 <= y <= 390:
-                    start_menu()
-                elif 180 <= x <= 420 and 450 <= y <= 540:
-                    quit_game()
-
-
-def start_menu():
-    waiting = True
-    menu_music.play(-1)
-    logo_bob = 150
-    title_text = title_font.render("Simon", True, white)
-
-    bob_direction = True
-    while waiting:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                quit_game()
-            if event.type == pygame.MOUSEBUTTONUP and event.button == 1:
-                pos = pygame.mouse.get_pos()
-                x = pos[0]
-                y = pos[1]
-
-                if 180 <= x <= 420 and 530 <= y <= 620:
-                    menu_music.stop()
-                    waiting = False
-
-        screen.fill(black)
-
-        screen.blit(title_text, (220, 50))
-        screen.blit(big_logo, (150, logo_bob))
-        screen.blit(start_button, (180, 530))
+    def draw_game_screen(self, override_colors: dict = {}):
+        self.screen.fill(BLACK)
+        score_text = self.font.render(f"Score: {self.score}", True, WHITE)
+        self.screen.blit(score_text, (450, 50))
+        for color, rect in self.buttons.items():
+            if color in BUTTON_COLORS:
+                # Use override color if provided (for flashing), otherwise use normal dark color
+                button_color = override_colors.get(color, BUTTON_COLORS[color][0])
+                pygame.draw.rect(self.screen, button_color, rect)
         pygame.display.update()
 
-        if logo_bob == 150:
-            pygame.time.delay(300)
-            bob_direction = True
-        elif logo_bob == 190:
-            pygame.time.delay(300)
-            bob_direction = False
+    def quit_game(self):
+        pygame.quit()
+        sys.exit()
 
-        if bob_direction:
-            logo_bob += 0.5
-        else:
-            logo_bob -= 0.5
-
-        clock.tick(60)
-
-    while running:
-        new_pattern()
-        show_pattern()
-        click_listen()
-
-
-start_menu()
+if __name__ == "__main__":
+    game = SimonGame()
+    game.run()

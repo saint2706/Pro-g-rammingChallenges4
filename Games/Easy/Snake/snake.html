@@ -4,17 +4,18 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<head>
 		<title>Snake Game</title>
-		<script src="https://code.jquery.com/jquery-1.11.3.js"></script>
-		<style src="snake.css"></style>
+		<link rel="stylesheet" href="snake.css">
 	</head>
 	<body>
-		<p id="p1">SCORE:</p>
-		<p id="p2">HIGHSCORE:</p>
-		<p id="score"></p>
-		<p id="high"></p>
-		<button id="btn_stop">Stop Snake Game</button>
-		<p id="end_msg"></p>
-		<canvas width="400" height="400" id="game"></canvas>
+        <h1>Classic Snake</h1>
+        <div class="scores">
+            <span>Score: <span id="current-score">0</span></span>
+            <span>High Score: <span id="high-score">0</span></span>
+        </div>
+		<canvas width="400" height="400" id="game-canvas"></canvas>
+        <div class="controls">
+            <p>Use WASD or Arrow Keys to move. Press 'P' to pause.</p>
+        </div>
 		<script src="snake.js"></script>
 	</body>
 </html>
