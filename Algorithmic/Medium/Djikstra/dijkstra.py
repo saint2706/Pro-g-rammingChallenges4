@@ -91,5 +91,79 @@ def main():
     except (EOFError, KeyboardInterrupt):
         print("\n\nOperation cancelled by user.")
 
+def dijkstra_stepper(graph: Graph, start_node: str):
+    """
+    A generator version of Dijkstra's algorithm that yields its state at each step,
+    making it suitable for visualization.
+    """
+    if start_node not in graph:
+        raise ValueError(f"Start node '{start_node}' not found in the graph.")
+
+    distances: Distances = {node: float("infinity") for node in graph}
+    distances[start_node] = 0
+
+    previous_nodes: Dict[str, Optional[str]] = {node: None for node in graph}
+
+    priority_queue: List[Tuple[Union[int, float], str]] = [(0, start_node)]
+
+    visited = set()
+
+    # Yield initial state
+    yield {
+        "current_node": None,
+        "distances": distances.copy(),
+        "previous_nodes": previous_nodes.copy(),
+        "queue": [item[1] for item in priority_queue],
+        "visited": visited.copy(),
+        "message": f"Starting at node {start_node}"
+    }
+
+    while priority_queue:
+        current_distance, current_node = heapq.heappop(priority_queue)
+
+        if current_node in visited:
+            continue
+
+        visited.add(current_node)
+
+        yield {
+            "current_node": current_node,
+            "distances": distances.copy(),
+            "previous_nodes": previous_nodes.copy(),
+            "queue": [item[1] for item in priority_queue],
+            "visited": visited.copy(),
+            "message": f"Visiting node {current_node}, current distance: {current_distance}"
+        }
+
+        for neighbor, weight in graph[current_node].items():
+            if neighbor in visited:
+                continue
+
+            distance = current_distance + weight
+
+            if distance < distances[neighbor]:
+                distances[neighbor] = distance
+                previous_nodes[neighbor] = current_node
+                heapq.heappush(priority_queue, (distance, neighbor))
+
+                yield {
+                    "current_node": current_node,
+                    "distances": distances.copy(),
+                    "previous_nodes": previous_nodes.copy(),
+                    "queue": [item[1] for item in priority_queue],
+                    "visited": visited.copy(),
+                    "message": f"Updating distance to {neighbor} to {distance:.2f} via {current_node}"
+                }
+
+    yield {
+        "current_node": None,
+        "distances": distances.copy(),
+        "previous_nodes": previous_nodes.copy(),
+        "queue": [],
+        "visited": visited.copy(),
+        "message": "Algorithm finished."
+    }
+
+
 if __name__ == "__main__":
     main()
