@@ -66,5 +66,43 @@ def main():
 
     print(f"\nTotal moves required: {2**num_disks - 1}")
 
+def hanoi_state_generator(num_disks: int, source: str, target: str, auxiliary: str):
+    """
+    A generator that solves Towers of Hanoi and yields the state of the pegs
+    after each move.
+
+    Args:
+        num_disks: The number of disks to move.
+        source: The name of the source rod.
+        target: The name of the destination rod.
+        auxiliary: The name of the auxiliary rod.
+
+    Yields:
+        A dictionary representing the state of the pegs, e.g.,
+        {'A': [3, 2, 1], 'B': [], 'C': []}
+    """
+    pegs = {
+        source: list(range(num_disks, 0, -1)),
+        auxiliary: [],
+        target: []
+    }
+    yield pegs.copy()
+
+    def solve(n, src, tgt, aux):
+        if n > 0:
+            # Move n-1 disks from source to auxiliary
+            yield from solve(n - 1, src, aux, tgt)
+
+            # Move disk n from source to target
+            disk = pegs[src].pop()
+            pegs[tgt].append(disk)
+            yield pegs.copy()
+
+            # Move n-1 disks from auxiliary to target
+            yield from solve(n - 1, aux, tgt, src)
+
+    yield from solve(num_disks, source, target, auxiliary)
+
+
 if __name__ == "__main__":
     main()
