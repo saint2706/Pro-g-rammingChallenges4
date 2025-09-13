@@ -1,6 +1,7 @@
+
 # Pro-g-ramming Challenges 4
 
-[![](https://wakatime.com/badge/github/saintwithataint/Pro-g-rammingChallenges4.svg)](https://wakatime.com/badge/github/saintwithataint/Pro-g-rammingChallenges4)
+[![Wakatime badge](https://wakatime.com/badge/github/saintwithataint/Pro-g-rammingChallenges4.svg)](https://wakatime.com/badge/github/saintwithataint/Pro-g-rammingChallenges4)
 
 Welcome to the fourth iteration of my programming challenges repository! This project is a personal journey of learning and implementing various programming challenges, spanning different categories and difficulty levels.
 
@@ -14,11 +15,11 @@ The solutions are organized by category and difficulty, making it easy to naviga
 
 While this is a personal project, the principles behind it are universal. If you're starting your own journey of programming challenges, here's a guide to help you get the most out of it:
 
-1.  **Understand the Problem:** Before writing a single line of code, do your research. Draw diagrams, write out the logic, and break the problem down into smaller pieces. If a problem seems too easy, think about how you can add more features or complexity.
-2.  **Implement a Solution:** Start with a language you're comfortable with to get a working solution first. Don't worry about writing perfect code on the first try. The goal is to get it working, then you can refactor and improve it.
-3.  **Test Your Code:** Think about how your code might fail. Write test cases to cover different scenarios and edge cases. Find bugs, fix them, and document your process.
-4.  **Re-implement and Explore:** Once you have a solid solution, try implementing it in a new language. Experiment with different algorithms, data structures, and programming styles. This is a great way to deepen your understanding and expand your skills.
-5.  **Never Stop Learning:** Keep challenging yourself. Contribute to open source, start new projects, and keep building your portfolio.
+1. **Understand the Problem:** Before writing a single line of code, do your research. Draw diagrams, write out the logic, and break the problem down into smaller pieces. If a problem seems too easy, think about how you can add more features or complexity.
+2. **Implement a Solution:** Start with a language you're comfortable with to get a working solution first. Don't worry about writing perfect code on the first try. The goal is to get it working, then you can refactor and improve it.
+3. **Test Your Code:** Think about how your code might fail. Write test cases to cover different scenarios and edge cases. Find bugs, fix them, and document your process.
+4. **Re-implement and Explore:** Once you have a solid solution, try implementing it in a new language. Experiment with different algorithms, data structures, and programming styles. This is a great way to deepen your understanding and expand your skills.
+5. **Never Stop Learning:** Keep challenging yourself. Contribute to open source, start new projects, and keep building your portfolio.
 
 ## Challenges
 
@@ -55,7 +56,7 @@ While this is a personal project, the principles behind it are universal. If you
 | 27 | Create a Torrent Client (CLI or GUI) | Not Yet |
 | 28 | Booru Client | Not Yet |
 | 29 | Key Press Bot | Not Yet |
-| 30 | IP/URL Obsucrification (http://www.pc-help.org/obscure.htm) | Not Yet |
+| 30 | IP/URL Obsucrification (<http://www.pc-help.org/obscure.htm>) | Not Yet |
 | 31 | Radix Base Converter (Given a radix base convert it to decimal) | [View Solution](./Practical/Radix%20Base%20Converter/) |
 | 32 | Chan aggregator (Let's user view various boards from different 'chans') (Bonus: Add 4ChanX and Archiving Functionality) | Not Yet |
 | 33 | Encrypt a File and Upload it online | Not Yet |
@@ -104,7 +105,7 @@ While this is a personal project, the principles behind it are universal. If you
 | 61 | ROT 13 | [View Solution](./Algorithmic/ROT%2013/) |
 | 62 | Program that displays MBR Contents | [View Solution](./Algorithmic/MBR/) |
 | 63 | Random Name Picker | [View Solution](./Algorithmic/Random%20Name%20Picker/) |
-| 64 | Encrypt/Decrypt Text: Implement at least one from http://rumkin.com/tools/cipher/collection | [View Solution](./Algorithmic/Rumkin%20Ciphers/) |
+| 64 | Encrypt/Decrypt Text: Implement at least one from <http://rumkin.com/tools/cipher/collection> | [View Solution](./Algorithmic/Rumkin%20Ciphers/) |
 | 65 | Youtube To MP3 | [View Solution](./Algorithmic/ytmp3/) |
 | 66 | Text to Hexadecimal/Binary | [View Solution](./Algorithmic/basic%20text%20encoding/) |
 | 67 | Calculate the first 1 000 digits of pi iteratively | [View Solution](./Algorithmic/1000%20Digits%20of%20Pi/) |
@@ -206,18 +207,20 @@ This repository includes several scripts with graphical user interfaces (GUIs) a
 For those hungry for more, here are some excellent resources to continue your journey.
 
 ### Recommended Reading
-*   Knuth: *The Art of Computer Programming*
-*   Skiena: *The Algorithm Design Manual*
-*   Cormen et al: *Introduction to Algorithms*
-*   Russel: *Artificial Intelligence: A Modern Approach*
-*   Abelson: *Structure and Interpretation of Computer Programs*
+
+* Knuth: *The Art of Computer Programming*
+* Skiena: *The Algorithm Design Manual*
+* Cormen et al: *Introduction to Algorithms*
+* Russel: *Artificial Intelligence: A Modern Approach*
+* Abelson: *Structure and Interpretation of Computer Programs*
 
 ### More Challenges
-*   [HackerRank](https://www.hackerrank.com)
-*   [CodeChef](https://www.codechef.com)
-*   [CodeFights](https://www.codefights.com)
-*   [Project Euler](https://www.projecteuler.net)
-*   [Rosetta Code](https://www.rosettacode.org)
-*   [CodeAbbey](https://www.codeabbey.com)
-*   [CodingBat](https://www.codingbat.com)
-*   [Programming Praxis](https://www.programmingpraxis.com)
+
+* [HackerRank](https://www.hackerrank.com)
+* [CodeChef](https://www.codechef.com)
+* [CodeFights](https://www.codefights.com)
+* [Project Euler](https://www.projecteuler.net)
+* [Rosetta Code](https://www.rosettacode.org)
+* [CodeAbbey](https://www.codeabbey.com)
+* [CodingBat](https://www.codingbat.com)
+* [Programming Praxis](https://www.programmingpraxis.com)

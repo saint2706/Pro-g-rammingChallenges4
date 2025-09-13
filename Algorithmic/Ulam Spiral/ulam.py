@@ -1,107 +1,226 @@
-import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.cm as cm
+"""Ulam Spiral generator.
+
+Modernized version featuring:
+  * Pure functions for sieve + spiral construction
+  * Dataclass-style configuration (using a lightweight class for Python <3.10 compatibility in simple scripts)
+  * Argparse driven CLI (no interactive input for automation friendliness)
+  * Optional JSON metadata output (--json)
+  * Save image to file (--save) and/or suppress window (--no-show)
+  * Adjustable colormap (--cmap) and figure size (--figsize)
+
+Example usages:
+  python ulam.py --size 101
+  python ulam.py -s 301 --cmap viridis --save ulam_301.png --no-show --json
+  python ulam.py -s 201 --json
+
+Notes:
+  * The canonical Ulam spiral places 1 at the center, then enumerates integers
+    by moving right, up, left, left, down, down, right, right, right, up, up, up ...
+    (spiral arms: step lengths repeating twice and incrementing: 1,1,2,2,3,3,...)
+  * Primes trace striking diagonal and radial patterns, hinting at underlying
+    structure in their distribution.
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import math
 import sys
-from typing import Tuple
+from dataclasses import dataclass
+from typing import List, Optional, Tuple
+
+import numpy as np
+
+try:  # Matplotlib is optional for JSON / data-only usage
+    import matplotlib.pyplot as plt  # type: ignore
+
+    HAVE_MPL = True
+except Exception:  # pragma: no cover - fallback when matplotlib absent
+    HAVE_MPL = False
+
+
+# ------------------------------ Core Algorithms ------------------------------ #
+
 
 def sieve_of_eratosthenes(n: int) -> np.ndarray:
-    """
-    Generates all prime numbers up to n using the Sieve of Eratosthenes.
+    """Return boolean array ``is_prime`` of length n+1 using a classic sieve.
 
-    Args:
-        n: The upper limit for the sieve.
-
-    Returns:
-        A boolean numpy array of size n+1, where array[i] is True if i is prime.
+    Complexity: O(n log log n). For modest sizes (<= 5e6) this is fast in pure NumPy.
     """
+    if n < 1:
+        return np.zeros(n + 1, dtype=bool)
     primes = np.ones(n + 1, dtype=bool)
-    primes[0:2] = False  # 0 and 1 are not prime
-    for i in range(2, int(np.sqrt(n)) + 1):
-        if primes[i]:
-            # Mark all multiples of i as not prime
-            primes[i*i : n+1 : i] = False
+    primes[:2] = False
+    limit = int(math.isqrt(n))
+    for p in range(2, limit + 1):
+        if primes[p]:
+            # Start eliminating from p*p; prior composites already handled.
+            primes[p * p : n + 1 : p] = False
     return primes
 
-def make_spiral(arr: np.ndarray) -> np.ndarray:
+
+def generate_ulam_spiral(size: int) -> np.ndarray:
+    """Generate a square ``size x size`` binary array for the Ulam spiral.
+
+    ``1`` indicates a prime number, ``0`` otherwise. The integer 1 (center) is
+    not prime so center may be zero if size > 1.
     """
-    Rearranges a flat 1D array into a 2D spiral matrix.
-    The input array must be a perfect square.
-    """
-    # Get the dimensions of the square matrix
-    edge_size = int(np.sqrt(arr.size))
-    if edge_size * edge_size != arr.size:
-        raise ValueError("Input array must be a perfect square.")
+    if size < 1:
+        raise ValueError("size must be >= 1")
+    limit = size * size
+    primes = sieve_of_eratosthenes(limit)
 
-    grid = arr.reshape((edge_size, edge_size))
+    grid = np.zeros((size, size), dtype=np.uint8)
 
-    # Create an index grid to map positions for the spiral
-    index_grid = np.arange(edge_size * edge_size).reshape((edge_size, edge_size))[::-1]
+    # Start at center (for even sizes this is the lower-left of the central 2x2)
+    x = y = size // 2
+    # Spiral parameters
+    directions: List[Tuple[int, int]] = [(1, 0), (0, -1), (-1, 0), (0, 1)]  # R, U, L, D
+    dir_index = 0
+    step_length = 1
+    steps_taken_at_length = 0
 
-    spiral_indices = []
-    while index_grid.size > 0:
-        # Take the top row of the index grid
-        spiral_indices.append(index_grid[0])
-        # Rotate the rest of the grid counter-clockwise to bring the next row to the top
-        index_grid = index_grid[1:].T[::-1]
+    for n in range(1, limit + 1):
+        if primes[n]:
+            if 0 <= y < size and 0 <= x < size:
+                grid[y, x] = 1
+        # Move to next cell in spiral unless done
+        if n == limit:
+            break
+        dx, dy = directions[dir_index]
+        x += dx
+        y += dy
+        step_length -= 0  # (kept for clarity; no change here)
+        steps_taken_at_length += 1
+        # After completing 'current step length' in a direction, rotate direction
+        if steps_taken_at_length == step_length:
+            dir_index = (dir_index + 1) % 4
+            steps_taken_at_length = 0
+            # Every two direction changes increase the segment length
+            if dir_index % 2 == 0:
+                step_length += 1
+    return grid
 
-    spiral_index_flat = np.concatenate(spiral_indices)
 
-    # Create the final spiral grid
-    spiral_grid = np.empty_like(grid)
-    # Place the elements from the input array into their spiral positions
-    spiral_grid.flat[spiral_index_flat] = grid.flat[::-1]
+# ------------------------------ Configuration ------------------------------ #
 
-    return spiral_grid
 
-def main():
-    """
-    Main function to generate and display an Ulam spiral.
-    """
-    print("--- Ulam Spiral Generator ---")
+@dataclass(slots=True)
+class SpiralConfig:
+    size: int = 101
+    cmap: str = "binary"
+    figsize: float = 10.0
+    save: Optional[str] = None
+    json_out: bool = False
+    show: bool = True
 
-    default_size = 101  # A larger, odd number shows the pattern better
-    edge_size = default_size
+    def validate(self) -> None:
+        if self.size < 1:
+            raise ValueError("size must be positive")
+        if self.figsize <= 0:
+            raise ValueError("figsize must be > 0")
 
-    if len(sys.argv) > 1:
+
+# ------------------------------ Plotting Helper ------------------------------ #
+
+
+def plot_ulam(grid: np.ndarray, cfg: SpiralConfig) -> None:
+    if not HAVE_MPL:
+        raise RuntimeError("matplotlib not available; cannot plot (install matplotlib)")
+    import matplotlib.pyplot as plt  # local import for clarity
+
+    fig, ax = plt.subplots(figsize=(cfg.figsize, cfg.figsize))
+    ax.imshow(grid, cmap=cfg.cmap, interpolation="nearest")
+    ax.set_title(f"Ulam Spiral ({cfg.size}x{cfg.size})")
+    ax.axis("off")
+    if cfg.save:
+        fig.savefig(cfg.save, dpi=150, bbox_inches="tight")
+    if cfg.show:
+        plt.show()
+    else:  # Close to free memory in batch contexts
+        plt.close(fig)
+
+
+# ------------------------------ CLI / Main ------------------------------ #
+
+
+def build_arg_parser() -> argparse.ArgumentParser:
+    p = argparse.ArgumentParser(
+        description="Generate an Ulam spiral image and/or JSON metadata."
+    )
+    p.add_argument(
+        "-s",
+        "--size",
+        type=int,
+        default=101,
+        help="Edge length of spiral (odd recommended, default 101)",
+    )
+    p.add_argument(
+        "--cmap", default="binary", help="Matplotlib colormap (default: binary)"
+    )
+    p.add_argument(
+        "--figsize", type=float, default=10.0, help="Figure size (inches, default 10)"
+    )
+    p.add_argument(
+        "--save",
+        metavar="PATH",
+        help="Save the generated image to PATH (PNG recommended)",
+    )
+    p.add_argument(
+        "--json", action="store_true", help="Output JSON summary metadata to stdout"
+    )
+    p.add_argument(
+        "--no-show",
+        action="store_true",
+        help="Do not display the window (useful with --save / --json)",
+    )
+    return p
+
+
+def main(argv: Optional[List[str]] = None) -> int:
+    parser = build_arg_parser()
+    args = parser.parse_args(argv)
+    cfg = SpiralConfig(
+        size=args.size,
+        cmap=args.cmap,
+        figsize=args.figsize,
+        save=args.save,
+        json_out=args.json,
+        show=not args.no_show,
+    )
+
+    try:
+        cfg.validate()
+    except ValueError as e:
+        parser.error(str(e))
+
+    grid = generate_ulam_spiral(cfg.size)
+    prime_count = int(grid.sum())
+    limit = cfg.size * cfg.size
+    density = prime_count / max(1, limit)
+
+    if cfg.json_out:
+        summary = {
+            "size": cfg.size,
+            "limit": limit,
+            "prime_count": prime_count,
+            "prime_density": density,
+            "cmap": cfg.cmap,
+            "saved": bool(cfg.save),
+        }
+        print(json.dumps(summary, indent=2))
+
+    # Only attempt plotting if user wants visualization
+    if cfg.show or cfg.save:
         try:
-            edge_size = int(sys.argv[1])
-        except ValueError:
-            print(f"Usage: python {sys.argv[0]} [edge_size]", file=sys.stderr)
-            sys.exit(1)
-    else:
-        try:
-            size_str = input(f"Enter the spiral edge size (odd number recommended, default: {default_size}): ")
-            if size_str:
-                edge_size = int(size_str)
-        except (ValueError, EOFError, KeyboardInterrupt):
-            print(f"\nInvalid input or operation cancelled. Using default size of {edge_size}.")
+            plot_ulam(grid, cfg)
+        except RuntimeError as e:
+            # If plotting requested but MPL not installed, surface clear message
+            print(f"Plot skipped: {e}", file=sys.stderr)
+            return 1
+    return 0
 
-    if edge_size <= 0:
-        print("Edge size must be a positive integer.", file=sys.stderr)
-        return
-    if edge_size % 2 == 0:
-        print("Warning: An even edge size will result in an off-center spiral. Odd sizes are better.")
 
-    # 1. Generate primes up to the maximum number in the spiral (edge_size^2)
-    limit = edge_size ** 2
-    is_prime = sieve_of_eratosthenes(limit)
-
-    # 2. Create a flat array where 1 represents a prime, 0 otherwise
-    # We want to represent numbers 1 to limit. is_prime[i] is for number i.
-    # So we take the slice from 1 to limit+1.
-    prime_markers = is_prime[1:limit+1].astype("u1")
-
-    # 3. Form the spiral
-    print("Generating spiral...")
-    spiral_grid = make_spiral(prime_markers)
-
-    # 4. Display the spiral using matplotlib
-    print("Displaying plot...")
-    plt.figure(figsize=(10, 10))
-    plt.matshow(spiral_grid, cmap=cm.binary, fignum=1)
-    plt.title(f"Ulam Spiral ({edge_size}x{edge_size})")
-    plt.axis("off")
-    plt.show()
-
-if __name__ == "__main__":
-    main()
+if __name__ == "__main__":  # pragma: no cover - CLI entry
+    raise SystemExit(main())

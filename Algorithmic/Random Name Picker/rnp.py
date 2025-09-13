@@ -1,82 +1,244 @@
+"""rnp.py - Random name picker with modern CLI & features.
+
+Enhancements over the original script:
+* Dataclass configuration object
+* argparse CLI with JSON output option
+* Optional weighted selection via "name,weight" lines
+* Support picking with or without replacement
+* Reproducibility via --seed
+* Automatic default file creation
+* Clean separation of parsing, selection, and I/O for testability
+
+File Format
+===========
+Each non-empty line is either:
+  Name
+  Name,weight   (weight must be a positive number)
+
+Examples:
+  Alice,3
+  Bob,1
+  Charlie
+
+CLI Examples
+------------
+Pick 3 unique names:
+    python rnp.py -c 3
+
+Allow repeats (with replacement):
+    python rnp.py -c 5 --with-replacement
+
+Weighted selection (if weights in file) and JSON output:
+    python rnp.py -c 4 --json
+
+Deterministic run:
+    python rnp.py -c 4 --seed 42
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import os
 import random
 import sys
-import os
-from typing import List
+from dataclasses import dataclass
+from typing import Iterable, List, Optional, Sequence, Tuple
 
-def create_default_name_file(filepath: str):
-    """Creates a default name file for demonstration purposes."""
-    print(f"A name file was not found. Creating a default file at '{filepath}'...")
-    default_names = ["Alice", "Bob", "Charlie", "David", "Eve", "Frank", "Grace", "Heidi", "Ivan", "Judy"]
+
+# ---------------------------- Data Model ---------------------------- #
+@dataclass(slots=True)
+class NamePickerConfig:
+    path: str = "names.txt"
+    count: int = 1
+    with_replacement: bool = False
+    json_output: bool = False
+    seed: Optional[int] = None
+    create_default: bool = True
+
+    def validate(self, total_names: int) -> None:
+        if self.count <= 0:
+            raise ValueError("Count must be positive")
+        if not self.with_replacement and self.count > total_names:
+            raise ValueError(
+                f"Cannot pick {self.count} unique names from {total_names}"
+            )
+
+
+DEFAULT_NAMES = [
+    "Alice",
+    "Bob",
+    "Charlie",
+    "David",
+    "Eve",
+    "Frank",
+    "Grace",
+    "Heidi",
+    "Ivan",
+    "Judy",
+]
+
+
+def ensure_default_file(path: str) -> None:
+    if os.path.exists(path):
+        return
     try:
-        with open(filepath, 'w') as f:
-            for name in default_names:
-                f.write(name + '\n')
-    except IOError as e:
-        print(f"Error: Could not create the default name file. {e}", file=sys.stderr)
+        with open(path, "w", encoding="utf-8") as f:
+            for name in DEFAULT_NAMES:
+                f.write(name + "\n")
+        print(f"Created default name file at '{path}'")
+    except OSError as e:  # pragma: no cover - unlikely
+        print(f"Error creating default file: {e}", file=sys.stderr)
         sys.exit(1)
 
-def pick_random_names(names_list: List[str], count: int) -> List[str]:
+
+def parse_names_file(path: str) -> Tuple[List[str], Optional[List[float]]]:
+    """Parse names (and optional weights) from file.
+
+    Returns (names, weights) where weights may be None if no weights present.
+    If any line has a weight, missing weights default to 1.0.
     """
-    Picks one or more random names from a list without replacement.
+    names: List[str] = []
+    weights: List[float] = []
+    saw_weight = False
+    with open(path, "r", encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if not line:
+                continue
+            if "," in line:
+                name, w_str = [part.strip() for part in line.split(",", 1)]
+                try:
+                    w = float(w_str)
+                    if w <= 0:
+                        raise ValueError
+                except ValueError:
+                    print(
+                        f"Warning: invalid weight '{w_str}' for name '{name}' – skipping line",
+                        file=sys.stderr,
+                    )
+                    continue
+                names.append(name)
+                weights.append(w)
+                saw_weight = True
+            else:
+                names.append(line)
+                weights.append(1.0)
+    if not names:
+        raise ValueError("Name file is empty")
+    if not saw_weight:
+        return names, None
+    return names, weights
 
-    Args:
-        names_list: A list of names to choose from.
-        count: The number of unique names to pick.
 
-    Returns:
-        A list containing the randomly picked names.
+def pick_names(
+    names: Sequence[str],
+    count: int,
+    *,
+    with_replacement: bool,
+    weights: Optional[Sequence[float]],
+    rng: random.Random,
+) -> List[str]:
+    if with_replacement:
+        # random.choices uses weights for replacement scenario
+        return rng.choices(names, weights=weights, k=count)
+    # Without replacement: use sample; weights necessitate manual approach.
+    if weights is None:
+        return rng.sample(list(names), count)
+    # Weighted without replacement: perform sequential weighted selection.
+    chosen: List[str] = []
+    names_mut = list(names)
+    weights_mut = list(weights)
+    for _ in range(count):
+        total = sum(weights_mut)
+        r = rng.random() * total
+        acc = 0.0
+        for i, w in enumerate(weights_mut):
+            acc += w
+            if r <= acc:
+                chosen.append(names_mut.pop(i))
+                weights_mut.pop(i)
+                break
+    return chosen
 
-    Raises:
-        ValueError: If the list is empty or if the requested count is invalid.
-    """
-    if not names_list:
-        raise ValueError("The list of names cannot be empty.")
-    if not 0 < count <= len(names_list):
-        raise ValueError(f"Cannot pick {count} names. Please pick a number between 1 and {len(names_list)}.")
 
-    # Use random.sample for efficient, non-repeating random selection.
-    return random.sample(names_list, count)
+def build_arg_parser() -> argparse.ArgumentParser:
+    p = argparse.ArgumentParser(
+        description="Random name picker with optional weighting"
+    )
+    p.add_argument("-c", "--count", type=int, default=1, help="Number of names to pick")
+    p.add_argument(
+        "-f", "--file", dest="path", default="names.txt", help="Path to names file"
+    )
+    p.add_argument(
+        "--with-replacement",
+        action="store_true",
+        help="Allow picking the same name multiple times",
+    )
+    p.add_argument(
+        "--json", action="store_true", help="Output JSON instead of plain text"
+    )
+    p.add_argument("--seed", type=int, help="Seed RNG for reproducibility")
+    p.add_argument(
+        "--no-create-default",
+        action="store_true",
+        help="Do not auto-create default file if missing",
+    )
+    return p
 
-def main():
-    """
-    Main function to load names from a file and pick a specified number of them.
-    """
-    print("--- Random Name Picker ---")
 
-    # The script will look for names.txt in the same directory.
-    name_file = "names.txt"
+def main(argv: Optional[Iterable[str]] = None) -> int:
+    parser = build_arg_parser()
+    args = parser.parse_args(list(argv) if argv is not None else None)
+    cfg = NamePickerConfig(
+        path=args.path,
+        count=args.count,
+        with_replacement=args.with_replacement,
+        json_output=args.json,
+        seed=args.seed,
+        create_default=not args.no_create_default,
+    )
 
-    # Create a default name file if it doesn't exist.
-    if not os.path.exists(name_file):
-        create_default_name_file(name_file)
+    if cfg.create_default:
+        ensure_default_file(cfg.path)
+    if not os.path.exists(cfg.path):
+        print(f"Error: Name file '{cfg.path}' not found", file=sys.stderr)
+        return 1
 
     try:
-        with open(name_file, 'r') as f:
-            # Read names, stripping whitespace and ignoring empty lines.
-            names = [line.strip() for line in f if line.strip()]
+        names, weights = parse_names_file(cfg.path)
+        cfg.validate(len(names))
+    except Exception as e:
+        print(f"Error: {e}", file=sys.stderr)
+        return 1
 
-        print(f"Loaded {len(names)} names from '{name_file}'.")
+    rng = random.Random(cfg.seed)
+    picked = pick_names(
+        names,
+        cfg.count,
+        with_replacement=cfg.with_replacement,
+        weights=weights,
+        rng=rng,
+    )
 
-        # Get the number of names to pick from the user.
-        try:
-            count_str = input("How many random names would you like to pick? (default: 1): ")
-            count = int(count_str) if count_str.strip() else 1
-        except ValueError:
-            print("Invalid number. Defaulting to picking 1 name.")
-            count = 1
-
-        picked_names = pick_random_names(names, count)
-
-        print(f"\nHere are your {len(picked_names)} randomly picked name(s):")
-        for name in picked_names:
+    if cfg.json_output:
+        payload = {
+            "picked": picked,
+            "count": cfg.count,
+            "with_replacement": cfg.with_replacement,
+            "seed": cfg.seed,
+            "total_names": len(names),
+            "weights_used": weights is not None,
+        }
+        print(json.dumps(payload, indent=2))
+    else:
+        print(f"Picked {len(picked)} name(s):")
+        for name in picked:
             print(f"  - {name}")
+        if cfg.seed is not None:
+            print(f"(Deterministic with seed {cfg.seed})")
+    return 0
 
-    except FileNotFoundError:
-        print(f"Error: The name file '{name_file}' was not found.", file=sys.stderr)
-    except ValueError as e:
-        print(f"\nError: {e}", file=sys.stderr)
-    except (EOFError, KeyboardInterrupt):
-        print("\n\nOperation cancelled by user.")
 
-if __name__ == "__main__":
-    main()
+if __name__ == "__main__":  # pragma: no cover
+    raise SystemExit(main())

@@ -1,103 +1,212 @@
-import sys
+"""Vigenère Cipher Tool (modernized).
+
+Features:
+  * Clean pure function `vigenere_cipher` for encryption/decryption
+  * Key sanitization (letters only, case-insensitive internally)
+  * Streaming-friendly implementation (can adapt to chunked processing)
+  * CLI with flexible input/output sources
+  * JSON output mode for automation pipelines
+  * Optional upper-case normalization for output for historical style
+
+Examples:
+  python vig.py encrypt "LEMON" -t "Attack at dawn" --json
+  python vig.py decrypt secret --in ciphertext.txt --out plain.txt
+  echo "Hello World" | python vig.py encrypt key
+  python vig.py encrypt key -t "Mixed CASE & punctuation!" --upper
+
+Algorithm Notes:
+  The Vigenère cipher applies a Caesar shift determined by successive key
+  letters. Non-alphabetic characters are passed through unchanged and do not
+  consume key characters (traditional variant). Case of letters is preserved
+  unless --upper is supplied.
+"""
+
+from __future__ import annotations
+
 import argparse
+import json
+import sys
+from dataclasses import dataclass
+from typing import Optional, TextIO
+
+# ------------------------------ Core Logic ------------------------------ #
+
 
 def sanitize_key(key: str) -> str:
+    """Return lowercase alphabetic-only key.
+
+    Empty result after sanitization is invalid and handled by caller.
     """
-    Sanitizes the Vigenère key by removing non-alphabetic characters
-    and converting it to lowercase.
+    return "".join(ch for ch in key if ch.isalpha()).lower()
 
-    Args:
-        key: The raw key string.
 
-    Returns:
-        The sanitized key.
+def vigenere_cipher(
+    text: str, key: str, mode: str = "encrypt", *, upper: bool = False
+) -> str:
+    """Encrypt or decrypt ``text`` with Vigenère cipher.
+
+    Parameters
+    ----------
+    text : str
+        Input text (any unicode; only A-Z/a-z transformed)
+    key : str
+        Cipher key (letters; other chars ignored). Case-insensitive.
+    mode : {'encrypt','decrypt'}
+        Operation mode.
+    upper : bool
+        If True, force alphabetic output to uppercase (common style in crypto puzzles).
     """
-    return "".join(filter(str.isalpha, key)).lower()
+    if mode not in {"encrypt", "decrypt"}:
+        raise ValueError("mode must be 'encrypt' or 'decrypt'")
+    skey = sanitize_key(key)
+    if not skey:
+        raise ValueError("key must contain at least one alphabetic character")
 
-def vigenere_cipher(text: str, key: str, mode: str) -> str:
-    """
-    Encrypts or decrypts text using the Vigenère cipher.
+    out_chars = []
+    klen = len(skey)
+    kpos = 0
+    decrypt = mode == "decrypt"
 
-    This function preserves the case of the original text and passes
-    non-alphabetic characters through unchanged.
-
-    Args:
-        text: The string to be processed.
-        key: The cipher key (will be sanitized).
-        mode: The operation mode, either 'encrypt' or 'decrypt'.
-
-    Returns:
-        The transformed string.
-
-    Raises:
-        ValueError: If the sanitized key is empty or the mode is incorrect.
-    """
-    if mode not in ['encrypt', 'decrypt']:
-        raise ValueError("Mode must be either 'encrypt' or 'decrypt'.")
-
-    sanitized_key = sanitize_key(key)
-    if not sanitized_key:
-        raise ValueError("Invalid key: The key must contain at least one alphabetic character.")
-
-    processed_text = []
-    key_index = 0
-
-    for char in text:
-        if char.isalpha():
-            # Determine the shift amount from the key
-            shift = ord(sanitized_key[key_index % len(sanitized_key)]) - ord('a')
-
-            if mode == 'decrypt':
+    for ch in text:
+        if ch.isalpha():
+            base = "A" if ch.isupper() else "a"
+            base_ord = ord(base)
+            shift = ord(skey[kpos % klen]) - ord("a")
+            if decrypt:
                 shift = -shift
-
-            # Apply the shift, preserving the original case
-            if char.isupper():
-                start = ord('A')
-                processed_char = chr((ord(char) - start + shift) % 26 + start)
-            else:  # islower()
-                start = ord('a')
-                processed_char = chr((ord(char) - start + shift) % 26 + start)
-
-            processed_text.append(processed_char)
-            key_index += 1
+            transformed = chr((ord(ch) - base_ord + shift) % 26 + base_ord)
+            if upper:
+                transformed = transformed.upper()
+            out_chars.append(transformed)
+            kpos += 1
         else:
-            # Pass non-alphabetic characters through unchanged
-            processed_text.append(char)
+            out_chars.append(ch)
+    return "".join(out_chars)
 
-    return "".join(processed_text)
 
-def main():
-    """
-    Main function to parse command-line arguments and run the Vigenère cipher tool.
-    """
-    parser = argparse.ArgumentParser(
-        description="A tool to encrypt or decrypt text using the Vigenère cipher.",
-        epilog="Example: python vig.py encrypt 'my secret key' -t 'Hello World!'"
-    )
-    parser.add_argument("mode", choices=['encrypt', 'decrypt'], help="The operation to perform: 'encrypt' or 'decrypt'.")
-    parser.add_argument("key", help="The secret key for the cipher (e.g., 'secretkey').")
-    parser.add_argument("-t", "--text", help="The text to process. If not provided, the tool will read from standard input.")
+# ------------------------------ Configuration ------------------------------ #
 
-    args = parser.parse_args()
 
-    if args.text:
-        input_text = args.text
+@dataclass(slots=True)
+class CLIConfig:
+    mode: str
+    key: str
+    text: Optional[str] = None
+    infile: Optional[str] = None
+    outfile: Optional[str] = None
+    json_out: bool = False
+    upper: bool = False
+
+    def validate(self) -> None:
+        if self.mode not in {"encrypt", "decrypt"}:
+            raise ValueError("mode must be 'encrypt' or 'decrypt'")
+        if not sanitize_key(self.key):
+            raise ValueError(
+                "key must contain at least one alphabetic character after sanitization"
+            )
+        if self.text is not None and self.infile is not None:
+            raise ValueError("Provide either --text or --in, not both")
+        if self.text is None and self.infile is None:
+            # Allow stdin fallback; handled later
+            pass
+
+
+# ------------------------------ I/O Helpers ------------------------------ #
+
+
+def read_input(cfg: CLIConfig) -> str:
+    if cfg.text is not None:
+        return cfg.text
+    if cfg.infile is not None:
+        with open(cfg.infile, "r", encoding="utf-8") as f:
+            return f.read()
+    # Stdin fallback
+    return sys.stdin.read()
+
+
+def write_output(cfg: CLIConfig, data: str) -> None:
+    if cfg.outfile:
+        with open(cfg.outfile, "w", encoding="utf-8") as f:
+            f.write(data)
     else:
-        print("Please enter the text to be processed (press Ctrl-D or Ctrl-Z on a new line to end):")
-        try:
-            input_text = sys.stdin.read()
-        except (KeyboardInterrupt, EOFError):
-            print("\nOperation cancelled.")
-            sys.exit(0)
+        # Raw output (not wrapped) when not JSON to simplify piping
+        print(data)
 
+
+# ------------------------------ CLI Assembly ------------------------------ #
+
+
+def build_parser() -> argparse.ArgumentParser:
+    p = argparse.ArgumentParser(
+        description="Vigenère cipher encrypt/decrypt utility (modernized)"
+    )
+    p.add_argument("mode", choices=["encrypt", "decrypt"], help="Operation mode")
+    p.add_argument("key", help="Cipher key (letters; other chars ignored)")
+    src = p.add_mutually_exclusive_group()
+    src.add_argument("-t", "--text", help="Inline plaintext/ciphertext input")
+    src.add_argument(
+        "--in", dest="infile", metavar="PATH", help="Input file path (UTF-8)"
+    )
+    p.add_argument(
+        "--out", dest="outfile", metavar="PATH", help="Write result to file (UTF-8)"
+    )
+    p.add_argument(
+        "--json",
+        action="store_true",
+        help="Emit JSON metadata instead of plain text output",
+    )
+    p.add_argument(
+        "--upper", action="store_true", help="Force output letters to uppercase"
+    )
+    return p
+
+
+def main(argv: Optional[list[str]] = None) -> int:
+    parser = build_parser()
+    args = parser.parse_args(argv)
+    cfg = CLIConfig(
+        mode=args.mode,
+        key=args.key,
+        text=args.text,
+        infile=args.infile,
+        outfile=args.outfile,
+        json_out=args.json,
+        upper=args.upper,
+    )
     try:
-        result = vigenere_cipher(input_text, args.key, args.mode)
-        print("\n--- Result ---")
-        print(result)
-        print("--------------")
+        cfg.validate()
     except ValueError as e:
-        print(f"\nError: {e}", file=sys.stderr)
-        sys.exit(1)
+        parser.error(str(e))
 
-if __name__ == "__main__":
-    main()
+    data_in = read_input(cfg)
+    try:
+        result = vigenere_cipher(data_in, cfg.key, cfg.mode, upper=cfg.upper)
+    except ValueError as e:
+        parser.error(str(e))
+
+    if cfg.json_out:
+        payload = {
+            "mode": cfg.mode,
+            "key_length": len(sanitize_key(cfg.key)),
+            "input_length": len(data_in),
+            "output_length": len(result),
+            "result": result,
+            "upper": cfg.upper,
+            "source": (
+                "text" if cfg.text is not None else ("file" if cfg.infile else "stdin")
+            ),
+            "outfile": bool(cfg.outfile),
+        }
+        json_str = json.dumps(payload, indent=2)
+        if cfg.outfile:
+            with open(cfg.outfile, "w", encoding="utf-8") as f:
+                f.write(json_str)
+        else:
+            print(json_str)
+    else:
+        write_output(cfg, result)
+    return 0
+
+
+if __name__ == "__main__":  # pragma: no cover - CLI entry
+    raise SystemExit(main())

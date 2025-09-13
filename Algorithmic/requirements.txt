@@ -1,0 +1,32 @@
+# Requirements for the Algorithmic collection
+# Install with: pip install -r requirements.txt
+# Versions are pinned conservatively for reproducibility; adjust as needed.
+
+# Core numerical / plotting
+numpy>=1.25,<2.0
+matplotlib>=3.8,<3.9
+pandas>=2.2,<2.3
+
+# Image handling / steganography
+Pillow>=10.0,<11.0
+
+# Web requests / parsing
+requests>=2.31,<3.0
+beautifulsoup4>=4.12,<5.0
+
+# Audio / video (optional, used by ytmp3 script; yt-dlp preferred)
+yt-dlp>=2024.7.1
+# youtube_dl # fallback only; usually omit to avoid conflicts
+
+# CLI tooling / type aids (optional)
+argparse; python_version<'3.10'
+
+# Testing
+pytest>=8.2,<9.0
+
+# Optional: if affine cipher brute force speed-ups are desired (not required)
+# sympy>=1.12
+
+# NOTE:
+# - Keep this list aligned with scripts' imports.
+# - Some scripts gracefully degrade if a lib is absent (e.g., matplotlib optional for JSON output).

@@ -1,23 +1,46 @@
-import numpy as np
-import matplotlib.pyplot as plt
+"""Least Squares Linear Regression (modernized)
+================================================
+
+This module provides ordinary least squares (OLS) linear regression y = m x + b.
+
+Enhancements:
+ - Dataclass config for synthetic data generation.
+ - CLI: control points, noise, seed, explicit data via --x/--y, JSON output, headless mode.
+ - Optional plotting (skips gracefully if matplotlib is unavailable).
+ - Clear separation of computation from presentation.
+ - Robust input validation and helpful error messages.
+
+Examples:
+  python lsf.py --points 50 --noise 8 --seed 42 --save plot.png
+  python lsf.py --json --no-plot --seed 7
+  python lsf.py --x 0 1 2 3 --y 1.1 2.9 4.2 6.0 --json --include-points
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
 import sys
-from typing import Tuple
+from dataclasses import dataclass
+from typing import Iterable, Optional, Tuple
 
-def least_squares_fit(x_coords: np.ndarray, y_coords: np.ndarray) -> Tuple[float, float]:
-    """
-    Calculates the slope (m) and y-intercept (b) for a set of points
-    using the least squares linear regression method.
+import numpy as np
 
-    Args:
-        x_coords: A numpy array of the x-coordinates of the points.
-        y_coords: A numpy array of the y-coordinates of the points.
+try:  # Optional dependency
+    import matplotlib.pyplot as plt  # type: ignore
 
-    Returns:
-        A tuple containing the slope (m) and y-intercept (b).
+    _HAVE_PLT = True
+except Exception:  # pragma: no cover
+    plt = None  # type: ignore
+    _HAVE_PLT = False
 
-    Raises:
-        ValueError: If input arrays are mismatched, empty, or would result
-                    in a division by zero (vertical line).
+
+def least_squares_fit(
+    x_coords: np.ndarray, y_coords: np.ndarray
+) -> Tuple[float, float]:
+    """Return slope (m) and intercept (b) via least squares.
+
+    Raises ValueError for empty, size-mismatched, or vertical-line inputs.
     """
     if x_coords.size != y_coords.size:
         raise ValueError("Input arrays must be of the same size.")
@@ -25,96 +48,168 @@ def least_squares_fit(x_coords: np.ndarray, y_coords: np.ndarray) -> Tuple[float
         raise ValueError("Input arrays must not be empty.")
 
     n = x_coords.size
+    sum_x = float(np.sum(x_coords))
+    sum_y = float(np.sum(y_coords))
+    sum_xy = float(np.sum(x_coords * y_coords))
+    sum_x_sq = float(np.sum(x_coords**2))
 
-    # Use numpy for efficient sum calculations
-    sum_x = np.sum(x_coords)
-    sum_y = np.sum(y_coords)
-    sum_xy = np.sum(x_coords * y_coords)
-    sum_x_sq = np.sum(x_coords**2)
-
-    # Calculate slope (m) and intercept (b) using the standard formulas
     numerator = n * sum_xy - sum_x * sum_y
     denominator = n * sum_x_sq - sum_x**2
-
-    if np.isclose(denominator, 0):
-        # This occurs if all x-values are the same, forming a vertical line.
-        raise ValueError("Cannot compute regression for a vertical set of points (denominator is zero).")
-
+    if np.isclose(denominator, 0.0):
+        raise ValueError(
+            "Cannot compute regression for a vertical set of points (denominator is zero)."
+        )
     m = numerator / denominator
     b = (sum_y - m * sum_x) / n
-
     return m, b
 
-def plot_regression(x: np.ndarray, y: np.ndarray, m: float, b: float, save_path: str = None):
-    """
-    Creates, displays, and optionally saves a plot of the data points,
-    the regression line, and the error lines.
 
-    Args:
-        x: The x-coordinates of the data points.
-        y: The y-coordinates of the data points.
-        m: The slope of the regression line.
-        b: The y-intercept of the regression line.
-        save_path: The path to save the plot image to. If None, not saved.
-    """
-    plt.figure(figsize=(12, 8))
-    plt.scatter(x, y, color="blue", s=30, zorder=5, label="Data Points")
-
-    # Determine the range for the regression line
-    line_x = np.array([np.min(x) - 5, np.max(x) + 5])
+def plot_regression(
+    x: np.ndarray,
+    y: np.ndarray,
+    m: float,
+    b: float,
+    save_path: Optional[str] = None,
+    show: bool = True,
+) -> None:
+    if not _HAVE_PLT or plt is None:  # type: ignore[truthy-bool]
+        print("[warn] matplotlib not available; skipping plot", file=sys.stderr)
+        return
+    plt.figure(figsize=(10, 6))  # type: ignore[attr-defined]
+    plt.scatter(x, y, color="tab:blue", s=35, zorder=5, label="Data Points")  # type: ignore[attr-defined]
+    x_min, x_max = float(np.min(x)), float(np.max(x))
+    span = x_max - x_min if x_max > x_min else 1.0
+    line_x = np.array([x_min - 0.05 * span, x_max + 0.05 * span])
     line_y = m * line_x + b
-    plt.plot(line_x, line_y, color="red", linewidth=2, label="Regression Line (y=mx+b)")
-
-    # Plot the error lines (vertical distance from point to line)
+    plt.plot(line_x, line_y, color="tab:red", linewidth=2, label=f"Regression Line y={m:.2f}x+{b:.2f}")  # type: ignore[attr-defined]
     for i in range(x.size):
         label = "Error (Residuals)" if i == 0 else ""
-        plt.plot([x[i], x[i]], [y[i], m * x[i] + b], color="green", linestyle="--", linewidth=1, label=label)
-
-    plt.title("Least Squares Linear Regression", fontsize=16)
-    plt.xlabel("X Values", fontsize=12)
-    plt.ylabel("Y Values", fontsize=12)
-    plt.grid(True, which='both', linestyle='--', linewidth=0.5)
-    plt.legend(fontsize=10)
-    plt.tight_layout()
-
+        plt.plot([x[i], x[i]], [y[i], m * x[i] + b], color="green", linestyle="--", linewidth=1, label=label)  # type: ignore[attr-defined]
+    plt.title("Least Squares Linear Regression", fontsize=15)  # type: ignore[attr-defined]
+    plt.xlabel("X Values")  # type: ignore[attr-defined]
+    plt.ylabel("Y Values")  # type: ignore[attr-defined]
+    plt.grid(True, linestyle="--", linewidth=0.5)  # type: ignore[attr-defined]
+    plt.legend(fontsize=9)  # type: ignore[attr-defined]
+    plt.tight_layout()  # type: ignore[attr-defined]
     if save_path:
         try:
-            plt.savefig(save_path, dpi=300)
-            print(f"Plot successfully saved to '{save_path}'")
-        except Exception as e:
-            print(f"Error: Could not save the plot. {e}", file=sys.stderr)
+            plt.savefig(save_path, dpi=200)  # type: ignore[attr-defined]
+            print(f"[info] Plot saved -> {save_path}")
+        except Exception as e:  # pragma: no cover
+            print(f"[error] Could not save plot: {e}", file=sys.stderr)
+    if show:
+        plt.show()  # type: ignore[attr-defined]
+    else:
+        plt.close()  # type: ignore[attr-defined]
 
-    plt.show()
 
-def main():
-    """
-    Main function to generate data and run the linear regression analysis.
-    """
-    print("--- Least Squares Fitting Demonstration ---")
+@dataclass
+class DemoConfig:
+    points: int = 20
+    noise: float = 10.0
+    seed: Optional[int] = None
+    save: Optional[str] = None
+    show_plot: bool = True
+    json: bool = False
 
-    # Generate some semi-random data for a more realistic demonstration
-    num_points = 20
-    # Create x-data with a bit of spread
-    x_data = np.linspace(0, 100, num_points)
 
-    # Create y-data based on a known line (y = 0.75x + 10) and add noise
-    true_m, true_b = 0.75, 10
-    noise = np.random.normal(0, 10, num_points) # Gaussian noise
-    y_data = true_m * x_data + true_b + noise
+def build_arg_parser() -> argparse.ArgumentParser:
+    p = argparse.ArgumentParser(
+        description="Least squares linear regression demo & utility."
+    )
+    p.add_argument(
+        "--points",
+        type=int,
+        default=20,
+        help="Synthetic points (ignored if --x provided)",
+    )
+    p.add_argument("--noise", type=float, default=10.0, help="Std dev Gaussian noise")
+    p.add_argument("--seed", type=int, help="Random seed")
+    p.add_argument("--save", type=str, help="Save plot to path")
+    p.add_argument("--no-plot", action="store_true", help="Disable plot display")
+    p.add_argument("--json", action="store_true", help="Emit JSON output")
+    p.add_argument(
+        "--x", type=float, nargs="*", help="Explicit x values (requires --y)"
+    )
+    p.add_argument(
+        "--y", type=float, nargs="*", help="Explicit y values (requires --x)"
+    )
+    p.add_argument(
+        "--include-points",
+        action="store_true",
+        help="Include raw points in JSON output",
+    )
+    return p
+
+
+def parse_args(argv: Optional[Iterable[str]] = None):
+    return build_arg_parser().parse_args(list(argv) if argv is not None else None)
+
+
+def generate_demo_data(cfg: DemoConfig):
+    true_m, true_b = 0.75, 10.0
+    rng = np.random.default_rng(cfg.seed)
+    x = np.linspace(0, 100, cfg.points)
+    noise = rng.normal(0, cfg.noise, cfg.points)
+    y = true_m * x + true_b + noise
+    return x, y, true_m, true_b
+
+
+def run_cli(argv: Optional[Iterable[str]] = None) -> int:
+    args = parse_args(argv)
+    if (args.x is None) ^ (args.y is None):
+        print("[error] Must supply both --x and --y or neither.", file=sys.stderr)
+        return 2
+    if args.x is not None and len(args.x) != len(args.y):  # type: ignore[arg-type]
+        print("[error] --x and --y lengths differ.", file=sys.stderr)
+        return 2
+    if args.x is None and args.points < 2:
+        print("[error] Need at least 2 points.", file=sys.stderr)
+        return 2
+
+    cfg = DemoConfig(
+        points=args.points,
+        noise=args.noise,
+        seed=args.seed,
+        save=args.save,
+        show_plot=not args.no_plot,
+        json=args.json,
+    )
+    if args.x is not None:
+        x = np.array(args.x, dtype=float)
+        y = np.array(args.y, dtype=float)
+        true_m = true_b = float("nan")
+    else:
+        x, y, true_m, true_b = generate_demo_data(cfg)
 
     try:
-        m, b = least_squares_fit(x_data, y_data)
-        print(f"Original Line: y = {true_m:.2f}x + {true_b:.2f}")
-        print(f"Calculated Regression Line: y = {m:.2f}x + {b:.2f}")
-
-        # Define the save path for the plot
-        save_path = "Algorithmic/Medium/Least Squares Fitting/plot.png"
-        plot_regression(x_data, y_data, m, b, save_path)
-
+        m, b = least_squares_fit(x, y)
     except ValueError as e:
-        print(f"Error during calculation: {e}", file=sys.stderr)
-    except Exception as e:
-        print(f"An unexpected error occurred: {e}", file=sys.stderr)
+        print(f"[error] {e}", file=sys.stderr)
+        return 3
 
-if __name__ == "__main__":
+    if args.json:
+        payload = {"slope": m, "intercept": b}
+        if not np.isnan(true_m):
+            payload["true_slope"] = true_m
+            payload["true_intercept"] = true_b
+        if args.include_points:
+            payload["x"] = x.tolist()
+            payload["y"] = y.tolist()
+        print(json.dumps(payload, indent=2))
+    else:
+        if not np.isnan(true_m):
+            print(f"True line: y = {true_m:.3f}x + {true_b:.3f}")
+        print(f"Fitted line: y = {m:.3f}x + {b:.3f}")
+
+    if cfg.show_plot or cfg.save:
+        plot_regression(x, y, m, b, save_path=cfg.save, show=cfg.show_plot)
+    return 0
+
+
+def main():  # pragma: no cover
+    raise SystemExit(run_cli())
+
+
+if __name__ == "__main__":  # pragma: no cover
     main()
