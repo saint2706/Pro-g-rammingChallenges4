@@ -186,20 +186,20 @@ This repository includes several scripts with graphical user interfaces (GUIs) a
 
 | Tool                              | Command                                                                 |
 | --------------------------------- | ----------------------------------------------------------------------- |
-| PDF Metadata Tagger               | `python "Practical/Easy/PDF Tagger/pdftag_gui.py"`                      |
-| Image to ASCII Art Converter      | `python "Practical/Easy/ImgToASCII/convert_gui.py"`                     |
-| Multi-threaded Port Scanner       | `python "Practical/Easy/Port Scanner/scanner_gui.py"`                   |
-| Radix Base Converter              | `python "Practical/Medium/Radix Base Converter/radix_gui.py"`           |
-| Markov Chain Sentence Generator   | `python "Practical/Easy/Markov Chain Sentence Generator/mcsg_gui.py"`   |
-| Seam Carving Image Resizer        | `python "Practical/Medium/Seam Carving/resize_gui.py"`                  |
+| PDF Metadata Tagger               | `python "Practical/PDF Tagger/pdftag_gui.py"`                           |
+| Image to ASCII Art Converter      | `python "Practical/ImgToASCII/convert_gui.py"`                          |
+| Multi-threaded Port Scanner       | `python "Practical/Port Scanner/scanner_gui.py"`                        |
+| Radix Base Converter              | `python "Practical/Radix Base Converter/radix_gui.py"`                  |
+| Markov Chain Sentence Generator   | `python "Practical/Markov Chain Sentence Generator/mcsg_gui.py"`        |
+| Seam Carving Image Resizer        | `python "Practical/Seam Carving/resize_gui.py"`                         |
 
 ### Algorithm Visualizations
 
 | Visualization                   | Command                                                                 |
 | ------------------------------- | ----------------------------------------------------------------------- |
-| Dijkstra's Shortest Path        | `python "Algorithmic/Medium/Djikstra/dijkstra_visualizer.py" --start A` |
-| Towers of Hanoi                 | `python "Algorithmic/Easy/Towers of Hanoi/ToH_visualizer.py" 4`         |
-| Character Frequency             | `python "Algorithmic/Easy/Character Counter/charcount_visualizer.py" -t "hello world"` |
+| Dijkstra's Shortest Path        | `python "Algorithmic/Djikstra/dijkstra_visualizer.py" --start A`        |
+| Towers of Hanoi                 | `python "Algorithmic/Towers of Hanoi/ToH_visualizer.py" 4`              |
+| Character Frequency             | `python "Algorithmic/Character Counter/charcount_visualizer.py" -t "hello world"` |
 
 ## Further Learning
 
