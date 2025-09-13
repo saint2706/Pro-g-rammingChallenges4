@@ -1,0 +1,5 @@
+# Artificial Intelligence Module Requirements
+# These are the core dependencies for all scripts in this folder.
+numpy>=1.20
+# No external dependencies required for Connect4 or BNN.py
+# All scripts are compatible with Python 3.8+

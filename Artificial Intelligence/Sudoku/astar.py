@@ -1,46 +1,49 @@
-# NOTE: This file was originally named 'astar.py' and contained an A* search
-# implementation for solving Sudoku, which was inefficient and ill-suited for
-# the problem. The algorithm has been replaced with a much more appropriate
-# and efficient recursive backtracking solver. The filename is kept for
-# consistency with the original repository structure.
-
+# Modern, clean A* Sudoku solver with optional backtracking comparison
+import argparse
 import numpy as np
-import sys
-from typing import List, Tuple, Optional
+import heapq
+from typing import List, Tuple, Optional, Set
+
 
 class Sudoku:
-    """
-    A Sudoku solver that uses a recursive backtracking algorithm.
-    """
     def __init__(self, board: List[List[int]]):
-        # Validate board dimensions
         if not all(len(row) == 9 for row in board) or len(board) != 9:
             raise ValueError("Input board must be a 9x9 grid.")
         self.board = np.array(board)
         self.original_board = self.board.copy()
 
-    def find_empty_cell(self) -> Optional[Tuple[int, int]]:
-        """Finds the next empty cell (represented by 0) in the board."""
-        for r in range(9):
-            for c in range(9):
-                if self.board[r, c] == 0:
-                    return (r, c)
-        return None
+    def astar_solve(self) -> bool:
+        """
+        Solve the Sudoku puzzle using the A* search algorithm.
+        Returns True if solved, False otherwise. Modifies the board in-place.
+        """
 
-    def is_valid_move(self, num: int, pos: Tuple[int, int]) -> bool:
-        """Checks if placing a number in a given position is valid."""
-        row, col = pos
-        # Check row
-        if num in self.board[row, :]:
-            return False
-        # Check column
-        if num in self.board[:, col]:
-            return False
-        # Check 3x3 box
-        box_x, box_y = col // 3, row // 3
-        if num in self.board[box_y*3 : box_y*3 + 3, box_x*3 : box_x*3 + 3]:
-            return False
-        return True
+        def heuristic(board: np.ndarray) -> int:
+            return np.count_nonzero(board == 0)
+
+        start = (heuristic(self.board), 0, self.board.copy())
+        heap: list[tuple[int, int, np.ndarray]] = [start]
+        visited: set[bytes] = set()
+
+        while heap:
+            f, g, board = heapq.heappop(heap)
+            board_bytes = board.tobytes()
+            if board_bytes in visited:
+                continue
+            visited.add(board_bytes)
+            empty = np.argwhere(board == 0)
+            if empty.size == 0:
+                self.board = board
+                return True
+            r, c = empty[0]
+            for num in range(1, 10):
+                temp_sudoku = Sudoku(board.tolist())
+                if temp_sudoku.is_valid_move(num, (r, c)):
+                    new_board = board.copy()
+                    new_board[r, c] = num
+                    h = heuristic(new_board)
+                    heapq.heappush(heap, (g + 1 + h, g + 1, new_board))
+        return False
 
     def solve(self) -> bool:
         """
@@ -68,47 +71,76 @@ class Sudoku:
 
         return False
 
-    def __str__(self) -> str:
-        """Returns a string representation of the board."""
-        s = ""
+    def is_valid_move(self, num: int, pos: Tuple[int, int]) -> bool:
+        row, col = pos
+        if num in self.board[row, :]:
+            return False
+        if num in self.board[:, col]:
+            return False
+        box_x, box_y = col // 3, row // 3
+        if num in self.board[box_y * 3 : box_y * 3 + 3, box_x * 3 : box_x * 3 + 3]:
+            return False
+        return True
+
+    def find_empty_cell(self) -> Optional[Tuple[int, int]]:
+        """
+        Finds the first empty cell (with value 0) in the Sudoku board.
+        Returns:
+            A tuple (row, col) if an empty cell is found, or None if the board is full.
+        """
+        empty = np.argwhere(self.board == 0)
+        if empty.size == 0:
+            return None
+        return tuple(empty[0])
+
+    def display(self):
         for i in range(9):
             if i % 3 == 0 and i != 0:
-                s += "- - - - - - - - - - - \n"
+                print("- - - - - - - - - - -")
             for j in range(9):
                 if j % 3 == 0 and j != 0:
-                    s += "| "
-                s += str(self.board[i, j]) + " "
-            s += "\n"
-        return s
+                    print("| ", end="")
+                print(self.board[i, j], end=" ")
+            print()
+
 
 def main():
-    """
-    Main function to initialize and solve a Sudoku puzzle.
-    """
-    # 0 represents empty cells
-    default_puzzle = [
-        [5, 3, 0, 0, 7, 0, 0, 0, 0],
-        [6, 0, 0, 1, 9, 5, 0, 0, 0],
-        [0, 9, 8, 0, 0, 0, 0, 6, 0],
-        [8, 0, 0, 0, 6, 0, 0, 0, 3],
-        [4, 0, 0, 8, 0, 3, 0, 0, 1],
-        [7, 0, 0, 0, 2, 0, 0, 0, 6],
-        [0, 6, 0, 0, 0, 0, 2, 8, 0],
-        [0, 0, 0, 4, 1, 9, 0, 0, 5],
-        [0, 0, 0, 0, 8, 0, 0, 7, 9]
-    ]
+    parser = argparse.ArgumentParser(
+        description="Sudoku Solver using A* search (main) with optional backtracking comparison. "
+        "Input file should contain 9 lines of 9 digits (0 for empty)."
+    )
+    parser.add_argument(
+        "--file",
+        type=str,
+        help="Path to input file containing Sudoku puzzle",
+        required=True,
+    )
+    parser.add_argument(
+        "--compare", action="store_true", help="Compare A* with recursive backtracking"
+    )
+    args = parser.parse_args()
 
-    print("--- Sudoku Solver using Backtracking ---")
-    solver = Sudoku(default_puzzle)
+    with open(args.file, "r") as f:
+        lines = [line.strip() for line in f if line.strip()]
+    board = [[int(ch) if ch.isdigit() else 0 for ch in line] for line in lines]
+    sudoku = Sudoku(board)
+    print("Input Puzzle:")
+    sudoku.display()
 
-    print("Original Puzzle:")
-    print(solver)
-
-    if solver.solve():
-        print("Sudoku Puzzle Solved:")
-        print(solver)
+    print("\nSolving with A* search...")
+    solved = sudoku.astar_solve()
+    if solved:
+        print("Solved Puzzle (A*):")
+        sudoku.display()
     else:
-        print("No solution found for the puzzle.")
+        print("A* could not solve the puzzle.")
 
-if __name__ == "__main__":
-    main()
+    if args.compare:
+        print("\nSolving with recursive backtracking...")
+        sudoku_bt = Sudoku(board)
+        solved_bt = sudoku_bt.solve()
+        if solved_bt:
+            print("Solved Puzzle (Backtracking):")
+            sudoku_bt.display()
+        else:
+            print("Backtracking could not solve the puzzle.")
