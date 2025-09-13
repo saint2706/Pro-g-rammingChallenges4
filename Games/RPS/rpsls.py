@@ -1,14 +1,23 @@
+
+#
+# Rock Paper Scissors Lizard Spock (RPSLS) Game - Python Implementation
+# Modernized, documented, and beginner-friendly code.
+#
 import random
 from enum import IntEnum
 from typing import Dict, List
 
+
 class Move(IntEnum):
-    """Enumeration for the possible moves in the game."""
+    """
+    Enumeration for the possible moves in the game.
+    """
     ROCK = 0
     PAPER = 1
     SCISSORS = 2
     LIZARD = 3
     SPOCK = 4
+
 
 # A dictionary defining the winning conditions.
 # Key: A move. Value: A list of moves that the key beats.
@@ -19,6 +28,7 @@ WINNING_CONDITIONS: Dict[Move, List[Move]] = {
     Move.LIZARD: [Move.SPOCK, Move.PAPER],
     Move.SPOCK: [Move.ROCK, Move.SCISSORS],
 }
+
 
 def get_user_move() -> Move:
     """
@@ -40,6 +50,7 @@ def get_user_move() -> Move:
         except (ValueError, IndexError):
             print(f"\nInvalid choice. Please enter a number between 0 and {len(Move) - 1}.")
 
+
 def get_computer_move() -> Move:
     """
     Selects a random move for the computer.
@@ -48,6 +59,7 @@ def get_computer_move() -> Move:
         A random Move.
     """
     return random.choice(list(Move))
+
 
 def determine_winner(user_move: Move, computer_move: Move) -> str:
     """
@@ -63,6 +75,7 @@ def determine_winner(user_move: Move, computer_move: Move) -> str:
         return "Player"
 
     return "Computer"
+
 
 def main():
     """

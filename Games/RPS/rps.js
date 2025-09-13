@@ -1,17 +1,27 @@
+/**
+ * Rock Paper Scissors (RPS) Game Logic
+ * Modern, modular, and well-documented JavaScript for the RPS web game.
+ * Updated for clarity, maintainability, and best practices.
+ */
 class RPSGame {
     constructor() {
         // --- DOM Elements ---
+        // Buttons for player options (Rock, Paper, Scissors)
         this.optionButtons = document.querySelectorAll(".options");
+        // Score display elements
         this.playerScoreElem = document.getElementById("p-score");
         this.computerScoreElem = document.getElementById("c-score");
+        // Move display images
         this.playerMoveElem = document.getElementById("p-move");
         this.computerMoveElem = document.getElementById("c-move");
+        // Result text element
         this.resultTextElem = document.getElementById("result-text");
 
         // --- Game State ---
         this.playerScore = 0;
         this.computerScore = 0;
         this.gameOptions = ["Rock", "Paper", "Scissors"];
+        // Defines which move beats which
         this.winningConditions = {
             Rock: "Scissors",
             Paper: "Rock",
@@ -23,6 +33,7 @@ class RPSGame {
 
     /**
      * Sets up the initial event listeners for the game buttons.
+     * Each button triggers a round with the selected move.
      */
     initEventListeners() {
         this.optionButtons.forEach(button => {
@@ -91,6 +102,9 @@ class RPSGame {
 
     /**
      * Updates the result text element with the outcome of the round.
+     * @param {string} winner The winner of the round.
+     * @param {string} playerMove The player's move.
+     * @param {string} computerMove The computer's move.
      */
     updateResultText(winner, playerMove, computerMove) {
         if (winner === 'Tie') {
@@ -104,6 +118,7 @@ class RPSGame {
 
     /**
      * Checks if a player has reached the winning score and ends the game if so.
+     * Displays a message and a reset button.
      */
     checkGameOver() {
         if (this.playerScore === 5 || this.computerScore === 5) {
@@ -124,6 +139,7 @@ class RPSGame {
 
     /**
      * Resets the game state to its initial values.
+     * Clears scores, resets UI, and prepares for a new game.
      */
     resetGame() {
         this.playerScore = 0;
@@ -136,7 +152,9 @@ class RPSGame {
     }
 }
 
+
 // --- Main Execution ---
+// Initialize the game when the DOM is fully loaded
 document.addEventListener("DOMContentLoaded", () => {
     new RPSGame();
 });

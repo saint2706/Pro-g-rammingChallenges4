@@ -1,0 +1,20 @@
+# requirements.txt for Games folder
+# Only Python games with external dependencies are listed here.
+
+# General (for all Python games)
+# No external dependencies required for most games (standard library only)
+
+# For games using numpy (e.g., Sudoku)
+numpy>=1.20
+
+# For games using tkinter (GUI, e.g., Simon, Snake)
+# tkinter is included with standard Python installations on Windows/Mac, but may need to be installed separately on Linux.
+
+# For games using matplotlib (e.g., Shuffle/cards.py)
+matplotlib>=3.0
+
+# For games using sound (Simon):
+# pygame is optional for enhanced sound support
+pygame>=2.0 # Optional, for sound in Simon
+
+# Note: Java, C++, JS, and HTML/CSS games do not require Python dependencies.

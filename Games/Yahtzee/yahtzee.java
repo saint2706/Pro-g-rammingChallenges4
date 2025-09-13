@@ -1,301 +1,350 @@
-package Games.Easy.Yahtzee;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.InputMismatchException;
+import java.util.Random;
+import java.util.Scanner;
 
-public class yahtzee {
+/**
+ * A simple command-line Yahtzee game for one player.
+ * Demonstrates dice rolling, rerolling, and scoring logic for educational
+ * purposes.
+ *
+ * Modernized, documented, and optimized for clarity and maintainability.
+ */
+public class Yahtzee {
+    /**
+     * Main entry point for the Yahtzee game.
+     * Handles game loop, dice rolling, rerolling, and scoring.
+     */
     public static void main(String[] args) {
-        int play = 1, score1 = 0, sum = 0;
-        int[] wins = new int[15];
-        while ((play == 1) && (sum < 15)) {
-            sum = 0;
-            int[] Dice = new int[] { 0, 0, 0, 0, 0 };
-            int roll = 0;
-            int x, y, w, z;
-            int reroll1 = 0, reroll2 = 03;
+        Scanner scanner = new Scanner(System.in);
+        int play = 1, totalScore = 0, filledCategories = 0;
+        int[] usedCategories = new int[15]; // Tracks which categories have been scored
+
+        System.out.println("Welcome to Yahtzee! Score in all 15 categories to finish the game.");
+        while (play == 1 && filledCategories < 15) {
+            filledCategories = 0;
+            int[] dice = new int[5];
+            int rerollCount = 0;
             Die die = new Die();
-            for (x = 0; x < 5; x++) {
+
+            // Initial roll
+            for (int i = 0; i < 5; i++) {
                 die.roll();
-                Dice[x] = die.get();
+                dice[i] = die.get();
             }
+            printDice(dice);
 
-            System.out.println("Die 1: " + Dice[0]);
-            System.out.println("Die 2: " + Dice[1]);
-            System.out.println("Die 3: " + Dice[2]);
-            System.out.println("Die 4: " + Dice[3]);
-            System.out.println("Die 5: " + Dice[4]);
-
-            do {
-                reroll1 = inputInt("How many dice do you want to reroll? (0-5)");
-                if (reroll1 > 0) {
-                    int[] reroll = new int[reroll1];
-                    for (y = 0; y < reroll1; y++) {
-                        reroll2 = inputInt("Which ones?");
-                        reroll[y] = reroll2;
-                    }
-                    for (w = 0; w < reroll1; w++) {
-                        if (reroll[w] == 1) {
-                            die.roll();
-                            Dice[0] = die.get();
-                        }
-                        if (reroll[w] == 2) {
-                            die.roll();
-                            Dice[1] = die.get();
-                        }
-                        if (reroll[w] == 3) {
-                            die.roll();
-                            Dice[2] = die.get();
-                        }
-                        if (reroll[w] == 4) {
-                            die.roll();
-                            Dice[3] = die.get();
-                        }
-                        if (reroll[w] == 5) {
-                            die.roll();
-                            Dice[4] = die.get();
-                        }
-                    }
-                    roll++;
-                    System.out.println("Die 1: " + Dice[0]);
-                    System.out.println("Die 2: " + Dice[1]);
-                    System.out.println("Die 3: " + Dice[2]);
-                    System.out.println("Die 4: " + Dice[3]);
-                    System.out.println("Die 5: " + Dice[4]);
-
+            // Up to two rerolls
+            while (rerollCount < 2) {
+                int rerollNum = inputInt(scanner, "How many dice do you want to reroll? (0-5): ", 0, 5);
+                if (rerollNum == 0)
+                    break;
+                int[] rerollIndices = new int[rerollNum];
+                for (int j = 0; j < rerollNum; j++) {
+                    rerollIndices[j] = inputInt(scanner, "Which die to reroll (1-5)? ", 1, 5) - 1;
                 }
-            } while ((roll < 2) && (reroll1 > 0));
-            Winnings prize = new Winnings();
-            prize.checkWinnings(Dice, wins);
-            wins[prize.choice() - 1] = 1;
-            for (z = 0; z < 15; z++) {
-                sum += wins[z];
+                for (int idx : rerollIndices) {
+                    die.roll();
+                    dice[idx] = die.get();
+                }
+                rerollCount++;
+                printDice(dice);
             }
-            score1 += prize.score();
-            System.out.println("Your total score is: " + score1);
-            if (sum < 15) {
-                play = inputInt("do you want to play again?(1=yes, 2=no)");
+
+            // Scoring
+            Winnings prize = new Winnings(scanner);
+            prize.checkWinnings(dice, usedCategories);
+            usedCategories[prize.choice() - 1] = 1;
+            for (int cat : usedCategories)
+                filledCategories += cat;
+            totalScore += prize.score();
+            System.out.println("Your total score is: " + totalScore);
+            if (filledCategories < 15) {
+                play = inputInt(scanner, "Do you want to play again? (1=yes, 2=no): ", 1, 2);
             } else {
-                System.out.println("GAME OVER!");
+                System.out.println("GAME OVER! Final score: " + totalScore);
             }
+        }
+        scanner.close();
+    }
+
+    /**
+     * Print the current dice values in a user-friendly format.
+     */
+    private static void printDice(int[] dice) {
+        System.out.println("Current dice:");
+        for (int i = 0; i < dice.length; i++) {
+            System.out.println("Die " + (i + 1) + ": " + dice[i]);
         }
     }
 
-    static int inputInt(String Prompt) {
-        int result = 0;
-        try {
-            result = Integer.parseInt(input(Prompt).trim());
-        } catch (Exception e) {
-            result = 0;
+    /**
+     * Prompt the user for an integer input within a specified range.
+     * Handles invalid input gracefully.
+     */
+    public static int inputInt(Scanner scanner, String prompt, int min, int max) {
+        int result = min - 1;
+        while (result < min || result > max) {
+            System.out.print(prompt);
+            try {
+                result = Integer.parseInt(scanner.nextLine().trim());
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Please enter a number between " + min + " and " + max + ".");
+                result = min - 1;
+            }
+            if (result < min || result > max) {
+                System.out.println("Please enter a number between " + min + " and " + max + ".");
+            }
         }
         return result;
     }
-
-    static String input(String prompt) {
-        String inputLine = "";
-        System.out.print(prompt);
-        try {
-            java.io.InputStreamReader sys = new java.io.InputStreamReader(
-                    System.in);
-            java.io.BufferedReader inBuffer = new java.io.BufferedReader(sys);
-            inputLine = inBuffer.readLine();
-        } catch (Exception e) {
-            String err = e.toString();
-            System.out.println(err);
-        }
-        return inputLine;
-    }
 }
 
+/**
+ * Represents a single six-sided die.
+ */
 class Die {
     private int value;
-    private Random rand;
+    private final Random rand;
 
     public Die() {
         value = 0;
         rand = new Random();
     }
 
+    /**
+     * Roll the die and set its value to a random number between 1 and 6.
+     */
     public void roll() {
         value = 1 + rand.nextInt(6);
     }
 
+    /**
+     * Get the current value of the die.
+     */
     public int get() {
-        return (value);
+        return value;
     }
 }
 
+/**
+ * Handles Yahtzee scoring logic and user category selection.
+ */
 class Winnings {
     private int score;
     private int choice;
+    private final Scanner scanner;
 
-    public Winnings() {
+    public Winnings(Scanner scanner) {
+        this.score = 0;
+        this.scanner = scanner;
+    }
+
+    /**
+     * Prompts the user to select a scoring category, checks if the dice match, and
+     * updates the score.
+     * 
+     * @param dice           The current dice values.
+     * @param usedCategories Array tracking which categories have been used.
+     */
+    public void checkWinnings(int[] dice, int[] usedCategories) {
+        System.out.println("Which category do you want to score?");
+        String[] categories = {
+                "Yahtzee", "Full House", "Large Straight", "Small Straight", "Four of a Kind", "Three of a Kind",
+                "Pair", "Two Pair", "Number of 1's", "Number of 2's", "Number of 3's", "Number of 4's",
+                "Number of 5's", "Number of 6's", "Chance"
+        };
+        for (int i = 0; i < categories.length; i++) {
+            if (usedCategories[i] == 0) {
+                System.out.printf("%2d - %s\n", i + 1, categories[i]);
+            }
+        }
+        // Prompt for category
+        choice = Yahtzee.inputInt(scanner, "Enter category number: ", 1, 15);
+
+        // Count occurrences of each die face
+        int[] counts = new int[6];
+        for (int d : dice)
+            counts[d - 1]++;
+        Arrays.sort(dice);
+
+        // Scoring logic
+        switch (choice) {
+            case 1: // Yahtzee
+                if (hasOfAKind(counts, 5)) {
+                    System.out.println("Yahtzee!");
+                    score = 50;
+                } else {
+                    fail();
+                }
+                break;
+            case 2: // Full House
+                if (hasFullHouse(counts)) {
+                    System.out.println("You have a full house.");
+                    score = 25;
+                } else {
+                    fail();
+                }
+                break;
+            case 3: // Large Straight
+                if (isLargeStraight(dice)) {
+                    System.out.println("You have a large straight.");
+                    score = 40;
+                } else {
+                    fail();
+                }
+                break;
+            case 4: // Small Straight
+                if (isSmallStraight(dice)) {
+                    System.out.println("You have a small straight.");
+                    score = 30;
+                } else {
+                    fail();
+                }
+                break;
+            case 5: // Four of a Kind
+                if (hasOfAKind(counts, 4)) {
+                    System.out.println("You have four of a kind.");
+                    score = sum(dice);
+                } else {
+                    fail();
+                }
+                break;
+            case 6: // Three of a Kind
+                if (hasOfAKind(counts, 3)) {
+                    System.out.println("You have three of a kind.");
+                    score = sum(dice);
+                } else {
+                    fail();
+                }
+                break;
+            case 7: // Pair
+                if (countPairs(counts) >= 1) {
+                    System.out.println("You have a pair.");
+                    score = 5;
+                } else {
+                    fail();
+                }
+                break;
+            case 8: // Two Pair
+                if (countPairs(counts) >= 2) {
+                    System.out.println("You have two pairs.");
+                    score = 10;
+                } else {
+                    fail();
+                }
+                break;
+            case 9: // Number of 1's
+                System.out.println("You have " + counts[0] + " ones.");
+                score = counts[0] * 1;
+                break;
+            case 10: // Number of 2's
+                System.out.println("You have " + counts[1] + " twos.");
+                score = counts[1] * 2;
+                break;
+            case 11: // Number of 3's
+                System.out.println("You have " + counts[2] + " threes.");
+                score = counts[2] * 3;
+                break;
+            case 12: // Number of 4's
+                System.out.println("You have " + counts[3] + " fours.");
+                score = counts[3] * 4;
+                break;
+            case 13: // Number of 5's
+                System.out.println("You have " + counts[4] + " fives.");
+                score = counts[4] * 5;
+                break;
+            case 14: // Number of 6's
+                System.out.println("You have " + counts[5] + " sixes.");
+                score = counts[5] * 6;
+                break;
+            case 15: // Chance
+                score = sum(dice);
+                System.out.println("You get " + score + " points.");
+                break;
+            default:
+                fail();
+        }
+    }
+
+    /**
+     * Get the score for the last checked category.
+     */
+    public int score() {
+        return score;
+    }
+
+    /**
+     * Get the category number chosen by the user (1-based).
+     */
+    public int choice() {
+        return choice;
+    }
+
+    // --- Helper methods for scoring logic ---
+
+    private void fail() {
+        System.out.println("You got nothin'.");
         score = 0;
     }
 
-    public void checkWinnings(int[] Dice, int[] wins) {
-        System.out.println("Which do you want to see if you have?");
-        if (wins[0] == 0) {
-            System.out.println("1 - yahtzee");
-        }
-        if (wins[1] == 0) {
-            System.out.println("2 - full house");
-        }
-        if (wins[2] == 0) {
-            System.out.println("3 - large straigt");
-        }
-        if (wins[3] == 0) {
-            System.out.println("4 - small straigt");
-        }
-        if (wins[4] == 0) {
-            System.out.println("5 - four of a kind");
-        }
-        if (wins[5] == 0) {
-            System.out.println("6 - three of a kind");
-        }
-        if (wins[6] == 0) {
-            System.out.println("7 - pair");
-        }
-        if (wins[7] == 0) {
-            System.out.println("8 - two pair");
-        }
-        if (wins[8] == 0) {
-            System.out.println("9 - number of 1's");
-        }
-        if (wins[9] == 0) {
-            System.out.println("10 - number of 2's");
-        }
-        if (wins[10] == 0) {
-            System.out.println("11 - number of 3's");
-        }
-        if (wins[11] == 0) {
-            System.out.println("12 - number of 4's");
-        }
-        if (wins[12] == 0) {
-            System.out.println("13 - number of 5's");
-        }
-        if (wins[13] == 0) {
-            System.out.println("14 - number of 6's");
-        }
-        if (wins[14] == 0) {
-            System.out.println("15 - chance");
-        }
-        choice = yahtzee.inputInt("");
-
-        int x = 0, y = 0, wins2 = 0, wins1 = 0;
-        int ones = 0, twos = 0, threes = 0, fours = 0, fives = 0, sixes = 0;
-        Arrays.sort(Dice);
-
-        for (y = 0; y < 5; y++) {
-            if (Dice[y] == 1) {
-                ones++;
-            }
-            if (Dice[y] == 2) {
-                twos++;
-            }
-            if (Dice[y] == 3) {
-                threes++;
-            }
-            if (Dice[y] == 4) {
-                fours++;
-            }
-            if (Dice[y] == 5) {
-                fives++;
-            }
-            if (Dice[y] == 6) {
-                sixes++;
-            }
-        }
-
-        if ((Dice[0] == Dice[1] - 1) && (Dice[1] == Dice[2] - 1)
-                && (Dice[2] == Dice[3] - 1) && (Dice[3] == Dice[4] - 1)
-                && (choice == 3)) {
-            wins1 = 1;
-        } else if ((ones > 0) && (twos > 0) && (threes > 0) && (fours > 0)) {
-            wins1 = 2;
-        } else if ((threes > 0) && (fours > 0) && (fives > 0) && (sixes > 0)) {
-            wins1 = 2;
-        } else if ((twos > 0) && (threes > 0) && (fours > 0) && (fives > 0)) {
-            wins1 = 2;
-        }
-
-        for (x = 0; x < 5; x++) {
-            if (x != 0) {
-                if ((Dice[0] == Dice[x])) {
-                    wins2++;
-                }
-            }
-            if ((x != 0) && (x != 1)) {
-                if ((Dice[1] == Dice[x])) {
-                    wins2++;
-                }
-            }
-            if ((x != 0) && (x != 1) && (x != 2)) {
-                if ((Dice[2] == Dice[x])) {
-                    wins2++;
-                }
-            }
-            if ((x != 0) && (x != 1) && (x != 2) && (x != 3)) {
-                if ((Dice[3] == Dice[x])) {
-                    wins2++;
-                }
-            }
-        }
-
-        if ((wins1 == 1) && (choice == 3)) {
-            System.out.println("You have a straight.");
-            score = 40;
-        } else if ((wins1 == 2) && (choice == 4)) {
-            System.out.println("You have a small straight.");
-            score = 30;
-        } else if ((wins2 == 10) && (choice == 1)) {
-            System.out.println("Yatzee!");
-            score = 50;
-        } else if ((choice == 6) && (wins2 >= 3)) {
-            System.out.println("You have three of a kind.");
-            score = Dice[0] + Dice[1] + Dice[2] + Dice[3] + Dice[4];
-        } else if ((choice == 7) && (wins2 > 0)) {
-            System.out.println("You have a pair.");
-            score = 5;
-        } else if ((wins2 == 2) && (choice == 8)) {
-            System.out.println("You have two pairs.");
-            score = 10;
-        } else if ((wins2 == 4) && (choice == 2)) {
-            System.out.println("You have a full house.");
-            score = 25;
-        } else if ((wins2 >= 6) && (choice == 5)) {
-            System.out.println("You have four of a kind.");
-            score = Dice[0] + Dice[1] + Dice[2] + Dice[3] + Dice[4];
-        } else if (choice == 9) {
-            System.out.println("You have " + ones + " ones.");
-            score = ones;
-        } else if (choice == 10) {
-            System.out.println("You have " + twos + " twos.");
-            score = twos * 2;
-        } else if (choice == 11) {
-            System.out.println("You have " + threes + " threes.");
-            score = threes * 3;
-        } else if (choice == 12) {
-            System.out.println("You have " + fours + " fours.");
-            score = fours * 4;
-        } else if (choice == 13) {
-            System.out.println("You have " + fives + " fives.");
-            score = fives * 5;
-        } else if (choice == 14) {
-            System.out.println("You have " + sixes + " sixes.");
-            score = sixes * 6;
-        } else if (choice == 15) {
-            score = Dice[0] + Dice[1] + Dice[2] + Dice[3] + Dice[4];
-            System.out.println("Your get " + score + " points.");
-        } else {
-            System.out.println("You got nothin'.");
-            score = 0;
-        }
+    private int sum(int[] arr) {
+        int s = 0;
+        for (int v : arr)
+            s += v;
+        return s;
     }
 
-    public int score() {
-        return (score);
+    private boolean hasOfAKind(int[] counts, int n) {
+        for (int c : counts)
+            if (c >= n)
+                return true;
+        return false;
     }
 
-    public int choice() {
-        return (choice);
+    private int countPairs(int[] counts) {
+        int pairs = 0;
+        for (int c : counts)
+            if (c >= 2)
+                pairs++;
+        return pairs;
+    }
+
+    private boolean hasFullHouse(int[] counts) {
+        boolean has3 = false, has2 = false;
+        for (int c : counts) {
+            if (c == 3)
+                has3 = true;
+            if (c == 2)
+                has2 = true;
+        }
+        return has3 && has2;
+    }
+
+    private boolean isLargeStraight(int[] dice) {
+        // Large straight: 1-2-3-4-5 or 2-3-4-5-6
+        return (Arrays.equals(dice, new int[] { 1, 2, 3, 4, 5 }) || Arrays.equals(dice, new int[] { 2, 3, 4, 5, 6 }));
+    }
+
+    private boolean isSmallStraight(int[] dice) {
+        // Small straight: any four consecutive numbers
+        int[][] smallStraights = {
+                { 1, 2, 3, 4 }, { 2, 3, 4, 5 }, { 3, 4, 5, 6 }
+        };
+        for (int[] straight : smallStraights) {
+            int found = 0;
+            for (int s : straight) {
+                for (int d : dice) {
+                    if (d == s) {
+                        found++;
+                        break;
+                    }
+                }
+            }
+            if (found == 4)
+                return true;
+        }
+        return false;
     }
 }

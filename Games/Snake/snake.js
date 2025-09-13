@@ -1,12 +1,31 @@
+
+/**
+ * Classic Snake Game (JavaScript Implementation)
+ * ---------------------------------------------
+ * Modern, well-documented, and beginner-friendly implementation of the classic Snake game for the web.
+ * Features:
+ * - Modular class-based design
+ * - Responsive controls (WASD/Arrow keys, pause)
+ * - Local storage for high score
+ * - Clear comments and docstrings
+ * - Optimized for readability and maintainability
+ */
+
 /**
  * Represents the Snake object, managing its position, movement, and body segments.
  */
 class Snake {
+    /**
+     * @param {number} gridSize - The size of each grid cell in pixels.
+     */
     constructor(gridSize) {
         this.gridSize = gridSize;
         this.reset();
     }
 
+    /**
+     * Resets the snake to its initial state.
+     */
     reset() {
         this.x = 160;
         this.y = 160;
@@ -16,6 +35,9 @@ class Snake {
         this.maxCells = 4;
     }
 
+    /**
+     * Updates the snake's position and body segments.
+     */
     update() {
         this.x += this.dx;
         this.y += this.dy;
@@ -43,6 +65,10 @@ class Snake {
         }
     }
 
+    /**
+     * Draws the snake on the canvas.
+     * @param {CanvasRenderingContext2D} context
+     */
     draw(context) {
         context.fillStyle = 'green';
         this.cells.forEach(cell => {
@@ -50,6 +76,10 @@ class Snake {
         });
     }
 
+    /**
+     * Handles keyboard input to change the snake's direction.
+     * @param {KeyboardEvent} e
+     */
     handleInput(e) {
         if ((e.key === 'a' || e.key === 'ArrowLeft') && this.dx === 0) {
             this.dx = -this.gridSize;
@@ -67,10 +97,16 @@ class Snake {
     }
 }
 
+
 /**
  * Represents the Apple object, managing its position.
  */
 class Apple {
+    /**
+     * @param {number} gridSize
+     * @param {number} canvasWidth
+     * @param {number} canvasHeight
+     */
     constructor(gridSize, canvasWidth, canvasHeight) {
         this.gridSize = gridSize;
         this.canvasWidth = canvasWidth;
@@ -80,6 +116,9 @@ class Apple {
         this.place();
     }
 
+    /**
+     * Places the apple at a random position on the grid.
+     */
     place() {
         const maxX = this.canvasWidth / this.gridSize;
         const maxY = this.canvasHeight / this.gridSize;
@@ -87,16 +126,24 @@ class Apple {
         this.y = Math.floor(Math.random() * maxY) * this.gridSize;
     }
 
+    /**
+     * Draws the apple on the canvas.
+     * @param {CanvasRenderingContext2D} context
+     */
     draw(context) {
         context.fillStyle = 'red';
         context.fillRect(this.x, this.y, this.gridSize - 1, this.gridSize - 1);
     }
 }
 
+
 /**
  * Main Game class to orchestrate the game loop, state, and rendering.
  */
 class Game {
+    /**
+     * @param {string} canvasId - The id of the canvas element.
+     */
     constructor(canvasId) {
         this.canvas = document.getElementById(canvasId);
         this.context = this.canvas.getContext('2d');
@@ -113,14 +160,15 @@ class Game {
         this.apple = new Apple(this.gridSize, this.canvas.width, this.canvas.height);
 
         this.score = 0;
-        this.highScore = localStorage.getItem('snakeHighScore') || 0;
+        this.highScore = Number(localStorage.getItem('snakeHighScore')) || 0;
         this.updateScoresUI();
 
         this.lastUpdateTime = 0;
         this.updateInterval = 100; // milliseconds between updates
 
+        // Use arrow function to preserve 'this' context
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'p') {
+            if (e.key === 'p' || e.key === 'P') {
                 this.togglePause();
             } else {
                 this.snake.handleInput(e);
@@ -128,6 +176,9 @@ class Game {
         });
     }
 
+    /**
+     * Toggles the pause state of the game.
+     */
     togglePause() {
         this.paused = !this.paused;
         if (!this.paused) {
@@ -135,6 +186,10 @@ class Game {
         }
     }
 
+    /**
+     * The main game loop, called via requestAnimationFrame.
+     * @param {DOMHighResTimeStamp} timestamp
+     */
     loop(timestamp) {
         if (this.paused) return;
 
@@ -148,11 +203,17 @@ class Game {
         }
     }
 
+    /**
+     * Updates the game state (snake, collisions, etc).
+     */
     update() {
         this.snake.update();
         this.checkCollisions();
     }
 
+    /**
+     * Checks for collisions (apple, self) and handles scoring and reset.
+     */
     checkCollisions() {
         // Check collision with apple
         if (this.snake.cells[0].x === this.apple.x && this.snake.cells[0].y === this.apple.y) {
@@ -170,6 +231,9 @@ class Game {
         }
     }
 
+    /**
+     * Resets the game state and updates high score if needed.
+     */
     resetGame() {
         if (this.score > this.highScore) {
             this.highScore = this.score;
@@ -181,17 +245,24 @@ class Game {
         this.updateScoresUI();
     }
 
+    /**
+     * Updates the score display in the UI.
+     */
     updateScoresUI() {
         this.scoreElem.textContent = this.score;
         this.highScoreElem.textContent = this.highScore;
     }
 
+    /**
+     * Draws the game (snake and apple) on the canvas.
+     */
     draw() {
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
         this.snake.draw(this.context);
         this.apple.draw(this.context);
     }
 }
+
 
 // --- Main Execution ---
 window.onload = () => {

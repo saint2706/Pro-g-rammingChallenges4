@@ -1,8 +1,11 @@
-package Games.Easy.RPS;
-
+//
+// Rock Paper Scissors (RPS) Game - Java Implementation
+// Modernized, documented, and beginner-friendly code.
+//
 import java.util.*;
 
-class RPS {
+public class Rps {
+    // Enum for possible moves
     enum Move {
         ROCK("rock"), PAPER("paper"), SCISSORS("scissors");
 
@@ -17,6 +20,10 @@ class RPS {
         }
     }
 
+    /**
+     * Main game loop for Rock Paper Scissors.
+     * Prompts user for input, plays against computer, and tracks wins/losses.
+     */
     public static void main(String[] args) {
         try (Scanner inp = new Scanner(System.in)) {
             int wins = 0;
@@ -33,15 +40,15 @@ class RPS {
                     break;
                 }
 
+                // Validate user input
                 if (Arrays.stream(Move.values()).noneMatch(move -> move.getVal().equals(userMove))) {
-                    System.out
-                            .println(
-                                    "Invalid move. Please enter \"rock\", \"paper\", \"scissors\", or \"quit\" to exit.");
+                    System.out.println("Invalid move. Please enter \"rock\", \"paper\", \"scissors\", or \"quit\" to exit.");
                     continue;
                 }
 
                 String compMove = getCompMove();
 
+                // Determine and print result
                 if (userMove.equals(compMove)) {
                     System.out.println("It's a tie!");
                 } else if (userMove.equals("rock") && compMove.equals("scissors")
@@ -53,11 +60,14 @@ class RPS {
                     System.out.println("You lose!");
                     losses++;
                 }
-
             }
         }
     }
 
+    /**
+     * Randomly selects a move for the computer.
+     * @return String representing the computer's move.
+     */
     private static String getCompMove() {
         Random rand = new Random();
         int randInt = rand.nextInt(3);

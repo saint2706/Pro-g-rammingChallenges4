@@ -1,21 +1,32 @@
+<!--
+	Classic Snake Game Webpage
+	Modern, accessible, and responsive HTML for the Snake web game.
+	Updated for clarity, maintainability, and best practices.
+-->
 <!DOCTYPE html>
 <html lang="en">
+<head>
 	<meta charset="UTF-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<head>
-		<title>Snake Game</title>
-		<link rel="stylesheet" href="snake.css">
-	</head>
-	<body>
-        <h1>Classic Snake</h1>
-        <div class="scores">
-            <span>Score: <span id="current-score">0</span></span>
-            <span>High Score: <span id="high-score">0</span></span>
-        </div>
-		<canvas width="400" height="400" id="game-canvas"></canvas>
-        <div class="controls">
-            <p>Use WASD or Arrow Keys to move. Press 'P' to pause.</p>
-        </div>
-		<script src="snake.js"></script>
-	</body>
+	<title>Snake Game</title>
+	<!-- Link to external stylesheet -->
+	<link rel="stylesheet" href="snake.css">
+</head>
+<body>
+	<!-- Game Title -->
+	<h1>Classic Snake</h1>
+	<!-- Score Display -->
+	<div class="scores" aria-label="Scoreboard">
+		<span>Score: <span id="current-score">0</span></span>
+		<span>High Score: <span id="high-score">0</span></span>
+	</div>
+	<!-- Game Canvas -->
+	<canvas width="400" height="400" id="game-canvas" tabindex="0" aria-label="Snake Game Board"></canvas>
+	<!-- Controls and Instructions -->
+	<div class="controls">
+		<p>Use <strong>WASD</strong> or <strong>Arrow Keys</strong> to move. Press <strong>P</strong> to pause.</p>
+	</div>
+	<!-- Game Logic Script -->
+	<script src="snake.js"></script>
+</body>
 </html>
