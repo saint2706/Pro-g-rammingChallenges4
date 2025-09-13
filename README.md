@@ -26,25 +26,25 @@ While this is a personal project, the principles behind it are universal. If you
 
 | # | Challenge | Status |
 | --- | --------- | ------ |
-| 1 | Download Manager | [View Solution](./Practical/Medium/Download%20Manager/) |
-| 2 | Make an elastic producer/consumer task queue. | [View Solution](./Practical/Medium/Producer%20Consumer/) |
+| 1 | Download Manager | [View Solution](./Practical/Download%20Manager/) |
+| 2 | Make an elastic producer/consumer task queue. | [View Solution](./Practical/Producer%20Consumer/) |
 | 3 | IRC Client | Not Yet |
-| 4 | Markov Chain Sentence Generator (Include Shitposting Capabilities) | [View Solution](./Practical/Easy/Markov%20Chain%20Sentence%20Generator/) |
-| 5 | English Sentence Parser that Points to the Context of a Sentence | [View Solution](./Practical/Medium/Context%20Pointer/) |
+| 4 | Markov Chain Sentence Generator (Include Shitposting Capabilities) | [View Solution](./Practical/Markov%20Chain%20Sentence%20Generator/) |
+| 5 | English Sentence Parser that Points to the Context of a Sentence | [View Solution](./Practical/Context%20Pointer/) |
 | 6 | MIDI Player + Editor | Not Yet |
 | 7 | Stock Market Simulator Using Yahoo Spreadsheet Data | Not Yet |
 | 8 | Parametric/Graphic Equalizer for .wav files (Make it real-time) | Not Yet |
-| 9 | Graphing Calculator (BONUS: Graph the Function's Derivatives) | [View Solution](./Practical/Medium/Graphing%20Calculator/) |
-| 10 | To-Do List Application (Web app or CLI) | [View Solution](./Practical/Easy/ToDoList-CLI/) |
+| 9 | Graphing Calculator (BONUS: Graph the Function's Derivatives) | [View Solution](./Practical/Graphing%20Calculator/) |
+| 10 | To-Do List Application (Web app or CLI) | [View Solution](./Practical/ToDoList-CLI/) |
 | 11 | Verlet Integration (Verlet Cloth) | Not Yet |
 | 12 | TCP/UDP Chat Server + Client | Not Yet |
 | 13 | Music Streaming | Not Yet |
 | 14 | Shazam | Not Yet |
 | 15 | Chatbot (with conversation retention) | Not Yet |
 | 16 | Curses Text Editor (with Emacs /Vim Keybindings) | Not Yet |
-| 17 | Paint Clone | [View Solution](./Practical/Medium/Paint/) |
-| 18 | Image to ASCII Art | [View Solution](./Practical/Easy/ImgToASCII/) |
-| 19 | Booru (Image Board) Image Downloader | [View Solution](./Practical/Medium/Booru%20Imageboard%20Downloader/) |
+| 17 | Paint Clone | [View Solution](./Practical/Paint/) |
+| 18 | Image to ASCII Art | [View Solution](./Practical/ImgToASCII/) |
+| 19 | Booru (Image Board) Image Downloader | [View Solution](./Practical/Booru%20Imageboard%20Downloader/) |
 | 20 | Image Converter | Not Yet |
 | 21 | ID3 Reader | Not Yet |
 | 22 | Sound Synthesis (Sine square sawtooth etc...) ("Fuck You" mode: Realtime MIDI Playback with Custom instruments) | Not Yet |
@@ -56,61 +56,61 @@ While this is a personal project, the principles behind it are universal. If you
 | 28 | Booru Client | Not Yet |
 | 29 | Key Press Bot | Not Yet |
 | 30 | IP/URL Obsucrification (http://www.pc-help.org/obscure.htm) | Not Yet |
-| 31 | Radix Base Converter (Given a radix base convert it to decimal) | [View Solution](./Practical/Medium/Radix%20Base%20Converter/) |
+| 31 | Radix Base Converter (Given a radix base convert it to decimal) | [View Solution](./Practical/Radix%20Base%20Converter/) |
 | 32 | Chan aggregator (Let's user view various boards from different 'chans') (Bonus: Add 4ChanX and Archiving Functionality) | Not Yet |
 | 33 | Encrypt a File and Upload it online | Not Yet |
-| 34 | Make a Text Editor that autosaves and includes the date in the filename | [View Solution](./Practical/Hard/AutoSave%20Text%20Editor/) |
-| 35 | Create an HSV Color Representation | [View Solution](./Practical/Easy/HSV%20color%20wheel/) |
+| 34 | Make a Text Editor that autosaves and includes the date in the filename | [View Solution](./Practical/AutoSave%20Text%20Editor/) |
+| 35 | Create an HSV Color Representation | [View Solution](./Practical/HSV%20color%20wheel/) |
 | 36 | Window Manager | Not Yet |
 | 37 | Basic Relational Database Software (SQL Support Handle Relationships Focus on Efficiency) | Not Yet |
 | 38 | Pixel Editor | Not Yet |
 | 39 | Trivial File Transfer Protocol (TFTP): Allow a client to put a file onto a remote host | Not Yet |
 | 40 | Markdown (HTML/XML) Editor | Not Yet |
-| 41 | IP Tracking Visualization | [View Solution](./Practical/Medium/IP%20Tracking%20visualization/) |
-| 42 | Port Scanner | [View Solution](./Practical/Easy/Port%20Scanner/) |
+| 41 | IP Tracking Visualization | [View Solution](./Practical/IP%20Tracking%20visualization/) |
+| 42 | Port Scanner | [View Solution](./Practical/Port%20Scanner/) |
 | 43 | Old School Demo Effect (Plasma Tunnel Scrollers Zoomers etc...) | Not Yet |
 | 135 | Bellman-Ford Simulation with at least Five Vertices | Not Yet |
 | 136 | Matrix Arithmetic | Not Yet |
 | 137 | File Compression Utility (Make it GUI) | Not Yet |
-| 138 | PDF Tagger | [View Solution](./Practical/Easy/PDF%20Tagger/) |
+| 138 | PDF Tagger | [View Solution](./Practical/PDF%20Tagger/) |
 | 139 | Nonogram Generator and Solver | Not Yet |
-| 140 | Calculate Dot and Cross Product of Two Vectors | [View Solution](./Practical/Medium/Vector%20Product/) |
-| 141 | Bismuth Fractal | [View Solution](./Practical/Medium/Bismuth%20Fractal/) |
-| 142 | Seam Carving | [View Solution](./Practical/Medium/Seam%20Carving/) |
-| 143 | Bayesian Filter | [View Solution](./Practical/Medium/Bayesian%20Filter/) |
+| 140 | Calculate Dot and Cross Product of Two Vectors | [View Solution](./Practical/Vector%20Product/) |
+| 141 | Bismuth Fractal | [View Solution](./Practical/Bismuth%20Fractal/) |
+| 142 | Seam Carving | [View Solution](./Practical/Seam%20Carving/) |
+| 143 | Bayesian Filter | [View Solution](./Practical/Bayesian%20Filter/) |
 | 144 | WMS viewer that isn't web based | Not Yet |
 
 ### Algorithmic
 
 | # | Challenge | Status |
 | --- | --------- | ------ |
-| 44 | Fizzbuzz (BONUS: In Assembly) | [View Solution](./Algorithmic/Easy/FizzBuzz/) |
-| 45 | RPN Calculator | [View Solution](./Algorithmic/Easy/RPN%20Calculator/) |
-| 46 | Counts occurrences of characters in a Given String (include support for unicode characters) | [View Solution](./Algorithmic/Easy/Character%20Counter/) |
-| 47 | Towers of Hanoi | [View Solution](./Algorithmic/Easy/Towers%20of%20Hanoi/) |
-| 48 | Music Visualizer | [View Solution](./Algorithmic/Medium/Music%20Visualizer/) |
-| 49 | Unicode Converter (Support for UTF-8 16LE 32LE and 32BE) | [View Solution](./Algorithmic/Easy/basic%20text%20encoding/) |
-| 50 | Calculate the first (n) digits of pi | [View Solution](./Algorithmic/Easy/Digits%20of%20Pi/) |
-| 51 | Least Squares Fitting Algorithm | [View Solution](./Algorithmic/Medium/Least%20Squares%20Fitting/) |
-| 52 | Given an Array of Stocks's values over time find the period of time where the stocks could have made the most money | [View Solution](./Algorithmic/Easy/Stock%20Prices/) |
-| 53 | Highest Prime Factor Calculator | [View Solution](./Algorithmic/Easy/Highest%20prime%20factor/) |
-| 54 | Hide and Extract Data in images (Basic Steganography) (Bonus: Include .gif support) | [View Solution](./Algorithmic/Medium/Steganography/) |
-| 55 | Web Page Crawler | [View Solution](./Algorithmic/Medium/Web%20Page%20Crawler/) |
-| 56 | Password Generator (Let User Choose Options) | [View Solution](./Algorithmic/Easy/PassGen/) |
-| 57 | VignÃ©re cipher encryption/decryption | [View Solution](./Algorithmic/Medium/Vigniere%20Cipher/) |
-| 58 | Game Of Life | [View Solution](./Algorithmic/Medium/Game%20of%20life/) |
-| 59 | Caesar Cipher Cracker | [View Solution](./Algorithmic/Easy/Caesar%20Cipher/) |
-| 60 | Dijkstra's Algorithm | [View Solution](./Algorithmic/Medium/Djikstra/) |
-| 61 | ROT 13 | [View Solution](./Algorithmic/Easy/ROT%2013/) |
-| 62 | Program that displays MBR Contents | [View Solution](./Algorithmic/Medium/MBR/) |
-| 63 | Random Name Picker | [View Solution](./Algorithmic/Medium/Random%20Name%20Picker/) |
-| 64 | Encrypt/Decrypt Text: Implement at least one from http://rumkin.com/tools/cipher/collection | [View Solution](./Algorithmic/Easy/Rumkin%20Ciphers/) |
-| 65 | Youtube To MP3 | [View Solution](./Algorithmic/Easy/ytmp3/) |
-| 66 | Text to Hexadecimal/Binary | [View Solution](./Algorithmic/Easy/basic%20text%20encoding/) |
-| 67 | Calculate the first 1 000 digits of pi iteratively | [View Solution](./Algorithmic/Medium/1000%20Digits%20of%20Pi/) |
-| 68 | Sierpinski Triangle | [View Solution](./Algorithmic/Easy/Sierpinski/) |
-| 69 | Mandlebrot Set | [View Solution](./Algorithmic/Medium/Mandelbrot%20Set/) |
-| 134 | Ulam Spiral | [View Solution](./Algorithmic/Easy/Ulam%20Spiral/) |
+| 44 | Fizzbuzz (BONUS: In Assembly) | [View Solution](./Algorithmic/FizzBuzz/) |
+| 45 | RPN Calculator | [View Solution](./Algorithmic/RPN%20Calculator/) |
+| 46 | Counts occurrences of characters in a Given String (include support for unicode characters) | [View Solution](./Algorithmic/Character%20Counter/) |
+| 47 | Towers of Hanoi | [View Solution](./Algorithmic/Towers%20of%20Hanoi/) |
+| 48 | Music Visualizer | [View Solution](./Algorithmic/Music%20Visualizer/) |
+| 49 | Unicode Converter (Support for UTF-8 16LE 32LE and 32BE) | [View Solution](./Algorithmic/basic%20text%20encoding/) |
+| 50 | Calculate the first (n) digits of pi | [View Solution](./Algorithmic/Digits%20of%20Pi/) |
+| 51 | Least Squares Fitting Algorithm | [View Solution](./Algorithmic/Least%20Squares%20Fitting/) |
+| 52 | Given an Array of Stocks's values over time find the period of time where the stocks could have made the most money | [View Solution](./Algorithmic/Stock%20Prices/) |
+| 53 | Highest Prime Factor Calculator | [View Solution](./Algorithmic/Highest%20prime%20factor/) |
+| 54 | Hide and Extract Data in images (Basic Steganography) (Bonus: Include .gif support) | [View Solution](./Algorithmic/Steganography/) |
+| 55 | Web Page Crawler | [View Solution](./Algorithmic/Web%20Page%20Crawler/) |
+| 56 | Password Generator (Let User Choose Options) | [View Solution](./Algorithmic/PassGen/) |
+| 57 | VignÃ©re cipher encryption/decryption | [View Solution](./Algorithmic/Vigniere%20Cipher/) |
+| 58 | Game Of Life | [View Solution](./Algorithmic/Game%20of%20life/) |
+| 59 | Caesar Cipher Cracker | [View Solution](./Algorithmic/Caesar%20Cipher/) |
+| 60 | Dijkstra's Algorithm | [View Solution](./Algorithmic/Djikstra/) |
+| 61 | ROT 13 | [View Solution](./Algorithmic/ROT%2013/) |
+| 62 | Program that displays MBR Contents | [View Solution](./Algorithmic/MBR/) |
+| 63 | Random Name Picker | [View Solution](./Algorithmic/Random%20Name%20Picker/) |
+| 64 | Encrypt/Decrypt Text: Implement at least one from http://rumkin.com/tools/cipher/collection | [View Solution](./Algorithmic/Rumkin%20Ciphers/) |
+| 65 | Youtube To MP3 | [View Solution](./Algorithmic/ytmp3/) |
+| 66 | Text to Hexadecimal/Binary | [View Solution](./Algorithmic/basic%20text%20encoding/) |
+| 67 | Calculate the first 1 000 digits of pi iteratively | [View Solution](./Algorithmic/1000%20Digits%20of%20Pi/) |
+| 68 | Sierpinski Triangle | [View Solution](./Algorithmic/Sierpinski/) |
+| 69 | Mandlebrot Set | [View Solution](./Algorithmic/Mandelbrot%20Set/) |
+| 134 | Ulam Spiral | [View Solution](./Algorithmic/Ulam%20Spiral/) |
 
 ### Artificial Intelligence
 
@@ -118,9 +118,9 @@ While this is a personal project, the principles behind it are universal. If you
 | --- | --------- | ------ |
 | 70 | OpenAl Gym Project | Not Yet |
 | 71 | Al for Roguelikes | Not Yet |
-| 72 | Sudoku/n-Puzzle Solver using A* algorithm | [View Solution](./Artificial%20Intelligence/Medium/Sudoku/) |
-| 73 | Connect-4 Al Player using Alpha-Beta Pruning | [View Solution](./Artificial%20Intelligence/Medium/Connect4/) |
-| 74 | Basic Neural Network - Simulate individual neurons and their connections | [View Solution](./Artificial%20Intelligence/Easy/Basic%20Neural%20Network/) |
+| 72 | Sudoku/n-Puzzle Solver using A* algorithm | [View Solution](./Artificial%20Intelligence/Sudoku/) |
+| 73 | Connect-4 Al Player using Alpha-Beta Pruning | [View Solution](./Artificial%20Intelligence/Connect4/) |
+| 74 | Basic Neural Network - Simulate individual neurons and their connections | [View Solution](./Artificial%20Intelligence/Basic%20Neural%20Network/) |
 | 75 | Real Neural Network - Implement a basic feed-forward neural network using matrices for entire layers along with matrix operations for computations. | Not Yet |
 | 76 | Convolutional Neural Network: Implement a convolutional N.N. for a handwritten digit recognition test on MNIST dataset (Use TensorFlow Theano etc...) | Not Yet |
 | 77 | Convolutional Neural Network: Implement your own convolutional neural network for handwritten digit recognition test on MNIST Dataset (Without TensorFlow Theano etc...) | Not Yet |
@@ -134,49 +134,49 @@ While this is a personal project, the principles behind it are universal. If you
 | 93 | Constructive Solid Geometry | Not Yet |
 | 94 | Ray Tracer | Not Yet |
 | 95 | Real-Time Fast Fourier Transform Spectrum Visualizer | Not Yet |
-| 96 | Generate a Complimentary Color from any input color | [View Solution](./Emulation/Easy/CompColor/) |
-| 97 | Generate a 5-Color Scheme from the most dominant tones in any image | [View Solution](./Emulation/Medium/5%20color%20scheme/) |
+| 96 | Generate a Complimentary Color from any input color | [View Solution](./Emulation/CompColor/) |
+| 97 | Generate a 5-Color Scheme from the most dominant tones in any image | [View Solution](./Emulation/5%20color%20scheme/) |
 | 98 | General Lambert's-Problem Solver (At least it's not rocket science... Oh wait it actually is) | Not Yet |
 | 99 | TI-86 Emulator (Bonus: Include the Option to Create Programs) | Not Yet |
 | 100 | N-Body Simulator with particles having a certain mass and radius depending on the mass that merge if they collide (Bonus: Include a GUI where you can place particles) | Not Yet |
-| 101 | Eulerian Path | [View Solution](./Emulation/Easy/EulerianPath/) |
-| 102 | Draw a spinning 3D Cube | [View Solution](./Emulation/Easy/SpinnyCube/) |
-| 103 | Cellular Textures | [View Solution](./Emulation/Easy/CellularTextures/) |
-| 145 | ASCII Digital Clock | [View Solution](./Emulation/Easy/ASCII_Clock/) |
+| 101 | Eulerian Path | [View Solution](./Emulation/EulerianPath/) |
+| 102 | Draw a spinning 3D Cube | [View Solution](./Emulation/SpinnyCube/) |
+| 103 | Cellular Textures | [View Solution](./Emulation/CellularTextures/) |
+| 145 | ASCII Digital Clock | [View Solution](./Emulation/ASCII_Clock/) |
 
 ### Games
 
 | # | Challenge | Status |
 | --- | --------- | ------ |
-| 104 | Knight's Tour | [View Solution](./Games/Medium/Knight%20Tour/) |
+| 104 | Knight's Tour | [View Solution](./Games/Knight%20Tour/) |
 | 105 | Monster Raising/Breeding Simulator | Not Yet |
 | 106 | Tetris | Not Yet |
-| 107 | Snake | [View Solution](./Games/Easy/Snake/) |
+| 107 | Snake | [View Solution](./Games/Snake/) |
 | 108 | Pipe Dreams | Not Yet |
 | 109 | Pac Man With Different Behaviors for each ghost | Not Yet |
 | 110 | Dragon Quest / Basic RPG Engine | Not Yet |
-| 111 | Rock Paper Scissors | [View Solution](./Games/Easy/RPS/) |
+| 111 | Rock Paper Scissors | [View Solution](./Games/RPS/) |
 | 112 | First-Person Engine in OpenGL (Walking Looking Around Jumping on Obstacles) (BONUS: VR Compatibility) | Not Yet |
-| 113 | Shuffle a Deck of Cards (Include a Visualization) | [View Solution](./Games/Medium/Shuffle/) |
+| 113 | Shuffle a Deck of Cards (Include a Visualization) | [View Solution](./Games/Shuffle/) |
 | 114 | Simulate a game of Tag using a multi-agent system | Not Yet |
 | 115 | Wolfenstein Clone (FPS two-dimensional map that appears to be 3-D) (If you need a starting point search for bisquit's video about DOOM-like Engines) | Not Yet |
 | 116 | Scorched Earth Clone | Not Yet |
-| 117 | Minesweeper | [View Solution](./Games/Medium/Minesweeper/) |
+| 117 | Minesweeper | [View Solution](./Games/Minesweeper/) |
 | 118 | An Audio/Visual 64KB Demonstration | Not Yet |
-| 119 | Sudoku | [View Solution](./Games/Medium/Sudoku/) |
+| 119 | Sudoku | [View Solution](./Games/Sudoku/) |
 | 120 | Danmaku (Bullet Hell) Engine | Not Yet |
 | 121 | Roguelike Engine/Dungeon Generator | Not Yet |
 | 122 | Design a Game Engine in Unity | Not Yet |
-| 123 | Yahtzee | [View Solution](./Games/Easy/Yahtzee/) |
+| 123 | Yahtzee | [View Solution](./Games/Yahtzee/) |
 | 124 | Oil Panic | Not Yet |
 | 125 | Chess | Not Yet |
 | 126 | Go (No AI Necessary) | Not Yet |
-| 127 | Connect Four | [View Solution](./Games/Easy/Connect4/) |
+| 127 | Connect Four | [View Solution](./Games/Connect4/) |
 | 128 | Mastermind | Not Yet |
 | 129 | Missile Command Game | Not Yet |
 | 130 | Tron | Not Yet |
 | 131 | Breakout | Not Yet |
-| 132 | Simon | [View Solution](./Games/Easy/Simon/) |
+| 132 | Simon | [View Solution](./Games/Simon/) |
 
 ## Highlights
 
