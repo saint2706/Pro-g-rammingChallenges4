@@ -1,0 +1,59 @@
+# Root consolidated dependencies for the entire Pro-g-rammingChallenges4 repository
+# Strategy: Pin major+minor to stabilize APIs; allow patch updates. Many scripts are stdlib-only.
+# Optional groups are annotated; you may safely trim what you do not need.
+
+#############################
+# Core / Numerical / Imaging
+#############################
+numpy>=1.26,<2.0              # Arrays, math (image ops, palette extraction, ASCII art)
+Pillow>=10.4,<10.5            # Image loading/saving (imageboard, converters, palette tools)
+matplotlib>=3.9,<3.10         # Plotting (vector product, rotating cube, color wheel)
+opencv-python>=4.10,<5.0      # Seam carving energy/gradients, optional image acceleration
+scikit-learn>=1.5,<1.6        # KMeans clustering (5 color scheme)
+colour-science>=0.4,<0.5      # Optional advanced color utilities (HSV wheel if installed)
+
+#############################
+# Data / Analysis / Progress
+#############################
+pandas>=2.2,<2.3              # IP tracking dataset assembly
+plotly>=5.22,<5.23            # Interactive geographic visualization (IP tracking)
+tqdm>=4.66,<4.67              # Progress bars (optional)
+
+#############################
+# Web / Networking / Services
+#############################
+Flask>=3.0,<3.1               # Imageboard web app
+requests>=2.32,<2.33          # External API calls (IP tracking)
+
+#############################
+# Documents / Files
+#############################
+pypdf>=4.3,<4.4               # PDF Tagger metadata operations
+
+#############################
+# Visualization / 3D / UI (Optional)
+#############################
+vpython>=7.6,<7.7             # 3D interactive spinny cube (optional)
+
+#############################
+# Terminal / UX Enhancements (Optional)
+#############################
+colorama>=0.4.6,<0.5          # Cross-platform ANSI colors (todo list future improvements)
+
+#############################
+# Security / Parsing (Future placeholders)
+#############################
+# beautifulsoup4>=4.12,<4.13  # For potential web crawler enhancements
+# lxml>=5.2,<5.3              # Faster HTML/XML parsing (optional)
+
+#############################
+# Dev / Tooling (Install separately if desired)
+#############################
+# ruff>=0.5,<0.6              # Linting
+# mypy>=1.11,<1.12            # Static type checking
+# pytest>=8.3,<8.4            # Testing framework
+
+# NOTES:
+# 1. If you only work inside one sub-area (e.g., Emulation or Practical/Imageboard), prefer that folder's requirements file.
+# 2. For a minimal educational install, you can start with just: numpy, Pillow, Flask.
+# 3. Consider migrating to a pyproject.toml with optional dependency groups (extras) for cleaner installs.

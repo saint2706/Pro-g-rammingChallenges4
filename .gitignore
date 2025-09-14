@@ -5,6 +5,10 @@
 .vscode/
 *.code-workspace
 
+# VSCode local history / profiles
+.history/
+.VSCodeCounter/
+
 # Node / JS (just in case future additions)
 node_modules/
 npm-debug.log*
@@ -17,6 +21,9 @@ pnpm-debug.log
 __pycache__/
 *.py[cod]
 *$py.class
+
+# Jupyter notebook checkpoints
+.ipynb_checkpoints/
 
 # C extensions
 *.so
@@ -33,6 +40,25 @@ build/
 *.egg-info/
 *.egg
 
+# C / C++ build outputs
+*.obj
+*.o
+*.out
+*.exe
+*.dll
+*.pdb
+*.lib
+*.a
+*.lo
+*.la
+*.mod.c
+*.gcno
+*.gcda
+*.gcov
+
+# Temporary compiled python extensions
+*.pyd
+
 ################################################################################
 # Virtual Environments
 ################################################################################
@@ -42,6 +68,8 @@ env/
 .env/
 ENV/
 
+.python-version
+
 ################################################################################
 # Logs / Temp / Misc
 ################################################################################
@@ -50,6 +78,24 @@ ENV/
 *.swp
 *.DS_Store
 Thumbs.db
+desktop.ini
+~$*
+
+# Archives / bundles
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.bz2
+*.7z
+*.rar
+
+# Crash / profiling dumps
+*.core
+core.*
+*.pid
+*.prof
+*.perf
 
 ################################################################################
 # Tooling / Code Quality
@@ -60,23 +106,77 @@ Thumbs.db
 .pytype/
 .hypothesis/
 
+# Generic caches / benchmarks
+.cache/
+.benchmarks/
+.coverage
+pyrightconfig.json.tmp
+
 ################################################################################
 # Project Specific Patterns
 ################################################################################
 # Matplotlib / plotting cache (if generated)
 *.mplstyle
 
+# Plotly offline exports
+*.plotly.json
+
+# Large raw datasets (adjust as needed)
+data/
+datasets/
+raw_data/
+
+# Model artifacts (ML / spaCy / sklearn pickles)
+models/
+*.pickle
+*.joblib
+*.pkl
+
+# spaCy downloaded model directories
+en_core_web_sm/
+en_core_web_md/
+en_core_web_lg/
+
 # Audio / large downloaded media (retain explicit tracked examples only)
 downloads/
+
+# Generated media / exports
+exports/
+reports/
+figures/
+plots/
+
+# Cache from image/video generation sessions
+frames/
+frame_*.png
+*.mp4
+*.gif
 
 # Local data exports / scratch
 scratch/
 
 # Ignore generated animation/video frames (naming convention example)
-frame_*.png
+# (frame_*.png now generalized above)
 
 # Allow test fixtures & sample media if committed intentionally (e.g., 'fur elise.mp3')
 !Algorithmic/Music Visualizer/fur elise.mp3
+
+# Binary & diff artifacts
+*.bin
+*.dat
+*.tmp
+*.bak
+*.orig
+*.rej
+
+# Sublime / other editor project files
+*.sublime-workspace
+*.sublime-project
+
+# Mac metadata variants
+.AppleDouble
+.LSOverride
+._*
 
 ################################################################################
 # Exceptions: Keep configuration & documentation
@@ -84,3 +184,14 @@ frame_*.png
 !.gitignore
 !README.md
 !LICENSE
+
+################################################################################
+# OPTIONAL (uncomment if you start adding these and don't want them tracked):
+# *.ipynb
+# media/
+# samples/
+# experiments/
+# benchmarks/
+################################################################################
+
+# End of optimized .gitignore

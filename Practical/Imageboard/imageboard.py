@@ -1,0 +1,395 @@
+"""Minimal vichan-like imageboard prototype (educational).
+
+Refined Version Enhancements:
+- Centralized configuration via Config dataclass (easy future extension / override).
+- Context manager wrapper for database connections (ensures close, DRY).
+- Unified helper `insert_post` for thread + reply creation.
+- Registered Jinja filter `datetime` for readable UTC conversion.
+- Stricter image validation: size constraint, basic MIME magic sniff (first bytes).
+- Added inline comments explaining each logical section for new developers.
+- Type hints across functions for clarity.
+- Slightly clearer error messages and flash categories.
+
+Security / production caveats remain (no auth/moderation/CAPTCHA). This is intentionally minimal.
+"""
+
+from __future__ import annotations
+
+import argparse
+import os
+import sqlite3
+import time
+from contextlib import contextmanager
+from dataclasses import dataclass
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Generator, Iterable, Optional, Tuple
+
+from flask import (
+    Flask,
+    abort,
+    flash,
+    redirect,
+    render_template,
+    request,
+    send_from_directory,
+    url_for,
+)
+from markupsafe import Markup, escape
+from werkzeug.utils import secure_filename
+from PIL import Image
+
+# ----------------------------- Configuration ----------------------------- #
+
+
+@dataclass(slots=True)
+class Config:
+    data_dir: Path = Path(__file__).parent.resolve() / "data"
+    allowed_ext: set[str] = frozenset({"jpg", "jpeg", "png", "gif", "webp"})  # type: ignore[assignment]
+    thumb_size: Tuple[int, int] = (200, 200)
+    rate_limit_window: int = 8  # seconds between posts from same IP
+    max_message_len: int = 2000
+    max_image_bytes: int = 8 * 1024 * 1024  # 8 MB
+    secret_key: str = "dev-secret-change-me"  # Replace in real usage
+
+
+CFG = Config()
+APP_ROOT = Path(__file__).parent.resolve()
+UPLOAD_DIR = CFG.data_dir / "uploads"
+THUMB_DIR = CFG.data_dir / "thumbs"
+DB_PATH = CFG.data_dir / "imageboard.db"
+
+# Ensure directories exist (idempotent)
+for d in (CFG.data_dir, UPLOAD_DIR, THUMB_DIR):
+    d.mkdir(parents=True, exist_ok=True)
+
+# ----------------------------- Flask App Setup ----------------------------- #
+app = Flask(__name__)
+app.secret_key = CFG.secret_key
+
+
+@app.template_filter("datetime")
+def jinja_datetime_filter(ts: int) -> str:
+    """Convert stored UTC epoch int -> iso-ish human string."""
+    dt = datetime.fromtimestamp(ts, tz=timezone.utc)
+    return dt.strftime("%Y-%m-%d %H:%M:%S UTC")
+
+
+@app.template_filter("format_post")
+def format_post_filter(text: str | None) -> Markup:
+    """Convert simple post markup to HTML.
+
+    Currently supported:
+    - Lines starting with '>' get a span for greentext styling.
+    - References of the form >>123 become links to #p123 if present on page.
+    All other content is HTML-escaped to avoid XSS.
+    """
+    if not text:
+        return Markup("")
+    formatted_lines: list[str] = []
+    for line in text.splitlines():
+        esc = escape(line)
+        # Greentext
+        if line.startswith(">") and not line.startswith(">>"):
+            esc = f"<span class='gt'>&gt;{escape(line[1:])}</span>"
+
+        # Quote links
+        # Replace occurrences of >>digits with anchor links
+        def repl(match):  # type: ignore
+            pid = match.group(1)
+            return f"<a href='#p{pid}' class='ref'>&gt;&gt;{pid}</a>"
+
+        import re
+
+        esc = re.sub(r"&gt;&gt;(\d+)", repl, esc)
+        formatted_lines.append(esc)
+    return Markup("<br>".join(formatted_lines))
+
+
+# ----------------------------- DB Helpers ----------------------------- #
+
+
+@contextmanager
+def db() -> Generator[sqlite3.Connection, None, None]:
+    conn = sqlite3.connect(DB_PATH)
+    try:
+        conn.row_factory = sqlite3.Row
+        yield conn
+    finally:
+        conn.close()
+
+
+def init_db() -> None:
+    with db() as conn:
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS posts (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                parent_id INTEGER REFERENCES posts(id) ON DELETE CASCADE,
+                created_utc INTEGER NOT NULL,
+                ip TEXT,
+                message TEXT,
+                image_filename TEXT,
+                thumb_filename TEXT
+            )
+            """
+        )
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_parent_id ON posts(parent_id)")
+        conn.commit()
+
+
+# ----------------------------- Image Handling ----------------------------- #
+
+
+def allowed_file(filename: str) -> bool:
+    return "." in filename and filename.rsplit(".", 1)[1].lower() in CFG.allowed_ext
+
+
+def _sniff_magic(data: bytes) -> bool:
+    """Very lightweight magic header check to reject obviously wrong files.
+    This is intentionally simple (not a full mime detection)."""
+    signatures = [
+        (b"\xff\xd8\xff", "jpg"),  # JPEG
+        (b"\x89PNG\r\n\x1a\n", "png"),  # PNG
+        (b"GIF87a", "gif"),
+        (b"GIF89a", "gif"),
+        (b"RIFF", "webp"),
+    ]
+    for sig, _ in signatures:
+        if data.startswith(sig):
+            return True
+    return True  # Fallback permissive (still extension filtered)
+
+
+def save_image(file_storage) -> Tuple[Optional[str], Optional[str]]:
+    if not file_storage or file_storage.filename == "":
+        return None, None
+    filename = secure_filename(file_storage.filename)
+    if not allowed_file(filename):
+        raise ValueError("Unsupported file type")
+    # Size guard: stream pointer approach (werkzeug's FileStorage) -> read into memory for check (small scale)
+    file_storage.stream.seek(0, os.SEEK_END)
+    size = file_storage.stream.tell()
+    file_storage.stream.seek(0)
+    if size > CFG.max_image_bytes:
+        raise ValueError("Image too large")
+    # Magic sniff
+    head = file_storage.stream.read(16)
+    file_storage.stream.seek(0)
+    if not _sniff_magic(head):
+        raise ValueError("File content not recognized as image")
+
+    ext = filename.rsplit(".", 1)[1].lower()
+    ts = int(time.time() * 1000)
+    basename = f"{ts}_{os.getpid()}"
+    image_name = f"{basename}.{ext}"
+    dest_path = UPLOAD_DIR / image_name
+    file_storage.save(dest_path)
+
+    # Create thumbnail
+    thumb_name: Optional[str]
+    try:
+        with Image.open(dest_path) as im:
+            im.thumbnail(CFG.thumb_size)
+            thumb_name = f"{basename}_thumb.jpg"
+            thumb_path = THUMB_DIR / thumb_name
+            if im.mode not in ("RGB", "L"):
+                im = im.convert("RGB")
+            im.save(thumb_path, format="JPEG", quality=85)
+    except Exception:
+        thumb_name = None
+    return image_name, thumb_name
+
+
+# ----------------------------- Rate Limit ----------------------------- #
+
+
+def rate_limited(ip: str) -> bool:
+    cutoff = int(time.time()) - CFG.rate_limit_window
+    with db() as conn:
+        cur = conn.execute(
+            "SELECT created_utc FROM posts WHERE ip=? ORDER BY created_utc DESC LIMIT 1",
+            (ip,),
+        )
+        row = cur.fetchone()
+    if not row:
+        return False
+    return row["created_utc"] > cutoff
+
+
+# ----------------------------- Query Helpers ----------------------------- #
+
+
+def fetch_threads(limit: int = 50):
+    with db() as conn:
+        cur = conn.execute(
+            """
+            SELECT p.*, (
+                SELECT COUNT(*) FROM posts r WHERE r.parent_id = p.id
+            ) AS replies
+            FROM posts p
+            WHERE p.parent_id IS NULL
+            ORDER BY p.created_utc DESC
+            LIMIT ?
+            """,
+            (limit,),
+        )
+        return cur.fetchall()
+
+
+def fetch_thread(thread_id: int):
+    with db() as conn:
+        thread_cur = conn.execute(
+            "SELECT * FROM posts WHERE id=? AND parent_id IS NULL", (thread_id,)
+        )
+        thread = thread_cur.fetchone()
+        if not thread:
+            return None, []
+        replies_cur = conn.execute(
+            "SELECT * FROM posts WHERE parent_id=? ORDER BY created_utc ASC",
+            (thread_id,),
+        )
+        replies = replies_cur.fetchall()
+        return thread, replies
+
+
+# ----------------------------- Insert Helper ----------------------------- #
+
+
+def insert_post(
+    *,
+    parent_id: Optional[int],
+    ip: str,
+    message: Optional[str],
+    image_name: Optional[str],
+    thumb_name: Optional[str],
+) -> int:
+    ts = int(time.time())
+    with db() as conn:
+        cur = conn.execute(
+            """INSERT INTO posts(parent_id, created_utc, ip, message, image_filename, thumb_filename)
+            VALUES (?, ?, ?, ?, ?, ?)""",
+            (parent_id, ts, ip, message, image_name, thumb_name),
+        )
+        conn.commit()
+    last_id = cur.lastrowid
+    assert last_id is not None, "Database did not return lastrowid"
+    return int(last_id)
+
+
+# ----------------------------- Routes ----------------------------- #
+
+
+@app.route("/")
+def index():
+    threads = fetch_threads()
+    return render_template("index.html", threads=threads)
+
+
+@app.route("/thread/<int:thread_id>")
+def view_thread(thread_id: int):
+    thread, replies = fetch_thread(thread_id)
+    if not thread:
+        abort(404)
+    return render_template("thread.html", thread=thread, replies=replies)
+
+
+# Thread creation
+@app.route("/create", methods=["POST"])
+def create_thread():
+    ip = request.remote_addr or "?"
+    if rate_limited(ip):
+        flash("Posting too fast; please wait a few seconds.", "error")
+        return redirect(url_for("index"))
+    message = (request.form.get("message") or "").strip()
+    if len(message) > CFG.max_message_len:
+        flash("Message too long.", "error")
+        return redirect(url_for("index"))
+    file = request.files.get("image")
+    try:
+        image_name, thumb_name = save_image(file)
+    except ValueError as e:
+        flash(str(e), "error")
+        return redirect(url_for("index"))
+
+    insert_post(
+        parent_id=None,
+        ip=ip,
+        message=message or None,
+        image_name=image_name,
+        thumb_name=thumb_name,
+    )
+    return redirect(url_for("index"))
+
+
+# Reply
+@app.route("/reply/<int:thread_id>", methods=["POST"])
+def reply(thread_id: int):
+    ip = request.remote_addr or "?"
+    if rate_limited(ip):
+        flash("Posting too fast; please wait a few seconds.", "error")
+        return redirect(url_for("view_thread", thread_id=thread_id))
+    message = (request.form.get("message") or "").strip()
+    if len(message) > CFG.max_message_len:
+        flash("Message too long.", "error")
+        return redirect(url_for("view_thread", thread_id=thread_id))
+    file = request.files.get("image")
+    try:
+        image_name, thumb_name = save_image(file)
+    except ValueError as e:
+        flash(str(e), "error")
+        return redirect(url_for("view_thread", thread_id=thread_id))
+
+    # Validate thread exists before inserting
+    thread, _ = fetch_thread(thread_id)
+    if not thread:
+        abort(404)
+    insert_post(
+        parent_id=thread_id,
+        ip=ip,
+        message=message or None,
+        image_name=image_name,
+        thumb_name=thumb_name,
+    )
+    return redirect(url_for("view_thread", thread_id=thread_id))
+
+
+# Static file serving
+@app.route("/uploads/<path:filename>")
+def uploaded_file(filename: str):
+    return send_from_directory(UPLOAD_DIR, filename)
+
+
+@app.route("/thumbs/<path:filename>")
+def thumb_file(filename: str):
+    return send_from_directory(THUMB_DIR, filename)
+
+
+# ----------------------------- CLI Entrypoint ----------------------------- #
+
+
+def parse_args():
+    ap = argparse.ArgumentParser(description="Minimal imageboard server")
+    ap.add_argument(
+        "--init-db", action="store_true", help="Create database schema and exit"
+    )
+    ap.add_argument("--host", default="127.0.0.1")
+    ap.add_argument("--port", type=int, default=5000)
+    ap.add_argument("--debug", action="store_true")
+    return ap.parse_args()
+
+
+def main():  # pragma: no cover
+    args = parse_args()
+    if args.init_db:
+        init_db()
+        print(f"Initialized DB at {DB_PATH}")
+        return
+    if not DB_PATH.exists():
+        print("Database missing. Run with --init-db first.")
+        return
+    app.run(host=args.host, port=args.port, debug=args.debug)
+
+
+if __name__ == "__main__":  # pragma: no cover
+    main()

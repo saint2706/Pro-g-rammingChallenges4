@@ -1,0 +1,13 @@
+{
+  "frames": 180,
+  "fps": 30,
+  "edge_color": "#4ade80",
+  "vertex_color": "#fbbf24",
+  "thickness": 2.0,
+  "projection_distance": -5.0,
+  "wobble": 0.05,
+  "seed": 42,
+  "output": "cube.gif",
+  "elapsed_sec": 14.708,
+  "success": true
+}

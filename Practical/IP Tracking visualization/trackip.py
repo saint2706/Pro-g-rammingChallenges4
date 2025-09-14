@@ -1,115 +1,348 @@
-import plotly.graph_objects as go
+"""trackip.py - IP geolocation visualization tool
+
+Features Added / Modernization:
+  * Dataclasses for Config & Location entries
+  * Concurrency with ThreadPoolExecutor for faster lookups
+  * Retry logic with exponential backoff & jitter per IP
+  * Optional progress bar (disable with --no-progress)
+  * Input via command line IPs or file (--file)
+  * JSON & CSV export of raw location data
+  * Summary stats (success, failures, unique countries)
+  * Exit codes: 0 success (>=1 success), 1 no successes, 2 usage/config error
+  * Adjustable timeout, retries, backoff base, and worker pool size
+  * Graceful handling of rate limits / HTTP errors
+  * Structured map generation separated from data fetch
+
+Examples:
+  python trackip.py 8.8.8.8 1.1.1.1 -o map.html
+  python trackip.py --file ips.txt --json results.json --csv results.csv --summary
+  python trackip.py 8.8.8.8 --retry 5 --backoff 0.8 --timeout 8 --max-workers 10
+"""
+
+from __future__ import annotations
+
+import argparse
+import csv
+import json
+import os
+import random
+import sys
+import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Sequence
+
 import requests
 import pandas as pd
-import argparse
-import sys
-import os
-from typing import List, Dict, Any, Optional
+import plotly.graph_objects as go
 
-# Add dependency checks for a better user experience.
 try:
     from tqdm import tqdm
-except ImportError:
-    print("Error: The 'tqdm' library is required for the progress bar.", file=sys.stderr)
-    print("Please install it using: pip install tqdm", file=sys.stderr)
-    sys.exit(1)
+except ImportError:  # pragma: no cover
+    tqdm = None  # type: ignore
 
-def fetch_ip_locations(ip_addresses: List[str]) -> List[Dict[str, Any]]:
-    """
-    Fetches geographic location data for a list of IP addresses from the ipapi.co API.
+API_URL_TEMPLATE = "https://ipapi.co/{ip}/json/"
 
-    Args:
-        ip_addresses: A list of IP address strings.
+# ----------------------------- Data Models ----------------------------- #
 
-    Returns:
-        A list of dictionaries, where each dictionary contains the location
-        data for a successfully located IP address.
-    """
-    location_data = []
-    print(f"Fetching location data for {len(ip_addresses)} IP address(es)...")
 
-    for ip in tqdm(ip_addresses, desc="Querying API"):
+@dataclass(slots=True)
+class Location:
+    ip: str
+    latitude: float
+    longitude: float
+    country: str
+    city: str
+    org: str
+
+    def as_dict(self) -> Dict[str, Any]:
+        return {
+            "IP": self.ip,
+            "Latitude": self.latitude,
+            "Longitude": self.longitude,
+            "Country": self.country,
+            "City": self.city,
+            "Org": self.org,
+        }
+
+
+@dataclass(slots=True)
+class Config:
+    ips: List[str]
+    file: Optional[Path]
+    output_html: Path
+    json_path: Optional[Path]
+    csv_path: Optional[Path]
+    timeout: float
+    retries: int
+    backoff: float
+    max_workers: int
+    show_progress: bool
+    summary: bool
+
+    def validate(self) -> None:
+        if not self.ips and not self.file:
+            raise ValueError("Provide IPs or --file")
+        if self.retries < 0:
+            raise ValueError("--retry must be >= 0")
+        if self.max_workers < 1:
+            raise ValueError("--max-workers must be >= 1")
+        if self.timeout <= 0:
+            raise ValueError("--timeout must be > 0")
+
+
+# ----------------------------- Fetch Logic ----------------------------- #
+
+
+def exponential_backoff(base: float, attempt: int) -> float:
+    return base * (2**attempt) + random.uniform(0, base)
+
+
+def fetch_single(ip: str, cfg: Config) -> Optional[Location]:
+    url = API_URL_TEMPLATE.format(ip=ip)
+    attempt = 0
+    while attempt <= cfg.retries:
         try:
-            response = requests.get(f"https://ipapi.co/{ip}/json/", timeout=5)
-            response.raise_for_status()
-            data = response.json()
-
-            if data.get("error"):
-                print(f"Warning: Could not locate IP {ip}. Reason: {data.get('reason')}", file=sys.stderr)
+            resp = requests.get(url, timeout=cfg.timeout)
+            if resp.status_code == 429:  # rate limit
+                attempt += 1
+                if attempt > cfg.retries:
+                    return None
+                time.sleep(min(exponential_backoff(cfg.backoff, attempt), 30))
                 continue
+            resp.raise_for_status()
+            data = resp.json()
+            if data.get("error"):
+                return None
+            if not all(k in data for k in ("latitude", "longitude", "country_name")):
+                return None
+            return Location(
+                ip=ip,
+                latitude=data["latitude"],
+                longitude=data["longitude"],
+                country=data.get("country_name", "N/A"),
+                city=data.get("city", "N/A") or "N/A",
+                org=data.get("org", "N/A") or "N/A",
+            )
+        except requests.RequestException:
+            attempt += 1
+            if attempt > cfg.retries:
+                return None
+            time.sleep(min(exponential_backoff(cfg.backoff, attempt), 30))
+        except Exception:
+            return None
+    return None
 
-            if all(k in data for k in ["latitude", "longitude", "country_name"]):
-                location_data.append({
-                    "IP": ip,
-                    "Latitude": data["latitude"],
-                    "Longitude": data["longitude"],
-                    "Country": data["country_name"],
-                    "City": data.get("city", "N/A"),
-                    "Org": data.get("org", "N/A")
-                })
-        except requests.exceptions.RequestException as e:
-            print(f"Warning: Network error for IP {ip}: {e}", file=sys.stderr)
-        except Exception as e:
-            print(f"Warning: An unexpected error occurred for IP {ip}: {e}", file=sys.stderr)
 
-    return location_data
+def fetch_locations(ips: Sequence[str], cfg: Config) -> List[Location]:
+    locations: List[Location] = []
+    iterable = ips
+    if cfg.show_progress and tqdm:
+        progress = tqdm(total=len(ips), desc="Fetching IP data")
+    else:
+        progress = None
+    with ThreadPoolExecutor(max_workers=cfg.max_workers) as pool:
+        future_map = {pool.submit(fetch_single, ip, cfg): ip for ip in iterable}
+        for fut in as_completed(future_map):
+            loc = fut.result()
+            if loc:
+                locations.append(loc)
+            if progress:
+                progress.update(1)
+    if progress:
+        progress.close()
+    return locations
 
-def create_map(location_data: List[Dict[str, Any]], output_path: str):
-    """
-    Creates and saves an interactive world map of IP locations using Plotly.
 
-    Args:
-        location_data: A list of dictionaries containing location data.
-        output_path: The path to save the output HTML file.
-    """
-    if not location_data:
+# ----------------------------- Map Creation ----------------------------- #
+
+
+def create_map(locations: List[Location], output_path: Path) -> None:
+    if not locations:
         print("No valid location data to plot.")
         return
-
-    df = pd.DataFrame(location_data)
-
-    fig = go.Figure(data=go.Scattergeo(
-        lon=df["Longitude"],
-        lat=df["Latitude"],
-        text=df["IP"] + "<br>" + df["City"] + ", " + df["Country"] + "<br>" + df["Org"],
-        mode="markers",
-        marker=dict(
-            size=8,
-            opacity=0.8,
-            symbol="circle",
-            line=dict(width=1, color="rgba(102, 102, 102)"),
-            color="blue",
-        ),
-    ))
-
+    df = pd.DataFrame([l.as_dict() for l in locations])
+    fig = go.Figure(
+        data=go.Scattergeo(
+            lon=df["Longitude"],
+            lat=df["Latitude"],
+            text=df["IP"]
+            + "<br>"
+            + df["City"]
+            + ", "
+            + df["Country"]
+            + "<br>"
+            + df["Org"],
+            mode="markers",
+            marker=dict(
+                size=8,
+                opacity=0.8,
+                symbol="circle",
+                line=dict(width=1, color="rgba(102,102,102)"),
+                color="blue",
+            ),
+        )
+    )
     fig.update_layout(
         title="IP Address Geographic Locations",
         geo=dict(
             scope="world",
             projection_type="natural earth",
             showland=True,
-            landcolor="rgb(243, 243, 243)",
-            countrycolor="rgb(204, 204, 204)",
+            landcolor="rgb(243,243,243)",
+            countrycolor="rgb(204,204,204)",
         ),
     )
-
     try:
         fig.write_html(output_path)
-        print(f"\nMap successfully saved to '{os.path.abspath(output_path)}'")
+        print(f"Map saved to '{output_path.resolve()}'")
     except Exception as e:
-        print(f"Error saving map to HTML: {e}", file=sys.stderr)
+        print(f"Error saving map HTML: {e}", file=sys.stderr)
 
-def main():
-    """Main function to parse arguments and run the IP tracker."""
-    parser = argparse.ArgumentParser(description="Visualize the geographic location of IP addresses on a world map.")
-    parser.add_argument("ips", nargs='+', help="One or more IP addresses to track.")
-    parser.add_argument("-o", "--output", default="ip_map.html",
-                        help="Output HTML file name for the map. Defaults to 'ip_map.html'.")
 
-    args = parser.parse_args()
+# ----------------------------- Export Helpers ----------------------------- #
 
-    locations = fetch_ip_locations(args.ips)
-    create_map(locations, args.output)
 
-if __name__ == "__main__":
-    main()
+def export_json(locations: List[Location], path: Path, meta: Dict[str, Any]) -> None:
+    data = [l.as_dict() for l in locations]
+    payload = {"locations": data, "meta": meta}
+    try:
+        with open(path, "w", encoding="utf-8") as fh:
+            json.dump(payload, fh, indent=2)
+        print(f"JSON data written to {path}")
+    except OSError as e:
+        print(f"Failed to write JSON: {e}", file=sys.stderr)
+
+
+def export_csv(locations: List[Location], path: Path) -> None:
+    try:
+        with open(path, "w", newline="", encoding="utf-8") as fh:
+            writer = csv.DictWriter(
+                fh, fieldnames=["IP", "Latitude", "Longitude", "Country", "City", "Org"]
+            )
+            writer.writeheader()
+            for l in locations:
+                writer.writerow(l.as_dict())
+        print(f"CSV data written to {path}")
+    except OSError as e:
+        print(f"Failed to write CSV: {e}", file=sys.stderr)
+
+
+# ----------------------------- CLI ----------------------------- #
+
+
+def build_parser() -> argparse.ArgumentParser:
+    p = argparse.ArgumentParser(
+        description="Visualize geographic location of IP addresses on a world map."
+    )
+    p.add_argument("ips", nargs="*", help="IP addresses to track")
+    p.add_argument("--file", type=Path, help="File containing IPs (one per line)")
+    p.add_argument(
+        "-o",
+        "--output",
+        dest="output",
+        default="ip_map.html",
+        help="Output HTML file (default ip_map.html)",
+    )
+    p.add_argument("--json", type=Path, help="Write JSON data to path")
+    p.add_argument("--csv", type=Path, help="Write CSV data to path")
+    p.add_argument(
+        "--timeout", type=float, default=5.0, help="Request timeout seconds (default 5)"
+    )
+    p.add_argument(
+        "--retry", type=int, default=2, help="Retries per IP on failure (default 2)"
+    )
+    p.add_argument(
+        "--backoff", type=float, default=0.6, help="Base backoff seconds (default 0.6)"
+    )
+    p.add_argument(
+        "--max-workers",
+        type=int,
+        default=8,
+        help="Maximum concurrent requests (default 8)",
+    )
+    p.add_argument("--no-progress", action="store_true", help="Disable progress bar")
+    p.add_argument("--summary", action="store_true", help="Print summary statistics")
+    return p
+
+
+def parse_args(argv: Optional[Sequence[str]]) -> Config:
+    parser = build_parser()
+    a = parser.parse_args(argv)
+    ips: List[str] = list(dict.fromkeys(a.ips))  # remove duplicates preserve order
+    if a.file:
+        try:
+            with open(a.file, "r", encoding="utf-8") as fh:
+                for line in fh:
+                    ip = line.strip()
+                    if ip and ip not in ips:
+                        ips.append(ip)
+        except OSError as e:
+            print(f"Error reading file: {e}", file=sys.stderr)
+            raise SystemExit(2)
+    cfg = Config(
+        ips=ips,
+        file=a.file,
+        output_html=Path(a.output),
+        json_path=a.json,
+        csv_path=a.csv,
+        timeout=a.timeout,
+        retries=a.retry,
+        backoff=a.backoff,
+        max_workers=a.max_workers,
+        show_progress=not a.no_progress,
+        summary=a.summary,
+    )
+    try:
+        cfg.validate()
+    except ValueError as e:
+        print(f"Argument error: {e}", file=sys.stderr)
+        raise SystemExit(2)
+    return cfg
+
+
+# ----------------------------- Orchestration ----------------------------- #
+
+
+def main(argv: Optional[Sequence[str]] = None) -> int:
+    cfg = parse_args(argv)
+    if not cfg.ips:
+        print("No IPs provided after processing input.", file=sys.stderr)
+        return 2
+    start = time.time()
+    locations = fetch_locations(cfg.ips, cfg)
+    elapsed = time.time() - start
+
+    if locations:
+        create_map(locations, cfg.output_html)
+    else:
+        print("No successful IP lookups; map not created.")
+
+    # Summary & exports
+    failures = len(cfg.ips) - len(locations)
+    meta = {
+        "requested": len(cfg.ips),
+        "succeeded": len(locations),
+        "failed": failures,
+        "countries": sorted({l.country for l in locations}),
+        "elapsed_sec": round(elapsed, 3),
+        "output_html": str(cfg.output_html) if locations else None,
+    }
+    if cfg.summary:
+        print("\nSummary:")
+        for k, v in meta.items():
+            print(f"  {k}: {v}")
+
+    if cfg.json_path:
+        export_json(locations, cfg.json_path, meta)
+    if cfg.csv_path:
+        export_csv(locations, cfg.csv_path)
+
+    if not locations:
+        return 1
+    return 0
+
+
+if __name__ == "__main__":  # pragma: no cover
+    raise SystemExit(main())

@@ -1,0 +1,26 @@
+{% extends 'layout.html' %}
+{% block content %}
+<h2>Create Thread</h2>
+<form class="new-post" action="{{ url_for('create_thread') }}" method="post" enctype="multipart/form-data">
+    <label>Message (optional):<br><textarea name="message" rows="3" style="width:100%"
+            maxlength="2000"></textarea></label><br>
+    <label>Image (optional): <input type="file" name="image" accept="image/*"></label><br>
+    <button type="submit">Post Thread</button>
+</form>
+
+<h2>Threads</h2>
+{% if not threads %}
+<p>No threads yet. Be the first!</p>
+{% endif %}
+{% for t in threads %}
+<div class="thread">
+    <div class="meta">#{{ t.id }} • {{ t.created_utc | datetime }} • Replies: {{ t.replies }}</div>
+    {% if t.thumb_filename %}
+    <a href="{{ url_for('view_thread', thread_id=t.id) }}"><img class="thumb"
+            src="{{ url_for('thumb_file', filename=t.thumb_filename) }}" alt="thumb"></a>
+    {% endif %}
+    {% if t.message %}<p>{{ t.message | e }}</p>{% endif %}
+    <a href="{{ url_for('view_thread', thread_id=t.id) }}">Open thread »</a>
+</div>
+{% endfor %}
+{% endblock %}

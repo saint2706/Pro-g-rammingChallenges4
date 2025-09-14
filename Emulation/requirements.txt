@@ -1,0 +1,17 @@
+# Consolidated third-party dependencies for the Emulation suite
+# Version strategy: pin major/minor for stability; allow patch updates.
+# Many scripts are pure-stdlib; install only what you need (see README selective installs).
+
+numpy>=1.26,<2.0             # Color computation, arrays
+Pillow>=10.4,<10.5            # Image loading/saving (color tools, palette extraction)
+matplotlib>=3.9,<3.10         # Visualization in 5 color scheme (patches), potential plotting extensions
+scikit-learn>=1.5,<1.6        # KMeans clustering for palette extraction
+opencv-python>=4.10,<5.0      # Optional image processing acceleration (5 color scheme if cv2 available)
+
+# Optional / specialized
+vpython>=7.6,<7.7             # 3D interactive rendering for SpinnyCube (optional; script degrades gracefully)
+
+# NOTE:
+# - If you only want palette extraction without clustering, you can skip scikit-learn (script will warn / fallback).
+# - Remove vpython if you run the textual / non-interactive modes only.
+# - No dependency is required for Eulerian path algorithms or ASCII clock (pure stdlib).

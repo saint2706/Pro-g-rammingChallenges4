@@ -1,0 +1,42 @@
+{% extends 'layout.html' %}
+{% block content %}
+<p><a href="{{ url_for('index') }}">« Back to index</a></p>
+
+<div class="thread" id="p{{ thread.id }}">
+    <div class="meta">Thread #{{ thread.id }} • {{ thread.created_utc | datetime }}</div>
+    {% if thread.image_filename %}
+    <a href="{{ url_for('uploaded_file', filename=thread.image_filename) }}" target="_blank">
+        {% if thread.thumb_filename %}
+        <img class="thumb" src="{{ url_for('thumb_file', filename=thread.thumb_filename) }}" alt="thread image">
+        {% else %}
+        (image)
+        {% endif %}
+    </a>
+    {% endif %}
+    {% if thread.message %}<p class="msg">{{ thread.message | format_post }}</p>{% endif %}
+</div>
+
+<h3>Replies</h3>
+{% if not replies %}<p>No replies yet.</p>{% endif %}
+{% for r in replies %}
+<div class="reply" id="p{{ r.id }}">
+    <div class="meta">#{{ r.id }} • {{ r.created_utc | datetime }}</div>
+    {% if r.image_filename %}
+    <a href="{{ url_for('uploaded_file', filename=r.image_filename) }}" target="_blank">
+        {% if r.thumb_filename %}
+        <img class="thumb" src="{{ url_for('thumb_file', filename=r.thumb_filename) }}">
+        {% else %}(image){% endif %}
+    </a>
+    {% endif %}
+    {% if r.message %}<p class="msg">{{ r.message | format_post }}</p>{% endif %}
+</div>
+{% endfor %}
+
+<h3>Reply</h3>
+<form class="new-post" action="{{ url_for('reply', thread_id=thread.id) }}" method="post" enctype="multipart/form-data">
+    <label>Message (optional):<br><textarea name="message" rows="3" style="width:100%" maxlength="2000"
+            placeholder=">greentext\n>>123 reference"></textarea></label><br>
+    <label>Image (optional): <input type="file" name="image" accept="image/*"></label><br>
+    <button type="submit">Post Reply</button>
+</form>
+{% endblock %}
