@@ -1,18 +1,55 @@
+// -----------------------------------------------------------------------------
+// Cellular Texture Benchmark / Generator (Original + Commented Modernization)
+// -----------------------------------------------------------------------------
+// This program generates a grayscale cellular / Worley-like texture using a set
+// of randomly distributed feature points on a toroidal (wrapped) 2D domain.
+// It implements and benchmarks multiple nearest-two-point distance strategies:
+//   * Brute force
+//   * Incremental Y-sorted pruning
+//   * Y-sorted + SSE vectorized
+//   * Tiled pruning
+//   * Tiled + SSE
+//   * Recursive spatial subdivision (pruned tiles) + SSE
+//   * A custom binary tree structure (two-nearest search)
+//
+// The intensity at each pixel is derived from the two closest feature points.
+// Specifically we compute (in several variants) an intensity similar to:
+//       I = 2 * d1 / (d1 + d2)
+// where d1 <= d2 are the distances to the first and second nearest points.
+// This maps 0..1 distances into a contrast-enhanced cell border pattern.
+//
+// Modernization goals (partial in this pass):
+//   - Added explanatory comments & high-level documentation.
+//   - Clarified intent of SSE code blocks.
+//   - Left algorithmic structure intact to preserve benchmarking comparability.
+//   - Future improvements could include: RAII (std::vector), std::chrono timing,
+//     command line argument parsing, deterministic RNG, optional multi-threading.
+//
+// NOTE: The file still uses some legacy constructs (manual memory, Windows QPC,
+//       custom min/max templates, MSVC-specific __declspec alignment). These
+//       are retained for minimal invasive change in this documentation-focused
+//       pass and to keep benchmark numbers comparable to the original.
+// -----------------------------------------------------------------------------
+
 #define _CRT_SECURE_NO_WARNINGS
 
 #include <assert.h>
-#include <malloc.h>
+#include <malloc.h> // alloca (legacy usage)
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <emmintrin.h>
+#include <emmintrin.h> // SSE2 intrinsics
 
-template <typename T> static inline T min(T a, T b) { return a < b ? a : b; }
+template <typename T>
+static inline T min(T a, T b) { return a < b ? a : b; }
 
-template <typename T> static inline T max(T a, T b) { return a > b ? a : b; }
+template <typename T>
+static inline T max(T a, T b) { return a > b ? a : b; }
 
-static inline float clamp(float x, float lowerBound, float upperBound) {
+// Clamp helper; restricts x to [lowerBound, upperBound].
+static inline float clamp(float x, float lowerBound, float upperBound)
+{
   return min(max(x, lowerBound), upperBound);
 }
 
@@ -22,7 +59,9 @@ static inline float square(float x) { return x * x; }
 
 static inline float frac(float x) { return x - floor(x); }
 
-template <typename T> static void swap(T &a, T &b) {
+template <typename T>
+static void swap(T &a, T &b)
+{
   T t = a;
   a = b;
   b = t;
@@ -30,7 +69,9 @@ template <typename T> static void swap(T &a, T &b) {
 
 typedef float Intens;
 
-class Image {
+// Lightweight grayscale image container (row-major, float intensities)
+class Image
+{
   Intens *Pixels;
 
 public:
@@ -44,18 +85,20 @@ public:
   const Intens *Row(int y) const { return Pixels + y * SizeX; }
 };
 
-static bool saveImageTGA(const char *filename, const Image &img) {
+// Minimal uncompressed top-left origin grayscale TGA writer (8 bpp)
+static bool saveImageTGA(const char *filename, const Image &img)
+{
   unsigned char header[18] = {
-      0,              // 0x00: no ident struct
-      0,              // 0x01: no color map
-      3,              // 0x02: grayscale
-      0,  0, 0, 0, 0, // 0x03: color map descriptor filled with zeroes
-      0,  0,          // 0x08: x origin
-      0,  0,          // 0x0a: y origin
-      0,  0,          // 0x0c: put width here
-      0,  0,          // 0x0e: put height here
-      8,              // 0x10: 8 bits/pixels
-      32,             // 0x11: descriptor bits (top-down tga)
+      0,             // 0x00: no ident struct
+      0,             // 0x01: no color map
+      3,             // 0x02: grayscale
+      0, 0, 0, 0, 0, // 0x03: color map descriptor filled with zeroes
+      0, 0,          // 0x08: x origin
+      0, 0,          // 0x0a: y origin
+      0, 0,          // 0x0c: put width here
+      0, 0,          // 0x0e: put height here
+      8,             // 0x10: 8 bits/pixels
+      32,            // 0x11: descriptor bits (top-down tga)
   };
 
   header[0x0c] = img.SizeX & 0xff;
@@ -71,7 +114,8 @@ static bool saveImageTGA(const char *filename, const Image &img) {
   ok &= fwrite(header, sizeof(header), 1, f) == 1;
 
   unsigned char *lineBuf = (unsigned char *)alloca(img.SizeX);
-  for (int y = 0; y < img.SizeY; y++) {
+  for (int y = 0; y < img.SizeY; y++)
+  {
     const Intens *src = img.Row(y);
     for (int x = 0; x < img.SizeX; x++)
       lineBuf[x] = (unsigned char)(saturate(src[x]) * 255.0f);
@@ -83,38 +127,49 @@ static bool saveImageTGA(const char *filename, const Image &img) {
   return ok;
 }
 
-struct Point {
+struct Point
+{
   float x, y;
 
   Point() : x(0.0f), y(0.0f) {}
   Point(float _x, float _y) : x(_x), y(_y) {}
 };
 
-static inline float wrapDist(float a, float b) {
+// Distance on a wrapped unit interval (toroidal axis)
+static inline float wrapDist(float a, float b)
+{
   float d = fabs(b - a);
   return min(d, 1.0f - d);
 }
 
-static float distanceBound(float x, float mid, float r) {
+static float distanceBound(float x, float mid, float r)
+{
   return max(wrapDist(x, mid) - r, 0.0f);
 }
 
-static inline float wrapDistSq(const Point &a, const Point &b) {
+static inline float wrapDistSq(const Point &a, const Point &b)
+{
   return square(wrapDist(a.x, b.x)) + square(wrapDist(a.y, b.y));
 }
 
-static inline float wrapDist(const Point &a, const Point &b) {
+static inline float wrapDist(const Point &a, const Point &b)
+{
   return sqrtf(wrapDistSq(a, b));
 }
 
-static int genRandomPoints(Point pts[], int count, float minDist) {
+// Poisson-ish rejection sampling enforcing a minimum separation (minDist)
+// Attempts up to maxTries per point; returns actual number accepted.
+static int genRandomPoints(Point pts[], int count, float minDist)
+{
   static const int maxTries = 10;
   float minDistSq = square(minDist);
 
-  for (int i = 0; i < count; i++) {
+  for (int i = 0; i < count; i++)
+  {
     int attempt = 0, j;
 
-    do {
+    do
+    {
       if (++attempt > maxTries)
         return i;
 
@@ -130,11 +185,14 @@ static int genRandomPoints(Point pts[], int count, float minDist) {
   return count;
 }
 
-static inline float cellIntensity(float dist, float dist2) {
+// Scalar intensity mapping from two nearest distances
+static inline float cellIntensity(float dist, float dist2)
+{
   return 2.0f * dist / (dist2 + dist);
 }
 
-static inline __m128 cellIntensity(__m128 dist, __m128 dist2) {
+static inline __m128 cellIntensity(__m128 dist, __m128 dist2)
+{
   __m128 sum = _mm_add_ps(dist2, dist);
   __m128 distx2 = _mm_add_ps(dist, dist);
   __m128 intens = _mm_div_ps(distx2, sum);
@@ -142,15 +200,18 @@ static inline __m128 cellIntensity(__m128 dist, __m128 dist2) {
   return intens;
 }
 
-struct KeyedPoint {
+struct KeyedPoint
+{
   Point pt;
   float key;
   float temp;
 };
 
-static KeyedPoint *makeKeyed(const Point pts[], int count) {
+static KeyedPoint *makeKeyed(const Point pts[], int count)
+{
   KeyedPoint *out = new KeyedPoint[count];
-  for (int i = 0; i < count; i++) {
+  for (int i = 0; i < count; i++)
+  {
     out[i].pt = pts[i];
     out[i].key = out[i].temp = 0.0f;
   }
@@ -159,7 +220,8 @@ static KeyedPoint *makeKeyed(const Point pts[], int count) {
 }
 
 static void insertKeyedPoint(KeyedPoint pts[], int count, Point pt, float key,
-                             float temp = 0.0f) {
+                             float temp = 0.0f)
+{
   int j;
   for (j = count; j > 0 && key < pts[j - 1].key; j--)
     pts[j] = pts[j - 1];
@@ -169,19 +231,25 @@ static void insertKeyedPoint(KeyedPoint pts[], int count, Point pt, float key,
   pts[j].temp = temp;
 }
 
-static void cellularTexBruteForce(Image &out, const Point pts[], int count) {
-  for (int y = 0; y < out.SizeY; y++) {
+// Reference O(P*W*H) method: brute force over all points for each pixel.
+static void cellularTexBruteForce(Image &out, const Point pts[], int count)
+{
+  for (int y = 0; y < out.SizeY; y++)
+  {
     Intens *dest = out.Row(y);
     Point cur(0.0f, float(y) / out.SizeY);
 
-    for (int x = 0; x < out.SizeX; x++) {
+    for (int x = 0; x < out.SizeX; x++)
+    {
       cur.x = float(x) / out.SizeX;
 
       float best = 1.0f, best2 = 1.0f;
 
-      for (int i = 0; i < count; i++) {
+      for (int i = 0; i < count; i++)
+      {
         float d = wrapDistSq(cur, pts[i]);
-        if (d < best2) {
+        if (d < best2)
+        {
           if (d < best)
             best2 = best, best = d;
           else
@@ -194,24 +262,30 @@ static void cellularTexBruteForce(Image &out, const Point pts[], int count) {
   }
 }
 
-static void cellularTexSortY(Image &out, const Point ptIn[], int count) {
+// Sort-by-Y pruning: maintain a sorted list of squared y-distances to early-exit.
+static void cellularTexSortY(Image &out, const Point ptIn[], int count)
+{
   KeyedPoint *pts = makeKeyed(ptIn, count);
 
-  for (int y = 0; y < out.SizeY; y++) {
+  for (int y = 0; y < out.SizeY; y++)
+  {
     Intens *dest = out.Row(y);
     float curY = float(y) / out.SizeY;
 
     for (int i = 0; i < count; i++)
       insertKeyedPoint(pts, i, pts[i].pt, square(wrapDist(pts[i].pt.y, curY)));
 
-    for (int x = 0; x < out.SizeX; x++) {
+    for (int x = 0; x < out.SizeX; x++)
+    {
       float curX = float(x) / out.SizeX;
 
       float best = 1.0f, best2 = 1.0f;
 
-      for (int i = 0; i < count && best2 > pts[i].key; i++) {
+      for (int i = 0; i < count && best2 > pts[i].key; i++)
+      {
         float d = square(wrapDist(pts[i].pt.x, curX)) + pts[i].key;
-        if (d < best2) {
+        if (d < best2)
+        {
           if (d < best)
             best2 = best, best = d;
           else
@@ -226,13 +300,16 @@ static void cellularTexSortY(Image &out, const Point ptIn[], int count) {
   delete[] pts;
 }
 
-static void cellularTexSortY_SSE(Image &out, const Point ptIn[], int count) {
+// SSE2 variant of Y-sorted approach; processes 4 pixels (x positions) in parallel.
+static void cellularTexSortY_SSE(Image &out, const Point ptIn[], int count)
+{
   assert(out.SizeX % 4 == 0);
   float stepX = 1.0f / out.SizeX;
 
   KeyedPoint *pts = makeKeyed(ptIn, count);
 
-  for (int y = 0; y < out.SizeY; y++) {
+  for (int y = 0; y < out.SizeY; y++)
+  {
     Intens *dest = out.Row(y);
     float curY = float(y) / out.SizeY;
 
@@ -248,10 +325,12 @@ static void cellularTexSortY_SSE(Image &out, const Point ptIn[], int count) {
     __m128 _one = _mm_set1_ps(1.0f);
     __m128 clearSign = _mm_load_ps((const float *)clearSignC);
 
-    for (int x = 0; x < out.SizeX; x += 4) {
+    for (int x = 0; x < out.SizeX; x += 4)
+    {
       __m128 best = _one, best2 = _one;
 
-      for (int i = 0; i < count; i++) {
+      for (int i = 0; i < count; i++)
+      {
         __m128 pt = _mm_loadu_ps(&pts[i].pt.x);
         __m128 ptKey = _mm_shuffle_ps(pt, pt, 0xaa); // splat key
         __m128 cmp =
@@ -290,11 +369,15 @@ static void cellularTexSortY_SSE(Image &out, const Point ptIn[], int count) {
   delete[] pts;
 }
 
+// Tile-based pruning: subdivide into fixed blocks, compute conservative bounds,
+// prune distant points early; scalar inner evaluation.
 static void cellularTexTilesRect(Image &out, int x0, int y0, int x1, int y1,
-                                 KeyedPoint pts[], int count) {
+                                 KeyedPoint pts[], int count)
+{
   static int tileSize = 32;
 
-  for (int ty = y0; ty < y1; ty += tileSize) {
+  for (int ty = y0; ty < y1; ty += tileSize)
+  {
     int endY = min(ty + tileSize, y1);
     float y0 = float(ty) / out.SizeY;
     float radY = 0.5f * float(endY - ty - 1) / out.SizeY;
@@ -303,7 +386,8 @@ static void cellularTexTilesRect(Image &out, int x0, int y0, int x1, int y1,
     for (int i = 0; i < count; i++)
       pts[i].temp = square(distanceBound(pts[i].pt.y, midY, radY));
 
-    for (int tx = x0; tx < x1; tx += tileSize) {
+    for (int tx = x0; tx < x1; tx += tileSize)
+    {
       int endX = min(tx + tileSize, x1);
       float x0 = float(tx) / out.SizeX;
       float radX = 0.5f * float(endX - tx - 1) / out.SizeX;
@@ -315,17 +399,21 @@ static void cellularTexTilesRect(Image &out, int x0, int y0, int x1, int y1,
                              square(distanceBound(pts[i].pt.x, midX, radX)),
                          pts[i].temp);
 
-      for (int y = ty; y < endY; y++) {
+      for (int y = ty; y < endY; y++)
+      {
         Intens *dest = out.Row(y);
         Point cur(0.0f, float(y) / out.SizeY);
 
-        for (int x = tx; x < endX; x++) {
+        for (int x = tx; x < endX; x++)
+        {
           cur.x = float(x) / out.SizeX;
 
           float best = 1.0f, best2 = 1.0f;
-          for (int i = 0; i < count && best2 > pts[i].key; i++) {
+          for (int i = 0; i < count && best2 > pts[i].key; i++)
+          {
             float d = wrapDistSq(cur, pts[i].pt);
-            if (d < best2) {
+            if (d < best2)
+            {
               if (d < best)
                 best2 = best, best = d;
               else
@@ -340,20 +428,24 @@ static void cellularTexTilesRect(Image &out, int x0, int y0, int x1, int y1,
   }
 }
 
-static void cellularTexTiles(Image &out, const Point ptIn[], int count) {
+static void cellularTexTiles(Image &out, const Point ptIn[], int count)
+{
   KeyedPoint *pts = makeKeyed(ptIn, count);
   cellularTexTilesRect(out, 0, 0, out.SizeX, out.SizeY, pts, count);
   delete[] pts;
 }
 
+// SSE2-accelerated version of tile pruning combining x & y wrap distance math.
 static void cellularTexTilesRect_SSE(Image &out, int x0, int y0, int x1, int y1,
-                                     KeyedPoint pts[], int count) {
+                                     KeyedPoint pts[], int count)
+{
   static int tileSize = 32;
 
   float stepX = 1.0f / out.SizeX;
   float stepY = 1.0f / out.SizeY;
 
-  for (int ty = y0; ty < y1; ty += tileSize) {
+  for (int ty = y0; ty < y1; ty += tileSize)
+  {
     int endY = min(ty + tileSize, y1);
     float y0 = float(ty) * stepY;
     float radY = 0.5f * float(endY - ty - 1) * stepY;
@@ -362,7 +454,8 @@ static void cellularTexTilesRect_SSE(Image &out, int x0, int y0, int x1, int y1,
     for (int i = 0; i < count; i++)
       pts[i].temp = square(distanceBound(pts[i].pt.y, midY, radY));
 
-    for (int tx = x0; tx < x1; tx += tileSize) {
+    for (int tx = x0; tx < x1; tx += tileSize)
+    {
       int endX = min(tx + tileSize, x1);
       float x0 = float(tx) * stepX;
       float radX = 0.5f * float(endX - tx - 1) * stepX;
@@ -385,16 +478,19 @@ static void cellularTexTilesRect_SSE(Image &out, int x0, int y0, int x1, int y1,
       __m128 curY = _mm_set1_ps(y0);
       __m128 stepYv = _mm_set1_ps(stepY);
 
-      for (int y = ty; y < endY; y++) {
+      for (int y = ty; y < endY; y++)
+      {
         Intens *dest = out.Row(y);
         __m128 curX = _mm_setr_ps(x0 + stepX * 0.0f, x0 + stepX * 1.0f,
                                   x0 + stepX * 2.0f, x0 + stepX * 3.0f);
 
-        for (int x = tx; x < endX; x += 4) {
+        for (int x = tx; x < endX; x += 4)
+        {
 
           __m128 best = _one, best2 = _one;
 
-          for (int i = 0; i < count; i++) {
+          for (int i = 0; i < count; i++)
+          {
             __m128 pt = _mm_loadu_ps(&pts[i].pt.x);
             __m128 ptKey = _mm_shuffle_ps(pt, pt, 0xaa); // splat key
             __m128 cmp =
@@ -441,19 +537,22 @@ static void cellularTexTilesRect_SSE(Image &out, int x0, int y0, int x1, int y1,
   }
 }
 
-static void cellularTexTiles_SSE(Image &out, const Point ptIn[], int count) {
+static void cellularTexTiles_SSE(Image &out, const Point ptIn[], int count)
+{
   KeyedPoint *pts = makeKeyed(ptIn, count);
   cellularTexTilesRect_SSE(out, 0, 0, out.SizeX, out.SizeY, pts, count);
   delete[] pts;
 }
 
-struct TreeNode {
+struct TreeNode
+{
   int point2;       // second support point (1st is implicit)
   float radius;     // bounding sphere radius
   TreeNode *kid[2]; // child nodes
 };
 
-class Tree {
+class Tree
+{
   Point *points;
   TreeNode *nodes;
 
@@ -471,7 +570,8 @@ private:
                        float dist1, TreeNode *cur);
 };
 
-Tree::Tree(const Point pts[], int nPoints) {
+Tree::Tree(const Point pts[], int nPoints)
+{
   assert(nPoints >= 2);
 
   points = new Point[nPoints];
@@ -480,16 +580,19 @@ Tree::Tree(const Point pts[], int nPoints) {
 
   nodes = new TreeNode[nPoints - 1];
 
-  for (int i = 1; i < nPoints; i++) {
+  for (int i = 1; i < nPoints; i++)
+  {
     TreeNode *newNode = nodes + (i - 1);
     newNode->point2 = i;
     newNode->kid[0] = newNode->kid[1] = 0;
 
-    if (i > 1) {
+    if (i > 1)
+    {
       TreeNode *cur = nodes;
       float p1DistSq = wrapDistSq(points[i], points[0]);
 
-      for (;;) {
+      for (;;)
+      {
         float p2DistSq = wrapDistSq(points[i], points[cur->point2]);
         int idx = 0;
 
@@ -501,7 +604,8 @@ Tree::Tree(const Point pts[], int nPoints) {
 
         if (cur->kid[idx])
           cur = cur->kid[idx];
-        else {
+        else
+        {
           cur->kid[idx] = newNode;
           break;
         }
@@ -512,12 +616,14 @@ Tree::Tree(const Point pts[], int nPoints) {
   calcBoundsR(nodes, 0);
 }
 
-Tree::~Tree() {
+Tree::~Tree()
+{
   delete[] points;
   delete[] nodes;
 }
 
-void Tree::calcBoundsR(TreeNode *root, int point1) {
+void Tree::calcBoundsR(TreeNode *root, int point1)
+{
   int point2 = root->point2;
   if (root->kid[0])
     calcBoundsR(root->kid[0], point1);
@@ -535,12 +641,14 @@ void Tree::calcBoundsR(TreeNode *root, int point1) {
   root->radius = sqrtf(root->radius);
 }
 
-void Tree::findNearestTwo(const Point &pt, float &best, float &best2) {
+void Tree::findNearestTwo(const Point &pt, float &best, float &best2)
+{
   float dist1 = wrapDist(pt, points[0]);
   findNearestTwoR(pt, best, best2, 0, dist1, nodes);
 }
 
-void Tree::calcBoundsR2(TreeNode *target, const Point &center, TreeNode *cur) {
+void Tree::calcBoundsR2(TreeNode *target, const Point &center, TreeNode *cur)
+{
   target->radius = max(target->radius, wrapDistSq(center, points[cur->point2]));
 
   if (cur->kid[0])
@@ -550,7 +658,8 @@ void Tree::calcBoundsR2(TreeNode *target, const Point &center, TreeNode *cur) {
 }
 
 void Tree::findNearestTwoR(const Point &pt, float &best, float &best2,
-                           int point1, float dist1, TreeNode *cur) {
+                           int point1, float dist1, TreeNode *cur)
+{
   if (cur) // inner node
   {
     int point2 = cur->point2;
@@ -562,7 +671,8 @@ void Tree::findNearestTwoR(const Point &pt, float &best, float &best2,
       float rad2 = cur->kid[1] ? cur->kid[1]->radius : 0.0f;
       if (dist2 < best2 + rad2)
         findNearestTwoR(pt, best, best2, point2, dist2, cur->kid[1]);
-    } else // second point is closer
+    }
+    else // second point is closer
     {
       findNearestTwoR(pt, best, best2, point2, dist2, cur->kid[1]);
 
@@ -570,9 +680,11 @@ void Tree::findNearestTwoR(const Point &pt, float &best, float &best2,
       if (dist1 < best2 + rad1)
         findNearestTwoR(pt, best, best2, point1, dist1, cur->kid[0]);
     }
-  } else // leaf node
+  }
+  else // leaf node
   {
-    if (dist1 < best2) {
+    if (dist1 < best2)
+    {
       if (dist1 < best) // new best point!
         best2 = best, best = dist1;
       else // new second best
@@ -581,15 +693,19 @@ void Tree::findNearestTwoR(const Point &pt, float &best, float &best2,
   }
 }
 
-static void cellularTexTree(Image &out, const Point pts[], int count) {
+// Binary tree structure holding hierarchical distance bounds for pruning.
+static void cellularTexTree(Image &out, const Point pts[], int count)
+{
   Tree tree(pts, count);
   int besti = -1, besti2 = -1;
 
-  for (int y = 0; y < out.SizeY; y++) {
+  for (int y = 0; y < out.SizeY; y++)
+  {
     Intens *dest = out.Row(y);
     Point cur(0.0f, float(y) / out.SizeY);
 
-    for (int x = 0; x < out.SizeX; x++) {
+    for (int x = 0; x < out.SizeX; x++)
+    {
       cur.x = float(x) / out.SizeX;
 
       float best = 1.0f, best2 = 1.0f;
@@ -600,8 +716,11 @@ static void cellularTexTree(Image &out, const Point pts[], int count) {
   }
 }
 
+// Recursive spatial subdivision with bounding tests; falls back to tile SSE
+// when regions become small or have limited candidate points.
 static void cellularTexSpatialSubdR(Image &out, int x0, int y0, int x1, int y1,
-                                    float radius, KeyedPoint pts[], int count) {
+                                    float radius, KeyedPoint pts[], int count)
+{
   static const int minSize = 16;
 
   int hx = (x1 - x0) / 2; // diameter in x/y of subdivided rectangles
@@ -609,7 +728,8 @@ static void cellularTexSpatialSubdR(Image &out, int x0, int y0, int x1, int y1,
   float subRad =
       0.5f * radius; // "radius" (half-extent) of subdivided rectangles
 
-  for (int i = 0; i < 4; i++) {
+  for (int i = 0; i < 4; i++)
+  {
     int sx0 = x0 + ((i & 1) ? hx : 0);
     int sy0 = y0 + ((i & 2) ? hy : 0);
 
@@ -617,12 +737,14 @@ static void cellularTexSpatialSubdR(Image &out, int x0, int y0, int x1, int y1,
     float midY = float(sy0) / out.SizeY + subRad;
 
     int outCount = 0, realIn = 0;
-    for (int j = 0; j < count; j++) {
+    for (int j = 0; j < count; j++)
+    {
       Point pt = pts[j].pt;
       float bx = distanceBound(pt.x, midX, subRad);
       float by = distanceBound(pt.y, midY, subRad);
 
-      if (bx < radius && by < radius) {
+      if (bx < radius && by < radius)
+      {
         if (bx == 0.0f && by == 0.0f) // point inside subrect
           realIn++;
 
@@ -638,7 +760,8 @@ static void cellularTexSpatialSubdR(Image &out, int x0, int y0, int x1, int y1,
   }
 }
 
-static void cellularTexSpatialSubd(Image &out, const Point ptIn[], int count) {
+static void cellularTexSpatialSubd(Image &out, const Point ptIn[], int count)
+{
   KeyedPoint *pts = makeKeyed(ptIn, count);
   cellularTexSpatialSubdR(out, 0, 0, out.SizeX, out.SizeY, 0.5f, pts, count);
   delete[] pts;
@@ -651,25 +774,30 @@ typedef void (*CellularFunc)(Image &out, const Point pts[], int count);
 
 static LARGE_INTEGER timeFreq;
 
-static void initTimeUS() {
+// Windows high-resolution timer initialization (legacy timing path)
+static void initTimeUS()
+{
   QueryPerformanceFrequency(&timeFreq);
   timeFreq.QuadPart /= 1000000;
 }
 
-static int getTimeUS() {
+static int getTimeUS()
+{
   LARGE_INTEGER now;
   QueryPerformanceCounter(&now);
   return (int)(now.QuadPart / timeFreq.QuadPart);
 }
 
 static void measure(CellularFunc func, const char *name, Image &out,
-                    const Point pts[], int count) {
+                    const Point pts[], int count)
+{
   printf("%20s: ", name);
   fflush(stdout);
 
   int minTime = 0x7fffffff;
 
-  for (int i = 0; i < 3; i++) {
+  for (int i = 0; i < 3; i++)
+  {
     int timeStart = getTimeUS();
     func(out, pts, count);
     minTime = min(minTime, getTimeUS() - timeStart);
@@ -678,7 +806,9 @@ static void measure(CellularFunc func, const char *name, Image &out,
   printf("%9d microseconds\n", minTime);
 }
 
-int main() {
+int main()
+{
+  // Future improvement: expose these via CLI args (width, height, algorithms, seed, output path)
   static const int maxPts = 2048;
   static const int numPts[] = {64, 128, 256, 512, 1024};
 
@@ -687,21 +817,30 @@ int main() {
   Image img(1024, 1024);
   Point pts[maxPts];
 
-  for (int j = 0; j < sizeof(numPts) / sizeof(*numPts); j++) {
+  for (int j = 0; j < sizeof(numPts) / sizeof(*numPts); j++)
+  {
     int count = genRandomPoints(pts, numPts[j], 0.01f);
     printf("%d points.\n", count);
 
-    static const struct MeasureTarget {
+    static const struct MeasureTarget
+    {
       CellularFunc Target;
       const char *Name;
     } targets[] = {
-        cellularTexBruteForce,  "brute force",
-        cellularTexTree,        "tree",
-        cellularTexSortY,       "sort by y",
-        cellularTexSortY_SSE,   "sort by y, SSE",
-        cellularTexTiles,       "tiles",
-        cellularTexTiles_SSE,   "tiles, SSE",
-        cellularTexSpatialSubd, "spatial subd",
+        cellularTexBruteForce,
+        "brute force",
+        cellularTexTree,
+        "tree",
+        cellularTexSortY,
+        "sort by y",
+        cellularTexSortY_SSE,
+        "sort by y, SSE",
+        cellularTexTiles,
+        "tiles",
+        cellularTexTiles_SSE,
+        "tiles, SSE",
+        cellularTexSpatialSubd,
+        "spatial subd",
     };
 
     for (int i = 0; i < sizeof(targets) / sizeof(*targets); i++)
@@ -710,6 +849,7 @@ int main() {
     printf("\n");
   }
 
+  // Output final image (only last benchmark result retained in buffer)
   saveImageTGA("Emulation\\Easy\\CellularTextures\\test.tga", img);
 
   return 0;

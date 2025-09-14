@@ -1,131 +1,171 @@
 #include <iostream>
-#include <list>
-using namespace std;
+#include <vector>
+#include <queue>
+#include <algorithm>
+#include <string>
 
-class Graph {
-  // Number of vertices in the graph
-  int V;
-  // Dynamic array containing adjacency lists
-  list<int> *adj;
+// -----------------------------------------------------------------------------
+// Eulerian Graph Classification & Connectedness Checker (Undirected Simple Graph)
+// -----------------------------------------------------------------------------
+// Modernized version of the original naive implementation.
+// Improvements:
+//  * Uses std::vector instead of manual dynamic arrays (RAII safety)
+//  * Adds enum class EulerianType for clearer return semantics
+//  * Explicit connectivity ignoring isolated vertices
+//  * Clear comments and function responsibilities
+//  * Avoids 'using namespace std;' to prevent namespace pollution
+//  * Provides utility to print classification results
+//  * Maintains O(V + E) complexity for connectivity/degree checks
+//
+// Eulerian definitions:
+//  * Eulerian Circuit: All vertices have even degree and the graph is connected (ignoring isolated vertices)
+//  * Eulerian Trail (Semi-Eulerian): Exactly 2 vertices have odd degree and the graph is connected
+//  * Not Eulerian: Otherwise.
+// ----------------------------------------------------------------------------/
 
+class Graph
+{
 public:
-  Graph(int V) {
-    this->V = V;
-    adj = new list<int>[V];
-  }
-  // lol mem leak
-  ~Graph() { delete[] adj; }
+  enum class EulerianType
+  {
+    NotEulerian = 0,
+    Trail = 1,
+    Circuit = 2
+  };
 
-  void addEdge(int v, int w);
-  int isEulerian();
-  bool isConnected();
-  void DFSUtil(int v, bool visited[]);
-};
-
-void Graph::addEdge(int v, int w) {
-  // Undirected graph
-  adj[v].push_back(w);
-  adj[w].push_back(v);
-}
-
-void Graph::DFSUtil(int v, bool visited[]) {
-  // Mark the current node as visited and print it
-  visited[v] = true;
-
-  // Recur for all the vertices adjacent to this vertex
-  list<int>::iterator i;
-  for (i = adj[v].begin(); i != adj[v].end(); ++i)
-    if (!visited[*i])
-      DFSUtil(*i, visited);
-}
-
-bool Graph::isConnected() {
-  bool visited[V];
-  int i;
-  for (i = 0; i < V; i++) {
-    visited[i] = false;
+  explicit Graph(int vertices) : V(vertices), adj(vertices)
+  {
+    if (vertices <= 0)
+      throw std::invalid_argument("Vertex count must be positive");
   }
 
-  for (i = 0; i < V; i++) {
-    if (adj[i].size() != 0) {
-      break;
+  void addEdge(int u, int v)
+  {
+    validateVertex(u);
+    validateVertex(v);
+    if (u == v)
+    {
+      throw std::invalid_argument("Self-loops not supported in this simple model");
     }
+    adj[u].push_back(v);
+    adj[v].push_back(u);
   }
 
-  if (i == V) {
+  EulerianType classify() const
+  {
+    if (!isConnectedIgnoringIsolated())
+      return EulerianType::NotEulerian;
+    int odd = 0;
+    for (int v = 0; v < V; ++v)
+    {
+      if (adj[v].size() % 2 == 1)
+        ++odd;
+    }
+    if (odd == 0)
+      return EulerianType::Circuit;
+    if (odd == 2)
+      return EulerianType::Trail;
+    return EulerianType::NotEulerian;
+  }
+
+  static std::string toString(EulerianType t)
+  {
+    switch (t)
+    {
+    case EulerianType::NotEulerian:
+      return "Not Eulerian";
+    case EulerianType::Trail:
+      return "Semi-Eulerian (Trail)";
+    case EulerianType::Circuit:
+      return "Eulerian Circuit";
+    }
+    return "Unknown";
+  }
+
+private:
+  int V;
+  std::vector<std::vector<int>> adj;
+
+  void validateVertex(int v) const
+  {
+    if (v < 0 || v >= V)
+      throw std::out_of_range("Vertex out of range");
+  }
+
+  bool isConnectedIgnoringIsolated() const
+  {
+    // Find a start vertex with non-zero degree
+    int start = -1;
+    for (int v = 0; v < V; ++v)
+    {
+      if (!adj[v].empty())
+      {
+        start = v;
+        break;
+      }
+    }
+    if (start == -1)
+      return true; // no edges => trivially Eulerian
+
+    std::vector<bool> visited(V, false);
+    dfs(start, visited);
+    for (int v = 0; v < V; ++v)
+    {
+      if (!adj[v].empty() && !visited[v])
+        return false;
+    }
     return true;
   }
 
-  DFSUtil(i, visited);
-
-  for (i = 0; i < V; i++) {
-    if (visited[i] == false && adj[i].size() > 0) {
-      return false;
+  void dfs(int v, std::vector<bool> &visited) const
+  {
+    visited[v] = true;
+    for (int w : adj[v])
+    {
+      if (!visited[w])
+        dfs(w, visited);
     }
   }
-  return true;
+};
+
+// ------------------------------- Demo -------------------------------- //
+
+static void test(const Graph &g)
+{
+  std::cout << Graph::toString(g.classify()) << '\n';
 }
 
-/*
-    0 -> if not eulerian
-    1 -> if semi-eulerian
-    2 -> if euler circuit
-*/
-int Graph::isEulerian() {
-  if (!isConnected()) {
-    return 0;
+int main()
+{
+  {
+    Graph g(6);
+    g.addEdge(0, 1);
+    g.addEdge(2, 0);
+    g.addEdge(1, 2);
+    g.addEdge(3, 0);
+    g.addEdge(4, 3);
+    g.addEdge(5, 0);
+    test(g);
   }
 
-  int odd = 0;
-
-  for (int i = 0; i < V; i++) {
-    if (adj[i].size() & 1) {
-      odd++;
-    }
+  {
+    Graph g(5);
+    g.addEdge(0, 1);
+    g.addEdge(2, 0);
+    g.addEdge(2, 1);
+    g.addEdge(3, 0);
+    g.addEdge(4, 3);
+    g.addEdge(0, 4);
+    test(g);
   }
 
-  if (odd > 2) {
-    return 0;
+  {
+    Graph g(3);
+    g.addEdge(0, 1);
+    g.addEdge(1, 2);
+    g.addEdge(2, 0);
+    test(g);
   }
-
-  return (odd) ? 1 : 2;
-}
-
-void test(Graph &g) {
-  int n = g.isEulerian();
-  if (n == 0) {
-    cout << "Not Eulerian" << endl;
-  } else if (n == 1) {
-    cout << "Semi-Eulerian" << endl;
-  } else if (n == 2) {
-    cout << "Eulerian" << endl;
-  }
-}
-
-int main() {
-  Graph g(6);
-  g.addEdge(0, 1);
-  g.addEdge(2, 0);
-  g.addEdge(1, 2);
-  g.addEdge(3, 0);
-  g.addEdge(4, 3);
-  g.addEdge(5, 0);
-  test(g);
-
-  Graph g1(5);
-  g1.addEdge(0, 1);
-  g1.addEdge(2, 0);
-  g1.addEdge(2, 1);
-  g1.addEdge(3, 0);
-  g1.addEdge(4, 3);
-  g1.addEdge(0, 4);
-  test(g1);
-
-  Graph g2(3);
-  g2.addEdge(0, 1);
-  g2.addEdge(1, 2);
-  g2.addEdge(2, 0);
-  test(g2);
 
   return 0;
 }

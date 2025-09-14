@@ -1,213 +1,130 @@
-/* Setting up area*/
-.space {
-    width: 300px;
-    height: 300px;
-    margin-left: 120px;
-    -webkit-perspective: 1600px;
-    perspective: 1600px;
-    -webkit-perspective-origin: 50% -240px;
-    perspective-origin: 50% -240px;
+/*
+  cube.css – 3D cube face styling
+  Modernized: CSS custom properties, reduced duplication, accessible defaults, 
+  and motion reduction support. The JavaScript canvas animation has replaced the
+  pure CSS rotating cube for primary rendering, but these styles remain for the
+  original DOM-based cube (if used) and as a reference.
+*/
+
+:root {
+    --cube-size: 300px;
+    --cube-bg: #678f9c;
+    --shadow-color: rgba(0, 0, 0, 0.7);
+    --anim-duration: 20s;
 }
 
-/* Setting the cube*/
+.space {
+    /* 3D perspective container */
+    width: var(--cube-size);
+    height: var(--cube-size);
+    margin-left: 120px;
+    perspective: 1600px;
+    perspective-origin: 50% -240px;
+    position: relative;
+}
+
 figure {
+    /* cube faces */
     display: block;
     position: absolute;
-    width: 300px;
-    height: 300px;
-    background-color: #678f9c;
-    -webkit-transform-origin: 50% 50% 0;
+    width: var(--cube-size);
+    height: var(--cube-size);
+    background: var(--cube-bg);
     transform-origin: 50% 50% 0;
-    /* -webkit-box-reflect: below 0  -ms-gradient -webkit-gradient(linear, left top, left bottom, from(transparent), color-stop(70%, transparent), to(rgba(0, 0, 0, 0.1))); */
+    backface-visibility: hidden;
 }
 
 .cube {
-    -webkit-transform-style: preserve-3d;
+    /* container for faces */
     transform-style: preserve-3d;
+    animation: rotate var(--anim-duration) linear infinite;
 }
 
+/* Individual face transforms (half depth = size/2 => 150px) */
 .front {
-    -webkit-transform: translateZ(150px);
-    transform: translateZ(150px);
+    transform: translateZ(calc(var(--cube-size) / 2));
 }
 
 .back {
-    -webkit-transform: rotateY(180deg) translateZ(150px);
-    transform: rotateY(180deg) translateZ(150px);
+    transform: rotateY(180deg) translateZ(calc(var(--cube-size) / 2));
 }
 
 .top {
-    -webkit-transform: rotateX(90deg) translateZ(150px);
-    transform: rotateX(90deg) translateZ(150px);
+    transform: rotateX(90deg) translateZ(calc(var(--cube-size) / 2));
 }
 
 .bottom {
-    -webkit-transform: rotateX(-90deg) translateZ(150px);
-    -webkit-box-shadow: 1px 5px 50px rgba(0, 0, 0, 0.7);
-    background-color: rgba(0, 0, 0, 0);
-    transform: rotateX(-90deg) translateZ(150px);
-    box-shadow: 1px 5px 50px rgba(0, 0, 0, 0.7);
+    transform: rotateX(-90deg) translateZ(calc(var(--cube-size) / 2));
 }
 
 .left {
-    -webkit-transform: rotateY(-90deg) translateZ(150px);
-    transform: rotateY(-90deg) translateZ(150px);
+    transform: rotateY(-90deg) translateZ(calc(var(--cube-size) / 2));
 }
 
 .right {
-    -webkit-transform: rotateY(90deg) translateZ(150px);
-    transform: rotateY(90deg) translateZ(150px);
+    transform: rotateY(90deg) translateZ(calc(var(--cube-size) / 2));
+}
+
+.bottom {
+    /* subtle drop shadow */
+    box-shadow: 0 10px 100px var(--shadow-color), 1px 5px 50px var(--shadow-color);
+    background: transparent;
+}
+
+/* Shading pseudo-elements (optional aesthetics) */
+figure::before,
+figure::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    pointer-events: none;
+    background: radial-gradient(circle at top left, rgba(0, 0, 0, 0.5), #000);
+    mix-blend-mode: multiply;
+    animation: faceShade 10s linear infinite;
+}
+
+/* Only animate shading on front face for subtlety */
+.front::before,
+.front::after {
+    opacity: 0;
+    animation: faceShade 10s linear infinite;
+}
+
+@keyframes faceShade {
+
+    0%,
+    2% {
+        opacity: 0;
+    }
+
+    25%,
+    35% {
+        opacity: 0.8;
+    }
+
+    50%,
+    100% {
+        opacity: 0;
+    }
 }
 
 @keyframes rotate {
-    0% {
-        transform: rotateY(0);
-    }
-
-    100% {
+    to {
         transform: rotateY(360deg);
     }
 }
 
-@-webkit-keyframes rotate {
-    0% {
-        -webkit-transform: rotateY(0);
+/* Reduced-motion users get a static cube */
+@media (prefers-reduced-motion: reduce) {
+    .cube {
+        animation: none;
     }
 
-    100% {
-        -webkit-transform: rotateY(360deg);
+    figure::before,
+    figure::after {
+        animation: none;
     }
-}
-
-.cube {
-    -webkit-animation: rotate 20s infinite linear;
-    animation: rotate 20s infinite linear;
-}
-
-figure:before,
-figure:after {
-    content: "";
-    display: block;
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    opacity: 0;
-}
-
-figure:before {
-    background: -webkit-radial-gradient(top left, rgba(0, 0, 0, 0.5), #000000);
-}
-
-figure:after {
-    background: -webkit-radial-gradient(top right, rgba(0, 0, 0, 0.5), #000000);
-}
-
-.front:before {
-    -webkit-animation: frontShading1 10s infinite linear;
-    animation: frontShading1 10s infinite linear;
-}
-
-.front:after {
-    -webkit-animation: frontShading1 10s infinite linear;
-    animation: frontShading1 10s infinite linear;
-}
-
-@keyframes frontShading1 {
-    2% {
-        opacity: 0;
-    }
-
-    25% {
-        opacity: 0.8;
-    }
-
-    35% {
-        opacity: 0.8;
-    }
-
-    50% {
-        opacity: 0;
-    }
-}
-
-@keyframes backShading1 {
-    2% {
-        opacity: 0;
-    }
-
-    25% {
-        opacity: 0.8;
-    }
-
-    35% {
-        opacity: 0.8;
-    }
-
-    50% {
-        opacity: 0;
-    }
-}
-
-@-webkit-keyframes frontShading1 {
-    2% {
-        opacity: 0;
-    }
-
-    25% {
-        opacity: 0.8;
-    }
-
-    35% {
-        opacity: 0.8;
-    }
-
-    50% {
-        opacity: 0;
-    }
-}
-
-@-webkit-keyframes backShading1 {
-    2% {
-        opacity: 0;
-    }
-
-    25% {
-        opacity: 0.8;
-    }
-
-    35% {
-        opacity: 0.8;
-    }
-
-    50% {
-        opacity: 0;
-    }
-}
-
-.left:before {
-    opacity: 0.4;
-    -webkit-transition: all 0.4s ease;
-    transition: all 0.4s ease;
-}
-
-.left:after {
-    display: none;
-}
-
-.left:before {
-    opacity: 0.1;
-    -webkit-transition: all 0.4s ease;
-    transition: all 0.4s ease;
-}
-
-.left:after {
-    display: none;
-}
-
-.bottom {
-    -webkit-box-shadow: 0 10px 100px rgba(0, 0, 0, 0.7);
-    box-shadow: 0 10px 100px rgba(0, 0, 0, 0.7);
-    background-color: rgba(0, 0, 0, 0);
 }
 
 .content {

@@ -1,55 +1,113 @@
+"""spinny.py – VPython spinning cube demo
+
+Modernizations:
+  * argparse for speed factor & optional duration limit
+  * Type hints & structured functions
+  * Graceful exit with KeyboardInterrupt handling
+  * Optional frame rate configuration
+  * Reduced motion support via environment variable SPINNY_REDUCED=1
+  * Clear inline documentation for educational purposes
+"""
+
+from __future__ import annotations
+
+import argparse
 import math
+import os
 import sys
+from dataclasses import dataclass
+from typing import Optional
 
-# Add a check for the vpython library and provide a helpful message if it's missing.
-try:
-    from vpython import scene, box, rate, vector
-except ImportError:
-    print("Error: The 'vpython' library is required to run this script.", file=sys.stderr)
-    print("Please install it using: pip install vpython", file=sys.stderr)
-    sys.exit(1)
+try:  # dependency guard
+    from vpython import scene, box, rate, vector  # type: ignore
+except ImportError as e:  # pragma: no cover - environment dependent
+    print(
+        "Error: The 'vpython' library is required to run this script.", file=sys.stderr
+    )
+    print("Install with: pip install vpython", file=sys.stderr)
+    raise SystemExit(1)
 
-# --- Constants ---
-ROTATION_SPEED = 0.005  # Radians per frame, controlling the speed of the spin
+DEFAULT_ROT_SPEED = 0.005  # radians per frame at 50 fps (~0.25 rad/sec)
 
-def setup_scene():
-    """Initializes the VPython scene and sets its properties."""
+
+@dataclass(slots=True)
+class Config:
+    rotation_speed: float
+    fps: int
+    duration: Optional[float]
+    reduced_motion: bool
+
+
+def build_parser() -> argparse.ArgumentParser:
+    p = argparse.ArgumentParser(description="VPython spinning cube demo")
+    p.add_argument(
+        "--speed", type=float, default=1.0, help="Speed multiplier for rotation"
+    )
+    p.add_argument("--fps", type=int, default=50, help="Target frames per second")
+    p.add_argument(
+        "--duration", type=float, help="Optional duration in seconds then exit"
+    )
+    p.add_argument(
+        "--reduced",
+        action="store_true",
+        help="Start in reduced-motion mode (slower & fewer rotations)",
+    )
+    return p
+
+
+def setup_scene() -> None:
     scene.title = "Spinny Cube"
-    scene.range = 2  # Set the camera's zoom level
-    scene.autocenter = True
-    print("--- VPython Spinning Cube ---")
-    print("Drag with your right mouse button to rotate the camera.")
-    print("Scroll with your mouse wheel to zoom in and out.")
+    scene.range = 2
+    scene.caption = (
+        "Drag (right mouse) to rotate camera. Scroll to zoom.\n"
+        "Press Ctrl+C in terminal or close window to exit."
+    )
 
-def main():
-    """
-    Main function to set up the scene, create the cube, and run the animation loop.
-    """
-    setup_scene()
 
-    # Create the cube at the origin
-    the_cube = box()
+def run(config: Config) -> int:
+    cube = box()  # Create cube at origin
 
-    # Set the initial rotation of the cube for a more interesting starting view
-    angle_45_rad = math.pi / 4
-    the_cube.rotate(angle=angle_45_rad, axis=vector(1, 0, 0))
-    the_cube.rotate(angle=angle_45_rad, axis=vector(0, 0, 1))
+    # Initial orientation for isometric view
+    ang = math.pi / 4
+    cube.rotate(angle=ang, axis=vector(1, 0, 0))
+    cube.rotate(angle=ang, axis=vector(0, 0, 1))
 
-    print("Starting animation... Close the VPython window to stop.")
+    base_speed = DEFAULT_ROT_SPEED * config.rotation_speed
+    if config.reduced_motion:
+        base_speed *= 0.25  # slow down
 
-    # Main animation loop
+    frame_time = 1.0 / max(1, config.fps)
+    elapsed = 0.0
+
     try:
         while True:
-            # The rate() function limits the loop to 50 iterations per second,
-            # creating a smooth animation.
-            rate(50)
+            rate(config.fps)
+            cube.rotate(angle=base_speed, axis=vector(0, 1, 0))
+            elapsed += frame_time
+            if config.duration is not None and elapsed >= config.duration:
+                print("Duration reached; exiting.")
+                break
+    except KeyboardInterrupt:
+        print("\nInterrupted by user.")
+    except Exception as e:  # pragma: no cover
+        print(f"Unexpected termination: {e}", file=sys.stderr)
+        return 1
+    return 0
 
-            # Rotate the cube around the y-axis
-            the_cube.rotate(angle=ROTATION_SPEED, axis=vector(0, 1, 0))
-    except Exception as e:
-        # VPython's window being closed can sometimes raise an exception.
-        # This ensures the program exits gracefully.
-        print(f"\nAnimation window closed. Exiting. ({e})")
 
-if __name__ == "__main__":
-    main()
+def main(argv: Optional[list[str]] = None) -> int:
+    parser = build_parser()
+    args = parser.parse_args(argv)
+    reduced_env = os.getenv("SPINNY_REDUCED") == "1"
+    config = Config(
+        rotation_speed=args.speed,
+        fps=args.fps,
+        duration=args.duration,
+        reduced_motion=args.reduced or reduced_env,
+    )
+    setup_scene()
+    return run(config)
+
+
+if __name__ == "__main__":  # pragma: no cover
+    raise SystemExit(main())

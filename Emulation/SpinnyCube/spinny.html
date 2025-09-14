@@ -1,20 +1,100 @@
 <!DOCTYPE html>
 <html lang="en">
-	<title>SpinnyCube</title>
 
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<link rel="stylesheet" src="cube.css" />
-		<style>
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<meta name="description" content="Spinning wireframe cube demonstration (Canvas + JS)" />
+	<title>Spinning Cube Demo</title>
+	<link rel="stylesheet" href="cube.css" />
+	<style>
+		:root {
+			color-scheme: dark light;
+		}
+
+		body {
+			margin: 0;
+			font-family: system-ui, sans-serif;
+			background: #000;
+			color: #eee;
+		}
+
+		header {
+			position: fixed;
+			top: 0;
+			left: 0;
+			right: 0;
+			padding: 0.5rem 1rem;
+			backdrop-filter: blur(6px);
+			background: rgba(0, 0, 0, 0.45);
+			font-size: 0.9rem;
+			line-height: 1.2;
+		}
+
+		header a {
+			color: #7fc6ff;
+			text-decoration: none;
+		}
+
+		header a:hover {
+			text-decoration: underline;
+		}
+
+		#controls {
+			display: flex;
+			gap: 0.75rem;
+			align-items: center;
+			flex-wrap: wrap;
+		}
+
+		#controls label {
+			display: flex;
+			align-items: center;
+			gap: 0.35rem;
+		}
+
+		canvas {
+			display: block;
+			width: 100vw;
+			height: 100vh;
+			background: #000;
+		}
+
+		footer {
+			position: fixed;
+			bottom: 0;
+			left: 0;
+			right: 0;
+			padding: 0.35rem 0.75rem;
+			font-size: 0.7rem;
+			text-align: right;
+			opacity: 0.55;
+			pointer-events: none;
+		}
+
+		@media (prefers-reduced-motion: reduce) {
 			canvas {
-				background-color: black;
+				background: #111;
 			}
-		</style>
-	</head>
+		}
+	</style>
+</head>
 
-	<body>
-		<canvas></canvas>
-		<script src="spinny.js"></script>
-	</body>
+<body>
+	<header>
+		<div id="controls" role="group" aria-label="Cube animation controls">
+			<label title="Rotation speed multiplier"><span>Speed:</span><input id="speed" type="range" min="0" max="300"
+					value="100" /></label>
+			<label title="Pause / resume animation"><input id="pause" type="checkbox" /> <span>Pause</span></label>
+			<label title="Toggle auto resize to window"><input id="autoresize" type="checkbox" checked />
+				<span>Auto-resize</span></label>
+			<button id="reset" type="button">Reset</button>
+			<span id="status" aria-live="polite"></span>
+		</div>
+	</header>
+	<canvas id="cubeCanvas" aria-label="Animated spinning cube" role="img"></canvas>
+	<footer>Press R to reset · Esc to pause · Respects prefers-reduced-motion.</footer>
+	<script src="spinny.js" defer></script>
+</body>
+
 </html>
