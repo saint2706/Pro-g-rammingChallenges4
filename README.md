@@ -39,7 +39,7 @@ While this is a personal project, the principles behind it are universal. If you
 | 10 | To-Do List Application (Web app or CLI) | [View Solution](./Practical/ToDoList-CLI/) |
 | 11 | Verlet Integration (Verlet Cloth) | Not Yet |
 | 12 | TCP/UDP Chat Server + Client | Not Yet |
-| 13 | Music Streaming | Not Yet |
+| 13 | Music Streaming | [View Solution](./Practical/Music%20Streaming/) |
 | 14 | Shazam | Not Yet |
 | 15 | Chatbot (with conversation retention) | Not Yet |
 | 16 | Curses Text Editor (with Emacs /Vim Keybindings) | Not Yet |
