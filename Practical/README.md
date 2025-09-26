@@ -67,6 +67,7 @@ Brief synopses; dive into each folder for details.
 | Matrix Arithmetic | Explainable matrix calculator (CLI + GUI) covering add/multiply/det/inverse plus 2D visualiser. | NumPy, Tkinter, matplotlib |
 | Stock Market Simulator | Backtest custom strategies over Yahoo Finance data with caching + reports. | pandas, requests, matplotlib (optional) |
 | MIDI Player Editor | CLI-based MIDI playback, editing, and export workflow. | mido, python-rtmidi |
+| Nonogram Solver | Generate, solve, and play logic puzzles with GUI + exports. | Tkinter, Pillow |
 | Paint (clone) | Lightweight Tk canvas paint app with palette + save. | Tkinter, Pillow (optional) |
 | Pixel Editor | Layered pixel art editor with animation preview & sprite sheet IO. | Tkinter, Pillow |
 | PDF Tagger | Add arbitrary JSON metadata tags to PDFs. | pypdf |
