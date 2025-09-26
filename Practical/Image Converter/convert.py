@@ -21,9 +21,10 @@ from __future__ import annotations
 from dataclasses import dataclass
 import argparse
 import logging
+import os
 import sys
 from pathlib import Path
-from typing import Iterable, Iterator, List, Optional, Sequence, Tuple
+from typing import IO, Iterable, Iterator, List, Optional, Sequence, Tuple, Union
 
 try:
     from PIL import Image, ImageOps, PngImagePlugin
@@ -185,35 +186,78 @@ def _infer_output_path(input_path: Path, output_dir: Optional[Path], target_form
     return destination_dir / f"{input_path.stem}{extension}"
 
 
+PathOrStr = Union[str, os.PathLike, Path]
+FileLike = IO[bytes]
+
+
+def _is_path_like(value: object) -> bool:
+    return isinstance(value, (str, Path, os.PathLike))
+
+
 def convert_image(
-    input_path: Path,
+    input_path: Union[PathOrStr, FileLike],
     *,
     target_format: str,
-    output_path: Optional[Path] = None,
+    output_path: Optional[Union[PathOrStr, FileLike]] = None,
     quality: Optional[int] = None,
     resize: Optional[ResizeSpec] = None,
     keep_metadata: bool = True,
-) -> Path:
-    """Convert ``input_path`` to ``target_format`` and return the output path."""
+) -> Optional[Path]:
+    """Convert an image to ``target_format``.
+
+    Parameters accept filesystem paths or file-like objects. When ``input_path``
+    is a file-like, an explicit ``output_path`` must be provided. When
+    ``output_path`` is a file-like, ``None`` is returned instead of a
+    :class:`~pathlib.Path` instance.
+    """
 
     target_format = target_format.upper()
     if target_format not in SUPPORTED_EXPORT_SET:
         raise ValueError(f"Unsupported target format '{target_format}'. Supported: {sorted(SUPPORTED_EXPORT_SET)}")
 
-    input_path = Path(input_path)
-    if not input_path.exists():
-        raise FileNotFoundError(input_path)
-
-    if output_path is None:
-        output_path = _infer_output_path(input_path, None, target_format)
+    resolved_input_path: Optional[Path] = None
+    if _is_path_like(input_path):
+        resolved_input_path = Path(input_path)
+        if not resolved_input_path.exists():
+            raise FileNotFoundError(resolved_input_path)
+        image_source: Union[Path, FileLike] = resolved_input_path
     else:
-        output_path = Path(output_path)
-        if output_path.is_dir():
-            output_path = _infer_output_path(input_path, output_path, target_format)
-        else:
-            output_path.parent.mkdir(parents=True, exist_ok=True)
+        if not hasattr(input_path, "read"):
+            raise TypeError("input_path must be a filesystem path or binary file-like object")
+        if hasattr(input_path, "seek"):
+            try:
+                input_path.seek(0)
+            except Exception:  # pragma: no cover - best effort
+                pass
+        image_source = input_path  # type: ignore[assignment]
 
-    with Image.open(input_path) as img:
+    destination: Union[Path, FileLike]
+    written_path: Optional[Path] = None
+    if output_path is None:
+        if resolved_input_path is None:
+            raise ValueError("output_path must be provided when reading from a file-like object")
+        destination = _infer_output_path(resolved_input_path, None, target_format)
+        written_path = destination
+    elif _is_path_like(output_path):
+        resolved_output = Path(output_path)
+        if resolved_output.is_dir():
+            if resolved_input_path is not None:
+                resolved_output = _infer_output_path(resolved_input_path, resolved_output, target_format)
+            else:
+                name_hint = getattr(input_path, "name", None)
+                if not name_hint:
+                    raise ValueError(
+                        "Directory output_path requires the file-like input to provide a 'name' attribute."
+                    )
+                resolved_output = resolved_output / f"{Path(str(name_hint)).stem}{SUPPORTED_EXPORT_FORMATS[target_format][0]}"
+        else:
+            resolved_output.parent.mkdir(parents=True, exist_ok=True)
+        destination = resolved_output
+        written_path = resolved_output
+    else:
+        destination = output_path  # type: ignore[assignment]
+
+    with Image.open(image_source) as img:
         img = ImageOps.exif_transpose(img)
         info: dict = {}
         exif_bytes: Optional[bytes] = None
@@ -229,13 +273,39 @@ def convert_image(
             if not 1 <= quality <= 100:
                 raise ValueError("Quality must be within 1..100")
             save_kwargs["quality"] = quality
-        img.save(output_path, format=target_format, **save_kwargs)
+        img.save(destination, format=target_format, **save_kwargs)
 
-    return output_path
+    if hasattr(destination, "seek"):
+        try:
+            destination.seek(0)  # type: ignore[union-attr]
+        except Exception:  # pragma: no cover - non seekable output
+            pass
+
+    return written_path
+
+
+BatchInput = Union[PathOrStr, FileLike, Tuple[str, FileLike]]
+
+
+def _normalize_file_like(item: Union[FileLike, Tuple[str, FileLike]]) -> Tuple[str, FileLike]:
+    if isinstance(item, tuple):
+        if len(item) != 2:
+            raise ValueError("Tuple file-like inputs must be (name, file_obj)")
+        name, file_obj = item
+        if not hasattr(file_obj, "read"):
+            raise TypeError("Provided file-like object does not support read()")
+        return str(name), file_obj
+
+    if not hasattr(item, "read"):
+        raise TypeError("File-like inputs must implement read()")
+    name = getattr(item, "name", None)
+    if not name:
+        raise ValueError("File-like inputs must provide a name via attribute or tuple metadata")
+    return str(name), item
 
 
 def batch_convert(
-    inputs: Sequence[Path],
+    inputs: Sequence[BatchInput],
     *,
     target_format: str,
     output_dir: Optional[Path] = None,
@@ -246,23 +316,50 @@ def batch_convert(
 ) -> List[Path]:
     """Convert multiple files. Returns successfully written paths."""
 
+    fmt_upper = target_format.upper()
+    if fmt_upper not in SUPPORTED_EXPORT_SET:
+        raise ValueError(f"Unsupported target format '{target_format}'. Supported: {sorted(SUPPORTED_EXPORT_SET)}")
+
     written: List[Path] = []
     output_dir = Path(output_dir) if output_dir else None
-    for input_path in _gather_inputs(inputs, recursive=recursive):
-        try:
-            destination = _infer_output_path(input_path, output_dir, target_format)
-            destination.parent.mkdir(parents=True, exist_ok=True)
-            path = convert_image(
-                input_path,
-                target_format=target_format,
-                output_path=destination,
-                quality=quality,
-                resize=resize,
-                keep_metadata=keep_metadata,
-            )
-            written.append(path)
-        except Exception as exc:
-            LOGGER.error("Failed to convert %s: %s", input_path, exc)
+    for raw_input in inputs:
+        if _is_path_like(raw_input):
+            for input_path in _gather_inputs([Path(raw_input)], recursive=recursive):
+                try:
+                    destination = _infer_output_path(input_path, output_dir, target_format)
+                    destination.parent.mkdir(parents=True, exist_ok=True)
+                    path = convert_image(
+                        input_path,
+                        target_format=target_format,
+                        output_path=destination,
+                        quality=quality,
+                        resize=resize,
+                        keep_metadata=keep_metadata,
+                    )
+                    if path is not None:
+                        written.append(path)
+                except Exception as exc:
+                    LOGGER.error("Failed to convert %s: %s", input_path, exc)
+        else:
+            try:
+                if output_dir is None:
+                    raise ValueError("output_dir is required when converting file-like inputs")
+                name, file_obj = _normalize_file_like(raw_input)
+                extension = SUPPORTED_EXPORT_FORMATS[fmt_upper][0]
+                destination = output_dir / f"{Path(name).stem}{extension}"
+                destination.parent.mkdir(parents=True, exist_ok=True)
+                path = convert_image(
+                    file_obj,
+                    target_format=target_format,
+                    output_path=destination,
+                    quality=quality,
+                    resize=resize,
+                    keep_metadata=keep_metadata,
+                )
+                if path is not None:
+                    written.append(path)
+            except Exception as exc:
+                LOGGER.error("Failed to convert in-memory file %s: %s", getattr(raw_input, "name", raw_input), exc)
     return written
 
 
