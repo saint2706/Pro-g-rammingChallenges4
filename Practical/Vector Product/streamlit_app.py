@@ -69,9 +69,8 @@ def render() -> None:
         plt.close(fig)
 
 
-def main() -> None:
-    render()
+__all__ = ["render"]
 
 
 if __name__ == "__main__":
-    main()
+    render()

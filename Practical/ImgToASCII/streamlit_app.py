@@ -40,7 +40,7 @@ def _render_ascii(ascii_art: str) -> None:
     )
 
 
-def main() -> None:
+def render() -> None:
     st.set_page_config(page_title="Image to ASCII", layout="wide")
     st.title("Image to ASCII Converter")
 
@@ -110,6 +110,9 @@ def main() -> None:
     )
 
 
+__all__ = ["render"]
+
+
 if __name__ == "__main__":  # pragma: no cover
-    main()
+    render()
 

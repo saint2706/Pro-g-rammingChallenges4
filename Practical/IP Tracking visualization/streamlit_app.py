@@ -81,7 +81,7 @@ def _render_summary(meta: dict[str, object]) -> None:
     st.write(f"**Elapsed:** {meta.get('elapsed_sec', 0)} seconds")
 
 
-def main() -> None:
+def render() -> None:
     st.set_page_config(page_title="IP Tracking Visualization", layout="wide")
     st.title("IP Tracking Visualization")
     st.write(
@@ -167,5 +167,8 @@ def main() -> None:
         )
 
 
+__all__ = ["render"]
+
+
 if __name__ == "__main__":  # pragma: no cover
-    main()
+    render()

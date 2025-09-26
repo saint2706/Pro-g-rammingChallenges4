@@ -101,4 +101,8 @@ def render() -> None:
         st.warning("\n".join(result.errors))
 
 
-render()
+__all__ = ["render"]
+
+
+if __name__ == "__main__":  # pragma: no cover - manual execution helper
+    render()
