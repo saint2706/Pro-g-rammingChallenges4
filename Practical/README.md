@@ -77,6 +77,7 @@ Brief synopses; dive into each folder for details.
 | Seam Carving | Content-aware image resizing (CLI + GUI + progress). | OpenCV, NumPy, Pillow (GUI) |
 | TFTP Tool | RFC 1350-compliant UDP file transfer client/server with CLI. | sockets, logging |
 | ToDoList-CLI | File‑backed todo manager (undo, prioritize, search). | Dataclasses, color output |
+| Window Manager | Lightweight tiling WM with master/stack layout & keybindings. | python-xlib, X11 |
 | Vector Product | Vector math utilities & 3D plotting. | matplotlib |
 
 | Verlet Cloth | Cloth simulation using Verlet integration with interactive toggles. | NumPy, matplotlib |
