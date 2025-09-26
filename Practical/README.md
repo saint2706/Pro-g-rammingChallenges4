@@ -56,7 +56,7 @@ Brief synopses; dive into each folder for details.
 
 | Folder | Summary | Key Tech |
 |--------|---------|----------|
-| Imageboard | Minimal Flask + SQLite anonymous imageboard (threads, replies, uploads, quoting, thumbnails). | Flask, Pillow, SQLite, Jinja filters |
+| Imageboard | Minimal Flask + SQLite anonymous imageboard (threads, replies, uploads, quoting, thumbnails, moderation). | Flask, Pillow, SQLite, Jinja filters |
 | ImgToASCII | Convert images to ASCII art (CLI + Tk GUI). | Pillow, NumPy, Tkinter |
 | IP Tracking visualization | Fetch IP geolocation data & plot interactive map. | requests, pandas, plotly, tqdm |
 | Markov Chain Sentence Generator | Train simple Markov model over corpora (CLI + GUI). | Dataclasses, Tkinter |
