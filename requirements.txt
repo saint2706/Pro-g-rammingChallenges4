@@ -6,6 +6,7 @@
 # Core / Numerical / Imaging
 #############################
 numpy>=1.26,<2.0              # Arrays, math (image ops, palette extraction, ASCII art)
+scipy>=1.11,<1.13              # Signal processing, FFT helpers (equalizer, future DSP tools)
 Pillow>=10.4,<10.5            # Image loading/saving (imageboard, converters, palette tools)
 matplotlib>=3.9,<3.10         # Plotting (vector product, rotating cube, color wheel)
 opencv-python>=4.10,<5.0      # Seam carving energy/gradients, optional image acceleration
@@ -34,6 +35,11 @@ pypdf>=4.3,<4.4               # PDF Tagger metadata operations
 # Visualization / 3D / UI (Optional)
 #############################
 vpython>=7.6,<7.7             # 3D interactive spinny cube (optional)
+
+#############################
+# Audio / DSP (Optional)
+#############################
+sounddevice>=0.4,<0.5         # Real-time audio playback (WAV Equalizer)
 
 #############################
 # Terminal / UX Enhancements (Optional)
