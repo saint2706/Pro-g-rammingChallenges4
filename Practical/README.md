@@ -85,6 +85,7 @@ Brief synopses; dive into each folder for details.
 | Shazam Clone | Audio fingerprinting with spectrogram peaks + MinHash, CLI tooling for build/query/benchmark. | librosa, NumPy, sounddevice (optional) |
 | TFTP Tool | RFC 1350-compliant UDP file transfer client/server with CLI. | sockets, logging |
 | ToDoList-CLI | File‑backed todo manager (undo, prioritize, search). | Dataclasses, color output |
+| Torrent Client | Educational BitTorrent implementation with resume + CLI progress. | sockets, requests, tqdm |
 | Window Manager | Lightweight tiling WM with master/stack layout & keybindings. | python-xlib, X11 |
 | Vector Product | Vector math utilities & 3D plotting. | matplotlib |
 | Old School cringe | Multi-effect demoscene timeline (plasma, scroller, zoomer) with synced audio. | pygame, NumPy |
