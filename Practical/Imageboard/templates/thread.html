@@ -3,7 +3,14 @@
 <p><a href="{{ url_for('index') }}">« Back to index</a></p>
 
 <div class="thread" id="p{{ thread.id }}">
-    <div class="meta">Thread #{{ thread.id }} • {{ thread.created_utc | datetime }}</div>
+    <div class="meta">Thread #{{ thread.id }} • {{ thread.created_utc | datetime }}
+        {% if is_admin %}
+        <form method="post" action="{{ url_for('admin_delete', post_id=thread.id) }}" class="inline-form">
+            <input type="hidden" name="next" value="{{ request.path }}">
+            <button type="submit" class="link-button">Delete</button>
+        </form>
+        {% endif %}
+    </div>
     {% if thread.image_filename %}
     <a href="{{ url_for('uploaded_file', filename=thread.image_filename) }}" target="_blank">
         {% if thread.thumb_filename %}
@@ -20,7 +27,14 @@
 {% if not replies %}<p>No replies yet.</p>{% endif %}
 {% for r in replies %}
 <div class="reply" id="p{{ r.id }}">
-    <div class="meta">#{{ r.id }} • {{ r.created_utc | datetime }}</div>
+    <div class="meta">#{{ r.id }} • {{ r.created_utc | datetime }}
+        {% if is_admin %}
+        <form method="post" action="{{ url_for('admin_delete', post_id=r.id) }}" class="inline-form">
+            <input type="hidden" name="next" value="{{ request.path }}">
+            <button type="submit" class="link-button">Delete</button>
+        </form>
+        {% endif %}
+    </div>
     {% if r.image_filename %}
     <a href="{{ url_for('uploaded_file', filename=r.image_filename) }}" target="_blank">
         {% if r.thumb_filename %}

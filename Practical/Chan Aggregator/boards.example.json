@@ -1,0 +1,38 @@
+{
+  "sources": [
+    {
+      "name": "4chan",
+      "boards": [
+        {
+          "board_id": "g",
+          "title": "Technology",
+          "catalog_url": "https://a.4cdn.org/{board}/catalog.json",
+          "thread_url": "https://a.4cdn.org/{board}/thread/{thread}.json",
+          "rate_limit_seconds": 2,
+          "cache_ttl": 120
+        },
+        {
+          "board_id": "co",
+          "title": "Comics & Cartoons",
+          "catalog_url": "https://a.4cdn.org/{board}/catalog.json",
+          "thread_url": "https://a.4cdn.org/{board}/thread/{thread}.json",
+          "rate_limit_seconds": 2,
+          "cache_ttl": 120
+        }
+      ]
+    },
+    {
+      "name": "4plebs",
+      "boards": [
+        {
+          "board_id": "g",
+          "title": "Technology (Archive)",
+          "catalog_url": "https://archive.4plebs.org/{board}/catalog.json",
+          "thread_url": "https://archive.4plebs.org/_/api/chan/thread/?board={board}&num={thread}",
+          "rate_limit_seconds": 4,
+          "cache_ttl": 300
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,5 @@
+# Ignore generated uploads, thumbnails, and database files
+uploads/
+thumbs/
+*.db
+*.sqlite3
