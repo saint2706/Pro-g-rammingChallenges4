@@ -43,6 +43,8 @@ colorama>=0.4.6,<0.5          # Cross-platform ANSI colors (todo list future imp
 #############################
 # Security / Parsing (Future placeholders)
 #############################
+# AES-GCM password vault
+cryptography>=42.0,<43.0
 # beautifulsoup4>=4.12,<4.13  # For potential web crawler enhancements
 # lxml>=5.2,<5.3              # Faster HTML/XML parsing (optional)
 

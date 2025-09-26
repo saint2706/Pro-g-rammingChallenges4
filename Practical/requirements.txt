@@ -25,6 +25,9 @@ pypdf>=4.3,<4.4             # Preferred modern PDF library
 # CLI polish / color (some scripts may benefit if extended)
 colorama>=0.4.6,<0.5        # Windows-safe ANSI colors (optional; used implicitly / future use)
 
+# Security / encryption
+cryptography>=42.0,<43.0    # Password manager AES-GCM vault
+
 # NOTE:
 # - Some desktop GUI tools rely only on the Python standard library (tkinter, threading, etc.).
 # - If you want a lighter install, you can create per-project requirement subsets.
