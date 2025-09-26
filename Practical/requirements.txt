@@ -22,6 +22,7 @@ Pillow>=10.4,<10.5          # Image handling (imageboard, ASCII converter, seam 
 pypdf>=4.3,<4.4             # Preferred modern PDF library
 # PyPDF3  (legacy fallback) not listed intentionally; install manually only if needed
 
+python-xlib>=0.33,<0.34        # X11 window manager bindings (PracticalWM)
 # CLI polish / color (some scripts may benefit if extended)
 colorama>=0.4.6,<0.5        # Windows-safe ANSI colors (optional; used implicitly / future use)
 

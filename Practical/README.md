@@ -67,6 +67,7 @@ Brief synopses; dive into each folder for details.
 | Radix Base Converter | Arbitrary base conversion (2..36) with GUI. | Pure Python, Tkinter |
 | Seam Carving | Content-aware image resizing (CLI + GUI + progress). | OpenCV, NumPy, Pillow (GUI) |
 | ToDoList-CLI | File‑backed todo manager (undo, prioritize, search). | Dataclasses, color output |
+| Window Manager | Lightweight tiling WM with master/stack layout & keybindings. | python-xlib, X11 |
 | Vector Product | Vector math utilities & 3D plotting. | matplotlib |
 | Old School cringe | Retro rotating cube + assets demo. | matplotlib.animation, NumPy |
 | Graphing Calculator | Basic expression plotting GUI. | Tkinter, eval sandboxing |
