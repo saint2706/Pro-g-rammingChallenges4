@@ -22,6 +22,7 @@ from pathlib import Path
 from typing import Dict, List, Optional, Sequence, Tuple
 
 import matplotlib.pyplot as plt
+from matplotlib.figure import Figure
 from matplotlib.patches import Circle, FancyArrowPatch
 from matplotlib.widgets import Button
 
@@ -278,6 +279,108 @@ class BellmanFordSimulation:
         if math.isinf(distance):
             return "∞"
         return f"{distance:.2f}"
+
+
+def render_step(step: Step, nodes: Sequence[str], edges: Sequence[Edge]) -> Figure:
+    """Create a Matplotlib figure visualizing a single simulation step."""
+
+    positions = generate_layout(nodes)
+    fig, ax = plt.subplots(figsize=(10, 7))
+    fig.subplots_adjust(right=0.65)
+    ax.set_title("Bellman–Ford Simulation")
+    ax.axis("off")
+    ax.set_aspect("equal")
+
+    for edge in edges:
+        start = positions[edge.source]
+        end = positions[edge.target]
+        color = "#888888"
+        linewidth = 1.8
+        zorder = 1
+        is_active_edge = step.edge and edge.source == step.edge.source and edge.target == step.edge.target
+        if is_active_edge:
+            color = "#d62728" if step.updated else "#ff7f0e"
+            if step.negative_cycle:
+                color = "#9467bd"
+            linewidth = 3.0
+            zorder = 4
+        arrow = FancyArrowPatch(
+            posA=start,
+            posB=end,
+            arrowstyle="-|>",
+            mutation_scale=15,
+            linewidth=linewidth,
+            color=color,
+            zorder=zorder,
+        )
+        ax.add_patch(arrow)
+        mid_x = start[0] + 0.6 * (end[0] - start[0])
+        mid_y = start[1] + 0.6 * (end[1] - start[1])
+        label_color = color if is_active_edge else "#444444"
+        ax.text(
+            mid_x,
+            mid_y,
+            f"{edge.weight}",
+            fontsize=9,
+            ha="center",
+            va="center",
+            backgroundcolor="white",
+            color=label_color,
+            zorder=5,
+        )
+
+    for node in nodes:
+        x, y = positions[node]
+        distance = step.distances.get(node, math.inf)
+        facecolor = "#dddddd"
+        text_color = "black"
+        if not math.isinf(distance):
+            facecolor = "#1f77b4"
+            text_color = "white"
+        if step.edge and node == step.edge.target and step.updated:
+            facecolor = "#2ca02c"
+            text_color = "white"
+        circle = Circle((x, y), 0.35, facecolor=facecolor, edgecolor="black", linewidth=1.5, zorder=3)
+        ax.add_patch(circle)
+        ax.text(
+            x,
+            y,
+            f"{node}\n{BellmanFordSimulation._fmt_distance(distance)}",
+            ha="center",
+            va="center",
+            color=text_color,
+            fontsize=11,
+            fontweight="bold",
+            zorder=4,
+        )
+
+    ax.set_xlim(-5, 5)
+    ax.set_ylim(-5, 5)
+
+    iteration_label = (
+        f"Iteration {step.iteration}" if step.phase in {"relax", "check"} else "Initialization"
+    )
+    phase_label = step.phase.capitalize()
+    header = f"Step {step.index + 1} — {phase_label} ({iteration_label})"
+    fig.text(0.68, 0.92, header, va="top", ha="left", fontsize=12, fontweight="bold")
+    fig.text(0.68, 0.88, textwrap.fill(step.note, 40), va="top", ha="left", fontsize=10)
+
+    distance_lines = ["Node  Dist   Pred"]
+    for node in nodes:
+        dist = BellmanFordSimulation._fmt_distance(step.distances.get(node, math.inf))
+        pred = step.predecessors.get(node) or "-"
+        distance_lines.append(f"{node:>4}  {dist:>5}  {pred:>4}")
+    fig.text(
+        0.68,
+        0.72,
+        "\n".join(distance_lines),
+        va="top",
+        ha="left",
+        fontfamily="monospace",
+        fontsize=10,
+    )
+
+    return fig
 
 
 class BellmanFordVisualizer:
