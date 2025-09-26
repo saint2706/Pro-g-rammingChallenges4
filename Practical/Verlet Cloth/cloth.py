@@ -15,7 +15,7 @@ Example
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Iterable, List, Sequence, Tuple
+from typing import Dict, Iterable, List, Sequence, Tuple
 
 import numpy as np
 
@@ -271,3 +271,132 @@ class Cloth:
                 if particle.pinned:
                     positions.append(particle.position.copy())
         return np.array(positions)
+
+
+def _capture_frame(
+    cloth: "Cloth",
+    step_index: int,
+    time_elapsed: float,
+    record_positions: bool,
+    record_segments: bool,
+) -> Dict[str, np.ndarray | int | float]:
+    frame: Dict[str, np.ndarray | int | float] = {
+        "step": step_index,
+        "time": time_elapsed,
+    }
+    if record_positions:
+        frame["positions"] = cloth.positions.copy()
+    if record_segments:
+        frame["segments"] = cloth.segments.copy()
+    return frame
+
+
+def simulate_cloth(
+    steps: int,
+    *,
+    dt: float = 0.016,
+    include_initial_state: bool = True,
+    record_positions: bool = True,
+    record_segments: bool = True,
+    cloth: "Cloth" | None = None,
+    **cloth_kwargs,
+) -> List[Dict[str, np.ndarray | int | float]]:
+    """Run a cloth simulation and capture frame data.
+
+    Parameters
+    ----------
+    steps:
+        Number of simulation steps to advance.  A value of ``0`` captures only
+        the initial state (if requested).
+    dt:
+        Duration of each step.  Must be positive.
+    include_initial_state:
+        When ``True`` the first frame corresponds to the state before any
+        integration step has been applied.
+    record_positions / record_segments:
+        Control which arrays are stored for each frame.  Disabling unused data
+        avoids unnecessary allocations when only a subset of information is
+        required.
+    cloth:
+        An optional pre-configured :class:`Cloth` instance.  When provided no
+        additional keyword arguments may be supplied.
+    **cloth_kwargs:
+        Parameters forwarded to :class:`Cloth` when ``cloth`` is not supplied.
+
+    Returns
+    -------
+    list of dict
+        A list of frames; each frame contains the ``step`` index, ``time`` in
+        seconds, and any requested arrays.
+    """
+
+    if steps < 0:
+        raise ValueError("steps must be non-negative")
+    if dt <= 0:
+        raise ValueError("dt must be positive")
+
+    if cloth is not None and cloth_kwargs:
+        raise ValueError("Cannot supply cloth_kwargs when cloth instance is provided")
+
+    if cloth is None:
+        cloth = Cloth(**cloth_kwargs)
+    else:
+        cloth.reset()
+
+    frames: List[Dict[str, np.ndarray | int | float]] = []
+
+    if include_initial_state:
+        frames.append(_capture_frame(cloth, 0, 0.0, record_positions, record_segments))
+
+    for step in range(1, steps + 1):
+        cloth.step(dt)
+        time_elapsed = step * dt
+        frames.append(
+            _capture_frame(cloth, step, time_elapsed, record_positions, record_segments)
+        )
+
+    return frames
+
+
+def simulate_positions(
+    steps: int,
+    *,
+    dt: float = 0.016,
+    include_initial_state: bool = True,
+    cloth: "Cloth" | None = None,
+    **cloth_kwargs,
+) -> List[np.ndarray]:
+    """Convenience wrapper returning only the node positions for each frame."""
+
+    frames = simulate_cloth(
+        steps,
+        dt=dt,
+        include_initial_state=include_initial_state,
+        record_positions=True,
+        record_segments=False,
+        cloth=cloth,
+        **cloth_kwargs,
+    )
+    return [frame["positions"] for frame in frames]
+
+
+def simulate_segments(
+    steps: int,
+    *,
+    dt: float = 0.016,
+    include_initial_state: bool = True,
+    cloth: "Cloth" | None = None,
+    **cloth_kwargs,
+) -> List[np.ndarray]:
+    """Convenience wrapper returning only the constraint segments for each frame."""
+
+    frames = simulate_cloth(
+        steps,
+        dt=dt,
+        include_initial_state=include_initial_state,
+        record_positions=False,
+        record_segments=True,
+        cloth=cloth,
+        **cloth_kwargs,
+    )
+    return [frame["segments"] for frame in frames]
