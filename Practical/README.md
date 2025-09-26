@@ -56,6 +56,7 @@ Brief synopses; dive into each folder for details.
 
 | Folder | Summary | Key Tech |
 |--------|---------|----------|
+| Bellman Ford Simulation | Visual Bellman–Ford walkthrough with CLI + Matplotlib GUI controls and exports. | matplotlib, argparse |
 | Imageboard | Minimal Flask + SQLite anonymous imageboard (threads, replies, uploads, quoting, thumbnails). | Flask, Pillow, SQLite, Jinja filters |
 | ImgToASCII | Convert images to ASCII art (CLI + Tk GUI). | Pillow, NumPy, Tkinter |
 | IRC Client | Async terminal IRC client with TLS, reconnection, logging. | Python stdlib (`asyncio`, `ssl`, `argparse`, `logging`) |
