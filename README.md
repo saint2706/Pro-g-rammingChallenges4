@@ -32,7 +32,7 @@ While this is a personal project, the principles behind it are universal. If you
 | 3 | IRC Client | [View Solution](./Practical/IRC%20Client/) |
 | 4 | Markov Chain Sentence Generator (Include Shitposting Capabilities) | [View Solution](./Practical/Markov%20Chain%20Sentence%20Generator/) |
 | 5 | English Sentence Parser that Points to the Context of a Sentence | [View Solution](./Practical/Context%20Pointer/) |
-| 6 | MIDI Player + Editor | Not Yet |
+| 6 | MIDI Player + Editor | [View Solution](./Practical/MIDI%20Player%20Editor/) |
 | 7 | Stock Market Simulator Using Yahoo Spreadsheet Data | Not Yet |
 | 8 | Parametric/Graphic Equalizer for .wav files (Make it real-time) | Not Yet |
 | 9 | Graphing Calculator (BONUS: Graph the Function's Derivatives) | [View Solution](./Practical/Graphing%20Calculator/) |
