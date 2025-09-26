@@ -23,14 +23,15 @@ from __future__ import annotations
 
 import argparse
 import csv
+import io
 import json
-import os
 import random
 import sys
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
 from pathlib import Path
+from threading import Lock
 from typing import Any, Dict, List, Optional, Sequence
 
 import requests
@@ -43,6 +44,9 @@ except ImportError:  # pragma: no cover
     tqdm = None  # type: ignore
 
 API_URL_TEMPLATE = "https://ipapi.co/{ip}/json/"
+
+_CACHE_LOCK = Lock()
+_FETCH_CACHE: Dict[str, Optional["Location"]] = {}
 
 # ----------------------------- Data Models ----------------------------- #
 
@@ -99,7 +103,7 @@ def exponential_backoff(base: float, attempt: int) -> float:
     return base * (2**attempt) + random.uniform(0, base)
 
 
-def fetch_single(ip: str, cfg: Config) -> Optional[Location]:
+def _fetch_single_uncached(ip: str, cfg: Config) -> Optional[Location]:
     url = API_URL_TEMPLATE.format(ip=ip)
     attempt = 0
     while attempt <= cfg.retries:
@@ -135,6 +139,19 @@ def fetch_single(ip: str, cfg: Config) -> Optional[Location]:
     return None
 
 
+def fetch_single(ip: str, cfg: Config) -> Optional[Location]:
+    with _CACHE_LOCK:
+        if ip in _FETCH_CACHE:
+            return _FETCH_CACHE[ip]
+
+    result = _fetch_single_uncached(ip, cfg)
+
+    with _CACHE_LOCK:
+        _FETCH_CACHE[ip] = result
+
+    return result
+
+
 def fetch_locations(ips: Sequence[str], cfg: Config) -> List[Location]:
     locations: List[Location] = []
     iterable = ips
@@ -158,10 +175,7 @@ def fetch_locations(ips: Sequence[str], cfg: Config) -> List[Location]:
 # ----------------------------- Map Creation ----------------------------- #
 
 
-def create_map(locations: List[Location], output_path: Path) -> None:
-    if not locations:
-        print("No valid location data to plot.")
-        return
+def build_map_figure(locations: Sequence[Location]) -> go.Figure:
     df = pd.DataFrame([l.as_dict() for l in locations])
     fig = go.Figure(
         data=go.Scattergeo(
@@ -194,6 +208,14 @@ def create_map(locations: List[Location], output_path: Path) -> None:
             countrycolor="rgb(204,204,204)",
         ),
     )
+    return fig
+
+
+def create_map(locations: List[Location], output_path: Path) -> None:
+    if not locations:
+        print("No valid location data to plot.")
+        return
+    fig = build_map_figure(locations)
     try:
         fig.write_html(output_path)
         print(f"Map saved to '{output_path.resolve()}'")
@@ -204,29 +226,52 @@ def create_map(locations: List[Location], output_path: Path) -> None:
 # ----------------------------- Export Helpers ----------------------------- #
 
 
-def export_json(locations: List[Location], path: Path, meta: Dict[str, Any]) -> None:
+def export_json(
+    locations: Sequence[Location], path: Optional[Path], meta: Dict[str, Any]
+) -> str:
     data = [l.as_dict() for l in locations]
-    payload = {"locations": data, "meta": meta}
-    try:
-        with open(path, "w", encoding="utf-8") as fh:
-            json.dump(payload, fh, indent=2)
-        print(f"JSON data written to {path}")
-    except OSError as e:
-        print(f"Failed to write JSON: {e}", file=sys.stderr)
+    payload = json.dumps({"locations": data, "meta": meta}, indent=2)
+    if path:
+        try:
+            with open(path, "w", encoding="utf-8") as fh:
+                fh.write(payload)
+            print(f"JSON data written to {path}")
+        except OSError as e:
+            print(f"Failed to write JSON: {e}", file=sys.stderr)
+    return payload
 
 
-def export_csv(locations: List[Location], path: Path) -> None:
-    try:
-        with open(path, "w", newline="", encoding="utf-8") as fh:
-            writer = csv.DictWriter(
-                fh, fieldnames=["IP", "Latitude", "Longitude", "Country", "City", "Org"]
-            )
-            writer.writeheader()
-            for l in locations:
-                writer.writerow(l.as_dict())
-        print(f"CSV data written to {path}")
-    except OSError as e:
-        print(f"Failed to write CSV: {e}", file=sys.stderr)
+def export_csv(locations: Sequence[Location], path: Optional[Path]) -> str:
+    output = io.StringIO()
+    writer = csv.DictWriter(
+        output, fieldnames=["IP", "Latitude", "Longitude", "Country", "City", "Org"]
+    )
+    writer.writeheader()
+    for l in locations:
+        writer.writerow(l.as_dict())
+    contents = output.getvalue()
+    if path:
+        try:
+            with open(path, "w", newline="", encoding="utf-8") as fh:
+                fh.write(contents)
+            print(f"CSV data written to {path}")
+        except OSError as e:
+            print(f"Failed to write CSV: {e}", file=sys.stderr)
+    return contents
+
+
+def summarize_results(
+    requested_ips: Sequence[str], locations: Sequence[Location], elapsed: float
+) -> Dict[str, Any]:
+    failures = len(requested_ips) - len(locations)
+    return {
+        "requested": len(requested_ips),
+        "succeeded": len(locations),
+        "failed": failures,
+        "countries": sorted({l.country for l in locations}),
+        "elapsed_sec": round(elapsed, 3),
+        "output_html": None,
+    }
 
 
 # ----------------------------- CLI ----------------------------- #
@@ -320,15 +365,9 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         print("No successful IP lookups; map not created.")
 
     # Summary & exports
-    failures = len(cfg.ips) - len(locations)
-    meta = {
-        "requested": len(cfg.ips),
-        "succeeded": len(locations),
-        "failed": failures,
-        "countries": sorted({l.country for l in locations}),
-        "elapsed_sec": round(elapsed, 3),
-        "output_html": str(cfg.output_html) if locations else None,
-    }
+    meta = summarize_results(cfg.ips, locations, elapsed)
+    if locations:
+        meta["output_html"] = str(cfg.output_html)
     if cfg.summary:
         print("\nSummary:")
         for k, v in meta.items():
