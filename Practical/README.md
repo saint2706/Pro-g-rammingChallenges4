@@ -80,11 +80,9 @@ Brief synopses; dive into each folder for details.
 | ToDoList-CLI | File‑backed todo manager (undo, prioritize, search). | Dataclasses, color output |
 | Window Manager | Lightweight tiling WM with master/stack layout & keybindings. | python-xlib, X11 |
 | Vector Product | Vector math utilities & 3D plotting. | matplotlib |
-
+| Old School cringe | Multi-effect demoscene timeline (plasma, scroller, zoomer) with synced audio. | pygame, NumPy |
 | Verlet Cloth | Cloth simulation using Verlet integration with interactive toggles. | NumPy, matplotlib |
-
 | WAV Equalizer | Real-time multi-band audio equalizer with live spectrum GUI. | numpy, scipy, sounddevice, matplotlib, Tkinter |
-
 | Old School cringe | Retro rotating cube + assets demo. | matplotlib.animation, NumPy |
 | Graphing Calculator | Basic expression plotting GUI. | Tkinter, eval sandboxing |
 | Paint / Clone | Simple drawing & export. | Tkinter |

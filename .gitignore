@@ -152,7 +152,6 @@ frames/
 frame_*.png
 *.mp4
 *.gif
-
 # Local data exports / scratch
 scratch/
 

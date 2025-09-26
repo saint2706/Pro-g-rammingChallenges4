@@ -7,6 +7,8 @@ scipy>=1.11,<1.13            # Signal processing (WAV Equalizer, future DSP demo
 pandas>=2.2,<2.3            # Used by IP Tracking visualization
 opencv-python>=4.10,<5.0    # Seam carving (energy calculation)
 matplotlib>=3.9,<3.10       # Vector product, rotating cube visualization
+pygame>=2.6,<2.7            # Old School demo multi-effect timeline
+imageio>=2.34,<2.35         # GIF capture/export for retro demo
 sounddevice>=0.4,<0.5       # Real-time audio playback (WAV Equalizer)
 plotly>=5.22,<5.23          # Interactive geo plots for IP tracking
 
