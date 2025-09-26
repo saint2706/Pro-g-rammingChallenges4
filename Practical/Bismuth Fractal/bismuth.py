@@ -22,7 +22,7 @@ import random
 import time
 from dataclasses import dataclass
 from pathlib import Path
-from typing import List, Sequence, Tuple, Optional
+from typing import List, Optional, Sequence, Tuple
 import turtle
 
 # ----------------------------- Data Model ----------------------------- #
@@ -56,14 +56,48 @@ DEFAULT_PALETTE = [
     "#DAF7A6",
 ]
 
-# Precompute a unit hex (pointy-top) around origin centered horizontally
-# We'll scale it by 'size' at draw time. Points are relative moves in order.
-HEX_POINTS: List[Tuple[float, float]] = []
-for angle_deg in range(0, 360, 60):
-    rad = math.radians(angle_deg)
-    HEX_POINTS.append((math.cos(rad), math.sin(rad)))
+
+def parse_palette(palette_arg: Optional[str]) -> List[str]:
+    """Parse a comma-separated palette string, falling back to the default palette."""
+
+    if not palette_arg:
+        return list(DEFAULT_PALETTE)
+    colors = [color.strip() for color in palette_arg.split(",") if color.strip()]
+    return colors or list(DEFAULT_PALETTE)
+
+# Hexagon metadata tuple: (center_x, center_y, side_length, color)
+HexSpec = Tuple[float, float, float, str]
+
+# Precomputed offsets for placing child hexes around a parent
+PLACEMENT_OFFSETS: List[Tuple[float, float]] = [
+    (math.cos(math.radians(a)), math.sin(math.radians(a))) for a in range(0, 360, 60)
+]
 
 # ----------------------------- Fractal Core ----------------------------- #
+
+
+def generate_hexes(cfg: Config) -> List[HexSpec]:
+    """Generate the coordinates, sizes and colours for the fractal hexagons."""
+
+    palette = list(cfg.palette)
+    if cfg.shuffle_palette:
+        random.shuffle(palette)
+        cfg.palette = palette
+
+    hexes: List[HexSpec] = []
+
+    def recurse(x: float, y: float, size: float, level: int) -> None:
+        if level == 0:
+            return
+        color = palette[level % len(palette)]
+        hexes.append((x, y, size, color))
+        child_size = size * 0.5
+        dist = size * 0.75
+        for dx_unit, dy_unit in PLACEMENT_OFFSETS:
+            recurse(x + dist * dx_unit, y + dist * dy_unit, child_size, level - 1)
+
+    recurse(0.0, 0.0, cfg.size, cfg.level)
+    return hexes
 
 
 class BismuthFractal:
@@ -75,11 +109,6 @@ class BismuthFractal:
         self.t = turtle.Turtle(visible=False)
         self.t.speed(0)
         self.t.penup()
-        # compute vertex placement offsets using cached sin/cos
-        self.vertex_offsets = [
-            (math.cos(math.radians(a)), math.sin(math.radians(a)))
-            for a in range(0, 360, 60)
-        ]
         self.draw_count = 0
 
     def draw_hex(self, x: float, y: float, size: float, color: str) -> None:
@@ -102,25 +131,14 @@ class BismuthFractal:
         if self.cfg.animate and self.draw_count % self.cfg.frame_interval == 0:
             self.screen.update()
 
-    def recurse(self, x: float, y: float, size: float, level: int) -> None:
-        if level == 0:
-            return
-        color = self.cfg.palette[level % len(self.cfg.palette)]
-        self.draw_hex(x, y, size, color)
-        child_size = size * 0.5
-        dist = size * 0.75
-        for dx_unit, dy_unit in self.vertex_offsets:
-            self.recurse(x + dist * dx_unit, y + dist * dy_unit, child_size, level - 1)
-
     def run(self) -> None:
-        if self.cfg.shuffle_palette:
-            random.shuffle(self.cfg.palette)
         if self.cfg.animate:
             self.screen.tracer(0, 0)  # manual updates every frame_interval draws
         else:
             self.screen.tracer(0)  # single final update
         start = time.time()
-        self.recurse(0.0, 0.0, self.cfg.size, self.cfg.level)
+        for x, y, size, color in generate_hexes(self.cfg):
+            self.draw_hex(x, y, size, color)
         self.screen.update()
         elapsed = time.time() - start
         print(
@@ -179,11 +197,7 @@ def parse_args(argv: Optional[Sequence[str]] = None) -> Config:
         parser.error("--level must be >= 1")
     if args.size < 10:
         parser.error("--size must be >= 10 for visibility")
-    palette = (
-        DEFAULT_PALETTE
-        if not args.palette
-        else [c.strip() for c in args.palette.split(",") if c.strip()]
-    )
+    palette = parse_palette(args.palette)
     cfg = Config(
         level=args.level,
         size=args.size,
