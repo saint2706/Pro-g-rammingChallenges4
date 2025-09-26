@@ -1,20 +1,19 @@
 # requirements.txt for Games folder
-# Only Python games with external dependencies are listed here.
+# Only Python games with external dependencies are listed here; pins follow the canonical repo versions.
 
 # General (for all Python games)
-# No external dependencies required for most games (standard library only)
+# Standard-library-only games do not require extra packages.
 
-# For games using numpy (e.g., Sudoku)
-numpy>=1.20
-
-# For games using tkinter (GUI, e.g., Simon, Snake)
-# tkinter is included with standard Python installations on Windows/Mac, but may need to be installed separately on Linux.
+# For games using numpy (e.g., Sudoku generator/solver)
+numpy>=1.26,<2.0              # Grid math utilities – planned extra: games-core
 
 # For games using matplotlib (e.g., Shuffle/cards.py)
-matplotlib>=3.0
+matplotlib>=3.8,<3.9          # Plotting for statistics/visualizations – planned extra: games-visuals
 
-# For games using sound (Simon):
-# pygame is optional for enhanced sound support
-pygame>=2.0 # Optional, for sound in Simon
+# For games using sound (Simon mini-game)
+pygame>=2.6,<2.7              # Optional sound support – planned extra: games-audio
 
-# Note: Java, C++, JS, and HTML/CSS games do not require Python dependencies.
+# For games using tkinter (GUI titles such as Simon, Snake)
+# tkinter ships with most Python installs; install separately on Linux if missing.
+
+# Future pyproject extras will expose groups such as "games-core" and "games-audio" covering these needs.

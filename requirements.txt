@@ -1,98 +1,43 @@
 # Root consolidated dependencies for the entire Pro-g-rammingChallenges4 repository
-# Strategy: Pin major+minor to stabilize APIs; allow patch updates. Many scripts are stdlib-only.
-# Optional groups are annotated; you may safely trim what you do not need.
+# Strategy: keep one canonical pin per library aligned with actual imports.
+# Optional stacks are marked for forthcoming pyproject extras so base installs stay minimal.
 
 #############################
-# Core / Numerical / Imaging
+# Base / cross-project core
 #############################
-numpy>=1.26,<2.0              # Arrays, math (image ops, palette extraction, ASCII art)
-scipy>=1.11,<1.12             # Signal processing (audio fingerprinting, future DSP tools)
-scipy>=1.11,<1.13              # Signal processing, FFT helpers (equalizer, future DSP tools)
-Pillow>=10.4,<10.5            # Image loading/saving (imageboard, converters, palette tools)
-matplotlib>=3.9,<3.10         # Plotting (vector product, rotating cube, color wheel)
-pygame>=2.6,<2.7             # Retro multi-effect demo (Old School cringe)
-imageio>=2.34,<2.35          # GIF capture/export for retro demo assets
-opencv-python>=4.10,<5.0      # Seam carving energy/gradients, optional image acceleration
-scikit-learn>=1.5,<1.6        # KMeans clustering (5 color scheme)
-colour-science>=0.4,<0.5      # Optional advanced color utilities (HSV wheel if installed)
-librosa>=0.10,<0.11           # Audio loading/STFT helper (Shazam clone)
-soundfile>=0.12,<0.13         # Backend reader for librosa
-sounddevice>=0.4,<0.5         # Optional microphone capture for Shazam clone
+numpy>=1.26,<2.0              # Arrays and math (Algorithmic/, Emulation/, Practical audio tools) – planned extra: core
+Pillow>=10.4,<10.5            # Image handling (Algorithmic steganography, Emulation palette helpers) – planned extra: imaging
+pandas>=2.2,<2.3              # Data analytics (Practical/IP Tracking dashboard) – planned extra: data
+requests>=2.31,<3.0           # HTTP client (Practical/IP Tracking, Algorithmic web scraping) – planned extra: web
+Flask>=3.0,<3.1               # Imageboard web app (Practical/Imageboard) – planned extra: web
+pypdf>=4.3,<4.4               # PDF metadata editing (Practical/PDF Tagger) – planned extra: documents
+mutagen>=1.47,<1.48           # Audio metadata parsing (Practical/ID3 Reader) – planned extra: audio
+cryptography>=42.0,<44.0      # AES-GCM vaults (Practical/Password Manager, Encrypted Upload) – planned extra: security
 
 #############################
-# Data / Analysis / Progress
+# Optional extras (install on demand; will move to pyproject extras)
 #############################
-pandas>=2.2,<2.3              # IP tracking dataset assembly
-plotly>=5.22,<5.23            # Interactive geographic visualization (IP tracking)
-tqdm>=4.66,<4.67              # Progress bars (optional)
-
-#############################
-# Web / Networking / Services
-#############################
-Flask>=3.0,<3.1               # Imageboard web app
-requests>=2.32,<2.33          # External API calls (IP tracking)
-
-#############################
-# Documents / Files
-#############################
-pypdf>=4.3,<4.4               # PDF Tagger metadata operations
-mutagen>=1.47,<1.48           # MP3/ID3 parsing utilities (ID3 Reader)
-
-#############################
-# Visualization / 3D / UI (Optional)
-#############################
-vpython>=7.6,<7.7             # 3D interactive spinny cube (optional)
-
-#############################
-
-# Audio / MIDI (Optional)
-#############################
-sounddevice>=0.4.6,<0.5        # Low-latency audio streaming for synth performer
-mido>=1.3,<1.4                 # MIDI messaging
-python-rtmidi>=1.5,<1.6         # MIDI backend for mido realtime support
-
-
-# Audio / DSP (Optional)
-#############################
-sounddevice>=0.4,<0.5         # Real-time audio playback (WAV Equalizer)
-
-# MIDI / Audio
-#############################
-mido>=1.3,<1.4                # MIDI parsing and playback helpers
-python-rtmidi>=1.5,<1.6       # RtMidi backend for mido real-time output
-
-
-
-#############################
-# Terminal / UX Enhancements (Optional)
-#############################
-colorama>=0.4.6,<0.5          # Cross-platform ANSI colors (todo list future improvements)
-
-#############################
-# Security / Parsing (Future placeholders)
-#############################
-
-# AES-GCM password vault
-cryptography>=42.0,<43.0
-
-cryptography>=43.0.0,<44.0.0  # AES-GCM encryption for secure uploads
-boto3>=1.34,<1.35             # S3 uploads and presigned URLs
-
-# beautifulsoup4>=4.12,<4.13  # For potential web crawler enhancements
-# lxml>=5.2,<5.3              # Faster HTML/XML parsing (optional)
-
-#############################
-# Dev / Tooling (Install separately if desired)
-#############################
-# ruff>=0.5,<0.6              # Linting
-# mypy>=1.11,<1.12            # Static type checking
-pytest>=8.3,<8.4              # Testing framework
-moto>=5.0,<5.1                # Mock AWS services for S3 upload tests
-ruff>=0.5,<0.6                # Linting
-mypy>=1.11,<1.12              # Static type checking
-pytest>=8.3,<8.4              # Testing framework
+matplotlib>=3.8,<3.9          # Plotting (Algorithmic visualizations, Games/shuffle) – planned extra: visualization
+scipy>=1.11,<1.13             # Signal processing (Practical Shazam clone, WAV Equalizer) – planned extra: audio
+pygame>=2.6,<2.7              # Retro demos & Simon audio (Practical/Old School, Games/Simon) – planned extra: games
+imageio>=2.34,<2.35           # GIF export (Practical retro demo capture) – planned extra: visualization
+opencv-python>=4.10,<5.0      # Seam carving & palette ops (Practical/Seam Carving, Emulation palette) – planned extra: imaging
+scikit-learn>=1.5,<1.6        # KMeans palettes (Emulation/5 color scheme) – planned extra: ml
+colour-science>=0.4,<0.5      # Advanced color math (Emulation color experiments) – planned extra: visualization
+librosa>=0.10,<0.11           # Audio STFT helper (Practical Shazam clone) – planned extra: audio
+soundfile>=0.12,<0.13         # Audio file backend (Practical Shazam clone) – planned extra: audio
+sounddevice>=0.4,<0.5         # Live audio I/O (Practical WAV Equalizer, Synth performer) – planned extra: audio
+plotly>=5.22,<5.23            # Interactive geo plots (Practical IP Tracking) – planned extra: visualization
+tqdm>=4.66,<4.67              # CLI progress bars (Practical IP Tracking) – planned extra: cli
+vpython>=7.6,<7.7             # 3D spinny cube (Emulation/SpinnyCube) – planned extra: visualization
+mido>=1.3,<1.4                # MIDI utilities (Practical synth tools) – planned extra: midi
+python-rtmidi>=1.5,<1.6       # RtMidi backend (Practical synth tools) – planned extra: midi
+boto3>=1.34,<1.35             # S3 uploads (Practical/Encrypted Upload) – planned extra: cloud
+pytest>=8.3,<8.4              # Testing harness (repo wide) – planned extra: dev
+ruff>=0.5,<0.6                # Linting (repo tooling) – planned extra: dev
+mypy>=1.11,<1.12              # Static type checking (repo tooling) – planned extra: dev
 
 # NOTES:
-# 1. If you only work inside one sub-area (e.g., Emulation or Practical/Imageboard), prefer that folder's requirements file.
-# 2. For a minimal educational install, you can start with just: numpy, Pillow, Flask.
-# 3. Consider migrating to a pyproject.toml with optional dependency groups (extras) for cleaner installs.
+# 1. For folder-specific work, prefer the scoped requirements files.
+# 2. Once pyproject extras land, the "planned extra" labels will map directly to optional dependency groups.
+# 3. Start with numpy + Pillow + Flask for the lightest educational install, then layer extras as needed.
