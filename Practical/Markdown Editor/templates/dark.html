@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>$title</title>
+    <style>
+        :root {
+            color-scheme: dark;
+        }
+        body {
+            font-family: "Fira Sans", "Segoe UI", sans-serif;
+            margin: 0 auto;
+            max-width: 900px;
+            padding: 2.5rem 1.5rem 4rem;
+            background: #0f172a;
+            color: #e2e8f0;
+        }
+        a { color: #38bdf8; }
+        pre {
+            background: #020617;
+            border-radius: 0.6rem;
+            padding: 1rem;
+            overflow-x: auto;
+        }
+        code {
+            background: rgba(148, 163, 184, 0.1);
+            padding: 0.15rem 0.35rem;
+            border-radius: 0.35rem;
+        }
+        h1, h2, h3, h4 { color: #f8fafc; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+        }
+        th, td {
+            border: 1px solid rgba(148, 163, 184, 0.3);
+            padding: 0.65rem 0.75rem;
+        }
+        blockquote {
+            border-left: 4px solid rgba(56, 189, 248, 0.5);
+            padding-left: 1rem;
+            color: #cbd5f5;
+        }
+        .byline {
+            color: rgba(226, 232, 240, 0.65);
+        }
+        $styles
+    </style>
+    $extra_head
+</head>
+<body>
+<header>
+    <h1>$title</h1>
+    $author_line
+</header>
+<main>
+$content
+</main>
+</body>
+</html>
