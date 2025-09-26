@@ -7,6 +7,11 @@ canonical dotted-decimal string.
 
 The tool is intentionally educational—showing how easy it is to disguise a
 network destination—and should be used ethically.
+
+The public helpers are designed to be imported by other tools or notebooks.
+They expose structured return types and raise :class:`ObscurifierError`
+instead of terminating the process so callers can provide their own error
+handling and presentation layers.
 """
 
 from __future__ import annotations
@@ -20,7 +25,7 @@ from dataclasses import dataclass
 from typing import Dict, Iterable, List, Sequence, Tuple
 from urllib.parse import ParseResult, urlparse, urlunparse
 
-DEFAULT_MIX_PATTERNS: List[Tuple[str, Tuple[str, str, str, str]]] = [
+DEFAULT_MIX_PATTERNS: List["MixPattern"] = [
     ("hex-lead", ("hex", "hex", "decimal", "decimal")),
     ("binary-tail", ("decimal", "decimal", "binary", "binary")),
     ("octal-sandwich", ("octal", "decimal", "octal", "hex")),
@@ -29,12 +34,39 @@ DEFAULT_MIX_PATTERNS: List[Tuple[str, Tuple[str, str, str, str]]] = [
 
 @dataclass
 class IPv4VariantBundle:
-    """Container for IPv4 obfuscation variants."""
+    """Container for IPv4 obfuscation variants.
+
+    Attributes
+    ----------
+    canonical:
+        Canonical dotted-decimal representation of the IPv4 address.
+    integers:
+        Mapping of style name to single-integer disguises.
+    dotted:
+        Mapping of style name to dotted representations using a single base
+        per octet.
+    mixed:
+        Sequence of ``(label, dotted_value)`` pairs describing mixed-base
+        dotted representations.
+    """
 
     canonical: str
     integers: Dict[str, str]
     dotted: Dict[str, str]
     mixed: List[Tuple[str, str]]
+
+
+__all__ = [
+    "DEFAULT_MIX_PATTERNS",
+    "IPv4VariantBundle",
+    "ObscurifierError",
+    "generate_ipv4_variants",
+    "decode_ipv4",
+    "encode_url",
+    "decode_url",
+    "build_parser",
+    "main",
+]
 
 
 _BASE_FORMATTERS = {
@@ -66,14 +98,49 @@ def _validate_mix_sequence(sequence: Sequence[str]) -> Tuple[str, str, str, str]
     return tuple(normalised)  # type: ignore[return-value]
 
 
+MixPattern = Tuple[str, Tuple[str, str, str, str]]
+MixPatternInput = Sequence[Tuple[str, Sequence[str]]]
+
+
 def generate_ipv4_variants(
     ip: str,
     *,
     custom_mix: Sequence[str] | None = None,
     include_default_mixes: bool = True,
     mix_limit: int | None = None,
+    default_mix_patterns: MixPatternInput | None = None,
 ) -> IPv4VariantBundle:
-    """Produce dotted and integer IPv4 disguises."""
+    """Produce dotted and integer IPv4 disguises.
+
+    Parameters
+    ----------
+    ip:
+        IPv4 address in dotted-decimal notation.
+    custom_mix:
+        Optional sequence of base labels (``decimal``, ``hex``, ``octal``,
+        ``binary``, ``zero-padded``) that will be used to generate a single
+        mixed dotted representation.
+    include_default_mixes:
+        When ``True`` the default mix patterns (or the ones supplied via
+        ``default_mix_patterns``) are included in the bundle.
+    mix_limit:
+        Optional cap on the number of default mix patterns returned.
+    default_mix_patterns:
+        Override for the default mix pattern catalogue. Each entry should be
+        a ``(label, pattern)`` tuple where ``pattern`` contains four base
+        names.
+
+    Returns
+    -------
+    IPv4VariantBundle
+        Structured collection containing canonical, integer and dotted
+        variants.
+
+    Raises
+    ------
+    ObscurifierError
+        If the IPv4 address is invalid or a mix pattern is malformed.
+    """
 
     try:
         addr = ipaddress.IPv4Address(ip)
@@ -102,11 +169,14 @@ def generate_ipv4_variants(
     mixed: List[Tuple[str, str]] = []
 
     if include_default_mixes:
-        patterns = DEFAULT_MIX_PATTERNS
+        patterns_source: Sequence[Tuple[str, Sequence[str]]]
+        patterns_source = default_mix_patterns if default_mix_patterns is not None else DEFAULT_MIX_PATTERNS
+        patterns_list = list(patterns_source)
         if mix_limit is not None:
-            patterns = patterns[:mix_limit]
-        for label, pattern in patterns:
-            mixed.append((label, _format_dotted(octets, pattern)))
+            patterns_list = patterns_list[:mix_limit]
+        for label, pattern in patterns_list:
+            normalised = _validate_mix_sequence(pattern)
+            mixed.append((label, _format_dotted(octets, normalised)))
 
     if custom_mix:
         pattern = _validate_mix_sequence(custom_mix)
@@ -153,7 +223,25 @@ def _detect_base(token: str) -> Tuple[int, str]:
 
 
 def decode_ipv4(value: str) -> Tuple[str, List[Tuple[str, str, int]]]:
-    """Return canonical IPv4 along with detected component bases."""
+    """Normalise an IPv4 string back to dotted decimal form.
+
+    Parameters
+    ----------
+    value:
+        String containing either a dotted representation or an integer form
+        of the IPv4 address.
+
+    Returns
+    -------
+    tuple[str, list[tuple[str, str, int]]]
+        A tuple of the canonical dotted-decimal IPv4 string and a breakdown
+        of the detected bases for each component.
+
+    Raises
+    ------
+    ObscurifierError
+        If the input cannot be interpreted as a valid IPv4 address.
+    """
 
     stripped = value.strip()
     if not stripped:
@@ -223,7 +311,32 @@ def encode_url(
     custom_mix: Sequence[str] | None = None,
     include_default_mixes: bool = True,
     mix_limit: int | None = None,
+    default_mix_patterns: MixPatternInput | None = None,
 ) -> Tuple[IPv4VariantBundle, List[Tuple[str, str]]]:
+    """Rewrite a URL with hosts disguised via IPv4 variants.
+
+    Parameters
+    ----------
+    url:
+        Input URL whose host component should be obfuscated.
+    credentials:
+        Optional ``user:password`` string to inject if the URL does not
+        already provide credentials.
+    custom_mix, include_default_mixes, mix_limit, default_mix_patterns:
+        Passed through to :func:`generate_ipv4_variants` to control the host
+        disguise catalogue.
+
+    Returns
+    -------
+    tuple[IPv4VariantBundle, list[tuple[str, str]]]
+        ``IPv4VariantBundle`` describing the host and a list of
+        ``(label, url)`` pairs for each rewritten URL.
+
+    Raises
+    ------
+    ObscurifierError
+        If the URL or credentials are malformed.
+    """
     parsed = _parse_url(url)
     host = parsed.hostname
     if host is None:
@@ -235,6 +348,7 @@ def encode_url(
         custom_mix=custom_mix,
         include_default_mixes=include_default_mixes,
         mix_limit=mix_limit,
+        default_mix_patterns=default_mix_patterns,
     )
 
     user, password = _parse_credentials(credentials)
@@ -278,6 +392,24 @@ def _iter_url_hosts(bundle: IPv4VariantBundle) -> Iterable[Tuple[str, str]]:
 
 
 def decode_url(url: str) -> Dict[str, object]:
+    """Inspect a URL and surface canonical addressing information.
+
+    Parameters
+    ----------
+    url:
+        URL whose host may be disguised.
+
+    Returns
+    -------
+    dict[str, object]
+        JSON-serialisable structure mirroring the CLI output, including
+        credentials, host breakdown, and canonical URL.
+
+    Raises
+    ------
+    ObscurifierError
+        If the URL is malformed or the host cannot be decoded.
+    """
     parsed = _parse_url(url)
     host = parsed.hostname
     if host is None:
