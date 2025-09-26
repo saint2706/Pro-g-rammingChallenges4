@@ -65,6 +65,7 @@ Brief synopses; dive into each folder for details.
 | Port Scanner | Concurrent TCP port scanning (CLI + GUI + export). | sockets, ThreadPoolExecutor, Tkinter |
 | Producer Consumer | Modernized concurrency patterns (Py/Java/C/C++ examples). | threading, semaphores, queues |
 | Radix Base Converter | Arbitrary base conversion (2..36) with GUI. | Pure Python, Tkinter |
+| Relational DB | Educational in-memory SQL engine with parser, executor, and CLI shell. | Pure Python |
 | Seam Carving | Content-aware image resizing (CLI + GUI + progress). | OpenCV, NumPy, Pillow (GUI) |
 | ToDoList-CLI | File‑backed todo manager (undo, prioritize, search). | Dataclasses, color output |
 | Vector Product | Vector math utilities & 3D plotting. | matplotlib |
@@ -160,6 +161,23 @@ GUI:
 
 ```pwsh
 python "Markov Chain Sentence Generator/mcsg_gui.py"
+```
+
+### 5.6. Relational DB (SQL shell)
+
+```pwsh
+cd "Relational DB"
+python -m relational_db.cli
+```
+
+Sample session:
+
+```sql
+db> CREATE TABLE authors (id INT PRIMARY KEY, name TEXT);
+db> INSERT INTO authors VALUES (1, 'Octavia Butler');
+db> SELECT * FROM authors;
+id | name
+1  | Octavia Butler
 ```
 
 ### 5.6. ASCII Conversion
