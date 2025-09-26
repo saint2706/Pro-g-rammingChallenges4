@@ -74,6 +74,22 @@ The repository now ships a `pyproject.toml` so you can install challenge stacks 
 
 See the category READMEs for per-project suggestions; each now points back to these extras.
 
+## Streamlit deployment keep-alive workflow
+
+The repository includes a GitHub Actions workflow at `.github/workflows/keep-streamlit-alive.yml` that pings the deployed Streamlit app on a schedule. The job runs hourly to keep the hosted instance warm and also supports manual runs so maintainers can verify that the endpoint is still responding.
+
+### Configure the `STREAMLIT_PING_URL` secret
+
+1. In GitHub, open **Settings → Secrets and variables → Actions** for this repository.
+2. Add a new repository secret named `STREAMLIT_PING_URL` that contains the fully qualified URL of the Streamlit deployment (e.g., `https://example.streamlit.app/`).
+3. Save the secret; the workflow will automatically read the value when it runs on its hourly schedule.
+
+### Manually test the keep-alive workflow
+
+1. Navigate to **Actions → Keep Streamlit deployment alive** in GitHub.
+2. Click **Run workflow** to launch it on demand. You may leave the `target_url` field blank to use the `STREAMLIT_PING_URL` secret, or provide a one-off URL for testing.
+3. Review the workflow run logs to ensure the keep-alive request succeeded.
+
 ## Challenges
 
 ### Practical
