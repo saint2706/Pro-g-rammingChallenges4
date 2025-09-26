@@ -6,6 +6,8 @@ numpy>=1.26,<2.0
 pandas>=2.2,<2.3            # Used by IP Tracking visualization
 opencv-python>=4.10,<5.0    # Seam carving (energy calculation)
 matplotlib>=3.9,<3.10       # Vector product, rotating cube visualization
+pygame>=2.6,<2.7            # Old School demo multi-effect timeline
+imageio>=2.34,<2.35         # GIF capture/export for retro demo
 plotly>=5.22,<5.23          # Interactive geo plots for IP tracking
 
 # Web / networking

@@ -8,6 +8,8 @@
 numpy>=1.26,<2.0              # Arrays, math (image ops, palette extraction, ASCII art)
 Pillow>=10.4,<10.5            # Image loading/saving (imageboard, converters, palette tools)
 matplotlib>=3.9,<3.10         # Plotting (vector product, rotating cube, color wheel)
+pygame>=2.6,<2.7             # Retro multi-effect demo (Old School cringe)
+imageio>=2.34,<2.35          # GIF capture/export for retro demo assets
 opencv-python>=4.10,<5.0      # Seam carving energy/gradients, optional image acceleration
 scikit-learn>=1.5,<1.6        # KMeans clustering (5 color scheme)
 colour-science>=0.4,<0.5      # Optional advanced color utilities (HSV wheel if installed)

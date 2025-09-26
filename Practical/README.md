@@ -68,7 +68,7 @@ Brief synopses; dive into each folder for details.
 | Seam Carving | Content-aware image resizing (CLI + GUI + progress). | OpenCV, NumPy, Pillow (GUI) |
 | ToDoList-CLI | File‑backed todo manager (undo, prioritize, search). | Dataclasses, color output |
 | Vector Product | Vector math utilities & 3D plotting. | matplotlib |
-| Old School cringe | Retro rotating cube + assets demo. | matplotlib.animation, NumPy |
+| Old School cringe | Multi-effect demoscene timeline (plasma, scroller, zoomer) with synced audio. | pygame, NumPy |
 | Graphing Calculator | Basic expression plotting GUI. | Tkinter, eval sandboxing |
 | Paint / Clone | Simple drawing & export. | Tkinter |
 
