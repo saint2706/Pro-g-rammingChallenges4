@@ -1,0 +1,26 @@
+[
+    {
+        "caption": "C++ IDE Plugin: Open Settings",
+        "command": "cpp_open_settings"
+    },
+    {
+        "caption": "C++ IDE Plugin: Index Symbols",
+        "command": "cpp_index_symbols"
+    },
+    {
+        "caption": "C++ IDE Plugin: Show Cached Symbols",
+        "command": "cpp_show_cached_symbols"
+    },
+    {
+        "caption": "C++ IDE Plugin: Run clangd --check",
+        "command": "cpp_clangd_check"
+    },
+    {
+        "caption": "C++ IDE Plugin: Go to Definition",
+        "command": "cpp_go_to_definition"
+    },
+    {
+        "caption": "C++ IDE Plugin: Go to Declaration",
+        "command": "cpp_go_to_declaration"
+    }
+]
