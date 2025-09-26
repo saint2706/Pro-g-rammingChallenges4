@@ -71,7 +71,7 @@ While this is a personal project, the principles behind it are universal. If you
 | 42 | Port Scanner | [View Solution](./Practical/Port%20Scanner/) |
 | 43 | Old School Demo Effect (Plasma Tunnel Scrollers Zoomers etc...) | Not Yet |
 | 135 | Bellman-Ford Simulation with at least Five Vertices | Not Yet |
-| 136 | Matrix Arithmetic | Not Yet |
+| 136 | Matrix Arithmetic | [View Solution](./Practical/Matrix%20Arithmetic/) |
 | 137 | File Compression Utility (Make it GUI) | Not Yet |
 | 138 | PDF Tagger | [View Solution](./Practical/PDF%20Tagger/) |
 | 139 | Nonogram Generator and Solver | Not Yet |

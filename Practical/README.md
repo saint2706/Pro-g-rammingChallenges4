@@ -60,6 +60,7 @@ Brief synopses; dive into each folder for details.
 | ImgToASCII | Convert images to ASCII art (CLI + Tk GUI). | Pillow, NumPy, Tkinter |
 | IP Tracking visualization | Fetch IP geolocation data & plot interactive map. | requests, pandas, plotly, tqdm |
 | Markov Chain Sentence Generator | Train simple Markov model over corpora (CLI + GUI). | Dataclasses, Tkinter |
+| Matrix Arithmetic | Explainable matrix calculator (CLI + GUI) covering add/multiply/det/inverse plus 2D visualiser. | NumPy, Tkinter, matplotlib |
 | Paint (clone) | Lightweight Tk canvas paint app with palette + save. | Tkinter, Pillow (optional) |
 | PDF Tagger | Add arbitrary JSON metadata tags to PDFs. | pypdf |
 | Port Scanner | Concurrent TCP port scanning (CLI + GUI + export). | sockets, ThreadPoolExecutor, Tkinter |
