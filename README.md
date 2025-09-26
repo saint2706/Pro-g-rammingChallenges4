@@ -37,6 +37,43 @@ While this is a personal project, the principles behind it are universal. If you
 4. **Re-implement and Explore:** Once you have a solid solution, try implementing it in a new language. Experiment with different algorithms, data structures, and programming styles. This is a great way to deepen your understanding and expand your skills.
 5. **Never Stop Learning:** Keep challenging yourself. Contribute to open source, start new projects, and keep building your portfolio.
 
+## Using pyproject.toml
+
+The repository now ships a `pyproject.toml` so you can install challenge stacks as editable extras.
+
+1. **Create a virtual environment** (recommended):
+   ```bash
+   python -m venv .venv
+   source .venv/bin/activate  # PowerShell: .venv\Scripts\Activate.ps1
+   ```
+2. **Install the extras you need**:
+   ```bash
+   python -m pip install -e .[practical]
+   python -m pip install -e .[algorithmic]
+   ```
+   Combine extras (e.g., `.[practical,visual]`) or grab everything with `.[all]`.
+3. **Run scripts/tests** directly from the repo. Editable installs keep your checkout in sync with the environment.
+
+| Extra | Covers | Highlights |
+| ----- | ------ | ---------- |
+| `practical` | `Practical/` utilities, desktop apps, and web tools | Flask imageboard, Seam Carving, Shazam clone, WMS viewer |
+| `algorithmic` | `Algorithmic/` problem set helpers | Steganography, stock analysis, crawler tooling |
+| `visual` | Visualization add-ons used across categories | Matplotlib demos, colour-science palettes, VPython spinny cube |
+| `audio` | Audio processing stacks | WAV equalizer, Shazam clone, music streaming |
+| `games` | Python games in `Games/` | Sudoku solver, Simon, Shuffle stats |
+| `ai` | `Artificial Intelligence/` demos | A* Sudoku, Connect4 AI, neural network |
+| `web` | HTTP and dashboard helpers | Imageboard, IP tracking, web crawlers |
+| `desktop` | GUI/automation conveniences | Window manager, key press bot, Tk front-ends |
+| `markdown` | Markdown Editor stack | Live preview, HTML export |
+| `geo` | Geospatial helpers | WMS viewer, map projections |
+| `media` | Download/encoding helpers | YouTube to MP3 workflows |
+| `security` | Crypto utilities | Password manager, encrypted upload |
+| `documents` | PDF tooling | PDF Tagger |
+| `midi` | MIDI pipeline | MIDI player/editor, synth tools |
+| `developer` | Repo test/lint helpers | pytest, ruff, mypy |
+
+See the category READMEs for per-project suggestions; each now points back to these extras.
+
 ## Challenges
 
 ### Practical

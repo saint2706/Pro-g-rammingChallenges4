@@ -1,16 +1,5 @@
-# Consolidated third-party dependencies for the Emulation suite
-# Pins mirror the repo-wide canonical versions; optional pieces point to future pyproject extras.
-# Many scripts are pure-stdlib; install only what you need.
-
-numpy>=1.26,<2.0              # Array math for color conversions – planned extra: emulation-core
-Pillow>=10.4,<10.5            # Image loading/saving (palette extraction) – planned extra: emulation-imaging
-matplotlib>=3.8,<3.9          # Visualization for 5 color scheme plots – planned extra: emulation-visuals
-scikit-learn>=1.5,<1.6        # KMeans clustering for palette extraction – planned extra: emulation-ml
-opencv-python>=4.10,<5.0      # Optional acceleration for palette & filters – planned extra: emulation-imaging
-
-# Optional / specialized
-vpython>=7.6,<7.7             # 3D interactive rendering for SpinnyCube – planned extra: emulation-visuals
-
-# NOTE:
-# - No dependency is required for Eulerian path algorithms or ASCII clock (pure stdlib).
-# - Optional items above will be exposed as pyproject extras once available.
+# The Emulation suite now relies on the repository's pyproject extras.
+# Install what you need with:
+#   python -m pip install -e .[visual]
+#   python -m pip install -e .[algorithmic]
+# Optional 3D/ML helpers live in extras such as [visual] and [ai]; see Emulation/README.md for guidance.

@@ -1,51 +1,8 @@
-# Consolidated dependencies for all Practical subprojects
-# Pins are canonical across the repo; inline notes flag the tools that import them.
-# Optional stacks note their future pyproject extras so you can install selectively.
-
-# Core scientific / numeric
-numpy>=1.26,<2.0              # Shared array ops (Shazam clone, Seam Carving, Equalizer) – planned extra: practical-core
-scipy>=1.11,<1.13             # Signal processing (Shazam clone, WAV Equalizer) – planned extra: practical-audio
-librosa>=0.10,<0.11           # Audio fingerprinting (Shazam clone) – planned extra: practical-audio
-soundfile>=0.12,<0.13         # Audio decoding backend (Shazam clone) – planned extra: practical-audio
-sounddevice>=0.4,<0.5         # Live audio IO (WAV Equalizer, Synth performer) – planned extra: practical-audio
-pandas>=2.2,<2.3              # Dataframes (IP Tracking visualization) – planned extra: practical-data
-opencv-python>=4.10,<5.0      # Seam carving energy maps (Seam Carving GUI) – planned extra: practical-imaging
-matplotlib>=3.8,<3.9          # Plotting (Vector product demo, rotating cube) – planned extra: practical-visuals
-pygame>=2.6,<2.7              # Audio cues & demos (Old School timeline) – planned extra: practical-games
-imageio>=2.34,<2.35           # GIF export (Retro demo capture) – planned extra: practical-visuals
-plotly>=5.22,<5.23            # Interactive geo plots (IP Tracking dashboard) – planned extra: practical-visuals
-
-# Web / networking
-Flask>=3.0,<3.1               # Imageboard web app – planned extra: practical-web
-requests>=2.31,<3.0           # API calls (IP Tracking, WMS viewer) – planned extra: practical-web
-mutagen>=1.47,<1.48           # Audio metadata (Music streaming server, ID3 reader) – planned extra: practical-audio
-pyproj>=3.6,<3.7              # Coordinate transforms (WMS viewer) – planned extra: practical-geo
-
-# Data processing / progress
-PyYAML>=6.0.2,<6.1            # Config parsing (WMS viewer) – planned extra: practical-geo
-tqdm>=4.66,<4.67              # Optional progress bars (IP Tracking) – planned extra: practical-cli
-
-# Imaging
-Pillow>=10.4,<10.5            # Imageboard thumbnails & ASCII converter – planned extra: practical-imaging
-
-# PDF handling
-pypdf>=4.3,<4.4               # PDF Tagger metadata edits – planned extra: practical-docs
-
-# Desktop / input automation
-python-xlib>=0.33,<0.34       # PracticalWM window manager – planned extra: practical-desktop
-colorama>=0.4.6,<0.5          # Optional CLI colors (future CLI polish) – planned extra: practical-cli
-pynput>=1.7,<1.8              # Cross-platform input control (automation tools) – planned extra: practical-desktop
-pyautogui>=0.9,<0.10          # High-level key typing helpers (automation tools) – planned extra: practical-desktop
-
-# Security / encryption
-cryptography>=42.0,<44.0      # Password manager + encrypted upload – planned extra: practical-security
-boto3>=1.34,<1.35             # AWS S3 uploads (Encrypted upload) – planned extra: practical-cloud
-
-# MIDI tooling
-mido>=1.3,<1.4                # MIDI parsing/editing utilities – planned extra: practical-midi
-python-rtmidi>=1.5,<1.6       # RtMidi backend for realtime playback – planned extra: practical-midi
-
-# NOTE:
-# - Many desktop GUI tools rely only on the Python standard library (tkinter, threading, etc.).
-# - For a lighter install, cherry-pick lines relevant to your project or wait for pyproject extras listed above.
-# - Optional instrumentation (e.g., tqdm, colorama) can be removed if you need a barebones footprint.
+# Practical tools share the central pyproject optional extras.
+# Install everything with:
+#   python -m pip install -e .[practical]
+# Or mix and match targeted stacks:
+#   python -m pip install -e .[audio]
+#   python -m pip install -e .[web]
+#   python -m pip install -e .[desktop]
+# See Practical/README.md for a matrix of extras per project.

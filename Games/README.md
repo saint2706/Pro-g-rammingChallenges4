@@ -5,6 +5,8 @@ Welcome to the **Games** folder of the Pro-g-rammingChallenges4 repository! This
 ## Contents
 
 - **Connect4** (`Connect4.java`, `connect4.py`): Play the classic Connect Four game in Java or Python.
+
+
 - **Knight Tour** (`knight.py`): Solve the Knight's Tour puzzle using Python.
 - **Minesweeper** (`mine.py`): A simple command-line Minesweeper game in Python.
 - **RPS** (Rock Paper Scissors):
@@ -16,15 +18,32 @@ Welcome to the **Games** folder of the Pro-g-rammingChallenges4 repository! This
 - **Sudoku** (`sudoku.py`): Sudoku puzzle generator and solver in Python (uses numpy).
 - **Yahtzee** (`Yahtzee.java`, `yahtzee.py`): Play Yahtzee in Java or Python.
 
+
+## Using pyproject.toml
+
+Create a virtual environment, then install the extras for the games you want to run:
+
+```bash
+python -m venv .venv
+source .venv/bin/activate  # Windows: .venv\Scripts\Activate.ps1
+python -m pip install -e .[games]
+# Optional helpers
+python -m pip install -e .[visual]  # matplotlib-based scoreboards
+python -m pip install -e .[audio]   # shared sound backends (pygame, sounddevice)
+```
+
+Editable installs keep your local changes immediately playable.
+
 ## How to Run
 
 ### Python Games
 
 - Make sure you have Python 3.8+ installed.
-- Install dependencies (if needed):
+- Install dependencies via pyproject extras:
 
   ```sh
-  pip install -r requirements.txt
+  python -m pip install -e .[games]
+  # Add .[visual] for matplotlib stats or .[audio] for richer sound
   ```
 
 - Run the desired game:

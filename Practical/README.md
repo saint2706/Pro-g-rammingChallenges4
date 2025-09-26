@@ -30,15 +30,19 @@ python -m venv .venv
 . .venv/Scripts/Activate.ps1   # PowerShell activation
 ```
 
-### 1.3. Install consolidated dependencies
+### 1.3. Install via pyproject extras
 
-This installs everything needed for ALL tools (heavier, but simple):
+From the repo root install the bundles you need (editable install keeps code + env in sync):
 
 ```pwsh
-pip install -r requirements.txt
+python -m pip install -e .[practical]
+# Optional focused stacks
+python -m pip install -e .[audio]     # Sound synthesis, WAV equalizer
+python -m pip install -e .[desktop]   # Window manager, key press bot
+python -m pip install -e .[web]       # Imageboard, IP tracking dashboard
 ```
 
-Want minimal installs? See "Selective Installs" below.
+You can mix extras (e.g., `.[practical,audio]`). See "Selective Installs" for a quick matrix.
 
 ### 1.4. Run something
 
@@ -47,6 +51,10 @@ python "Imageboard/imageboard.py" --help
 python "Seam Carving/resize.py" --help
 python "ToDoList-CLI/todo.py" add "Ship awesome README"
 ```
+
+## Using pyproject.toml
+
+All Practical projects share the repo-wide optional extras. Install `.[practical]` for the full toolkit or combine targeted extras (audio, web, desktop, markdown, geo, midi) depending on what you plan to explore. Editable installs (`pip install -e .[extra]`) keep your changes instantly runnable. See the table below for combinations.
 
 ---
 
@@ -104,21 +112,22 @@ Brief synopses; dive into each folder for details.
 
 ---
 
-## 3. Selective Installs
+## 3. Selective Installs (pyproject extras)
 
-If you only need a subset, install manually:
+Mix and match extras to keep installs lean. Combine them in a single command, e.g. `python -m pip install -e .[practical,audio]`.
 
-| Feature | Minimal Install |
-|---------|-----------------|
-| Imageboard | `pip install Flask Pillow` |
-| Seam Carving | `pip install opencv-python numpy` (Pillow optional for GUI) |
-| IP Map | `pip install requests pandas plotly tqdm` |
-| IRC Client | no extra packages (Python 3.10+ standard library) |
-| PDF Tagger | `pip install pypdf` |
-| ASCII Converter | `pip install Pillow numpy` |
-| Vector / Rotating Cube | `pip install matplotlib numpy` |
+| Focus | Extras | Notes |
+|-------|--------|-------|
+| All practical projects | `practical` | Pulls every dependency pinned for the Practical/ tree. |
+| Audio pipelines (Shazam clone, WAV Equalizer, Sound Synthesis) | `audio` (or `practical,audio`) | Adds librosa, sounddevice, mutagen, scipy. |
+| Web-facing tools (Imageboard, IP Tracker, Encrypted Upload) | `practical,web` | Flask + requests + tqdm convenience. |
+| Imaging & GUI editors (Seam Carving, Pixel Editor, ImgToASCII) | `practical,visual` | Brings in Pillow, OpenCV, plotly/imageio for exports. |
+| Desktop automation (Window Manager, Key Press Bot) | `practical,desktop` | Installs python-xlib, pynput, pyautogui, colorama. |
+| Geospatial tooling (WMS viewer) | `practical,geo` | Provides pyproj + PyYAML configuration helpers. |
+| Markdown editor suite | `practical,markdown` | Adds markdown + tkhtmlview widgets. |
+| MIDI workflow | `practical,midi` | Installs mido + python-rtmidi. |
 
-You can also break the monolithic `requirements.txt` later into extras (see "Future Improvements").
+Need test tooling? Add `developer` for pytest, ruff, and mypy.
 
 ---
 

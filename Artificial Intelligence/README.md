@@ -18,7 +18,12 @@ This folder contains a collection of classic and educational artificial intellig
 1. **Install dependencies** (recommended in a virtual environment):
 
    ```bash
-   pip install -r requirements.txt
+   python -m venv .venv
+   source .venv/bin/activate  # Windows: .venv\Scripts\Activate.ps1
+   python -m pip install -e .[ai]
+   # Optional helpers
+   python -m pip install -e .[algorithmic]  # plotting + scipy utilities
+   python -m pip install -e .[developer]   # pytest/ruff/mypy
    ```
 
 2. **Run any script directly**. For example, to solve a Sudoku puzzle:
@@ -34,10 +39,14 @@ This folder contains a collection of classic and educational artificial intellig
    python "Basic Neural Network/BNN.py"
    ```
 
+## Using pyproject.toml
+
+The AI projects share dependencies with the rest of the repository via optional extras. Install `.[ai]` for the default numpy/scikit-learn stack, then layer on `algorithmic` or `developer` as needed. Editable installs keep your working tree synced with the environment, so changes you make are immediately importable.
+
 ## Requirements
 
 - Python 3.8 or newer
-- See `requirements.txt` for Python package dependencies
+- Install extras from `pyproject.toml` such as `ai`, `algorithmic`, and `developer` depending on what you plan to run
 
 ## Contributing
 
