@@ -79,7 +79,7 @@ While this is a personal project, the principles behind it are universal. If you
 | 141 | Bismuth Fractal | [View Solution](./Practical/Bismuth%20Fractal/) |
 | 142 | Seam Carving | [View Solution](./Practical/Seam%20Carving/) |
 | 143 | Bayesian Filter | [View Solution](./Practical/Bayesian%20Filter/) |
-| 144 | WMS viewer that isn't web based | Not Yet |
+| 144 | WMS viewer that isn't web based | [View Solution](./Practical/WMS%20Viewer/) |
 
 ### Algorithmic
 
