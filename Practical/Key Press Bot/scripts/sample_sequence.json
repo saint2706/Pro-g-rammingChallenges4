@@ -1,0 +1,25 @@
+{
+  "mode": "sequence",
+  "meta": {
+    "name": "Open Run dialog",
+    "description": "Example sequence that opens the OS run dialog and types a command."
+  },
+  "steps": [
+    {
+      "action": "press",
+      "keys": ["win", "r"],
+      "hold": 0.15,
+      "delay_after": 0.4
+    },
+    {
+      "action": "type_text",
+      "text": "notepad",
+      "delay_after": 0.1
+    },
+    {
+      "action": "press",
+      "keys": ["enter"],
+      "hold": 0.05
+    }
+  ]
+}
