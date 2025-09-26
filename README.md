@@ -64,7 +64,7 @@ While this is a personal project, the principles behind it are universal. If you
 | 35 | Create an HSV Color Representation | [View Solution](./Practical/HSV%20color%20wheel/) |
 | 36 | Window Manager | Not Yet |
 | 37 | Basic Relational Database Software (SQL Support Handle Relationships Focus on Efficiency) | Not Yet |
-| 38 | Pixel Editor | Not Yet |
+| 38 | Pixel Editor | [View Solution](./Practical/Pixel%20Editor/) |
 | 39 | Trivial File Transfer Protocol (TFTP): Allow a client to put a file onto a remote host | Not Yet |
 | 40 | Markdown (HTML/XML) Editor | Not Yet |
 | 41 | IP Tracking Visualization | [View Solution](./Practical/IP%20Tracking%20visualization/) |

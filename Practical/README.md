@@ -61,6 +61,7 @@ Brief synopses; dive into each folder for details.
 | IP Tracking visualization | Fetch IP geolocation data & plot interactive map. | requests, pandas, plotly, tqdm |
 | Markov Chain Sentence Generator | Train simple Markov model over corpora (CLI + GUI). | Dataclasses, Tkinter |
 | Paint (clone) | Lightweight Tk canvas paint app with palette + save. | Tkinter, Pillow (optional) |
+| Pixel Editor | Layered pixel art editor with animation preview & sprite sheet IO. | Tkinter, Pillow |
 | PDF Tagger | Add arbitrary JSON metadata tags to PDFs. | pypdf |
 | Port Scanner | Concurrent TCP port scanning (CLI + GUI + export). | sockets, ThreadPoolExecutor, Tkinter |
 | Producer Consumer | Modernized concurrency patterns (Py/Java/C/C++ examples). | threading, semaphores, queues |
