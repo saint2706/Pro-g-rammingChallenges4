@@ -91,7 +91,7 @@ While this is a personal project, the principles behind it are universal. If you
 | 136 | Matrix Arithmetic | [View Solution](./Practical/Matrix%20Arithmetic/) |
 | 137 | File Compression Utility (Make it GUI) | Not Yet |
 | 138 | PDF Tagger | [View Solution](./Practical/PDF%20Tagger/) |
-| 139 | Nonogram Generator and Solver | Not Yet |
+| 139 | Nonogram Generator and Solver | [View Solution](./Practical/Nonogram%20Solver/) |
 | 140 | Calculate Dot and Cross Product of Two Vectors | [View Solution](./Practical/Vector%20Product/) |
 | 141 | Bismuth Fractal | [View Solution](./Practical/Bismuth%20Fractal/) |
 | 142 | Seam Carving | [View Solution](./Practical/Seam%20Carving/) |
