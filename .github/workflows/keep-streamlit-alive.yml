@@ -1,0 +1,30 @@
+name: Keep Streamlit deployment alive
+
+on:
+  schedule:
+    - cron: '0 * * * *'
+  workflow_dispatch:
+    inputs:
+      target_url:
+        description: 'Optional override for the Streamlit app URL to ping.'
+        required: false
+        type: string
+
+jobs:
+  ping:
+    name: Ping Streamlit app
+    runs-on: ubuntu-latest
+    env:
+      TARGET_URL: ${{ github.event.inputs.target_url || secrets.STREAMLIT_PING_URL }}
+    steps:
+      - name: Validate target URL
+        run: |
+          if [ -z "${TARGET_URL}" ]; then
+            echo "The target URL is not configured. Provide it as a workflow input or configure the STREAMLIT_PING_URL secret." >&2
+            exit 1
+          fi
+
+          echo "::add-mask::${TARGET_URL}"
+      - name: Send keep-alive request
+        run: |
+          curl --fail --silent --show-error --max-time 10 "$TARGET_URL"
