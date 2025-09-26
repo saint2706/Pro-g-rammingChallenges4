@@ -1,0 +1,31 @@
+{
+    // Absolute path to libclang shared library. Leave blank to auto-discover.
+    "libclang_path": "",
+
+    // Additional directories to probe when locating libclang.
+    "libclang_search_paths": [
+        "/usr/lib/llvm-16/lib",
+        "/usr/local/opt/llvm/lib"
+    ],
+
+    // Extra compilation arguments passed to libclang.
+    "clang_arguments": [
+        "-std=c++20",
+        "-Iinclude"
+    ],
+
+    // Directory containing compile_commands.json for your project.
+    "compile_commands_dir": "",
+
+    // Path to clangd binary (used for --check diagnostics).
+    "clangd_binary": "clangd",
+
+    // Additional clangd flags appended to the --check invocation.
+    "clangd_additional_flags": [],
+
+    // Maximum number of translation units cached in memory.
+    "max_cached_translation_units": 4,
+
+    // Override directory for persistent caches (defaults to Sublime cache path).
+    "cache_directory": ""
+}
