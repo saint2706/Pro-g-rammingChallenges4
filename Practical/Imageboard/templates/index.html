@@ -7,6 +7,10 @@
     <label>Image (optional): <input type="file" name="image" accept="image/*"></label><br>
     <button type="submit">Post Thread</button>
 </form>
+<p style="font-size:0.9rem;color:#444;max-width:52ch;">
+    Tip: replies can quote posts with the syntax <code>&gt;&gt;123</code> and greentext using <code>&gt; words</code>.
+    Accepted uploads: {{ (CFG.allowed_ext | list | sort | join(', ')) | upper }} ({{ (CFG.max_image_bytes // (1024*1024)) }} MB max).
+</p>
 
 <h2>Threads</h2>
 {% if not threads %}
@@ -14,12 +18,19 @@
 {% endif %}
 {% for t in threads %}
 <div class="thread">
-    <div class="meta">#{{ t.id }} • {{ t.created_utc | datetime }} • Replies: {{ t.replies }}</div>
+    <div class="meta">#{{ t.id }} • {{ t.created_utc | datetime }} • Replies: {{ t.replies }}
+        {% if is_admin %}
+        <form method="post" action="{{ url_for('admin_delete', post_id=t.id) }}" class="inline-form">
+            <input type="hidden" name="next" value="{{ request.full_path }}">
+            <button type="submit" class="link-button">Delete</button>
+        </form>
+        {% endif %}
+    </div>
     {% if t.thumb_filename %}
     <a href="{{ url_for('view_thread', thread_id=t.id) }}"><img class="thumb"
             src="{{ url_for('thumb_file', filename=t.thumb_filename) }}" alt="thumb"></a>
     {% endif %}
-    {% if t.message %}<p>{{ t.message | e }}</p>{% endif %}
+    {% if t.message %}<p class="msg">{{ t.message | format_post }}</p>{% endif %}
     <a href="{{ url_for('view_thread', thread_id=t.id) }}">Open thread »</a>
 </div>
 {% endfor %}

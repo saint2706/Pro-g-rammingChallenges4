@@ -18,6 +18,14 @@
             padding: 0.6rem 1rem;
         }
 
+        header .header-inner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
         main {
             padding: 1rem;
             max-width: 900px;
@@ -37,6 +45,7 @@
             background: #fff;
             padding: 0.6rem 0.8rem;
             margin-bottom: 0.9rem;
+            position: relative;
         }
 
         .thread h2 {
@@ -60,6 +69,11 @@
             margin-bottom: 0.8rem;
             border-left: 4px solid #c33;
             background: #fee;
+        }
+
+        .flash.info {
+            border-color: #2c7;
+            background: #eefdf0;
         }
 
         a {
@@ -88,18 +102,46 @@
             white-space: normal;
             word-wrap: break-word;
         }
+
+        .inline-form {
+            display: inline;
+            margin-left: 0.5rem;
+        }
+
+        .link-button {
+            background: none;
+            border: none;
+            color: inherit;
+            text-decoration: underline;
+            cursor: pointer;
+            padding: 0;
+            font: inherit;
+        }
+
+        .link-button:hover {
+            text-decoration: none;
+        }
     </style>
 </head>
 
 <body>
     <header>
-        <h1 style="margin:0;font-size:1.2rem;">Minimal Imageboard</h1>
+        <div class="header-inner">
+            <h1 style="margin:0;font-size:1.2rem;">{{ board_title }}</h1>
+            <nav>
+                {% if is_admin %}
+                <a href="{{ url_for('admin_logout') }}">Log out</a>
+                {% else %}
+                <a href="{{ url_for('admin_login', next=request.full_path) }}">Admin login</a>
+                {% endif %}
+            </nav>
+        </div>
     </header>
     <main>
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
         {% for category, message in messages %}
-        <div class="flash">{{ message }}</div>
+        <div class="flash {{ category }}">{{ message }}</div>
         {% endfor %}
         {% endif %}
         {% endwith %}

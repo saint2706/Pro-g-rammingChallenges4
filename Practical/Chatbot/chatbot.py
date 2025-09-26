@@ -20,12 +20,11 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 import random
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Dict, List, Sequence, Optional
+from typing import Dict, List, Sequence, Optional, Iterable
 
 # --------------------------- Data Structures --------------------------- #
 
@@ -38,6 +37,10 @@ class Config:
     exit_phrase: str
     color: bool
     dump_rules: bool
+    history_path: Optional[Path]
+    memory_length: int
+    export_history: Optional[Path]
+    import_history: Optional[Path]
 
 
 @dataclass(slots=True)
@@ -62,10 +65,22 @@ class SimpleChatbot:
       4. Fallback to 'default'
     """
 
-    def __init__(self, rules: RuleSet):
+    def __init__(
+        self,
+        rules: RuleSet,
+        *,
+        history: Optional[Iterable[tuple[str, str]]] = None,
+        memory_length: int = 100,
+    ):
         self.rules = rules
         self.last_response: Optional[str] = None
-        self.history: List[tuple[str, str]] = []  # (user, bot)
+        self.memory_length = max(1, memory_length)
+        incoming: List[tuple[str, str]] = []
+        if history is not None:
+            incoming = [(str(u), str(b)) for u, b in history]
+        self.history: List[tuple[str, str]] = incoming[-self.memory_length :]
+        if self.history:
+            self.last_response = self.history[-1][1]
 
     def _candidate_triggers(self) -> List[str]:
         return [k for k in self.rules.responses.keys() if k != "default"]
@@ -100,8 +115,8 @@ class SimpleChatbot:
         choice = random.choice(options)
         self.last_response = choice
         self.history.append((user_input, choice))
-        if len(self.history) > 100:
-            self.history.pop(0)
+        if len(self.history) > self.memory_length:
+            self.history = self.history[-self.memory_length :]
         return choice
 
 
@@ -167,6 +182,28 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument(
         "--dump-rules", action="store_true", help="Print loaded rules and exit"
     )
+    p.add_argument(
+        "--history-path",
+        type=Path,
+        default=Path.home() / ".simple_chatbot_history.json",
+        help="Path to JSON file used to persist chat history (default: ~/.simple_chatbot_history.json)",
+    )
+    p.add_argument(
+        "--memory-length",
+        type=int,
+        default=100,
+        help="Maximum number of exchanges to keep in memory",
+    )
+    p.add_argument(
+        "--export-history",
+        type=Path,
+        help="Write the current history to the given JSON file and exit",
+    )
+    p.add_argument(
+        "--import-history",
+        type=Path,
+        help="Load history from the given JSON file before chatting",
+    )
     return p
 
 
@@ -180,7 +217,61 @@ def parse_args(argv: Optional[Sequence[str]]) -> Config:
         exit_phrase=args.exit_phrase.lower(),
         color=not args.no_color,
         dump_rules=args.dump_rules,
+        history_path=args.history_path,
+        memory_length=max(1, args.memory_length),
+        export_history=args.export_history,
+        import_history=args.import_history,
     )
+
+
+def _coerce_history_items(items: Iterable[object]) -> List[tuple[str, str]]:
+    history: List[tuple[str, str]] = []
+    for item in items:
+        if isinstance(item, dict):
+            user = item.get("user")
+            bot = item.get("bot")
+            if user is None or bot is None:
+                continue
+            history.append((str(user), str(bot)))
+        elif isinstance(item, (list, tuple)) and len(item) == 2:
+            history.append((str(item[0]), str(item[1])))
+    return history
+
+
+def load_history(path: Optional[Path]) -> List[tuple[str, str]]:
+    if path is None:
+        return []
+    try:
+        if not path.exists():
+            return []
+        data = json.loads(path.read_text(encoding="utf-8"))
+        if isinstance(data, list):
+            return _coerce_history_items(data)
+    except Exception:
+        pass
+    return []
+
+
+def save_history(path: Optional[Path], history: Sequence[tuple[str, str]]) -> None:
+    if path is None:
+        return
+    try:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        serializable = [
+            {"user": user, "bot": bot}
+            for user, bot in history
+        ]
+        path.write_text(json.dumps(serializable, indent=2), encoding="utf-8")
+    except Exception as exc:
+        print(f"Warning: could not persist history to {path}: {exc}", file=sys.stderr)
+
+
+def export_history(history: Sequence[tuple[str, str]], destination: Path) -> None:
+    save_history(destination, history)
+
+
+def import_history(path: Path) -> List[tuple[str, str]]:
+    return load_history(path)
 
 
 def format_prompt(label: str, color: bool) -> str:
@@ -199,10 +290,13 @@ def interactive(bot: SimpleChatbot, cfg: Config) -> int:
             print("\nGoodbye!")
             return 0
         if user_input.lower().strip() == cfg.exit_phrase:
-            print(format_prompt("Bot:", cfg.color) + " " + bot.get_response("bye"))
+            farewell = bot.get_response("bye")
+            print(format_prompt("Bot:", cfg.color) + " " + farewell)
+            save_history(cfg.history_path, bot.history)
             return 0
         response = bot.get_response(user_input)
         print(format_prompt("Bot:", cfg.color) + " " + response)
+        save_history(cfg.history_path, bot.history)
 
 
 def main(argv: Optional[Sequence[str]] = None) -> int:
@@ -213,9 +307,22 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     if cfg.dump_rules:
         print(json.dumps(rules.responses, indent=2))
         return 0
-    bot = SimpleChatbot(rules)
+
+    history: List[tuple[str, str]] = load_history(cfg.history_path)
+    if cfg.import_history is not None:
+        history = import_history(cfg.import_history)
+        save_history(cfg.history_path, history)
+    bot = SimpleChatbot(rules, history=history, memory_length=cfg.memory_length)
+
+    if cfg.export_history is not None and cfg.once is None:
+        export_history(bot.history, cfg.export_history)
+        return 0
     if cfg.once is not None:
-        print(bot.get_response(cfg.once))
+        response = bot.get_response(cfg.once)
+        print(response)
+        save_history(cfg.history_path, bot.history)
+        if cfg.export_history is not None:
+            export_history(bot.history, cfg.export_history)
         return 0
     return interactive(bot, cfg)
 

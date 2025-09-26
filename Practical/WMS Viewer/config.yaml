@@ -1,0 +1,32 @@
+# Default view options
+view:
+  width: 640
+  height: 640
+  default_zoom: 2
+  default_center: [0.0, 0.0]   # lon, lat
+
+servers:
+  - name: "NASA Blue Marble"
+    url: "https://gibs.earthdata.nasa.gov/wms/epsg3857/best/wms.cgi"
+    version: "1.1.1"
+    crs: "EPSG:3857"
+    attribution: "NASA GIBS"
+    layers:
+      - name: "BlueMarble_ShadedRelief"
+        title: "Blue Marble"
+        styles: ""
+        format: "image/png"
+  - name: "Ahocevar Demo"
+    url: "https://ahocevar.com/geoserver/wms"
+    version: "1.1.1"
+    crs: "EPSG:3857"
+    attribution: "Ahocevar.com GeoServer"
+    layers:
+      - name: "topp:states"
+        title: "US States"
+        styles: ""
+        format: "image/png"
+      - name: "ne:ne"
+        title: "Natural Earth"
+        styles: ""
+        format: "image/png"
