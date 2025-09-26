@@ -63,13 +63,14 @@ python -m pip install -e .[ai]            # palette clustering (scikit-learn)
 Editable installs keep the code you edit inside this repo linked to your environment.
 
 1. Create a virtual environment (recommended).
+
    ```pwsh
    python -m venv .venv
    . .venv/\Scripts\Activate.ps1  # Windows
    ```
+
 2. Move to the repository root and install extras, e.g. `python -m pip install -e .[visual]`.
 3. Stack extras together: `.[visual,algorithmic]` for plotting + numerical helpers, `.[visual,ai]` for VPython + scikit-learn palette clustering.
-
 
 ## 3. Selective Installs
 

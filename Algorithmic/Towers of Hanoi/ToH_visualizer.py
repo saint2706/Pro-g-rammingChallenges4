@@ -87,7 +87,7 @@ class HanoiVisualizer:
             self.ax.text(x, self.cfg.disks + 1.1, name, ha="center", fontsize=14)
 
     def _disk_width(self, disk_num: int) -> float:
-        return 0.4 * disk_num + 0.6
+        return 0.3 * disk_num + 0.6
 
     def _draw_disk(self, disk_num: int, peg_name: str, position: int):
         width = self._disk_width(disk_num)
@@ -147,7 +147,7 @@ class HanoiVisualizer:
 
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(description="Visualize Towers of Hanoi solution states")
-    p.add_argument("--disks", type=int, default=4)
+    p.add_argument("--disks", type=int, default=6)
     p.add_argument("--interval", type=int, default=400, help="Frame interval in ms")
     p.add_argument("--colormap", default="viridis", help="Matplotlib colormap")
     p.add_argument("--save", help="Output animation filename (.mp4, .gif)")
