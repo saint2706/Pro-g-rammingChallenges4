@@ -31,10 +31,14 @@ python -m venv .venv
 . .venv/Scripts/Activate.ps1
 ```
 
-### 1.3. Install everything (heavier, simplest)
+### 1.3. Install via pyproject extras
+
+From the repo root install the extras that match the demos you want to run:
 
 ```pwsh
-pip install -r requirements.txt
+python -m pip install -e .[visual]
+python -m pip install -e .[algorithmic]   # optional math helpers
+python -m pip install -e .[ai]            # palette clustering (scikit-learn)
 ```
 
 ### 1.4. Or install just what you need (see Section 3)
@@ -54,20 +58,30 @@ pip install -r requirements.txt
 
 > Some folders may contain experimental or WIP code; stable scripts include `5cs.py`, `comp.py`, `hierholzer.py`, `ClockSynced.py`.
 
----
+## Using pyproject.toml
+
+Editable installs keep the code you edit inside this repo linked to your environment.
+
+1. Create a virtual environment (recommended).
+   ```pwsh
+   python -m venv .venv
+   . .venv/\Scripts\Activate.ps1  # Windows
+   ```
+2. Move to the repository root and install extras, e.g. `python -m pip install -e .[visual]`.
+3. Stack extras together: `.[visual,algorithmic]` for plotting + numerical helpers, `.[visual,ai]` for VPython + scikit-learn palette clustering.
+
 
 ## 3. Selective Installs
 
-Install only the dependencies you need:
+Install only the extras you need:
 
-| Feature | Minimal Install |
-|---------|-----------------|
-| Palette extraction (5 color scheme) | `pip install numpy Pillow matplotlib` (+ `scikit-learn` for KMeans) |
-| Faster palette via OpenCV (optional) | `pip install opencv-python` |
-| Component color visualizer (CompColor) | `pip install numpy Pillow` |
-| SpinnyCube VPython 3D version | `pip install vpython` |
-
-Most other scripts run with only the Python standard library.
+| Feature | Extras | Notes |
+|---------|--------|-------|
+| Palette extraction (5 color scheme) | `visual,algorithmic` | Includes numpy, Pillow, matplotlib, scikit-learn. |
+| OpenCV acceleration | `visual` | Adds `opencv-python` alongside Pillow/imageio. |
+| Component color visualizer (CompColor) | `visual` | Only Pillow + numpy required. |
+| SpinnyCube VPython 3D version | `visual` | VPython is part of the visual extra. |
+| Pure stdlib demos (Eulerian path, ASCII clock) | *(none)* | Standard library only. |
 
 ---
 
@@ -134,16 +148,13 @@ python "SpinnyCube/spinny.py" --mode vpython --edge-color "#ff8800"
 
 ## 6. Dependencies Overview
 
-See `requirements.txt` for consolidated install. Rationale:
+All third-party packages are grouped in `pyproject.toml` extras:
 
-- `numpy` foundational for pixel arrays and math
-- `Pillow` robust image loading/saving (JPEG/PNG, read metadata)
-- `matplotlib` quick visual diagnostics and palette swatches
-- `scikit-learn` reliable KMeans (convergence, inertia reporting)
-- `opencv-python` (optional) faster image ops & resizing
-- `vpython` 3D interactive rendering (only for SpinnyCube in vpython mode)
+- `visual` &mdash; Pillow, matplotlib, imageio, opencv-python, colour-science, vpython
+- `algorithmic` &mdash; numpy + scipy for numeric helpers
+- `ai` &mdash; scikit-learn when you want KMeans palette clustering
 
-You can safely omit any that a script does not import.
+Activate the extras relevant to your experiment; the rest of the suite remains pure stdlib.
 
 ---
 
@@ -153,7 +164,7 @@ You can safely omit any that a script does not import.
 2. Add a short module docstring explaining purpose & expected inputs.
 3. For new visualizations, provide at least one static sample output (PNG/JPG) if feasible.
 4. Prefer deterministic seeds in examples when randomness is involved.
-5. Document optional dependencies with a brief comment in `requirements.txt`.
+5. Document optional dependencies by extending the relevant `pyproject.toml` extras and README tables.
 6. Avoid introducing heavy frameworks; simplicity is a goal here.
 
 ### Extension Ideas

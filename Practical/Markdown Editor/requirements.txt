@@ -1,7 +1,4 @@
-# Requirements for the Markdown Editor subproject
-# Each pin matches the repo-wide canonical versions for consistency.
-
-markdown>=3.6,<3.7            # Core Markdown rendering (Markdown Editor) – planned extra: practical-markdown
-tkhtmlview>=0.2.0,<0.3        # Optional live HTML preview widget – planned extra: practical-markdown
-
-# Future pyproject extras will expose a "practical-markdown" group covering these libraries.
+# Markdown Editor dependencies now live in pyproject extras.
+# Install just this stack with:
+#   python -m pip install -e .[markdown]
+# or include it via the larger practical extra: `python -m pip install -e .[practical]`.
