@@ -5,11 +5,14 @@ import argparse
 import ast
 from dataclasses import dataclass
 from pathlib import Path
-from typing import List, Sequence
+from typing import TYPE_CHECKING, List, Sequence
 
 import numpy as np
 
 EPSILON = 1e-10
+
+if TYPE_CHECKING:  # pragma: no cover - only imported for type checking
+    from matplotlib.figure import Figure
 
 
 class MatrixError(Exception):
@@ -39,19 +42,31 @@ def ensure_2d(matrix: np.ndarray) -> np.ndarray:
     return matrix
 
 
-def parse_matrix(text_or_path: str) -> np.ndarray:
-    """Parse a matrix either from a literal string or a file path."""
-    candidate = Path(text_or_path)
-    if candidate.exists():
-        text = candidate.read_text(encoding="utf-8")
+def parse_literal_or_file(text_or_path: str | Path) -> str:
+    """Return text from a literal string or from a path if it exists."""
+    if isinstance(text_or_path, Path):
+        candidate = text_or_path
     else:
-        text = text_or_path
+        candidate = Path(text_or_path)
+    if candidate.exists():
+        return candidate.read_text(encoding="utf-8")
+    return str(text_or_path)
+
+
+def parse_matrix_text(text: str) -> np.ndarray:
+    """Parse a matrix from a string literal."""
     try:
         data = ast.literal_eval(text)
     except (ValueError, SyntaxError) as exc:
         raise MatrixError(f"Could not parse matrix data: {exc}") from exc
     array = np.array(data, dtype=float)
     return ensure_2d(array)
+
+
+def parse_matrix(text_or_path: str | Path) -> np.ndarray:
+    """Parse a matrix either from a literal string or a file path."""
+    text = parse_literal_or_file(text_or_path)
+    return parse_matrix_text(text)
 
 
 def format_matrix(matrix: np.ndarray, precision: int = 6) -> str:
@@ -193,7 +208,12 @@ def inverse(matrix: np.ndarray, explain: bool = False) -> OperationResult:
     return OperationResult(inverse_matrix, steps)
 
 
-def visualize_transformation(matrix: np.ndarray, output: str | None = None) -> str:
+def visualize_transformation(
+    matrix: np.ndarray,
+    output: str | None = None,
+    *,
+    return_figure: bool = False,
+) -> str | "Figure":
     matrix = ensure_2d(np.array(matrix, dtype=float))
     if matrix.shape != (2, 2):
         raise MatrixError("Visualisation currently supports only 2×2 matrices.")
@@ -221,10 +241,47 @@ def visualize_transformation(matrix: np.ndarray, output: str | None = None) -> s
     ax.legend()
     ax.grid(True, linestyle=":", alpha=0.6)
 
-    output_path = output or "matrix_transformation.png"
-    fig.savefig(output_path, bbox_inches="tight", dpi=200)
+    output_path: str | None
+    if output is not None:
+        output_path = output
+    elif not return_figure:
+        output_path = "matrix_transformation.png"
+    else:
+        output_path = None
+
+    if output_path is not None:
+        fig.savefig(output_path, bbox_inches="tight", dpi=200)
+
+    if return_figure:
+        return fig
+
     plt.close(fig)
-    return output_path
+    return output_path or ""
+
+
+def compute_operation(
+    operation: str,
+    matrix_a: np.ndarray,
+    matrix_b: np.ndarray | None = None,
+    *,
+    explain: bool = False,
+) -> OperationResult:
+    """Dispatch helper shared by the CLI and Streamlit front-ends."""
+
+    operation = operation.lower()
+    if operation == "add":
+        if matrix_b is None:
+            raise MatrixError("Addition requires a second matrix.")
+        return add_matrices(matrix_a, matrix_b, explain=explain)
+    if operation == "multiply":
+        if matrix_b is None:
+            raise MatrixError("Multiplication requires a second matrix.")
+        return multiply_matrices(matrix_a, matrix_b, explain=explain)
+    if operation == "determinant":
+        return determinant(matrix_a, explain=explain)
+    if operation == "inverse":
+        return inverse(matrix_a, explain=explain)
+    raise MatrixError(f"Unsupported operation '{operation}'.")
 
 
 def _print_steps(steps: Sequence[str]) -> None:
@@ -275,20 +332,22 @@ def run_cli(argv: Sequence[str] | None = None) -> None:
     precision: int = args.precision
 
     try:
-        if args.command == "add":
+        if args.command in {"add", "multiply"}:
             matrix_a = parse_matrix(args.matrix_a)
             matrix_b = parse_matrix(args.matrix_b)
-            result = add_matrices(matrix_a, matrix_b, explain=args.explain)
-        elif args.command == "multiply":
-            matrix_a = parse_matrix(args.matrix_a)
-            matrix_b = parse_matrix(args.matrix_b)
-            result = multiply_matrices(matrix_a, matrix_b, explain=args.explain)
-        elif args.command == "determinant":
+            result = compute_operation(
+                args.command,
+                matrix_a,
+                matrix_b,
+                explain=args.explain,
+            )
+        elif args.command in {"determinant", "inverse"}:
             matrix = parse_matrix(args.matrix)
-            result = determinant(matrix, explain=args.explain)
-        elif args.command == "inverse":
-            matrix = parse_matrix(args.matrix)
-            result = inverse(matrix, explain=args.explain)
+            result = compute_operation(
+                args.command,
+                matrix,
+                explain=args.explain,
+            )
         elif args.command == "visualize":
             matrix = parse_matrix(args.matrix)
             path = visualize_transformation(matrix, output=args.output)
@@ -302,15 +361,6 @@ def run_cli(argv: Sequence[str] | None = None) -> None:
 
     print(result.format(precision=precision))
     _print_steps(result.steps)
-
-    visualize_path = getattr(args, "visualize", None)
-    if visualize_path:
-        matrix = result.value if isinstance(result.value, np.ndarray) else parse_matrix(args.matrix)
-        try:
-            path = visualize_transformation(matrix, output=visualize_path)
-            print(f"Saved visualisation to {path}")
-        except MatrixError as exc:
-            print(f"Visualisation skipped: {exc}")
 
 
 def launch_gui() -> None:
