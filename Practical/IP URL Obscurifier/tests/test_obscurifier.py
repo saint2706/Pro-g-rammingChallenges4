@@ -33,6 +33,15 @@ def test_decode_ipv4_handles_mixed_dotted():
     assert bases == ["octal", "hex", "binary", "zero-padded"]
 
 
+def test_generate_ipv4_variants_custom_default_patterns():
+    custom_defaults = [("only-hex", ("hex", "hex", "hex", "hex"))]
+    bundle = obscurifier.generate_ipv4_variants(
+        "127.0.0.1",
+        default_mix_patterns=custom_defaults,
+    )
+    assert [label for label, _ in bundle.mixed] == ["only-hex"]
+
+
 def test_encode_url_with_credentials():
     bundle, variants = obscurifier.encode_url(
         "http://192.168.0.1/admin",
@@ -52,3 +61,14 @@ def test_decode_url_reveals_credentials():
     assert data["credentials"]["username"] == "user"
     assert data["credentials"]["password"] == "pass"
     assert data["canonical_url"].startswith("http://192.168.0.1")
+
+
+def test_encode_url_supports_custom_mix_patterns():
+    custom_defaults = [("bin-front", ("binary", "decimal", "decimal", "decimal"))]
+    bundle, variants = obscurifier.encode_url(
+        "http://10.0.0.5/",
+        default_mix_patterns=custom_defaults,
+    )
+    assert bundle.canonical == "10.0.0.5"
+    labels = [label for label, _ in variants if label.startswith("mixed-")]
+    assert labels == ["mixed-bin-front"]
