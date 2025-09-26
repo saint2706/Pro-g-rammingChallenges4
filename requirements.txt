@@ -3,3 +3,7 @@
 #   python -m pip install -e .[practical]
 #   python -m pip install -e .[algorithmic]
 # See the README "Using pyproject.toml" section for more combinations and details.
+
+# Additional ad-hoc dependencies referenced by individual tools.
+streamlit>=1.37
+streamlit-drawable-canvas>=0.9.3  # Interactive canvas widget for Practical/Paint/streamlit_app.py
