@@ -61,6 +61,8 @@ While this is a personal project, the principles behind it are universal. If you
 | 27 | Create a Torrent Client (CLI or GUI) | Not Yet |
 | 28 | Booru Client | [View Solution](./Practical/Booru%20Client/) |
 | 29 | Key Press Bot | Not Yet |
+| 28 | Booru Client | Not Yet |
+| 29 | Key Press Bot | [View Solution](./Practical/Key%20Press%20Bot/) |
 | 30 | IP/URL Obsucrification (<http://www.pc-help.org/obscure.htm>) | Not Yet |
 | 31 | Radix Base Converter (Given a radix base convert it to decimal) | [View Solution](./Practical/Radix%20Base%20Converter/) |
 | 32 | Chan aggregator (Let's user view various boards from different 'chans') (Bonus: Add 4ChanX and Archiving Functionality) | Not Yet |
