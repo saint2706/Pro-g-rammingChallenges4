@@ -66,6 +66,7 @@ Brief synopses; dive into each folder for details.
 | Producer Consumer | Modernized concurrency patterns (Py/Java/C/C++ examples). | threading, semaphores, queues |
 | Radix Base Converter | Arbitrary base conversion (2..36) with GUI. | Pure Python, Tkinter |
 | Seam Carving | Content-aware image resizing (CLI + GUI + progress). | OpenCV, NumPy, Pillow (GUI) |
+| Shazam Clone | Audio fingerprinting with spectrogram peaks + MinHash, CLI tooling for build/query/benchmark. | librosa, NumPy, sounddevice (optional) |
 | ToDoList-CLI | File‑backed todo manager (undo, prioritize, search). | Dataclasses, color output |
 | Vector Product | Vector math utilities & 3D plotting. | matplotlib |
 | Old School cringe | Retro rotating cube + assets demo. | matplotlib.animation, NumPy |
