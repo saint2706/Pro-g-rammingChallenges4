@@ -73,6 +73,7 @@ Brief synopses; dive into each folder for details.
 | File Compression Utility | Drag-and-drop archiver with Tk GUI, reusable backend, and tests. | zipfile, tarfile, Tkinter |
 | Radix Base Converter | Arbitrary base conversion (2..36) with GUI. | Pure Python, Tkinter |
 | Seam Carving | Content-aware image resizing (CLI + GUI + progress). | OpenCV, NumPy, Pillow (GUI) |
+| TFTP Tool | RFC 1350-compliant UDP file transfer client/server with CLI. | sockets, logging |
 | ToDoList-CLI | File‑backed todo manager (undo, prioritize, search). | Dataclasses, color output |
 | Vector Product | Vector math utilities & 3D plotting. | matplotlib |
 
@@ -185,6 +186,17 @@ GUI:
 
 ```pwsh
 python "ImgToASCII/convert_gui.py"
+```
+
+### 5.7. TFTP Tool
+
+```pwsh
+# Terminal 1 – start the server on a high, non-privileged port
+python "TFTP Tool/cli.py" --port 6969 server data_root
+
+# Terminal 2 – download and upload files with block-size negotiation
+python "TFTP Tool/cli.py" --port 6969 get 127.0.0.1 remote.txt local.txt --blksize 2048
+python "TFTP Tool/cli.py" --port 6969 put 127.0.0.1 local.txt remote_copy.txt --blksize 1024
 ```
 
 ---

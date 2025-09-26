@@ -70,6 +70,8 @@ While this is a personal project, the principles behind it are universal. If you
 | 36 | Window Manager | Not Yet |
 | 37 | Basic Relational Database Software (SQL Support Handle Relationships Focus on Efficiency) | Not Yet |
 | 38 | Pixel Editor | Not Yet |
+| 39 | Trivial File Transfer Protocol (TFTP): Allow a client to put a file onto a remote host | [View Solution](./Practical/TFTP%20Tool/) |
+| 40 | Markdown (HTML/XML) Editor | Not Yet |
 | 39 | Trivial File Transfer Protocol (TFTP): Allow a client to put a file onto a remote host | Not Yet |
 | 40 | Markdown (HTML/XML) Editor | [View Solution](./Practical/Markdown%20Editor/) |
 | 41 | IP Tracking Visualization | [View Solution](./Practical/IP%20Tracking%20visualization/) |
