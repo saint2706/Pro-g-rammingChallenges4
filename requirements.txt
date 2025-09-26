@@ -43,6 +43,8 @@ colorama>=0.4.6,<0.5          # Cross-platform ANSI colors (todo list future imp
 #############################
 # Security / Parsing (Future placeholders)
 #############################
+cryptography>=43.0.0,<44.0.0  # AES-GCM encryption for secure uploads
+boto3>=1.34,<1.35             # S3 uploads and presigned URLs
 # beautifulsoup4>=4.12,<4.13  # For potential web crawler enhancements
 # lxml>=5.2,<5.3              # Faster HTML/XML parsing (optional)
 
@@ -51,7 +53,8 @@ colorama>=0.4.6,<0.5          # Cross-platform ANSI colors (todo list future imp
 #############################
 # ruff>=0.5,<0.6              # Linting
 # mypy>=1.11,<1.12            # Static type checking
-# pytest>=8.3,<8.4            # Testing framework
+pytest>=8.3,<8.4              # Testing framework
+moto>=5.0,<5.1                # Mock AWS services for S3 upload tests
 
 # NOTES:
 # 1. If you only work inside one sub-area (e.g., Emulation or Practical/Imageboard), prefer that folder's requirements file.

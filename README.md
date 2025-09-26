@@ -59,7 +59,7 @@ While this is a personal project, the principles behind it are universal. If you
 | 30 | IP/URL Obsucrification (<http://www.pc-help.org/obscure.htm>) | Not Yet |
 | 31 | Radix Base Converter (Given a radix base convert it to decimal) | [View Solution](./Practical/Radix%20Base%20Converter/) |
 | 32 | Chan aggregator (Let's user view various boards from different 'chans') (Bonus: Add 4ChanX and Archiving Functionality) | Not Yet |
-| 33 | Encrypt a File and Upload it online | Not Yet |
+| 33 | Encrypt a File and Upload it online | [View Solution](./Practical/Encrypted%20Upload/) |
 | 34 | Make a Text Editor that autosaves and includes the date in the filename | [View Solution](./Practical/AutoSave%20Text%20Editor/) |
 | 35 | Create an HSV Color Representation | [View Solution](./Practical/HSV%20color%20wheel/) |
 | 36 | Window Manager | Not Yet |
@@ -80,6 +80,8 @@ While this is a personal project, the principles behind it are universal. If you
 | 142 | Seam Carving | [View Solution](./Practical/Seam%20Carving/) |
 | 143 | Bayesian Filter | [View Solution](./Practical/Bayesian%20Filter/) |
 | 144 | WMS viewer that isn't web based | Not Yet |
+
+> **Security notice:** The encrypted upload utility in this repository is educational. Review the [project documentation](./Practical/Encrypted%20Upload/README.md) before using it with sensitive information and ensure keys, manifests, and remote endpoints are secured.
 
 ### Algorithmic
 
