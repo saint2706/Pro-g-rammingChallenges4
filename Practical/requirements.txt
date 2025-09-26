@@ -18,6 +18,8 @@ plotly>=5.22,<5.23          # Interactive geo plots for IP tracking
 
 # Web / networking
 Flask>=3.0,<3.1             # Imageboard web app
+requests>=2.32,<2.33        # IP tracking API calls
+mutagen>=1.47,<1.48         # Audio metadata for music streaming server
 requests>=2.32,<2.33        # IP tracking API calls, WMS viewer map requests
 pyproj>=3.6,<3.7            # Coordinate transforms for WMS viewer
 

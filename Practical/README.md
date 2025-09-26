@@ -68,6 +68,7 @@ Brief synopses; dive into each folder for details.
 | Key Press Bot | Cross-platform keyboard automation with scripting + recorder. | pynput, pyautogui |
 | Markdown Editor | Desktop Markdown editor with live preview & exports. | Tkinter, markdown |
 | Markov Chain Sentence Generator | Train simple Markov model over corpora (CLI + GUI). | Dataclasses, Tkinter |
+| Music Streaming | LAN audio streaming server/client with discovery + buffering. | Flask, mutagen, FFmpeg |
 | Matrix Arithmetic | Explainable matrix calculator (CLI + GUI) covering add/multiply/det/inverse plus 2D visualiser. | NumPy, Tkinter, matplotlib |
 | Stock Market Simulator | Backtest custom strategies over Yahoo Finance data with caching + reports. | pandas, requests, matplotlib (optional) |
 | MIDI Player Editor | CLI-based MIDI playback, editing, and export workflow. | mido, python-rtmidi |
