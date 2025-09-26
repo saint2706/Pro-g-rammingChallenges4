@@ -1,0 +1,32 @@
+[
+    {
+        "caption": "Preferences",
+        "mnemonic": "n",
+        "id": "preferences",
+        "children": [
+            {
+                "caption": "Package Settings",
+                "mnemonic": "P",
+                "id": "package-settings",
+                "children": [
+                    {
+                        "caption": "C++ IDE Plugin",
+                        "children": [
+                            {
+                                "command": "cpp_open_settings",
+                                "caption": "Settings"
+                            },
+                            {
+                                "command": "open_file",
+                                "args": {
+                                    "file": "${packages}/User/C++ IDE Plugin/c_cpp_ide_plugin.py"
+                                },
+                                "caption": "Open Plugin Source"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+]
