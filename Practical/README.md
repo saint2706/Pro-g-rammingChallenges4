@@ -56,6 +56,7 @@ Brief synopses; dive into each folder for details.
 
 | Folder | Summary | Key Tech |
 |--------|---------|----------|
+| Booru Client | Multi-board API search/download client with CLI + GUI browser. | requests, Tkinter, Pillow |
 | Chan Aggregator | Aggregate 4chan/4plebs style boards with caching + CLI search. | requests, argparse |
 | Bellman Ford Simulation | Visual Bellman–Ford walkthrough with CLI + Matplotlib GUI controls and exports. | matplotlib, argparse |
 | Imageboard | Minimal Flask + SQLite anonymous imageboard (threads, replies, uploads, quoting, thumbnails). | Flask, Pillow, SQLite, Jinja filters |
