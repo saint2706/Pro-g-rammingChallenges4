@@ -1,0 +1,16 @@
+{% extends 'layout.html' %}
+{% block content %}
+<h2>Administrator Login</h2>
+<p>Provide the configured credentials to access moderation tools (delete posts, prune threads).</p>
+<form class="new-post" method="post" action="{{ url_for('admin_login', next=request.args.get('next')) }}">
+    <label>Username<br><input type="text" name="username" autocomplete="username" required></label><br>
+    <label>Password<br><input type="password" name="password" autocomplete="current-password" required></label><br>
+    {% if request.args.get('next') %}
+    <input type="hidden" name="next" value="{{ request.args.get('next') }}">
+    {% endif %}
+    <button type="submit">Log in</button>
+</form>
+{% if is_admin %}
+<p>You are already logged in. <a href="{{ url_for('admin_logout') }}">Log out?</a></p>
+{% endif %}
+{% endblock %}

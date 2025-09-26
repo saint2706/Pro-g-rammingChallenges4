@@ -29,18 +29,22 @@ While this is a personal project, the principles behind it are universal. If you
 | --- | --------- | ------ |
 | 1 | Download Manager | [View Solution](./Practical/Download%20Manager/) |
 | 2 | Make an elastic producer/consumer task queue. | [View Solution](./Practical/Producer%20Consumer/) |
-| 3 | IRC Client | Not Yet |
+| 3 | IRC Client | [View Solution](./Practical/IRC%20Client/) |
 | 4 | Markov Chain Sentence Generator (Include Shitposting Capabilities) | [View Solution](./Practical/Markov%20Chain%20Sentence%20Generator/) |
 | 5 | English Sentence Parser that Points to the Context of a Sentence | [View Solution](./Practical/Context%20Pointer/) |
 | 6 | MIDI Player + Editor | Not Yet |
+| 7 | Stock Market Simulator Using Yahoo Spreadsheet Data | [View Solution](./Practical/Stock%20Market%20Simulator/) |
+| 6 | MIDI Player + Editor | [View Solution](./Practical/MIDI%20Player%20Editor/) |
 | 7 | Stock Market Simulator Using Yahoo Spreadsheet Data | Not Yet |
 | 8 | Parametric/Graphic Equalizer for .wav files (Make it real-time) | Not Yet |
 | 9 | Graphing Calculator (BONUS: Graph the Function's Derivatives) | [View Solution](./Practical/Graphing%20Calculator/) |
 | 10 | To-Do List Application (Web app or CLI) | [View Solution](./Practical/ToDoList-CLI/) |
-| 11 | Verlet Integration (Verlet Cloth) | Not Yet |
+| 11 | Verlet Integration (Verlet Cloth) | [View Solution](./Practical/Verlet%20Cloth/) |
 | 12 | TCP/UDP Chat Server + Client | Not Yet |
-| 13 | Music Streaming | Not Yet |
+| 13 | Music Streaming | [View Solution](./Practical/Music%20Streaming/) |
 | 14 | Shazam | Not Yet |
+| 15 | Chatbot (with conversation retention) | [View Solution](./Practical/Chatbot/) |
+| 14 | Shazam | [View Solution](./Practical/Shazam%20Clone/) |
 | 15 | Chatbot (with conversation retention) | Not Yet |
 | 16 | Curses Text Editor (with Emacs /Vim Keybindings) | Not Yet |
 | 17 | Paint Clone | [View Solution](./Practical/Paint/) |
@@ -51,27 +55,37 @@ While this is a personal project, the principles behind it are universal. If you
 | 22 | Sound Synthesis (Sine square sawtooth etc...) ("Fuck You" mode: Realtime MIDI Playback with Custom instruments) | Not Yet |
 | 23 | C++ IDE Plugin for Sublime/Atom (Auto-Complete Go-To Symbol Declaration and Definition using Clang's AST) | Not Yet |
 | 24 | Simple Version Control supporting checkout commit (with commit message) unlocking and per-file configuration of number of revisions kept | [View Solution](./Practical/Simple%20VCS/) |
+| 23 | C++ IDE Plugin for Sublime/Atom (Auto-Complete Go-To Symbol Declaration and Definition using Clang's AST) | [View Solution](./Practical/C++%20IDE%20Plugin/) |
+| 24 | Simple Version Control supporting checkout commit (with commit message) unlocking and per-file configuration of number of revisions kept | Not Yet |
 | 25 | Imageboard (Imagine vichan) | Not Yet |
 | 26 | Password Manager | Not Yet |
 | 27 | Create a Torrent Client (CLI or GUI) | Not Yet |
-| 28 | Booru Client | Not Yet |
+| 28 | Booru Client | [View Solution](./Practical/Booru%20Client/) |
 | 29 | Key Press Bot | Not Yet |
+| 28 | Booru Client | Not Yet |
+| 29 | Key Press Bot | [View Solution](./Practical/Key%20Press%20Bot/) |
 | 30 | IP/URL Obsucrification (<http://www.pc-help.org/obscure.htm>) | Not Yet |
 | 31 | Radix Base Converter (Given a radix base convert it to decimal) | [View Solution](./Practical/Radix%20Base%20Converter/) |
 | 32 | Chan aggregator (Let's user view various boards from different 'chans') (Bonus: Add 4ChanX and Archiving Functionality) | Not Yet |
-| 33 | Encrypt a File and Upload it online | Not Yet |
+| 33 | Encrypt a File and Upload it online | [View Solution](./Practical/Encrypted%20Upload/) |
 | 34 | Make a Text Editor that autosaves and includes the date in the filename | [View Solution](./Practical/AutoSave%20Text%20Editor/) |
 | 35 | Create an HSV Color Representation | [View Solution](./Practical/HSV%20color%20wheel/) |
 | 36 | Window Manager | Not Yet |
 | 37 | Basic Relational Database Software (SQL Support Handle Relationships Focus on Efficiency) | Not Yet |
-| 38 | Pixel Editor | Not Yet |
+| 38 | Pixel Editor | [View Solution](./Practical/Pixel%20Editor/) |
 | 39 | Trivial File Transfer Protocol (TFTP): Allow a client to put a file onto a remote host | Not Yet |
+| 38 | Pixel Editor | Not Yet |
+| 39 | Trivial File Transfer Protocol (TFTP): Allow a client to put a file onto a remote host | [View Solution](./Practical/TFTP%20Tool/) |
 | 40 | Markdown (HTML/XML) Editor | Not Yet |
+| 39 | Trivial File Transfer Protocol (TFTP): Allow a client to put a file onto a remote host | Not Yet |
+| 40 | Markdown (HTML/XML) Editor | [View Solution](./Practical/Markdown%20Editor/) |
 | 41 | IP Tracking Visualization | [View Solution](./Practical/IP%20Tracking%20visualization/) |
 | 42 | Port Scanner | [View Solution](./Practical/Port%20Scanner/) |
 | 43 | Old School Demo Effect (Plasma Tunnel Scrollers Zoomers etc...) | Not Yet |
-| 135 | Bellman-Ford Simulation with at least Five Vertices | Not Yet |
+| 135 | Bellman-Ford Simulation with at least Five Vertices | [View Solution](./Practical/Bellman%20Ford%20Simulation/) |
 | 136 | Matrix Arithmetic | Not Yet |
+| 137 | File Compression Utility (Make it GUI) | [View Solution](./Practical/File%20Compression%20Utility/) |
+| 136 | Matrix Arithmetic | [View Solution](./Practical/Matrix%20Arithmetic/) |
 | 137 | File Compression Utility (Make it GUI) | Not Yet |
 | 138 | PDF Tagger | [View Solution](./Practical/PDF%20Tagger/) |
 | 139 | Nonogram Generator and Solver | Not Yet |
@@ -79,7 +93,11 @@ While this is a personal project, the principles behind it are universal. If you
 | 141 | Bismuth Fractal | [View Solution](./Practical/Bismuth%20Fractal/) |
 | 142 | Seam Carving | [View Solution](./Practical/Seam%20Carving/) |
 | 143 | Bayesian Filter | [View Solution](./Practical/Bayesian%20Filter/) |
-| 144 | WMS viewer that isn't web based | Not Yet |
+| 144 | WMS viewer that isn't web based | [View Solution](./Practical/WMS%20Viewer/) |
+
+> The IRC client depends only on Python 3.10+ standard-library modules (`asyncio`, `ssl`, `argparse`, `logging`).
+
+> **Security notice:** The encrypted upload utility in this repository is educational. Review the [project documentation](./Practical/Encrypted%20Upload/README.md) before using it with sensitive information and ensure keys, manifests, and remote endpoints are secured.
 
 ### Algorithmic
 
