@@ -32,7 +32,7 @@ python -m venv .venv
 
 ### 1.3. Install via pyproject extras
 
-From the repo root install the bundles you need (editable install keeps code + env in sync):
+From the repo root install the bundles you need (editable install keeps code + env in sync). The full menu of extras lives in the [repository root README](../README.md#using-pyprojecttoml):
 
 ```pwsh
 python -m pip install -e .[practical]
@@ -54,63 +54,69 @@ python "ToDoList-CLI/todo.py" add "Ship awesome README"
 
 ## Using pyproject.toml
 
-All Practical projects share the repo-wide optional extras. Install `.[practical]` for the full toolkit or combine targeted extras (audio, web, desktop, markdown, geo, midi) depending on what you plan to explore. Editable installs (`pip install -e .[extra]`) keep your changes instantly runnable. See the table below for combinations.
+All Practical projects share the repo-wide optional extras defined in `pyproject.toml`. Install `.[practical]` for the full toolkit or combine targeted extras (audio, web, desktop, markdown, geo, midi) depending on what you plan to explore. Editable installs (`pip install -e .[extra]`) keep your changes instantly runnable. See the table below for combinations and the [root extras table](../README.md#using-pyprojecttoml) for cross-category options.
 
 ---
 
-## 2. Project Index (Alphabetical)
+## 2. Project Index (by challenge number)
 
-Brief synopses; dive into each folder for details.
+Authoritative mapping of Practical folders to their original /g/ challenge numbers. Summaries reflect the current implementations; check each folder for scripts, assets, and tests.
 
-| Folder | Summary | Key Tech |
-|--------|---------|----------|
-| Image Converter | Batch format conversion with resizing & metadata preservation. | Pillow, Tkinter |
-| Imageboard | Minimal Flask + SQLite anonymous imageboard (threads, replies, uploads, quoting, thumbnails, moderation). | Flask, Pillow, SQLite, Jinja filters |
-| Chat Server Client | Async chat rooms over TCP/UDP with logging, config files, and retrying UDP demo. | asyncio, sockets |
-| Curses Text Editor | Modal curses text editor with Vim/Emacs keymaps, autosave, and search/replace. | curses, curses.textpad |
-| Booru Client | Multi-board API search/download client with CLI + GUI browser. | requests, Tkinter, Pillow |
-| Chan Aggregator | Aggregate 4chan/4plebs style boards with caching + CLI search. | requests, argparse |
-| Bellman Ford Simulation | Visual Bellman–Ford walkthrough with CLI + Matplotlib GUI controls and exports. | matplotlib, argparse |
-| Imageboard | Minimal Flask + SQLite anonymous imageboard (threads, replies, uploads, quoting, thumbnails). | Flask, Pillow, SQLite, Jinja filters |
-| ImgToASCII | Convert images to ASCII art (CLI + Tk GUI). | Pillow, NumPy, Tkinter |
-| IP & URL Obscurifier | Explore IPv4/URL disguises (hex, decimal, mixed bases) with a decoder CLI. | argparse, ipaddress, urllib |
-| IRC Client | Async terminal IRC client with TLS, reconnection, logging. | Python stdlib (`asyncio`, `ssl`, `argparse`, `logging`) |
-| IP Tracking visualization | Fetch IP geolocation data & plot interactive map. | requests, pandas, plotly, tqdm |
-| Key Press Bot | Cross-platform keyboard automation with scripting + recorder. | pynput, pyautogui |
-| Markdown Editor | Desktop Markdown editor with live preview & exports. | Tkinter, markdown |
-| Markov Chain Sentence Generator | Train simple Markov model over corpora (CLI + GUI). | Dataclasses, Tkinter |
-| Music Streaming | LAN audio streaming server/client with discovery + buffering. | Flask, mutagen, FFmpeg |
-| Matrix Arithmetic | Explainable matrix calculator (CLI + GUI) covering add/multiply/det/inverse plus 2D visualiser. | NumPy, Tkinter, matplotlib |
-| Stock Market Simulator | Backtest custom strategies over Yahoo Finance data with caching + reports. | pandas, requests, matplotlib (optional) |
-| MIDI Player Editor | CLI-based MIDI playback, editing, and export workflow. | mido, python-rtmidi |
-| Nonogram Solver | Generate, solve, and play logic puzzles with GUI + exports. | Tkinter, Pillow |
-| Paint (clone) | Lightweight Tk canvas paint app with palette + save. | Tkinter, Pillow (optional) |
-| Pixel Editor | Layered pixel art editor with animation preview & sprite sheet IO. | Tkinter, Pillow |
-| PDF Tagger | Add arbitrary JSON metadata tags to PDFs. | pypdf |
-| Port Scanner | Concurrent TCP port scanning (CLI + GUI + export). | sockets, ThreadPoolExecutor, Tkinter |
-| Producer Consumer | Modernized concurrency patterns (Py/Java/C/C++ examples). | threading, semaphores, queues |
-| File Compression Utility | Drag-and-drop archiver with Tk GUI, reusable backend, and tests. | zipfile, tarfile, Tkinter |
-| Radix Base Converter | Arbitrary base conversion (2..36) with GUI. | Pure Python, Tkinter |
-| Relational DB | Educational in-memory SQL engine with parser, executor, and CLI shell. | Pure Python |
-| Seam Carving | Content-aware image resizing (CLI + GUI + progress). | OpenCV, NumPy, Pillow (GUI) |
-| Simple VCS | File-based version control with per-file revision caps, locking, and CLI. | Python stdlib |
-| Shazam Clone | Audio fingerprinting with spectrogram peaks + MinHash, CLI tooling for build/query/benchmark. | librosa, NumPy, sounddevice (optional) |
-| TFTP Tool | RFC 1350-compliant UDP file transfer client/server with CLI. | sockets, logging |
-| ToDoList-CLI | File‑backed todo manager (undo, prioritize, search). | Dataclasses, color output |
-| Torrent Client | Educational BitTorrent implementation with resume + CLI progress. | sockets, requests, tqdm |
-| Window Manager | Lightweight tiling WM with master/stack layout & keybindings. | python-xlib, X11 |
-| Vector Product | Vector math utilities & 3D plotting. | matplotlib |
-| Old School cringe | Multi-effect demoscene timeline (plasma, scroller, zoomer) with synced audio. | pygame, NumPy |
-| Verlet Cloth | Cloth simulation using Verlet integration with interactive toggles. | NumPy, matplotlib |
-| WAV Equalizer | Real-time multi-band audio equalizer with live spectrum GUI. | numpy, scipy, sounddevice, matplotlib, Tkinter |
-| Old School cringe | Retro rotating cube + assets demo. | matplotlib.animation, NumPy |
-| Graphing Calculator | Basic expression plotting GUI. | Tkinter, eval sandboxing |
-| ID3 Reader | Inspect MP3 ID3 tags, export JSON/CSV, includes Tk GUI. | mutagen, Tkinter |
-| Paint / Clone | Simple drawing & export. | Tkinter |
-
-> Some tiny folders (e.g. helper assets) may not appear above—table focuses on active code artifacts.
-
----
+| # | Folder | Summary | Key Tech |
+|---|--------|---------|----------|
+| 1 | Download Manager | Threaded HTTP downloader with resume, chunk retries, and SHA-256 verification. | requests, tqdm, concurrent.futures |
+| 2 | Producer Consumer | Cross-language producer/consumer demos showcasing semaphores and bounded queues. | Python threading, C/C++, Java |
+| 3 | IRC Client | Async IRC client with TLS, reconnection logic, and command scripting support. | asyncio, ssl, logging |
+| 4 | Markov Chain Sentence Generator | CLI + Tk GUI for training Markov chains and sampling shitpost-friendly text. | Tkinter, argparse, dataclasses |
+| 5 | Context Pointer | spaCy-powered CLI that surfaces token context, dependencies, and entity metadata. | spaCy, argparse, dataclasses |
+| 6 | MIDI Player Editor | Editable MIDI playlist/transform pipeline with CLI playback/export helpers. | mido, python-rtmidi, argparse |
+| 7 | Stock Market Simulator | Yahoo Finance backtester with caching, strategy hooks, and reporting suite. | pandas, requests, dataclasses |
+| 8 | WAV Equalizer | Real-time multi-band equalizer with FFT visualization and device routing. | numpy, scipy, sounddevice |
+| 9 | Graphing Calculator | SymPy-backed graphing GUI with derivatives, exports, and sandboxed parsing. | Tkinter, SymPy, matplotlib |
+| 10 | ToDoList-CLI | File-backed todo manager supporting priorities, search, undo, and colored output. | argparse, dataclasses, ANSI colors |
+| 11 | Verlet Cloth | Interactive cloth simulator with pin constraints and matplotlib visualization. | numpy, matplotlib |
+| 12 | Chat Server Client | TCP/UDP chat stack with async client, retrying UDP demo, and logging. | asyncio, sockets, argparse |
+| 13 | Music Streaming | LAN audio streaming server/client with playlist metadata and discovery. | Flask, mutagen, sockets |
+| 14 | Shazam Clone | Audio fingerprinting pipeline using spectrogram peaks and MinHash search. | librosa, numpy, sounddevice |
+| 15 | Chatbot | Rule-based chatbot with JSON rule loading, history export, and CLI tweaks. | argparse, dataclasses |
+| 16 | Curses Text Editor | Modal curses editor with autosave, search/replace, and configurable keymaps. | curses, textpad |
+| 17 | Paint | Tkinter paint clone with palette management, brush settings, and image export. | Tkinter, Pillow |
+| 18 | ImgToASCII | Image to ASCII renderer offering CLI batch mode and Tk preview. | Pillow, numpy, Tkinter |
+| 19 | Booru Imageboard Downloader | Multi-board downloader supporting bulk tags, rate limits, and metadata export. | requests, concurrent.futures, tqdm |
+| 20 | Image Converter | Batch converter with resizing, metadata preservation, and Tk GUI controls. | Pillow, Tkinter |
+| 21 | ID3 Reader | MP3 tag inspector exporting JSON/CSV summaries with optional Tk interface. | mutagen, Tkinter |
+| 22 | Sound Synthesis | Synth toolkit for generating waveforms, envelopes, and live MIDI playback. | numpy, sounddevice, mido |
+| 23 | C++ IDE Plugin | Sublime Text plugin wrapping libclang for completion, go-to, and indexing. | Sublime API, clang.cindex |
+| 24 | Simple VCS | Educational file-based VCS with revision caps, locking, and CLI tooling. | pathlib, json, argparse |
+| 25 | Imageboard | Flask + SQLite imageboard with threads, moderation tools, and thumbnailing. | Flask, SQLite, Pillow |
+| 26 | Password Manager | CLI vault with PBKDF2-derived keys, AES-GCM, and manifest sync. | cryptography, PBKDF2 |
+| 27 | Torrent Client | Educational BitTorrent client with resume, peer management, and CLI progress. | sockets, threading, tqdm |
+| 28 | Booru Client | Tag-searchable booru browser with download queue and Tkinter gallery. | Tkinter, requests, Pillow |
+| 29 | Key Press Bot | Cross-platform automation bot with macro recorder and hotkey scripting. | pynput, pyautogui |
+| 30 | IP URL Obscurifier | Encoder/decoder for IPv4/URL disguises in mixed bases and formats. | argparse, ipaddress |
+| 31 | Radix Base Converter | GUI converter handling arbitrary bases, validation, and copy-friendly output. | Tkinter |
+| 32 | Chan Aggregator | Aggregates boards with caching, CLI search, and archival helpers. | requests, threading, dataclasses |
+| 33 | Encrypted Upload | AES-GCM packaging with S3 upload hooks, manifests, and integrity checks. | cryptography, boto3 |
+| 34 | AutoSave Text Editor | Tk text editor with autosave hashing, atomic writes, and status bar. | Tkinter, dataclasses |
+| 35 | HSV color wheel | HSV visualizer rendering gradients, swatches, and conversions via Tkinter. | Tkinter, colorsys |
+| 36 | Window Manager | X11 tiling window manager with master/stack layouts and configurable bindings. | python-xlib |
+| 37 | Relational DB | In-memory SQL engine with parser, executor, and interactive shell. | dataclasses, Python stdlib |
+| 38 | Pixel Editor | Sprite editor with layers, animation preview, and palette tools. | Tkinter, Pillow |
+| 39 | TFTP Tool | RFC 1350 compliant client/server with CLI, retransmits, and logging. | sockets, argparse |
+| 40 | Markdown Editor | Live preview markdown editor with export, themes, and Tk HTML widget. | Tkinter, markdown, tkhtmlview |
+| 41 | IP Tracking visualization | Fetches IP geodata and plots interactive maps with caching. | requests, pandas, plotly |
+| 42 | Port Scanner | Concurrent TCP scanner with CLI + Tk GUI dashboards and exports. | sockets, concurrent.futures, Tkinter |
+| 43 | Old School cringe | Demoscene effects sequencer mixing plasma, scrolling text, and audio. | pygame, numpy |
+| 135 | Bellman Ford Simulation | CLI + matplotlib walkthrough of Bellman-Ford with exportable plots. | argparse, matplotlib |
+| 136 | Matrix Arithmetic | Matrix calculator with GUI, explanations, and visualizers for operations. | numpy, Tkinter, matplotlib |
+| 137 | File Compression Utility | Tk GUI for ZIP/TAR packing with drag/drop and reusable backend. | Tkinter, zipfile, tarfile |
+| 138 | PDF Tagger | CLI for attaching JSON metadata tags to PDFs and auditing contents. | pypdf |
+| 139 | Nonogram Solver | Nonogram generator/solver with interactive Tk board and exports. | Tkinter, Pillow |
+| 140 | Vector Product | Vector math helper computing dot/cross with 3D plotting. | numpy, matplotlib |
+| 141 | Bismuth Fractal | Turtle graphics fractal renderer with animation and palette controls. | turtle, argparse |
+| 142 | Seam Carving | Content-aware image resizer with CLI + GUI and progress feedback. | opencv-python, numpy, Pillow |
+| 143 | Bayesian Filter | Gaussian Naive Bayes CLI using pandas datasets and rich metrics output. | pandas, scikit-learn |
+| 144 | WMS Viewer | Desktop WMS client with map tiling, reprojection, and YAML presets. | Tkinter, requests, pyproj |
 
 ## 3. Selective Installs (pyproject extras)
 
