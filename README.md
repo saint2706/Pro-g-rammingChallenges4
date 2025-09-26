@@ -72,7 +72,7 @@ While this is a personal project, the principles behind it are universal. If you
 | 43 | Old School Demo Effect (Plasma Tunnel Scrollers Zoomers etc...) | Not Yet |
 | 135 | Bellman-Ford Simulation with at least Five Vertices | Not Yet |
 | 136 | Matrix Arithmetic | Not Yet |
-| 137 | File Compression Utility (Make it GUI) | Not Yet |
+| 137 | File Compression Utility (Make it GUI) | [View Solution](./Practical/File%20Compression%20Utility/) |
 | 138 | PDF Tagger | [View Solution](./Practical/PDF%20Tagger/) |
 | 139 | Nonogram Generator and Solver | Not Yet |
 | 140 | Calculate Dot and Cross Product of Two Vectors | [View Solution](./Practical/Vector%20Product/) |
