@@ -54,7 +54,7 @@ While this is a personal project, the principles behind it are universal. If you
 | 25 | Imageboard (Imagine vichan) | Not Yet |
 | 26 | Password Manager | Not Yet |
 | 27 | Create a Torrent Client (CLI or GUI) | Not Yet |
-| 28 | Booru Client | Not Yet |
+| 28 | Booru Client | [View Solution](./Practical/Booru%20Client/) |
 | 29 | Key Press Bot | Not Yet |
 | 30 | IP/URL Obsucrification (<http://www.pc-help.org/obscure.htm>) | Not Yet |
 | 31 | Radix Base Converter (Given a radix base convert it to decimal) | [View Solution](./Practical/Radix%20Base%20Converter/) |
