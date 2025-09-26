@@ -61,6 +61,7 @@ Brief synopses; dive into each folder for details.
 | ImgToASCII | Convert images to ASCII art (CLI + Tk GUI). | Pillow, NumPy, Tkinter |
 | IRC Client | Async terminal IRC client with TLS, reconnection, logging. | Python stdlib (`asyncio`, `ssl`, `argparse`, `logging`) |
 | IP Tracking visualization | Fetch IP geolocation data & plot interactive map. | requests, pandas, plotly, tqdm |
+| Markdown Editor | Desktop Markdown editor with live preview & exports. | Tkinter, markdown |
 | Markov Chain Sentence Generator | Train simple Markov model over corpora (CLI + GUI). | Dataclasses, Tkinter |
 | Matrix Arithmetic | Explainable matrix calculator (CLI + GUI) covering add/multiply/det/inverse plus 2D visualiser. | NumPy, Tkinter, matplotlib |
 | Stock Market Simulator | Backtest custom strategies over Yahoo Finance data with caching + reports. | pandas, requests, matplotlib (optional) |
