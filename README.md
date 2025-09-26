@@ -11,6 +11,22 @@ This repository is a collection of solutions to a wide array of programming prob
 
 The solutions are organized by category and difficulty, making it easy to navigate and find what you're looking for. Many of the projects are implemented in multiple languages to showcase different ways of solving the same problem.
 
+## Progress
+
+<progress value="98" max="131"></progress>
+
+**Overall:** 98 / 131 challenges completed (74.8%).
+
+| Category | Completed | Total | Progress |
+| --- | --- | --- | --- |
+| Practical | 53 | 53 | 100% |
+| Algorithmic | 27 | 27 | 100% |
+| Artificial Intelligence | 3 | 8 | 37.5% |
+| Emulation/Modeling | 6 | 14 | 42.9% |
+| Games | 9 | 29 | 31.0% |
+
+_Progress counts are generated from the actual solution folders in the repository (see tables below)._ 
+
 ## How to Contribute (A Guide for New Developers)
 
 While this is a personal project, the principles behind it are universal. If you're starting your own journey of programming challenges, here's a guide to help you get the most out of it:
@@ -32,64 +48,47 @@ While this is a personal project, the principles behind it are universal. If you
 | 3 | IRC Client | [View Solution](./Practical/IRC%20Client/) |
 | 4 | Markov Chain Sentence Generator (Include Shitposting Capabilities) | [View Solution](./Practical/Markov%20Chain%20Sentence%20Generator/) |
 | 5 | English Sentence Parser that Points to the Context of a Sentence | [View Solution](./Practical/Context%20Pointer/) |
-| 6 | MIDI Player + Editor | Not Yet |
-| 7 | Stock Market Simulator Using Yahoo Spreadsheet Data | [View Solution](./Practical/Stock%20Market%20Simulator/) |
 | 6 | MIDI Player + Editor | [View Solution](./Practical/MIDI%20Player%20Editor/) |
-| 7 | Stock Market Simulator Using Yahoo Spreadsheet Data | Not Yet |
-| 8 | Parametric/Graphic Equalizer for .wav files (Make it real-time) | Not Yet |
+| 7 | Stock Market Simulator Using Yahoo Spreadsheet Data | [View Solution](./Practical/Stock%20Market%20Simulator/) |
+| 8 | Parametric/Graphic Equalizer for .wav files (Make it real-time) | [View Solution](./Practical/WAV%20Equalizer/) |
 | 9 | Graphing Calculator (BONUS: Graph the Function's Derivatives) | [View Solution](./Practical/Graphing%20Calculator/) |
 | 10 | To-Do List Application (Web app or CLI) | [View Solution](./Practical/ToDoList-CLI/) |
 | 11 | Verlet Integration (Verlet Cloth) | [View Solution](./Practical/Verlet%20Cloth/) |
-| 12 | TCP/UDP Chat Server + Client | Not Yet |
+| 12 | TCP/UDP Chat Server + Client | [View Solution](./Practical/Chat%20Server%20Client/) |
 | 13 | Music Streaming | [View Solution](./Practical/Music%20Streaming/) |
-| 14 | Shazam | Not Yet |
-| 15 | Chatbot (with conversation retention) | [View Solution](./Practical/Chatbot/) |
 | 14 | Shazam | [View Solution](./Practical/Shazam%20Clone/) |
-| 15 | Chatbot (with conversation retention) | Not Yet |
-| 16 | Curses Text Editor (with Emacs /Vim Keybindings) | Not Yet |
+| 15 | Chatbot (with conversation retention) | [View Solution](./Practical/Chatbot/) |
+| 16 | Curses Text Editor (with Emacs /Vim Keybindings) | [View Solution](./Practical/Curses%20Text%20Editor/) |
 | 17 | Paint Clone | [View Solution](./Practical/Paint/) |
 | 18 | Image to ASCII Art | [View Solution](./Practical/ImgToASCII/) |
 | 19 | Booru (Image Board) Image Downloader | [View Solution](./Practical/Booru%20Imageboard%20Downloader/) |
-| 20 | Image Converter | Not Yet |
-| 21 | ID3 Reader | [View Solution](./Practical/ID3%20Reader/) |
-| 22 | Sound Synthesis (Sine square sawtooth etc...) ("Fuck You" mode: Realtime MIDI Playback with Custom instruments) | Not Yet |
 | 20 | Image Converter | [View Solution](./Practical/Image%20Converter/) |
-| 21 | ID3 Reader | Not Yet |
+| 21 | ID3 Reader | [View Solution](./Practical/ID3%20Reader/) |
 | 22 | Sound Synthesis (Sine square sawtooth etc...) ("Fuck You" mode: Realtime MIDI Playback with Custom instruments) | [View Solution](./Practical/Sound%20Synthesis/) |
-| 23 | C++ IDE Plugin for Sublime/Atom (Auto-Complete Go-To Symbol Declaration and Definition using Clang's AST) | Not Yet |
-| 24 | Simple Version Control supporting checkout commit (with commit message) unlocking and per-file configuration of number of revisions kept | [View Solution](./Practical/Simple%20VCS/) |
 | 23 | C++ IDE Plugin for Sublime/Atom (Auto-Complete Go-To Symbol Declaration and Definition using Clang's AST) | [View Solution](./Practical/C++%20IDE%20Plugin/) |
-| 24 | Simple Version Control supporting checkout commit (with commit message) unlocking and per-file configuration of number of revisions kept | Not Yet |
-| 25 | Imageboard (Imagine vichan) | Not Yet |
+| 24 | Simple Version Control supporting checkout commit (with commit message) unlocking and per-file configuration of number of revisions kept | [View Solution](./Practical/Simple%20VCS/) |
+| 25 | Imageboard (Imagine vichan) | [View Solution](./Practical/Imageboard/) |
 | 26 | Password Manager | [View Solution](./Practical/Password%20Manager/) |
-| 27 | Create a Torrent Client (CLI or GUI) | Not Yet |
+| 27 | Create a Torrent Client (CLI or GUI) | [View Solution](./Practical/Torrent%20Client/) |
 | 28 | Booru Client | [View Solution](./Practical/Booru%20Client/) |
-| 29 | Key Press Bot | Not Yet |
-| 28 | Booru Client | Not Yet |
 | 29 | Key Press Bot | [View Solution](./Practical/Key%20Press%20Bot/) |
-| 30 | IP/URL Obsucrification (<http://www.pc-help.org/obscure.htm>) | Not Yet |
+| 30 | IP/URL Obsucrification (<http://www.pc-help.org/obscure.htm>) | [View Solution](./Practical/IP%20URL%20Obscurifier/) |
 | 31 | Radix Base Converter (Given a radix base convert it to decimal) | [View Solution](./Practical/Radix%20Base%20Converter/) |
-| 32 | Chan aggregator (Let's user view various boards from different 'chans') (Bonus: Add 4ChanX and Archiving Functionality) | Not Yet |
+| 32 | Chan aggregator (Let's user view various boards from different 'chans') (Bonus: Add 4ChanX and Archiving Functionality) | [View Solution](./Practical/Chan%20Aggregator/) |
 | 33 | Encrypt a File and Upload it online | [View Solution](./Practical/Encrypted%20Upload/) |
 | 34 | Make a Text Editor that autosaves and includes the date in the filename | [View Solution](./Practical/AutoSave%20Text%20Editor/) |
 | 35 | Create an HSV Color Representation | [View Solution](./Practical/HSV%20color%20wheel/) |
-| 36 | Window Manager | Not Yet |
-| 37 | Basic Relational Database Software (SQL Support Handle Relationships Focus on Efficiency) | Not Yet |
+| 36 | Window Manager | [View Solution](./Practical/Window%20Manager/) |
+| 37 | Basic Relational Database Software (SQL Support Handle Relationships Focus on Efficiency) | [View Solution](./Practical/Relational%20DB/) |
 | 38 | Pixel Editor | [View Solution](./Practical/Pixel%20Editor/) |
-| 39 | Trivial File Transfer Protocol (TFTP): Allow a client to put a file onto a remote host | Not Yet |
-| 38 | Pixel Editor | Not Yet |
 | 39 | Trivial File Transfer Protocol (TFTP): Allow a client to put a file onto a remote host | [View Solution](./Practical/TFTP%20Tool/) |
-| 40 | Markdown (HTML/XML) Editor | Not Yet |
-| 39 | Trivial File Transfer Protocol (TFTP): Allow a client to put a file onto a remote host | Not Yet |
 | 40 | Markdown (HTML/XML) Editor | [View Solution](./Practical/Markdown%20Editor/) |
 | 41 | IP Tracking Visualization | [View Solution](./Practical/IP%20Tracking%20visualization/) |
 | 42 | Port Scanner | [View Solution](./Practical/Port%20Scanner/) |
-| 43 | Old School Demo Effect (Plasma Tunnel Scrollers Zoomers etc...) | Not Yet |
+| 43 | Old School Demo Effect (Plasma Tunnel Scrollers Zoomers etc...) | [View Solution](./Practical/Old%20School%20cringe/) |
 | 135 | Bellman-Ford Simulation with at least Five Vertices | [View Solution](./Practical/Bellman%20Ford%20Simulation/) |
-| 136 | Matrix Arithmetic | Not Yet |
-| 137 | File Compression Utility (Make it GUI) | [View Solution](./Practical/File%20Compression%20Utility/) |
 | 136 | Matrix Arithmetic | [View Solution](./Practical/Matrix%20Arithmetic/) |
-| 137 | File Compression Utility (Make it GUI) | Not Yet |
+| 137 | File Compression Utility (Make it GUI) | [View Solution](./Practical/File%20Compression%20Utility/) |
 | 138 | PDF Tagger | [View Solution](./Practical/PDF%20Tagger/) |
 | 139 | Nonogram Generator and Solver | [View Solution](./Practical/Nonogram%20Solver/) |
 | 140 | Calculate Dot and Cross Product of Two Vectors | [View Solution](./Practical/Vector%20Product/) |
@@ -119,7 +118,7 @@ While this is a personal project, the principles behind it are universal. If you
 | 54 | Hide and Extract Data in images (Basic Steganography) (Bonus: Include .gif support) | [View Solution](./Algorithmic/Steganography/) |
 | 55 | Web Page Crawler | [View Solution](./Algorithmic/Web%20Page%20Crawler/) |
 | 56 | Password Generator (Let User Choose Options) | [View Solution](./Algorithmic/PassGen/) |
-| 57 | VignÃ©re cipher encryption/decryption | [View Solution](./Algorithmic/Vigniere%20Cipher/) |
+| 57 | Vigenère cipher encryption/decryption | [View Solution](./Algorithmic/Vigniere%20Cipher/) |
 | 58 | Game Of Life | [View Solution](./Algorithmic/Game%20of%20life/) |
 | 59 | Caesar Cipher Cracker | [View Solution](./Algorithmic/Caesar%20Cipher/) |
 | 60 | Dijkstra's Algorithm | [View Solution](./Algorithmic/Djikstra/) |
@@ -131,17 +130,17 @@ While this is a personal project, the principles behind it are universal. If you
 | 66 | Text to Hexadecimal/Binary | [View Solution](./Algorithmic/basic%20text%20encoding/) |
 | 67 | Calculate the first 1 000 digits of pi iteratively | [View Solution](./Algorithmic/1000%20Digits%20of%20Pi/) |
 | 68 | Sierpinski Triangle | [View Solution](./Algorithmic/Sierpinski/) |
-| 69 | Mandlebrot Set | [View Solution](./Algorithmic/Mandelbrot%20Set/) |
+| 69 | Mandelbrot Set | [View Solution](./Algorithmic/Mandelbrot%20Set/) |
 | 134 | Ulam Spiral | [View Solution](./Algorithmic/Ulam%20Spiral/) |
 
 ### Artificial Intelligence
 
 | # | Challenge | Status |
 | --- | --------- | ------ |
-| 70 | OpenAl Gym Project | Not Yet |
-| 71 | Al for Roguelikes | Not Yet |
+| 70 | OpenAI Gym Project | Not Yet |
+| 71 | AI for Roguelikes | Not Yet |
 | 72 | Sudoku/n-Puzzle Solver using A* algorithm | [View Solution](./Artificial%20Intelligence/Sudoku/) |
-| 73 | Connect-4 Al Player using Alpha-Beta Pruning | [View Solution](./Artificial%20Intelligence/Connect4/) |
+| 73 | Connect-4 AI Player using Alpha-Beta Pruning | [View Solution](./Artificial%20Intelligence/Connect4/) |
 | 74 | Basic Neural Network - Simulate individual neurons and their connections | [View Solution](./Artificial%20Intelligence/Basic%20Neural%20Network/) |
 | 75 | Real Neural Network - Implement a basic feed-forward neural network using matrices for entire layers along with matrix operations for computations. | Not Yet |
 | 76 | Convolutional Neural Network: Implement a convolutional N.N. for a handwritten digit recognition test on MNIST dataset (Use TensorFlow Theano etc...) | Not Yet |
