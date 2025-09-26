@@ -70,6 +70,7 @@ Brief synopses; dive into each folder for details.
 | Vector Product | Vector math utilities & 3D plotting. | matplotlib |
 | Old School cringe | Retro rotating cube + assets demo. | matplotlib.animation, NumPy |
 | Graphing Calculator | Basic expression plotting GUI. | Tkinter, eval sandboxing |
+| ID3 Reader | Inspect MP3 ID3 tags, export JSON/CSV, includes Tk GUI. | mutagen, Tkinter |
 | Paint / Clone | Simple drawing & export. | Tkinter |
 
 > Some tiny folders (e.g. helper assets) may not appear above—table focuses on active code artifacts.

@@ -18,6 +18,9 @@ tqdm>=4.66,<4.67            # Optional progress bars (IP tracking) – optional 
 # Imaging
 Pillow>=10.4,<10.5          # Image handling (imageboard, ASCII converter, seam carving GUI thumbnails)
 
+# Audio metadata
+mutagen>=1.47,<1.48         # ID3 Reader MP3 tag parser
+
 # PDF handling (PDF Tagger)
 pypdf>=4.3,<4.4             # Preferred modern PDF library
 # PyPDF3  (legacy fallback) not listed intentionally; install manually only if needed
