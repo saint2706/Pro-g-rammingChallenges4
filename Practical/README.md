@@ -59,6 +59,7 @@ Brief synopses; dive into each folder for details.
 | Imageboard | Minimal Flask + SQLite anonymous imageboard (threads, replies, uploads, quoting, thumbnails). | Flask, Pillow, SQLite, Jinja filters |
 | ImgToASCII | Convert images to ASCII art (CLI + Tk GUI). | Pillow, NumPy, Tkinter |
 | IP Tracking visualization | Fetch IP geolocation data & plot interactive map. | requests, pandas, plotly, tqdm |
+| Key Press Bot | Cross-platform keyboard automation with scripting + recorder. | pynput, pyautogui |
 | Markov Chain Sentence Generator | Train simple Markov model over corpora (CLI + GUI). | Dataclasses, Tkinter |
 | Paint (clone) | Lightweight Tk canvas paint app with palette + save. | Tkinter, Pillow (optional) |
 | PDF Tagger | Add arbitrary JSON metadata tags to PDFs. | pypdf |

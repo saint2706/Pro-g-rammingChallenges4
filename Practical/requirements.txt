@@ -25,6 +25,10 @@ pypdf>=4.3,<4.4             # Preferred modern PDF library
 # CLI polish / color (some scripts may benefit if extended)
 colorama>=0.4.6,<0.5        # Windows-safe ANSI colors (optional; used implicitly / future use)
 
+# Input automation
+pynput>=1.7,<1.8             # Cross-platform keyboard/mouse control
+pyautogui>=0.9,<0.10        # High-level key typing helpers
+
 # NOTE:
 # - Some desktop GUI tools rely only on the Python standard library (tkinter, threading, etc.).
 # - If you want a lighter install, you can create per-project requirement subsets.
