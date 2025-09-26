@@ -36,6 +36,7 @@ requests>=2.32,<2.33          # External API calls (IP tracking)
 # Documents / Files
 #############################
 pypdf>=4.3,<4.4               # PDF Tagger metadata operations
+mutagen>=1.47,<1.48           # MP3/ID3 parsing utilities (ID3 Reader)
 
 #############################
 # Visualization / 3D / UI (Optional)
