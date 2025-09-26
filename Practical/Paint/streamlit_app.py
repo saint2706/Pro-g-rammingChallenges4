@@ -28,7 +28,7 @@ def _prepare_download(image_array: np.ndarray) -> bytes:
     return buffer.getvalue()
 
 
-def main() -> None:
+def render() -> None:
     st.set_page_config(page_title="Paint Clone (Streamlit)", layout="wide")
     st.title("🖌️ Paint Clone — Streamlit Edition")
     st.write(
@@ -77,5 +77,8 @@ def main() -> None:
         st.info("Start drawing on the canvas to enable PNG downloads.")
 
 
+__all__ = ["render"]
+
+
 if __name__ == "__main__":
-    main()
+    render()

@@ -140,9 +140,8 @@ def render() -> None:
     st.caption("Data sourced from retro_demo.py's timeline configuration.")
 
 
-def main() -> None:
-    render()
+__all__ = ["render"]
 
 
 if __name__ == "__main__":
-    main()
+    render()

@@ -146,67 +146,77 @@ def _step_history_csv(steps: Sequence[Step], nodes: Iterable[str]) -> str:
     return buffer.getvalue()
 
 
-st.set_page_config(page_title="Bellman–Ford Simulation", layout="wide")
-st.title("Bellman–Ford Simulation")
-st.write(
-    "Upload a weighted directed graph (JSON or CSV) to explore the Bellman–Ford algorithm "
-    "step-by-step. If no file is provided the bundled sample graph is used."
-)
+def render() -> None:
+    """Render the Bellman–Ford Streamlit interface."""
 
-uploaded = st.file_uploader("Graph file", type=["json", "csv"], accept_multiple_files=False)
+    st.set_page_config(page_title="Bellman–Ford Simulation", layout="wide")
+    st.title("Bellman–Ford Simulation")
+    st.write(
+        "Upload a weighted directed graph (JSON or CSV) to explore the Bellman–Ford algorithm "
+        "step-by-step. If no file is provided the bundled sample graph is used."
+    )
 
-try:
-    edges = _load_edges(uploaded)
-except Exception as exc:  # noqa: BLE001 - display friendly error
-    st.error(str(exc))
-    st.stop()
+    uploaded = st.file_uploader("Graph file", type=["json", "csv"], accept_multiple_files=False)
 
-nodes = sorted({edge.source for edge in edges} | {edge.target for edge in edges})
-if len(nodes) < 5:
-    st.error("Graph must contain at least five vertices for the simulation challenge.")
-    st.stop()
+    try:
+        edges = _load_edges(uploaded)
+    except Exception as exc:  # noqa: BLE001 - display friendly error
+        st.error(str(exc))
+        st.stop()
 
-start_vertex = st.selectbox("Start vertex", options=nodes, index=0)
+    nodes = sorted({edge.source for edge in edges} | {edge.target for edge in edges})
+    if len(nodes) < 5:
+        st.error("Graph must contain at least five vertices for the simulation challenge.")
+        st.stop()
 
-try:
-    simulation = BellmanFordSimulation(edges, start_vertex)
-except Exception as exc:  # noqa: BLE001 - display friendly error
-    st.error(str(exc))
-    st.stop()
+    start_vertex = st.selectbox("Start vertex", options=nodes, index=0)
 
-step_index = st.slider("Simulation step", 0, len(simulation.steps) - 1, 0)
-step = simulation.steps[step_index]
+    try:
+        simulation = BellmanFordSimulation(edges, start_vertex)
+    except Exception as exc:  # noqa: BLE001 - display friendly error
+        st.error(str(exc))
+        st.stop()
 
-fig = render_step(step, simulation.nodes, simulation.edges)
-st.pyplot(fig, use_container_width=True)
+    step_index = st.slider("Simulation step", 0, len(simulation.steps) - 1, 0)
+    step = simulation.steps[step_index]
 
-iteration_label = (
-    f"Iteration {step.iteration}" if step.phase in {"relax", "check"} else "Initialization"
-)
-st.subheader(
-    f"Step {step.index + 1}/{len(simulation.steps)} — {step.phase.capitalize()} ({iteration_label})"
-)
-st.write(step.note)
+    fig = render_step(step, simulation.nodes, simulation.edges)
+    st.pyplot(fig, use_container_width=True)
 
-distance_lines = ["Node  Dist   Pred"]
-for node in simulation.nodes:
-    dist = BellmanFordSimulation._fmt_distance(step.distances.get(node, math.inf))
-    pred = step.predecessors.get(node) or "-"
-    distance_lines.append(f"{node:>4}  {dist:>5}  {pred:>4}")
-st.code("\n".join(distance_lines))
+    iteration_label = (
+        f"Iteration {step.iteration}" if step.phase in {"relax", "check"} else "Initialization"
+    )
+    st.subheader(
+        f"Step {step.index + 1}/{len(simulation.steps)} — {step.phase.capitalize()} ({iteration_label})"
+    )
+    st.write(step.note)
 
-json_data = _step_history_json(simulation.steps)
-csv_data = _step_history_csv(simulation.steps, simulation.nodes)
+    distance_lines = ["Node  Dist   Pred"]
+    for node in simulation.nodes:
+        dist = BellmanFordSimulation._fmt_distance(step.distances.get(node, math.inf))
+        pred = step.predecessors.get(node) or "-"
+        distance_lines.append(f"{node:>4}  {dist:>5}  {pred:>4}")
+    st.code("\n".join(distance_lines))
 
-st.download_button(
-    "Download step history (JSON)",
-    data=json_data,
-    file_name="bellman_ford_steps.json",
-    mime="application/json",
-)
-st.download_button(
-    "Download step history (CSV)",
-    data=csv_data,
-    file_name="bellman_ford_steps.csv",
-    mime="text/csv",
-)
+    json_data = _step_history_json(simulation.steps)
+    csv_data = _step_history_csv(simulation.steps, simulation.nodes)
+
+    st.download_button(
+        "Download step history (JSON)",
+        data=json_data,
+        file_name="bellman_ford_steps.json",
+        mime="application/json",
+    )
+    st.download_button(
+        "Download step history (CSV)",
+        data=csv_data,
+        file_name="bellman_ford_steps.csv",
+        mime="text/csv",
+    )
+
+
+__all__ = ["render"]
+
+
+if __name__ == "__main__":  # pragma: no cover - manual execution helper
+    render()

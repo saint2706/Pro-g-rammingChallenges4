@@ -53,7 +53,7 @@ def _build_resize_spec(width_text: str, height_text: str) -> Optional[ResizeSpec
     return ResizeSpec(width=width_value, height=height_value)
 
 
-def main() -> None:
+def render() -> None:
     st.set_page_config(page_title="Image Converter", page_icon="🖼️")
     st.title("Image Converter")
     st.write(
@@ -175,5 +175,10 @@ def main() -> None:
             file_name=item["converted_name"],
             mime=mime,
         )
+
+
+__all__ = ["render"]
+
+
 if __name__ == "__main__":
-    main()
+    render()

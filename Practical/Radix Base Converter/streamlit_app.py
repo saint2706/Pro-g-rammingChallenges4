@@ -58,7 +58,7 @@ def _build_batch_downloads(rows: list[dict[str, str | int]]) -> tuple[bytes, byt
     return csv_bytes, text_bytes
 
 
-def main() -> None:
+def render() -> None:
     st.set_page_config(page_title="Radix Base Converter", page_icon="🔢", layout="centered")
     st.title("🔢 Radix Base Converter")
     st.write(
@@ -162,5 +162,8 @@ def main() -> None:
                     )
 
 
+__all__ = ["render"]
+
+
 if __name__ == "__main__":
-    main()
+    render()
