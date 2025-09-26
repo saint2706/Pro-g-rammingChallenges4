@@ -32,19 +32,18 @@ While this is a personal project, the principles behind it are universal. If you
 | 3 | IRC Client | [View Solution](./Practical/IRC%20Client/) |
 | 4 | Markov Chain Sentence Generator (Include Shitposting Capabilities) | [View Solution](./Practical/Markov%20Chain%20Sentence%20Generator/) |
 | 5 | English Sentence Parser that Points to the Context of a Sentence | [View Solution](./Practical/Context%20Pointer/) |
-
 | 6 | MIDI Player + Editor | Not Yet |
 | 7 | Stock Market Simulator Using Yahoo Spreadsheet Data | [View Solution](./Practical/Stock%20Market%20Simulator/) |
-
 | 6 | MIDI Player + Editor | [View Solution](./Practical/MIDI%20Player%20Editor/) |
 | 7 | Stock Market Simulator Using Yahoo Spreadsheet Data | Not Yet |
-
 | 8 | Parametric/Graphic Equalizer for .wav files (Make it real-time) | Not Yet |
 | 9 | Graphing Calculator (BONUS: Graph the Function's Derivatives) | [View Solution](./Practical/Graphing%20Calculator/) |
 | 10 | To-Do List Application (Web app or CLI) | [View Solution](./Practical/ToDoList-CLI/) |
 | 11 | Verlet Integration (Verlet Cloth) | [View Solution](./Practical/Verlet%20Cloth/) |
 | 12 | TCP/UDP Chat Server + Client | Not Yet |
 | 13 | Music Streaming | Not Yet |
+| 14 | Shazam | Not Yet |
+| 15 | Chatbot (with conversation retention) | [View Solution](./Practical/Chatbot/) |
 | 14 | Shazam | [View Solution](./Practical/Shazam%20Clone/) |
 | 15 | Chatbot (with conversation retention) | Not Yet |
 | 16 | Curses Text Editor (with Emacs /Vim Keybindings) | Not Yet |
