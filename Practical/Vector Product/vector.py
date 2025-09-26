@@ -73,7 +73,9 @@ def plot_vectors(
     v1: Sequence[Number],
     v2: Sequence[Number],
     cross_val: Union[Number, Sequence[Number]],
-) -> None:
+    *,
+    show: bool = True,
+) -> plt.Figure:
     """Plot vectors v1, v2 and (optionally) their cross product.
 
     For 2D: cross_val is scalar (if provided) -> direction (perp) is not drawn (kept simple).
@@ -84,8 +86,8 @@ def plot_vectors(
         raise ValueError("Only 2D/3D vectors supported for plotting")
 
     if dim == 2:
-        plt.figure()
-        plt.quiver(
+        fig, ax = plt.subplots()
+        ax.quiver(
             0,
             0,
             v1[0],
@@ -96,7 +98,7 @@ def plot_vectors(
             color="r",
             label="v1",
         )
-        plt.quiver(
+        ax.quiver(
             0,
             0,
             v2[0],
@@ -109,18 +111,19 @@ def plot_vectors(
         )
         # Optionally one could visualize orthogonal direction; omitted for clarity.
         limit = max(10, *(abs(c) for c in (*v1, *v2)))
-        plt.xlim(-limit, limit)
-        plt.ylim(-limit, limit)
-        plt.xlabel("X")
-        plt.ylabel("Y")
-        plt.axhline(0, color="k", linewidth=0.8)
-        plt.axvline(0, color="k", linewidth=0.8)
-        plt.grid(alpha=0.3)
-        plt.legend()
-        plt.title("2D Vectors")
-        plt.tight_layout()
-        plt.show()
-        return
+        ax.set_xlim(-limit, limit)
+        ax.set_ylim(-limit, limit)
+        ax.set_xlabel("X")
+        ax.set_ylabel("Y")
+        ax.axhline(0, color="k", linewidth=0.8)
+        ax.axvline(0, color="k", linewidth=0.8)
+        ax.grid(alpha=0.3)
+        ax.legend()
+        ax.set_title("2D Vectors")
+        fig.tight_layout()
+        if show:
+            plt.show()
+        return fig
 
     # 3D
     fig = plt.figure()
@@ -148,7 +151,9 @@ def plot_vectors(
     ax.legend()
     plt.title("3D Vectors")
     plt.tight_layout()
-    plt.show()
+    if show:
+        plt.show()
+    return fig
 
 
 # ----------------------------- CLI Interface ----------------------------- #
@@ -162,6 +167,32 @@ def parse_vector(text: str, dim: int) -> Sequence[Number]:
         return tuple(float(p) for p in parts)
     except ValueError as e:
         raise argparse.ArgumentTypeError(f"Invalid numeric component: {e}") from e
+
+
+def prepare_vector(value: Union[str, Sequence[Number]], dim: int) -> Tuple[float, ...]:
+    """Parse *value* into a numeric vector of length *dim*.
+
+    The CLI uses :func:`parse_vector` which raises ``ArgumentTypeError``; this helper wraps
+    that behaviour so GUI/front-end callers can share the logic and receive ``ValueError``
+    instead.
+    """
+
+    if isinstance(value, str):
+        try:
+            parsed = parse_vector(value, dim)
+        except argparse.ArgumentTypeError as exc:  # pragma: no cover - thin wrapper
+            raise ValueError(str(exc)) from exc
+        return tuple(float(c) for c in parsed)
+
+    if isinstance(value, Sequence):
+        if len(value) != dim:
+            raise ValueError(f"Expected {dim} components, got {len(value)}")
+        try:
+            return tuple(float(component) for component in value)
+        except (TypeError, ValueError) as exc:
+            raise ValueError(f"Invalid numeric component: {exc}") from exc
+
+    raise TypeError("Value must be a string or a numeric sequence")
 
 
 def build_parser() -> argparse.ArgumentParser:
