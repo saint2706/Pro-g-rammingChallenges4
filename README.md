@@ -49,7 +49,7 @@ While this is a personal project, the principles behind it are universal. If you
 | 20 | Image Converter | Not Yet |
 | 21 | ID3 Reader | Not Yet |
 | 22 | Sound Synthesis (Sine square sawtooth etc...) ("Fuck You" mode: Realtime MIDI Playback with Custom instruments) | Not Yet |
-| 23 | C++ IDE Plugin for Sublime/Atom (Auto-Complete Go-To Symbol Declaration and Definition using Clang's AST) | Not Yet |
+| 23 | C++ IDE Plugin for Sublime/Atom (Auto-Complete Go-To Symbol Declaration and Definition using Clang's AST) | [View Solution](./Practical/C++%20IDE%20Plugin/) |
 | 24 | Simple Version Control supporting checkout commit (with commit message) unlocking and per-file configuration of number of revisions kept | Not Yet |
 | 25 | Imageboard (Imagine vichan) | Not Yet |
 | 26 | Password Manager | Not Yet |
