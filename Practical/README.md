@@ -74,7 +74,11 @@ Brief synopses; dive into each folder for details.
 | Seam Carving | Content-aware image resizing (CLI + GUI + progress). | OpenCV, NumPy, Pillow (GUI) |
 | ToDoList-CLI | File‑backed todo manager (undo, prioritize, search). | Dataclasses, color output |
 | Vector Product | Vector math utilities & 3D plotting. | matplotlib |
+
+| Verlet Cloth | Cloth simulation using Verlet integration with interactive toggles. | NumPy, matplotlib |
+
 | WAV Equalizer | Real-time multi-band audio equalizer with live spectrum GUI. | numpy, scipy, sounddevice, matplotlib, Tkinter |
+
 | Old School cringe | Retro rotating cube + assets demo. | matplotlib.animation, NumPy |
 | Graphing Calculator | Basic expression plotting GUI. | Tkinter, eval sandboxing |
 | Paint / Clone | Simple drawing & export. | Tkinter |
