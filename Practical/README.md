@@ -56,19 +56,34 @@ Brief synopses; dive into each folder for details.
 
 | Folder | Summary | Key Tech |
 |--------|---------|----------|
+| Chan Aggregator | Aggregate 4chan/4plebs style boards with caching + CLI search. | requests, argparse |
+| Bellman Ford Simulation | Visual Bellman–Ford walkthrough with CLI + Matplotlib GUI controls and exports. | matplotlib, argparse |
 | Imageboard | Minimal Flask + SQLite anonymous imageboard (threads, replies, uploads, quoting, thumbnails). | Flask, Pillow, SQLite, Jinja filters |
 | ImgToASCII | Convert images to ASCII art (CLI + Tk GUI). | Pillow, NumPy, Tkinter |
 | IP & URL Obscurifier | Explore IPv4/URL disguises (hex, decimal, mixed bases) with a decoder CLI. | argparse, ipaddress, urllib |
+| IRC Client | Async terminal IRC client with TLS, reconnection, logging. | Python stdlib (`asyncio`, `ssl`, `argparse`, `logging`) |
 | IP Tracking visualization | Fetch IP geolocation data & plot interactive map. | requests, pandas, plotly, tqdm |
+| Markdown Editor | Desktop Markdown editor with live preview & exports. | Tkinter, markdown |
 | Markov Chain Sentence Generator | Train simple Markov model over corpora (CLI + GUI). | Dataclasses, Tkinter |
+| Matrix Arithmetic | Explainable matrix calculator (CLI + GUI) covering add/multiply/det/inverse plus 2D visualiser. | NumPy, Tkinter, matplotlib |
+| Stock Market Simulator | Backtest custom strategies over Yahoo Finance data with caching + reports. | pandas, requests, matplotlib (optional) |
+| MIDI Player Editor | CLI-based MIDI playback, editing, and export workflow. | mido, python-rtmidi |
 | Paint (clone) | Lightweight Tk canvas paint app with palette + save. | Tkinter, Pillow (optional) |
+| Pixel Editor | Layered pixel art editor with animation preview & sprite sheet IO. | Tkinter, Pillow |
 | PDF Tagger | Add arbitrary JSON metadata tags to PDFs. | pypdf |
 | Port Scanner | Concurrent TCP port scanning (CLI + GUI + export). | sockets, ThreadPoolExecutor, Tkinter |
 | Producer Consumer | Modernized concurrency patterns (Py/Java/C/C++ examples). | threading, semaphores, queues |
+| File Compression Utility | Drag-and-drop archiver with Tk GUI, reusable backend, and tests. | zipfile, tarfile, Tkinter |
 | Radix Base Converter | Arbitrary base conversion (2..36) with GUI. | Pure Python, Tkinter |
+| Relational DB | Educational in-memory SQL engine with parser, executor, and CLI shell. | Pure Python |
 | Seam Carving | Content-aware image resizing (CLI + GUI + progress). | OpenCV, NumPy, Pillow (GUI) |
+| TFTP Tool | RFC 1350-compliant UDP file transfer client/server with CLI. | sockets, logging |
 | ToDoList-CLI | File‑backed todo manager (undo, prioritize, search). | Dataclasses, color output |
+| Window Manager | Lightweight tiling WM with master/stack layout & keybindings. | python-xlib, X11 |
 | Vector Product | Vector math utilities & 3D plotting. | matplotlib |
+| Old School cringe | Multi-effect demoscene timeline (plasma, scroller, zoomer) with synced audio. | pygame, NumPy |
+| Verlet Cloth | Cloth simulation using Verlet integration with interactive toggles. | NumPy, matplotlib |
+| WAV Equalizer | Real-time multi-band audio equalizer with live spectrum GUI. | numpy, scipy, sounddevice, matplotlib, Tkinter |
 | Old School cringe | Retro rotating cube + assets demo. | matplotlib.animation, NumPy |
 | Graphing Calculator | Basic expression plotting GUI. | Tkinter, eval sandboxing |
 | Paint / Clone | Simple drawing & export. | Tkinter |
@@ -86,6 +101,7 @@ If you only need a subset, install manually:
 | Imageboard | `pip install Flask Pillow` |
 | Seam Carving | `pip install opencv-python numpy` (Pillow optional for GUI) |
 | IP Map | `pip install requests pandas plotly tqdm` |
+| IRC Client | no extra packages (Python 3.10+ standard library) |
 | PDF Tagger | `pip install pypdf` |
 | ASCII Converter | `pip install Pillow numpy` |
 | Vector / Rotating Cube | `pip install matplotlib numpy` |
@@ -163,6 +179,23 @@ GUI:
 python "Markov Chain Sentence Generator/mcsg_gui.py"
 ```
 
+### 5.6. Relational DB (SQL shell)
+
+```pwsh
+cd "Relational DB"
+python -m relational_db.cli
+```
+
+Sample session:
+
+```sql
+db> CREATE TABLE authors (id INT PRIMARY KEY, name TEXT);
+db> INSERT INTO authors VALUES (1, 'Octavia Butler');
+db> SELECT * FROM authors;
+id | name
+1  | Octavia Butler
+```
+
 ### 5.6. ASCII Conversion
 
 ```pwsh
@@ -173,6 +206,17 @@ GUI:
 
 ```pwsh
 python "ImgToASCII/convert_gui.py"
+```
+
+### 5.7. TFTP Tool
+
+```pwsh
+# Terminal 1 – start the server on a high, non-privileged port
+python "TFTP Tool/cli.py" --port 6969 server data_root
+
+# Terminal 2 – download and upload files with block-size negotiation
+python "TFTP Tool/cli.py" --port 6969 get 127.0.0.1 remote.txt local.txt --blksize 2048
+python "TFTP Tool/cli.py" --port 6969 put 127.0.0.1 local.txt remote_copy.txt --blksize 1024
 ```
 
 ---

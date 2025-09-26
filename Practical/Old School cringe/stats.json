@@ -1,13 +1,31 @@
 {
-  "frames": 180,
-  "fps": 30,
-  "edge_color": "#4ade80",
-  "vertex_color": "#fbbf24",
-  "thickness": 2.0,
-  "projection_distance": -5.0,
-  "wobble": 0.05,
-  "seed": 42,
-  "output": "cube.gif",
-  "elapsed_sec": 14.708,
-  "success": true
+  "demo": "retro_demo.py",
+  "resolution": [
+    960,
+    540
+  ],
+  "fps": 60,
+  "bpm": 120,
+  "duration_sec": 31.0,
+  "sample_rate": 44100,
+  "segments": [
+    {
+      "name": "Plasma Tunnel",
+      "duration": 12.0
+    },
+    {
+      "name": "Scroller",
+      "duration": 9.0
+    },
+    {
+      "name": "Zoomer",
+      "duration": 10.0
+    }
+  ],
+  "assets": {
+    "gif": "Generate via --capture-gif (not committed)",
+    "screenshot": "Use --capture-frames to grab stills",
+    "capture_stop_after": 12.0
+  },
+  "notes": "Plasma/scroller/zoomer timeline with procedural synth audio."
 }
