@@ -12,9 +12,11 @@ plotly>=5.22,<5.23          # Interactive geo plots for IP tracking
 
 # Web / networking
 Flask>=3.0,<3.1             # Imageboard web app
-requests>=2.32,<2.33        # IP tracking API calls
+requests>=2.32,<2.33        # IP tracking API calls, WMS viewer map requests
+pyproj>=3.6,<3.7            # Coordinate transforms for WMS viewer
 
 # Data processing / progress
+PyYAML>=6.0.2,<6.1          # Configuration parsing for WMS viewer
 tqdm>=4.66,<4.67            # Optional progress bars (IP tracking) – optional but recommended
 
 # Imaging
