@@ -93,6 +93,7 @@ desktop.ini
 # Crash / profiling dumps
 *.core
 core.*
+!Practical/Chan Aggregator/chan_aggregator/core.py
 *.pid
 *.prof
 *.perf
@@ -151,7 +152,6 @@ frames/
 frame_*.png
 *.mp4
 *.gif
-
 # Local data exports / scratch
 scratch/
 
