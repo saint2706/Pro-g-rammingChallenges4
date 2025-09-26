@@ -58,7 +58,7 @@ While this is a personal project, the principles behind it are universal. If you
 | 23 | C++ IDE Plugin for Sublime/Atom (Auto-Complete Go-To Symbol Declaration and Definition using Clang's AST) | [View Solution](./Practical/C++%20IDE%20Plugin/) |
 | 24 | Simple Version Control supporting checkout commit (with commit message) unlocking and per-file configuration of number of revisions kept | Not Yet |
 | 25 | Imageboard (Imagine vichan) | Not Yet |
-| 26 | Password Manager | Not Yet |
+| 26 | Password Manager | [View Solution](./Practical/Password%20Manager/) |
 | 27 | Create a Torrent Client (CLI or GUI) | Not Yet |
 | 28 | Booru Client | [View Solution](./Practical/Booru%20Client/) |
 | 29 | Key Press Bot | Not Yet |
