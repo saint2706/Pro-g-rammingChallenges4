@@ -56,6 +56,7 @@ Brief synopses; dive into each folder for details.
 
 | Folder | Summary | Key Tech |
 |--------|---------|----------|
+| Imageboard | Minimal Flask + SQLite anonymous imageboard (threads, replies, uploads, quoting, thumbnails, moderation). | Flask, Pillow, SQLite, Jinja filters |
 | Chat Server Client | Async chat rooms over TCP/UDP with logging, config files, and retrying UDP demo. | asyncio, sockets |
 | Curses Text Editor | Modal curses text editor with Vim/Emacs keymaps, autosave, and search/replace. | curses, curses.textpad |
 | Booru Client | Multi-board API search/download client with CLI + GUI browser. | requests, Tkinter, Pillow |

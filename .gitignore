@@ -184,6 +184,7 @@ scratch/
 !.gitignore
 !README.md
 !LICENSE
+!Practical/Imageboard/data/.gitignore
 
 ################################################################################
 # OPTIONAL (uncomment if you start adding these and don't want them tracked):

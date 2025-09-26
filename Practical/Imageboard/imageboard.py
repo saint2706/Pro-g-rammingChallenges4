@@ -1,16 +1,15 @@
 """Minimal vichan-like imageboard prototype (educational).
 
-Refined Version Enhancements:
-- Centralized configuration via Config dataclass (easy future extension / override).
+Highlights in this refined edition:
+- Centralised configuration via a `Config` dataclass (environment overrides supported).
 - Context manager wrapper for database connections (ensures close, DRY).
 - Unified helper `insert_post` for thread + reply creation.
-- Registered Jinja filter `datetime` for readable UTC conversion.
-- Stricter image validation: size constraint, basic MIME magic sniff (first bytes).
-- Added inline comments explaining each logical section for new developers.
-- Type hints across functions for clarity.
-- Slightly clearer error messages and flash categories.
+- Registered Jinja filters for readable timestamps and quote rendering.
+- Basic moderation (password-protected login + inline delete controls).
+- Stricter image validation: size guard and lightweight magic header sniff.
+- Type hints, inline comments, and friendlier flash messages for newcomers.
 
-Security / production caveats remain (no auth/moderation/CAPTCHA). This is intentionally minimal.
+Security / production caveats remain (no CAPTCHA, no IP bans, minimal rate limiting).
 """
 
 from __future__ import annotations
@@ -22,8 +21,9 @@ import time
 from contextlib import contextmanager
 from dataclasses import dataclass
 from datetime import datetime, timezone
+from functools import wraps
 from pathlib import Path
-from typing import Generator, Iterable, Optional, Tuple
+from typing import Generator, Optional, Tuple
 
 from flask import (
     Flask,
@@ -33,31 +33,75 @@ from flask import (
     render_template,
     request,
     send_from_directory,
+    session,
     url_for,
 )
 from markupsafe import Markup, escape
-from werkzeug.utils import secure_filename
 from PIL import Image
+from werkzeug.security import check_password_hash, generate_password_hash
+from werkzeug.utils import secure_filename
 
 # ----------------------------- Configuration ----------------------------- #
 
 
 @dataclass(slots=True)
 class Config:
-    data_dir: Path = Path(__file__).parent.resolve() / "data"
-    allowed_ext: set[str] = frozenset({"jpg", "jpeg", "png", "gif", "webp"})  # type: ignore[assignment]
-    thumb_size: Tuple[int, int] = (200, 200)
-    rate_limit_window: int = 8  # seconds between posts from same IP
-    max_message_len: int = 2000
-    max_image_bytes: int = 8 * 1024 * 1024  # 8 MB
-    secret_key: str = "dev-secret-change-me"  # Replace in real usage
+    data_dir: Path
+    allowed_ext: frozenset[str]
+    thumb_size: Tuple[int, int]
+    rate_limit_window: int
+    max_message_len: int
+    max_image_bytes: int
+    secret_key: str
+    board_title: str
+    admin_username: str
+    admin_password_hash: str
 
 
-CFG = Config()
+def _split_allowed_ext(raw: str) -> frozenset[str]:
+    parts = [segment.strip().lower() for segment in raw.split(",")]
+    return frozenset({segment for segment in parts if segment})
+
+
+def load_config() -> Config:
+    root = Path(__file__).parent.resolve()
+    data_dir = Path(os.getenv("IMAGEBOARD_DATA_DIR", root / "data")).expanduser().resolve()
+    allowed = _split_allowed_ext(
+        os.getenv("IMAGEBOARD_ALLOWED_EXT", "jpg,jpeg,png,gif,webp")
+    )
+    secret_key = os.getenv("IMAGEBOARD_SECRET_KEY", "dev-secret-change-me")
+    board_title = os.getenv("IMAGEBOARD_BOARD_TITLE", "Minimal Imageboard")
+    admin_username = os.getenv("IMAGEBOARD_ADMIN_USERNAME", "admin")
+    password_hash = os.getenv("IMAGEBOARD_ADMIN_PASSWORD_HASH")
+    if not password_hash:
+        admin_password = os.getenv("IMAGEBOARD_ADMIN_PASSWORD", "changeme")
+        password_hash = generate_password_hash(admin_password)
+    return Config(
+        data_dir=data_dir,
+        allowed_ext=allowed if allowed else frozenset({"jpg", "jpeg", "png", "gif", "webp"}),
+        thumb_size=(200, 200),
+        rate_limit_window=8,
+        max_message_len=2000,
+        max_image_bytes=8 * 1024 * 1024,
+        secret_key=secret_key,
+        board_title=board_title,
+        admin_username=admin_username,
+        admin_password_hash=password_hash,
+    )
+
+
+CFG = load_config()
 APP_ROOT = Path(__file__).parent.resolve()
 UPLOAD_DIR = CFG.data_dir / "uploads"
 THUMB_DIR = CFG.data_dir / "thumbs"
 DB_PATH = CFG.data_dir / "imageboard.db"
+ADMIN_SESSION_KEY = "imageboard_admin"
+
+
+def _safe_url(candidate: Optional[str], fallback: str) -> str:
+    if candidate and candidate.startswith("/") and not candidate.startswith("//"):
+        return candidate
+    return fallback
 
 # Ensure directories exist (idempotent)
 for d in (CFG.data_dir, UPLOAD_DIR, THUMB_DIR):
@@ -66,6 +110,26 @@ for d in (CFG.data_dir, UPLOAD_DIR, THUMB_DIR):
 # ----------------------------- Flask App Setup ----------------------------- #
 app = Flask(__name__)
 app.secret_key = CFG.secret_key
+
+
+def is_admin() -> bool:
+    return bool(session.get(ADMIN_SESSION_KEY))
+
+
+def require_admin(view):
+    @wraps(view)
+    def wrapper(*args, **kwargs):
+        if not is_admin():
+            flash("Administrator login required.", "error")
+            return redirect(url_for("admin_login"))
+        return view(*args, **kwargs)
+
+    return wrapper
+
+
+@app.context_processor
+def inject_globals():
+    return {"board_title": CFG.board_title, "is_admin": is_admin(), "CFG": CFG}
 
 
 @app.template_filter("datetime")
@@ -114,6 +178,7 @@ def db() -> Generator[sqlite3.Connection, None, None]:
     conn = sqlite3.connect(DB_PATH)
     try:
         conn.row_factory = sqlite3.Row
+        conn.execute("PRAGMA foreign_keys = ON")
         yield conn
     finally:
         conn.close()
@@ -199,6 +264,41 @@ def save_image(file_storage) -> Tuple[Optional[str], Optional[str]]:
     except Exception:
         thumb_name = None
     return image_name, thumb_name
+
+
+def _remove_file(path: Path) -> None:
+    try:
+        path.unlink()
+    except FileNotFoundError:
+        pass
+
+
+def delete_post(post_id: int) -> bool:
+    """Delete a post (and cascade replies) plus associated files."""
+    with db() as conn:
+        cur = conn.execute(
+            "SELECT id, parent_id, image_filename, thumb_filename FROM posts WHERE id=?",
+            (post_id,),
+        )
+        post = cur.fetchone()
+        if not post:
+            return False
+        cur = conn.execute(
+            "SELECT id, image_filename, thumb_filename FROM posts WHERE parent_id=?",
+            (post_id,),
+        )
+        attachments = [post, *cur.fetchall()]
+        conn.execute("DELETE FROM posts WHERE id=?", (post_id,))
+        conn.commit()
+
+    for entry in attachments:
+        img = entry["image_filename"]
+        if img:
+            _remove_file(UPLOAD_DIR / img)
+        thumb = entry["thumb_filename"]
+        if thumb:
+            _remove_file(THUMB_DIR / thumb)
+    return True
 
 
 # ----------------------------- Rate Limit ----------------------------- #
@@ -352,6 +452,45 @@ def reply(thread_id: int):
         thumb_name=thumb_name,
     )
     return redirect(url_for("view_thread", thread_id=thread_id))
+
+
+# ----------------------------- Admin Views ----------------------------- #
+
+
+@app.route("/admin/login", methods=["GET", "POST"])
+def admin_login():
+    if request.method == "POST":
+        username = (request.form.get("username") or "").strip()
+        password = request.form.get("password") or ""
+        if username == CFG.admin_username and check_password_hash(
+            CFG.admin_password_hash, password
+        ):
+            session[ADMIN_SESSION_KEY] = True
+            flash("Logged in as administrator.", "info")
+            next_url = _safe_url(request.args.get("next") or request.form.get("next"), 
+                                 url_for("index"))
+            return redirect(next_url)
+        flash("Invalid credentials.", "error")
+    return render_template("admin_login.html")
+
+
+@app.route("/admin/logout")
+def admin_logout():
+    session.pop(ADMIN_SESSION_KEY, None)
+    flash("Logged out.", "info")
+    return redirect(url_for("index"))
+
+
+@app.post("/admin/delete/<int:post_id>")
+@require_admin
+def admin_delete(post_id: int):
+    success = delete_post(post_id)
+    if success:
+        flash("Post deleted.", "info")
+    else:
+        flash("Post not found.", "error")
+    next_url = _safe_url(request.form.get("next"), url_for("index"))
+    return redirect(next_url)
 
 
 # Static file serving
