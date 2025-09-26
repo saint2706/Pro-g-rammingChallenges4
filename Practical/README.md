@@ -58,8 +58,10 @@ Brief synopses; dive into each folder for details.
 |--------|---------|----------|
 | Imageboard | Minimal Flask + SQLite anonymous imageboard (threads, replies, uploads, quoting, thumbnails). | Flask, Pillow, SQLite, Jinja filters |
 | ImgToASCII | Convert images to ASCII art (CLI + Tk GUI). | Pillow, NumPy, Tkinter |
+| IRC Client | Async terminal IRC client with TLS, reconnection, logging. | Python stdlib (`asyncio`, `ssl`, `argparse`, `logging`) |
 | IP Tracking visualization | Fetch IP geolocation data & plot interactive map. | requests, pandas, plotly, tqdm |
 | Markov Chain Sentence Generator | Train simple Markov model over corpora (CLI + GUI). | Dataclasses, Tkinter |
+| MIDI Player Editor | CLI-based MIDI playback, editing, and export workflow. | mido, python-rtmidi |
 | Paint (clone) | Lightweight Tk canvas paint app with palette + save. | Tkinter, Pillow (optional) |
 | PDF Tagger | Add arbitrary JSON metadata tags to PDFs. | pypdf |
 | Port Scanner | Concurrent TCP port scanning (CLI + GUI + export). | sockets, ThreadPoolExecutor, Tkinter |
@@ -86,6 +88,7 @@ If you only need a subset, install manually:
 | Imageboard | `pip install Flask Pillow` |
 | Seam Carving | `pip install opencv-python numpy` (Pillow optional for GUI) |
 | IP Map | `pip install requests pandas plotly tqdm` |
+| IRC Client | no extra packages (Python 3.10+ standard library) |
 | PDF Tagger | `pip install pypdf` |
 | ASCII Converter | `pip install Pillow numpy` |
 | Vector / Rotating Cube | `pip install matplotlib numpy` |
