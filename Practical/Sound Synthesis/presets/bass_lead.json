@@ -1,0 +1,9 @@
+{
+  "name": "Bass Lead",
+  "oscillators": [
+    {"type": "square", "detune_cents": 0, "gain": 0.8},
+    {"type": "saw", "detune_cents": 7, "gain": 0.2}
+  ],
+  "envelope": {"attack": 0.01, "decay": 0.15, "sustain": 0.4, "release": 0.25},
+  "filter": {"mode": "lowpass", "cutoff": 1200.0, "resonance": 0.35}
+}
