@@ -70,7 +70,7 @@ While this is a personal project, the principles behind it are universal. If you
 | 41 | IP Tracking Visualization | [View Solution](./Practical/IP%20Tracking%20visualization/) |
 | 42 | Port Scanner | [View Solution](./Practical/Port%20Scanner/) |
 | 43 | Old School Demo Effect (Plasma Tunnel Scrollers Zoomers etc...) | Not Yet |
-| 135 | Bellman-Ford Simulation with at least Five Vertices | Not Yet |
+| 135 | Bellman-Ford Simulation with at least Five Vertices | [View Solution](./Practical/Bellman%20Ford%20Simulation/) |
 | 136 | Matrix Arithmetic | Not Yet |
 | 137 | File Compression Utility (Make it GUI) | Not Yet |
 | 138 | PDF Tagger | [View Solution](./Practical/PDF%20Tagger/) |
