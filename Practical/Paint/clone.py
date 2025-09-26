@@ -21,7 +21,6 @@ from __future__ import annotations
 
 import tempfile
 import tkinter as tk
-from dataclasses import dataclass
 from pathlib import Path
 from tkinter import colorchooser, filedialog, messagebox
 from typing import List, Optional
@@ -34,18 +33,9 @@ except Exception:  # pragma: no cover - absence path
     PIL_AVAILABLE = False
     Image = None  # type: ignore
 
+from settings_util import CanvasSettings as Settings, VALID_SHAPES as SHARED_VALID_SHAPES
+
 # --------------------------- Settings --------------------------- #
-
-
-@dataclass(slots=True)
-class Settings:
-    width: int = 800
-    height: int = 600
-    bg: str = "white"
-    fg: str = "black"
-    stroke_width: int = 3
-    shape: str = "freehand"  # freehand | line | rectangle | oval
-    fill: bool = False
 
 
 # --------------------------- Application --------------------------- #
@@ -54,7 +44,7 @@ class Settings:
 class PaintApp:
     """A lightweight paint-like program with undo, save, and basic shapes."""
 
-    VALID_SHAPES = ("freehand", "line", "rectangle", "oval")
+    VALID_SHAPES = SHARED_VALID_SHAPES
 
     def __init__(self, root: tk.Tk, settings: Optional[Settings] = None):
         self.root = root
