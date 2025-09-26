@@ -10,7 +10,7 @@ from dataclasses import dataclass
 from html import escape
 from pathlib import Path
 from string import Template
-from typing import Dict, Iterable, Optional, Tuple
+from typing import Dict, Iterable, Optional, Sequence, Tuple
 import re
 import xml.etree.ElementTree as ET
 
@@ -52,6 +52,11 @@ class TemplateManager:
 
     def labels(self) -> Dict[str, str]:
         return {name: definition.label for name, definition in self._templates.items()}
+
+    def choices(self) -> Sequence[Tuple[str, str]]:
+        """Return template name/label pairs in a deterministic order."""
+
+        return [(name, definition.label) for name, definition in self._templates.items()]
 
     def render(
         self,
@@ -209,11 +214,70 @@ def convert_to_xml(result: ConversionResult) -> str:
     return ET.tostring(root, encoding="unicode")
 
 
+BASE_DIR = Path(__file__).resolve().parent
+DEFAULT_TEMPLATE_DIR = BASE_DIR / "templates"
+
+
+def load_template_manager(template_dir: Optional[Path] = None) -> TemplateManager:
+    """Instantiate a :class:`TemplateManager` for ``template_dir``.
+
+    The desktop and Streamlit applications both rely on this helper to lazily
+    construct a manager without importing any Tkinter modules. When
+    ``template_dir`` is ``None`` the default template folder bundled with the
+    project is used.
+    """
+
+    directory = template_dir or DEFAULT_TEMPLATE_DIR
+    return TemplateManager(directory)
+
+
+def list_template_choices(template_manager: TemplateManager) -> Sequence[Tuple[str, str]]:
+    """Expose available template ``(name, label)`` pairs for UI bindings."""
+
+    return template_manager.choices()
+
+
+def convert_markdown_to_html(
+    text: str,
+    *,
+    template_manager: TemplateManager,
+    preferred_template: Optional[str] = None,
+) -> str:
+    """Convenience wrapper returning rendered HTML only."""
+
+    return convert_markdown(
+        text,
+        template_manager=template_manager,
+        preferred_template=preferred_template,
+    ).html
+
+
+def convert_markdown_to_xml(
+    text: str,
+    *,
+    template_manager: TemplateManager,
+    preferred_template: Optional[str] = None,
+) -> str:
+    """Convert Markdown input directly to the XML payload used for exports."""
+
+    result = convert_markdown(
+        text,
+        template_manager=template_manager,
+        preferred_template=preferred_template,
+    )
+    return convert_to_xml(result)
+
+
 __all__ = [
     "ConversionResult",
     "TemplateDefinition",
     "TemplateManager",
+    "convert_markdown_to_html",
+    "convert_markdown_to_xml",
     "convert_markdown",
     "convert_to_xml",
+    "DEFAULT_TEMPLATE_DIR",
+    "list_template_choices",
+    "load_template_manager",
     "parse_front_matter",
 ]
