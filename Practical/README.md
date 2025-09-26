@@ -67,6 +67,7 @@ Brief synopses; dive into each folder for details.
 | Stock Market Simulator | Backtest custom strategies over Yahoo Finance data with caching + reports. | pandas, requests, matplotlib (optional) |
 | MIDI Player Editor | CLI-based MIDI playback, editing, and export workflow. | mido, python-rtmidi |
 | Paint (clone) | Lightweight Tk canvas paint app with palette + save. | Tkinter, Pillow (optional) |
+| Pixel Editor | Layered pixel art editor with animation preview & sprite sheet IO. | Tkinter, Pillow |
 | PDF Tagger | Add arbitrary JSON metadata tags to PDFs. | pypdf |
 | Port Scanner | Concurrent TCP port scanning (CLI + GUI + export). | sockets, ThreadPoolExecutor, Tkinter |
 | Producer Consumer | Modernized concurrency patterns (Py/Java/C/C++ examples). | threading, semaphores, queues |
