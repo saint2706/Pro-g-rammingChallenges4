@@ -1,32 +1,33 @@
 # Requirements for the Algorithmic collection
 # Install with: pip install -r requirements.txt
-# Versions are pinned conservatively for reproducibility; adjust as needed.
+# Canonical pins are shared across the repo; optional tools note their future pyproject extras.
 
 # Core numerical / plotting
-numpy>=1.25,<2.0
-matplotlib>=3.8,<3.9
-pandas>=2.2,<2.3
+numpy>=1.26,<2.0              # Arrays, vector ops, Monte Carlo demos – planned extra: algorithmic-core
+matplotlib>=3.8,<3.9          # Plotting for vector product & cube rotation – planned extra: algorithmic-visuals
+pandas>=2.2,<2.3              # Tabular summaries (sorting visualizer exports) – planned extra: algorithmic-data
 
 # Image handling / steganography
-Pillow>=10.0,<11.0
+Pillow>=10.4,<10.5            # Image IO for steganography scripts – planned extra: algorithmic-imaging
 
 # Web requests / parsing
-requests>=2.31,<3.0
-beautifulsoup4>=4.12,<5.0
+requests>=2.31,<3.0           # HTTP requests for web scraping demos – planned extra: algorithmic-web
+beautifulsoup4>=4.12,<5.0     # HTML parsing for crawler demo – planned extra: algorithmic-web
 
 # Audio / video (optional, used by ytmp3 script; yt-dlp preferred)
-yt-dlp>=2024.7.1
-# youtube_dl # fallback only; usually omit to avoid conflicts
+yt-dlp>=2024.7.1              # YouTube downloader (planned extra: algorithmic-media)
+# youtube_dl                  # Legacy fallback only; install manually if required
 
 # CLI tooling / type aids (optional)
-argparse; python_version<'3.10'
+argparse; python_version<'3.10'  # Backport for Python 3.9 users
 
 # Testing
-pytest>=8.2,<9.0
+pytest>=8.3,<8.4              # Unit tests for algorithmic utilities – planned extra: dev
 
 # Optional: if affine cipher brute force speed-ups are desired (not required)
-# sympy>=1.12
+# sympy>=1.12                 # Planned extra: algorithmic-math
 
 # NOTE:
 # - Keep this list aligned with scripts' imports.
 # - Some scripts gracefully degrade if a lib is absent (e.g., matplotlib optional for JSON output).
+# - Optional stacks above will migrate to pyproject extras as they are published.

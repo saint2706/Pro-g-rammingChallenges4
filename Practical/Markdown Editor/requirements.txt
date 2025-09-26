@@ -1,3 +1,7 @@
-markdown>=3.6,<3.7
-# Optional but recommended for the live HTML preview widget
-tkhtmlview>=0.2.0,<0.3
+# Requirements for the Markdown Editor subproject
+# Each pin matches the repo-wide canonical versions for consistency.
+
+markdown>=3.6,<3.7            # Core Markdown rendering (Markdown Editor) – planned extra: practical-markdown
+tkhtmlview>=0.2.0,<0.3        # Optional live HTML preview widget – planned extra: practical-markdown
+
+# Future pyproject extras will expose a "practical-markdown" group covering these libraries.

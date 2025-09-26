@@ -1,5 +1,8 @@
 # Artificial Intelligence Module Requirements
-# These are the core dependencies for all scripts in this folder.
-numpy>=1.20
-# No external dependencies required for Connect4 or BNN.py
-# All scripts are compatible with Python 3.8+
+# These are the core dependencies for Python-based AI scripts in this folder.
+# Pins stay aligned with the repo-wide canonical versions for consistency.
+
+numpy>=1.26,<2.0              # Shared math utilities (BNN.py, board evaluators) – planned extra: ai-core
+
+# No external dependencies required for Connect4 or BNN beyond numpy.
+# Future pyproject extras will expose optional ML stacks as they are added.
