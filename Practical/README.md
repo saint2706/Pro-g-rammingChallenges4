@@ -58,8 +58,14 @@ Brief synopses; dive into each folder for details.
 |--------|---------|----------|
 | Imageboard | Minimal Flask + SQLite anonymous imageboard (threads, replies, uploads, quoting, thumbnails). | Flask, Pillow, SQLite, Jinja filters |
 | ImgToASCII | Convert images to ASCII art (CLI + Tk GUI). | Pillow, NumPy, Tkinter |
+| IRC Client | Async terminal IRC client with TLS, reconnection, logging. | Python stdlib (`asyncio`, `ssl`, `argparse`, `logging`) |
 | IP Tracking visualization | Fetch IP geolocation data & plot interactive map. | requests, pandas, plotly, tqdm |
 | Markov Chain Sentence Generator | Train simple Markov model over corpora (CLI + GUI). | Dataclasses, Tkinter |
+
+| Stock Market Simulator | Backtest custom strategies over Yahoo Finance data with caching + reports. | pandas, requests, matplotlib (optional) |
+
+| MIDI Player Editor | CLI-based MIDI playback, editing, and export workflow. | mido, python-rtmidi |
+
 | Paint (clone) | Lightweight Tk canvas paint app with palette + save. | Tkinter, Pillow (optional) |
 | PDF Tagger | Add arbitrary JSON metadata tags to PDFs. | pypdf |
 | Port Scanner | Concurrent TCP port scanning (CLI + GUI + export). | sockets, ThreadPoolExecutor, Tkinter |
@@ -68,7 +74,11 @@ Brief synopses; dive into each folder for details.
 | Seam Carving | Content-aware image resizing (CLI + GUI + progress). | OpenCV, NumPy, Pillow (GUI) |
 | ToDoList-CLI | File‑backed todo manager (undo, prioritize, search). | Dataclasses, color output |
 | Vector Product | Vector math utilities & 3D plotting. | matplotlib |
+
 | Verlet Cloth | Cloth simulation using Verlet integration with interactive toggles. | NumPy, matplotlib |
+
+| WAV Equalizer | Real-time multi-band audio equalizer with live spectrum GUI. | numpy, scipy, sounddevice, matplotlib, Tkinter |
+
 | Old School cringe | Retro rotating cube + assets demo. | matplotlib.animation, NumPy |
 | Graphing Calculator | Basic expression plotting GUI. | Tkinter, eval sandboxing |
 | Paint / Clone | Simple drawing & export. | Tkinter |
@@ -86,6 +96,7 @@ If you only need a subset, install manually:
 | Imageboard | `pip install Flask Pillow` |
 | Seam Carving | `pip install opencv-python numpy` (Pillow optional for GUI) |
 | IP Map | `pip install requests pandas plotly tqdm` |
+| IRC Client | no extra packages (Python 3.10+ standard library) |
 | PDF Tagger | `pip install pypdf` |
 | ASCII Converter | `pip install Pillow numpy` |
 | Vector / Rotating Cube | `pip install matplotlib numpy` |

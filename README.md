@@ -29,11 +29,16 @@ While this is a personal project, the principles behind it are universal. If you
 | --- | --------- | ------ |
 | 1 | Download Manager | [View Solution](./Practical/Download%20Manager/) |
 | 2 | Make an elastic producer/consumer task queue. | [View Solution](./Practical/Producer%20Consumer/) |
-| 3 | IRC Client | Not Yet |
+| 3 | IRC Client | [View Solution](./Practical/IRC%20Client/) |
 | 4 | Markov Chain Sentence Generator (Include Shitposting Capabilities) | [View Solution](./Practical/Markov%20Chain%20Sentence%20Generator/) |
 | 5 | English Sentence Parser that Points to the Context of a Sentence | [View Solution](./Practical/Context%20Pointer/) |
+
 | 6 | MIDI Player + Editor | Not Yet |
+| 7 | Stock Market Simulator Using Yahoo Spreadsheet Data | [View Solution](./Practical/Stock%20Market%20Simulator/) |
+
+| 6 | MIDI Player + Editor | [View Solution](./Practical/MIDI%20Player%20Editor/) |
 | 7 | Stock Market Simulator Using Yahoo Spreadsheet Data | Not Yet |
+
 | 8 | Parametric/Graphic Equalizer for .wav files (Make it real-time) | Not Yet |
 | 9 | Graphing Calculator (BONUS: Graph the Function's Derivatives) | [View Solution](./Practical/Graphing%20Calculator/) |
 | 10 | To-Do List Application (Web app or CLI) | [View Solution](./Practical/ToDoList-CLI/) |
@@ -80,6 +85,8 @@ While this is a personal project, the principles behind it are universal. If you
 | 142 | Seam Carving | [View Solution](./Practical/Seam%20Carving/) |
 | 143 | Bayesian Filter | [View Solution](./Practical/Bayesian%20Filter/) |
 | 144 | WMS viewer that isn't web based | Not Yet |
+
+> The IRC client depends only on Python 3.10+ standard-library modules (`asyncio`, `ssl`, `argparse`, `logging`).
 
 ### Algorithmic
 
