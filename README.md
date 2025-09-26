@@ -50,7 +50,7 @@ While this is a personal project, the principles behind it are universal. If you
 | 17 | Paint Clone | [View Solution](./Practical/Paint/) |
 | 18 | Image to ASCII Art | [View Solution](./Practical/ImgToASCII/) |
 | 19 | Booru (Image Board) Image Downloader | [View Solution](./Practical/Booru%20Imageboard%20Downloader/) |
-| 20 | Image Converter | Not Yet |
+| 20 | Image Converter | [View Solution](./Practical/Image%20Converter/) |
 | 21 | ID3 Reader | Not Yet |
 | 22 | Sound Synthesis (Sine square sawtooth etc...) ("Fuck You" mode: Realtime MIDI Playback with Custom instruments) | [View Solution](./Practical/Sound%20Synthesis/) |
 | 23 | C++ IDE Plugin for Sublime/Atom (Auto-Complete Go-To Symbol Declaration and Definition using Clang's AST) | Not Yet |
