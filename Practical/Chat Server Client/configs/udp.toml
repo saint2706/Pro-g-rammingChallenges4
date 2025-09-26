@@ -1,0 +1,6 @@
+host = "127.0.0.1"
+port = 8766
+log_path = "Practical/Chat Server Client/logs/udp-chat.log"
+base_delay = 0.5
+max_retries = 5
+history_size = 50
