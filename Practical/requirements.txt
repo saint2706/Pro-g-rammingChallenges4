@@ -3,6 +3,10 @@
 
 # Core scientific / numeric
 numpy>=1.26,<2.0
+scipy>=1.11,<1.12             # Spectrogram + peak detection utilities (Shazam clone)
+librosa>=0.10,<0.11           # Audio loading/STFT helper (Shazam clone)
+soundfile>=0.12,<0.13         # Backend reader for librosa (WAV/FLAC/OGG support)
+sounddevice>=0.4,<0.5         # Optional microphone capture for querying
 scipy>=1.11,<1.13            # Signal processing (WAV Equalizer, future DSP demos)
 pandas>=2.2,<2.3            # Used by IP Tracking visualization
 opencv-python>=4.10,<5.0    # Seam carving (energy calculation)
