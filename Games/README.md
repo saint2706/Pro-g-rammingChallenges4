@@ -63,7 +63,7 @@ Authoritative status board for challenges #104–#132. Entry points list the mai
 | 109 | Pac-Man (behavioural ghosts) | Backlog | TBD | — |
 | 110 | Dragon Quest / Basic RPG Engine | Backlog | TBD | — |
 | 111 | Rock Paper Scissors (+Lizard Spock) | Solved | Python 3 (CLI), C++, Java, JavaScript/Web | `RPS/rpsls.py`, `RPS/rps.cpp`, `RPS/rps.java`, `RPS/rps.html` |
-| 112 | First-Person Engine (OpenGL) | Backlog | Planned OpenGL / C++ | — |
+| 112 | First-Person Engine (OpenGL) | Solved | C++17, GLFW, GLAD | `FirstPersonEngine` (see README) |
 | 113 | Shuffle a Deck (with visualisation) | Solved | Python 3 + matplotlib | `Shuffle/cards.py` |
 | 114 | Multi-agent Tag Simulation | Backlog | TBD | — |
 | 115 | Wolfenstein Clone | Backlog | Planned raycaster | — |
@@ -139,9 +139,14 @@ Ensure `javac`/`java` are on your `PATH`. See the linked READMEs for gameplay co
 ```bash
 g++ RPS/rps.cpp -o RPS/rps
 ./RPS/rps
+
+cmake -S FirstPersonEngine -B FirstPersonEngine/build
+cmake --build FirstPersonEngine/build
+./FirstPersonEngine/build/first_person_engine  # Launch (Linux/macOS)
+FirstPersonEngine\build\Debug\first_person_engine.exe  # Windows example
 ```
 
-The C++ build uses only the standard library; no external packages required. Details live in [Rock Paper Scissors](RPS/README.md).
+The `FirstPersonEngine` project ships its own [README](FirstPersonEngine/README.md) with platform-specific notes and VR hook instructions.
 
 ### 4.4. JavaScript / Web
 
