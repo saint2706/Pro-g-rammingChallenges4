@@ -1,0 +1,14 @@
+{
+  "scenes": [
+    {
+      "tag": "menu",
+      "scenePath": "Assets/Scenes/Menu.unity",
+      "description": "Boot scene featuring the world bridge and UI hooks."
+    },
+    {
+      "tag": "spinner",
+      "scenePath": "Assets/Scenes/SpinnerDemo.unity",
+      "description": "Demonstrates ECS-driven rotation and event bus telemetry."
+    }
+  ]
+}

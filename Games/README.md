@@ -73,7 +73,7 @@ Authoritative status board for challenges #104–#132. Entry points list the mai
 | 119 | Sudoku | Solved | Python 3 + tkinter + numpy | `Sudoku/sudoku.py` |
 | 120 | Danmaku (Bullet Hell) Engine | Backlog | TBD | — |
 | 121 | Roguelike Engine / Dungeon Generator | Backlog | TBD | — |
-| 122 | Design a Game Engine in Unity | Backlog | Unity (planned) | — |
+| 122 | Design a Game Engine in Unity | Solved | Unity 2022.3 LTS | `UnityEngine/` |
 | 123 | Yahtzee | Solved | Python 3 (CLI), Java | `Yahtzee/yahtzee.py`, `Yahtzee/yahtzee.java` |
 | 124 | Oil Panic | Backlog | TBD | — |
 | 125 | Chess | Backlog | TBD | — |
