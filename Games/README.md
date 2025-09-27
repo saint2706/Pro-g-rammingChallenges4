@@ -82,9 +82,15 @@ Authoritative status board for challenges #104–#132. Entry points list the mai
 | 117 | Minesweeper | Solved | Python 3 + tkinter | `Minesweeper/mine.py` |
 | 118 | 64KB Audio/Visual Demo | Backlog | TBD | — |
 | 119 | Sudoku | Solved | Python 3 + tkinter + numpy | `Sudoku/sudoku.py` |
+
+| 120 | Danmaku (Bullet Hell) Engine | Backlog | TBD | — |
+| 121 | Roguelike Engine / Dungeon Generator | Solved | Python 3 + tcod | `python -m Games.Roguelike.main` |
+| 122 | Design a Game Engine in Unity | Backlog | Unity (planned) | — |
+
 | 120 | Danmaku (Bullet Hell) Engine | Solved | TypeScript + PixiJS | `DanmakuEngine/` (`npm run dev`) |
 | 121 | Roguelike Engine / Dungeon Generator | Backlog | TBD | — |
 | 122 | Design a Game Engine in Unity | Solved | Unity 2022.3 LTS | `UnityEngine/` |
+
 | 123 | Yahtzee | Solved | Python 3 (CLI), Java | `Yahtzee/yahtzee.py`, `Yahtzee/yahtzee.java` |
 | 124 | Oil Panic | Backlog | TBD | — |
 | 125 | Chess | Backlog | TBD | — |
@@ -134,7 +140,11 @@ python "Knight Tour/knight.py"  # CLI solver visualises via stdout
 python "Mastermind/mastermind_cli.py"  # CLI Mastermind with difficulty presets
 python "Mastermind/mastermind_gui.py"  # tkinter GUI with code-maker mode
 python "RPS/rpsls.py"           # CLI (supports Lizard/Spock variant)
+
+python -m Games.Roguelike.main   # Terminal roguelike (tcod)
+
 python "Monster Raising/main.py"  # pygame ranch sim with JSON saves
+
 ```
 
 
