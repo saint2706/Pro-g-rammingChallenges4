@@ -169,6 +169,9 @@ scratch/
 *.orig
 *.rej
 
+# Explicitly keep the repository artwork out of version control
+programming challenges.png
+
 # Sublime / other editor project files
 *.sublime-workspace
 *.sublime-project
