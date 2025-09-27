@@ -72,7 +72,11 @@ Authoritative status board for challenges #104–#132. Entry points list the mai
 | 108 | Pipe Dreams | Solved | TypeScript + Vite (HTML5 Canvas) | `Pipe Dreams/index.html` (Vite dev server) |
 | 109 | Pac-Man (behavioural ghosts) | Backlog | TBD | — |
 
+| 110 | Dragon Quest / Basic RPG Engine | Solved | Python 3 + pygame RPG engine | `RPGEngine/main.py` |
+
+
 | 110 | Dragon Quest / Basic RPG Engine | Backlog | TBD | — |
+
 | 111 | Rock Paper Scissors (+Lizard Spock) | Solved | Python 3 (CLI), C++, Java, JavaScript/Web | `RPS/rpsls.py`, `RPS/rps.cpp`, `RPS/rps.java`, `RPS/rps.html` |
 | 112 | First-Person Engine (OpenGL) | Solved | C++17, GLFW, GLAD | `FirstPersonEngine` (see README) |
 | 113 | Shuffle a Deck (with visualisation) | Solved | Python 3 + matplotlib | `Shuffle/cards.py` |
