@@ -1,0 +1,21 @@
+{
+  "name": "danmaku-engine",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "stage:validate": "ts-node --esm scripts/validateStages.ts"
+  },
+  "dependencies": {
+    "pixi.js": "^8.2.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.25",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3",
+    "vite": "^5.2.0"
+  }
+}
