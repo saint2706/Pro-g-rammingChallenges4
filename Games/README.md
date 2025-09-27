@@ -105,9 +105,16 @@ Authoritative status board for challenges #104–#132. Entry points list the mai
 | 126 | Go (No AI necessary) | Backlog | TBD | — |
 
 | 127 | Connect Four | Solved | Python 3 + pygame + numpy, Java | `Connect4/connect4.py`, `Connect4/connect4.java` |
+
+| 128 | Mastermind | Backlog | TBD | — |
+| 129 | Missile Command | Solved | Python 3 + pygame | `MissileCommand/missile_command.py` |
+| 130 | Tron | Backlog | TBD | — |
+
+
 | 128 | Mastermind | Solved | Python 3 (CLI + tkinter GUI) | `Mastermind/mastermind_cli.py`, `Mastermind/mastermind_gui.py` |
 | 129 | Missile Command | Backlog 
 | 130 | Tron | Solved | JavaScript (HTML Canvas + WebRTC) | `Tron/index.html` |
+
 | 131 | Breakout | Backlog | TBD | — |
 
 | 130 | Tron | Backlog | TBD | — |
