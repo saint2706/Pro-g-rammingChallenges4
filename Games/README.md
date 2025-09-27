@@ -56,8 +56,13 @@ Authoritative status board for challenges #104–#132. Entry points list the mai
 | #   | Challenge | Status  | Primary Tech Stack | Entry Points |
 |-----|-----------|---------|--------------------|--------------|
 | 104 | Knight's Tour | Solved | Python 3 (CLI, backtracking) | `Knight Tour/knight.py` |
+
+| 105 | Monster Raising/Breeding Simulator | Solved | Python 3 + pygame | `Monster Raising/main.py` |
+| 106 | Tetris | Backlog | TBD | — |
+
 | 105 | Monster Raising/Breeding Simulator | Backlog | TBD | — |
 | 106 | Tetris | View Solution | Python 3 + pygame | `Tetris/main.py` |
+
 | 107 | Snake | Solved | Python 3 (turtle), JavaScript + HTML Canvas | `Snake/snake.py`, `Snake/snake.html` |
 | 108 | Pipe Dreams | Backlog | TBD | — |
 | 109 | Pac-Man (behavioural ghosts) | Backlog | TBD | — |
@@ -119,6 +124,7 @@ python "Yahtzee/yahtzee.py"     # CLI edition
 python "Snake/snake.py"         # Turtle graphics, ensure tkinter is available
 python "Knight Tour/knight.py"  # CLI solver visualises via stdout
 python "RPS/rpsls.py"           # CLI (supports Lizard/Spock variant)
+python "Monster Raising/main.py"  # pygame ranch sim with JSON saves
 ```
 
 Per-game documentation: [Connect Four](Connect4/README.md), [Tetris](Tetris/README.md), [Minesweeper](Minesweeper/README.md), [Simon](Simon/README.md), [Sudoku](Sudoku/README.md), [Shuffle](Shuffle/README.md), [Yahtzee](Yahtzee/README.md), [Snake](Snake/README.md), [Knight's Tour]("Knight Tour"/README.md), [Rock Paper Scissors](RPS/README.md).
