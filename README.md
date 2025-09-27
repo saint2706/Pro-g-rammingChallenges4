@@ -13,9 +13,9 @@ The solutions are organized by category and difficulty, making it easy to naviga
 
 ## Progress
 
-<progress value="98" max="131"></progress>
+<progress value="99" max="131"></progress>
 
-**Overall:** 98 / 131 challenges completed (74.8%).
+**Overall:** 99 / 131 challenges completed (75.6%).
 
 | Category | Completed | Total | Progress |
 | --- | --- | --- | --- |
@@ -23,7 +23,7 @@ The solutions are organized by category and difficulty, making it easy to naviga
 | Algorithmic | 27 | 27 | 100% |
 | Artificial Intelligence | 3 | 8 | 37.5% |
 | Emulation/Modeling | 6 | 14 | 42.9% |
-| Games | 9 | 29 | 31.0% |
+| Games | 10 | 29 | 34.5% |
 
 _Progress counts are generated from the actual solution folders in the repository (see tables below)._ 
 
@@ -223,7 +223,7 @@ The repository includes a GitHub Actions workflow at `.github/workflows/keep-str
 | # | Challenge | Status |
 | --- | --------- | ------ |
 | 104 | Knight's Tour | [View Solution](./Games/Knight%20Tour/) |
-| 105 | Monster Raising/Breeding Simulator | Not Yet |
+| 105 | Monster Raising/Breeding Simulator | [View Solution](./Games/Monster%20Raising/) |
 | 106 | Tetris | Not Yet |
 | 107 | Snake | [View Solution](./Games/Snake/) |
 | 108 | Pipe Dreams | Not Yet |
