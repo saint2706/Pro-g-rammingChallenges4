@@ -56,8 +56,13 @@ Authoritative status board for challenges #104–#132. Entry points list the mai
 | #   | Challenge | Status  | Primary Tech Stack | Entry Points |
 |-----|-----------|---------|--------------------|--------------|
 | 104 | Knight's Tour | Solved | Python 3 (CLI, backtracking) | `Knight Tour/knight.py` |
+
 | 105 | Monster Raising/Breeding Simulator | Solved | Python 3 + pygame | `Monster Raising/main.py` |
 | 106 | Tetris | Backlog | TBD | — |
+
+| 105 | Monster Raising/Breeding Simulator | Backlog | TBD | — |
+| 106 | Tetris | View Solution | Python 3 + pygame | `Tetris/main.py` |
+
 | 107 | Snake | Solved | Python 3 (turtle), JavaScript + HTML Canvas | `Snake/snake.py`, `Snake/snake.html` |
 | 108 | Pipe Dreams | Backlog | TBD | — |
 | 109 | Pac-Man (behavioural ghosts) | Backlog | TBD | — |
@@ -65,7 +70,7 @@ Authoritative status board for challenges #104–#132. Entry points list the mai
 | 111 | Rock Paper Scissors (+Lizard Spock) | Solved | Python 3 (CLI), C++, Java, JavaScript/Web | `RPS/rpsls.py`, `RPS/rps.cpp`, `RPS/rps.java`, `RPS/rps.html` |
 | 112 | First-Person Engine (OpenGL) | Backlog | Planned OpenGL / C++ | — |
 | 113 | Shuffle a Deck (with visualisation) | Solved | Python 3 + matplotlib | `Shuffle/cards.py` |
-| 114 | Multi-agent Tag Simulation | Backlog | TBD | — |
+| 114 | Multi-agent Tag Simulation | Solved | Python 3 + pygame + matplotlib | `MultiAgentTag/tag_sim.py` |
 | 115 | Wolfenstein Clone | Backlog | Planned raycaster | — |
 | 116 | Scorched Earth Clone | Backlog | TBD | — |
 | 117 | Minesweeper | Solved | Python 3 + tkinter | `Minesweeper/mine.py` |
@@ -110,6 +115,7 @@ Each language links to the dedicated game README for deeper context (rules, cont
 
 ```bash
 python "Connect4/connect4.py"   # Requires pygame + numpy
+python "Tetris/main.py"         # Pygame Tetris with DAS/ARR controls
 python "Minesweeper/mine.py"    # tkinter GUI (bundled with most Python installs)
 python "Simon/simon.py"         # Loads Assets/Audio and Assets/Images
 python "Sudoku/sudoku.py"       # Needs numpy + tkinter
@@ -121,7 +127,7 @@ python "RPS/rpsls.py"           # CLI (supports Lizard/Spock variant)
 python "Monster Raising/main.py"  # pygame ranch sim with JSON saves
 ```
 
-Per-game documentation: [Connect Four](Connect4/README.md), [Minesweeper](Minesweeper/README.md), [Simon](Simon/README.md), [Sudoku](Sudoku/README.md), [Shuffle](Shuffle/README.md), [Yahtzee](Yahtzee/README.md), [Snake](Snake/README.md), [Knight's Tour]("Knight Tour"/README.md), [Rock Paper Scissors](RPS/README.md).
+Per-game documentation: [Connect Four](Connect4/README.md), [Tetris](Tetris/README.md), [Minesweeper](Minesweeper/README.md), [Simon](Simon/README.md), [Sudoku](Sudoku/README.md), [Shuffle](Shuffle/README.md), [Yahtzee](Yahtzee/README.md), [Snake](Snake/README.md), [Knight's Tour]("Knight Tour"/README.md), [Rock Paper Scissors](RPS/README.md).
 
 Assets are co-located inside each project (e.g., `Simon/Assets/Audio`). Keep relative paths intact when running outside the repo root.
 
