@@ -231,7 +231,7 @@ The repository includes a GitHub Actions workflow at `.github/workflows/keep-str
 | 106 | Tetris | [View Solution](./Games/Tetris/) |
 
 | 107 | Snake | [View Solution](./Games/Snake/) |
-| 108 | Pipe Dreams | Not Yet |
+| 108 | Pipe Dreams | [View Solution](./Games/Pipe%20Dreams/) |
 | 109 | Pac Man With Different Behaviors for each ghost | Not Yet |
 | 110 | Dragon Quest / Basic RPG Engine | Not Yet |
 | 111 | Rock Paper Scissors | [View Solution](./Games/RPS/) |

@@ -64,7 +64,7 @@ Authoritative status board for challenges #104–#132. Entry points list the mai
 | 106 | Tetris | View Solution | Python 3 + pygame | `Tetris/main.py` |
 
 | 107 | Snake | Solved | Python 3 (turtle), JavaScript + HTML Canvas | `Snake/snake.py`, `Snake/snake.html` |
-| 108 | Pipe Dreams | Backlog | TBD | — |
+| 108 | Pipe Dreams | Solved | TypeScript + Vite (HTML5 Canvas) | `Pipe Dreams/index.html` (Vite dev server) |
 | 109 | Pac-Man (behavioural ghosts) | Backlog | TBD | — |
 | 110 | Dragon Quest / Basic RPG Engine | Backlog | TBD | — |
 | 111 | Rock Paper Scissors (+Lizard Spock) | Solved | Python 3 (CLI), C++, Java, JavaScript/Web | `RPS/rpsls.py`, `RPS/rps.cpp`, `RPS/rps.java`, `RPS/rps.html` |
@@ -155,10 +155,17 @@ The C++ build uses only the standard library; no external packages required. Det
 1. Open the HTML file directly in a browser:
    - `Snake/snake.html`
    - `RPS/rps.html`
-2. For asset-backed games, keep the accompanying `.js`, `.css`, and `assets/` folders in the same directory.
-3. Optional: use a static server for clean module loading (`python -m http.server` from within the game folder).
+2. Launch the Vite dev server for the TypeScript canvas build:
+   ```bash
+   cd "Pipe Dreams"
+   npm install
+   npm run dev
+   ```
+   Use `npm run build` for a static bundle (already included under `Pipe Dreams/dist/`).
+3. For asset-backed games, keep the accompanying `.js`, `.css`, and `assets/` folders in the same directory.
+4. Optional: use a static server for clean module loading (`python -m http.server` from within the game folder).
 
-See [Snake](Snake/README.md) and [Rock Paper Scissors](RPS/README.md) for control schemes and asset notes.
+See [Snake](Snake/README.md), [Rock Paper Scissors](RPS/README.md), and [Pipe Dreams](Pipe%20Dreams/README.md) for control schemes and asset notes.
 
 ---
 
