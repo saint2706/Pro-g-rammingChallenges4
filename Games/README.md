@@ -97,9 +97,13 @@ Authoritative status board for challenges #104–#132. Entry points list the mai
 | 126 | Go (No AI necessary) | Backlog | TBD | — |
 | 127 | Connect Four | Solved | Python 3 + pygame + numpy, Java | `Connect4/connect4.py`, `Connect4/connect4.java` |
 | 128 | Mastermind | Solved | Python 3 (CLI + tkinter GUI) | `Mastermind/mastermind_cli.py`, `Mastermind/mastermind_gui.py` |
-| 129 | Missile Command | Backlog | TBD | — |
+| 129 | Missile Command | Backlog 
+| 130 | Tron | Solved | JavaScript (HTML Canvas + WebRTC) | `Tron/index.html` |
+| 131 | Breakout | Backlog | TBD | — |
+
 | 130 | Tron | Backlog | TBD | — |
 | 131 | Breakout | Solved | Python 3 + pygame | `Breakout/breakout.py` |
+
 | 132 | Simon | Solved | Python 3 + pygame (audio assets) | `Simon/simon.py` |
 
 > When you create a new implementation, update this table with the tech stack and primary launch command so the backlog remains actionable.
@@ -189,7 +193,11 @@ The `FirstPersonEngine` project ships its own [README](FirstPersonEngine/README.
    - `Snake/snake.html`
    - `RPS/rps.html`
 
+   - `Tron/index.html`
+
+
    - `DanmakuEngine/index.html` (or run `npm run dev` inside `DanmakuEngine/` for PixiJS build tooling)
+
 2. For asset-backed games, keep the accompanying `.js`, `.css`, and `assets/` folders in the same directory.
 3. Optional: use a static server for clean module loading (`python -m http.server` from within the game folder).
 

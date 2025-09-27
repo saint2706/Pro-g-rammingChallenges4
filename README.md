@@ -263,8 +263,13 @@ The repository includes a GitHub Actions workflow at `.github/workflows/keep-str
 | 127 | Connect Four | [View Solution](./Games/Connect4/) |
 | 128 | Mastermind | Not Yet |
 | 129 | Missile Command Game | Not Yet |
+
+| 130 | Tron | [View Solution](./Games/Tron/) |
+| 131 | Breakout | Not Yet |
+
 | 130 | Tron | Not Yet |
 | 131 | Breakout | [View Solution](./Games/Breakout/) |
+
 | 132 | Simon | [View Solution](./Games/Simon/) |
 
 ## Highlights
