@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tron Lightcycle Arena</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="app-header">
+    <h1>Tron Lightcycle Arena</h1>
+    <p class="tagline">Grid-based duels with local multiplayer, adaptive AI, and neon boosts.</p>
+  </header>
+
+  <main>
+    <section class="control-panel">
+      <h2>Match Setup</h2>
+      <form id="match-form">
+        <div class="config-grid">
+          <label>
+            Arena Variant
+            <select name="variant" id="variant-select">
+              <option value="classic">Classic Grid</option>
+              <option value="ring">Fusion Ring</option>
+              <option value="maze">Sector Maze</option>
+              <option value="pillars">Quad Pillars</option>
+            </select>
+          </label>
+
+          <label>
+            Arena Size
+            <select name="size" id="size-select">
+              <option value="sm">Small (32×24)</option>
+              <option value="md" selected>Medium (44×32)</option>
+              <option value="lg">Large (60×44)</option>
+            </select>
+          </label>
+
+          <label>
+            Game Speed
+            <select name="speed" id="speed-select">
+              <option value="slow">Tactical</option>
+              <option value="normal" selected>Standard</option>
+              <option value="fast">Hyper</option>
+            </select>
+          </label>
+
+          <label>
+            Rounds to Win
+            <input type="number" name="target" id="target-score" min="1" max="15" value="3" />
+          </label>
+        </div>
+
+        <table class="player-table">
+          <caption>Players</caption>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Pilot</th>
+              <th>Role</th>
+              <th>Controller</th>
+              <th>Color</th>
+            </tr>
+          </thead>
+          <tbody id="player-config"></tbody>
+        </table>
+
+        <div class="button-row">
+          <button type="submit" class="primary">Launch Match</button>
+          <button type="button" id="reset-btn" class="secondary">Reset</button>
+        </div>
+      </form>
+
+      <details class="network-details">
+        <summary>Experimental network play (WebRTC)</summary>
+        <p>
+          Network mode lets one remote pilot join a host-controlled arena using WebRTC data channels. Use it after configuring a
+          player as <strong>Remote</strong> and selecting a network role below. Exchange the offer/answer text through any chat
+          or voice channel.
+        </p>
+        <div class="network-grid">
+          <label>
+            Network Role
+            <select id="network-role">
+              <option value="standalone" selected>Standalone / Local only</option>
+              <option value="host">Host an arena</option>
+              <option value="client">Join a remote arena</option>
+            </select>
+          </label>
+
+          <label class="full">
+            Signal Exchange
+            <textarea id="signal-io" rows="6" placeholder="Offer or answer blob appears here"></textarea>
+          </label>
+
+          <div class="network-buttons">
+            <button type="button" id="create-offer" disabled>Create host offer</button>
+            <button type="button" id="accept-answer" disabled>Accept remote answer</button>
+            <button type="button" id="submit-offer" disabled>Submit host offer</button>
+          </div>
+        </div>
+        <p class="network-note">Tip: keep this tab focused during the handshake so ICE candidates finish gathering.</p>
+      </details>
+    </section>
+
+    <section class="arena-section">
+      <div class="scoreboard" id="scoreboard"></div>
+      <canvas id="arena" width="880" height="640" aria-label="Tron arena" role="img"></canvas>
+      <div class="status-panel">
+        <div id="status-text">Configure players and press Launch Match.</div>
+        <button type="button" id="next-round" class="primary" disabled>Next Round</button>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>
+      Built with vanilla JavaScript, Canvas, and the Gamepad API. Source lives in
+      <a href="https://github.com/saintwithataint/Pro-g-rammingChallenges4/tree/main/Games/Tron" target="_blank" rel="noopener"
+        >Pro-g-ramming Challenges 4</a
+      >.
+    </p>
+  </footer>
+
+  <script type="module" src="tron.js"></script>
+</body>
+</html>

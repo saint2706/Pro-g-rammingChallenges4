@@ -1,0 +1,53 @@
+{
+  "id": "stage1",
+  "title": "Scarlet Garden",
+  "difficulty": "normal",
+  "background": "nebula",
+  "boss": "crimsonCountess",
+  "patterns": [
+    {
+      "id": "openingFan",
+      "parameters": [
+        { "name": "speed", "default": 140 }
+      ],
+      "steps": [
+        { "time": 0.0, "action": { "type": "spawnRadial", "bullet": "needle", "count": 12 } },
+        { "time": 0.6, "action": { "type": "spawnRadial", "bullet": "needle", "count": 16, "speed": 150 } },
+        { "time": 1.2, "action": { "type": "spawnRadial", "bullet": "needle", "count": 18, "speed": 170 } }
+      ]
+    },
+    {
+      "id": "butterflySpiral",
+      "parameters": [
+        { "name": "speed", "default": 120 },
+        { "name": "spiralDirection", "default": 1 }
+      ],
+      "steps": [
+        { "time": 0.0, "action": { "type": "spawnSpiral", "bullet": "spread", "count": 48, "revolutions": 3 } },
+        { "time": 2.0, "action": { "type": "spawnSpiral", "bullet": "spread", "count": 48, "revolutions": 3 } }
+      ]
+    },
+    {
+      "id": "crimsonRain",
+      "parameters": [
+        { "name": "speed", "default": 160 }
+      ],
+      "steps": [
+        { "time": 0.0, "action": { "type": "spawnAimed", "bullet": "orb", "speed": 140 } },
+        { "time": 0.4, "action": { "type": "spawnAimed", "bullet": "orb", "speed": 150 } },
+        { "time": 0.8, "action": { "type": "spawnAimed", "bullet": "orb", "speed": 160 } },
+        { "time": 1.2, "action": { "type": "spawnRadial", "bullet": "spread", "count": 24, "speed": 110 } }
+      ]
+    }
+  ],
+  "waves": [
+    { "time": 1.5, "enemies": ["openingFan"] },
+    { "time": 6.0, "enemies": ["butterflySpiral"] },
+    { "time": 12.0, "enemies": ["crimsonRain"] }
+  ],
+  "configOverrides": {
+    "player": {
+      "slowSpeedMultiplier": 0.4
+    }
+  }
+}
