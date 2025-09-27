@@ -13,9 +13,9 @@ The solutions are organized by category and difficulty, making it easy to naviga
 
 ## Progress
 
-<progress value="98" max="131"></progress>
+<progress value="99" max="131"></progress>
 
-**Overall:** 98 / 131 challenges completed (74.8%).
+**Overall:** 99 / 131 challenges completed (75.6%).
 
 | Category | Completed | Total | Progress |
 | --- | --- | --- | --- |
@@ -23,7 +23,7 @@ The solutions are organized by category and difficulty, making it easy to naviga
 | Algorithmic | 27 | 27 | 100% |
 | Artificial Intelligence | 3 | 8 | 37.5% |
 | Emulation/Modeling | 6 | 14 | 42.9% |
-| Games | 9 | 29 | 31.0% |
+| Games | 10 | 29 | 34.5% |
 
 _Progress counts are generated from the actual solution folders in the repository (see tables below)._ 
 
@@ -60,7 +60,7 @@ The repository now ships a `pyproject.toml` so you can install challenge stacks 
 | `algorithmic` | `Algorithmic/` problem set helpers | Steganography, stock analysis, crawler tooling |
 | `visual` | Visualization add-ons used across categories | Matplotlib demos, colour-science palettes, VPython spinny cube |
 | `audio` | Audio processing stacks | WAV equalizer, Shazam clone, music streaming |
-| `games` | Python games in `Games/` | Sudoku solver, Simon, Shuffle stats |
+| `games` | Python games in `Games/` | Sudoku solver, Simon, Oil Panic tribute |
 | `ai` | `Artificial Intelligence/` demos | A* Sudoku, Connect4 AI, neural network |
 | `web` | HTTP and dashboard helpers | Imageboard, IP tracking, web crawlers |
 | `desktop` | GUI/automation conveniences | Window manager, key press bot, Tk front-ends |
@@ -242,7 +242,7 @@ The repository includes a GitHub Actions workflow at `.github/workflows/keep-str
 | 121 | Roguelike Engine/Dungeon Generator | Not Yet |
 | 122 | Design a Game Engine in Unity | Not Yet |
 | 123 | Yahtzee | [View Solution](./Games/Yahtzee/) |
-| 124 | Oil Panic | Not Yet |
+| 124 | Oil Panic | [View Solution](./Games/OilPanic/) |
 | 125 | Chess | Not Yet |
 | 126 | Go (No AI Necessary) | Not Yet |
 | 127 | Connect Four | [View Solution](./Games/Connect4/) |

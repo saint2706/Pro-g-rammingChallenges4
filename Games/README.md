@@ -42,6 +42,7 @@ Extras keep Python dependencies lightweight and consistent with the root extras 
 ```bash
 python "Snake/snake.py"          # Turtle graphics Snake
 python "Simon/simon.py"          # Pygame Simon (loads local assets)
+python "OilPanic/oil_panic.py"   # Dual-screen Game & Watch tribute
 python "Shuffle/cards.py"        # Matplotlib card shuffler
 ```
 
@@ -75,7 +76,7 @@ Authoritative status board for challenges #104–#132. Entry points list the mai
 | 121 | Roguelike Engine / Dungeon Generator | Backlog | TBD | — |
 | 122 | Design a Game Engine in Unity | Backlog | Unity (planned) | — |
 | 123 | Yahtzee | Solved | Python 3 (CLI), Java | `Yahtzee/yahtzee.py`, `Yahtzee/yahtzee.java` |
-| 124 | Oil Panic | Backlog | TBD | — |
+| 124 | Oil Panic | Solved | Python 3 + pygame | `OilPanic/oil_panic.py` |
 | 125 | Chess | Backlog | TBD | — |
 | 126 | Go (No AI necessary) | Backlog | TBD | — |
 | 127 | Connect Four | Solved | Python 3 + pygame + numpy, Java | `Connect4/connect4.py`, `Connect4/connect4.java` |
@@ -112,6 +113,7 @@ Each language links to the dedicated game README for deeper context (rules, cont
 python "Connect4/connect4.py"   # Requires pygame + numpy
 python "Minesweeper/mine.py"    # tkinter GUI (bundled with most Python installs)
 python "Simon/simon.py"         # Loads Assets/Audio and Assets/Images
+python "OilPanic/oil_panic.py"  # Dual-screen Game & Watch tribute
 python "Sudoku/sudoku.py"       # Needs numpy + tkinter
 python "Shuffle/cards.py"       # matplotlib visualiser
 python "Yahtzee/yahtzee.py"     # CLI edition
