@@ -250,7 +250,7 @@ The repository includes a GitHub Actions workflow at `.github/workflows/keep-str
 | 119 | Sudoku | [View Solution](./Games/Sudoku/) |
 | 120 | Danmaku (Bullet Hell) Engine | Not Yet |
 | 121 | Roguelike Engine/Dungeon Generator | Not Yet |
-| 122 | Design a Game Engine in Unity | Not Yet |
+| 122 | Design a Game Engine in Unity | [View Solution](./Games/UnityEngine/) |
 | 123 | Yahtzee | [View Solution](./Games/Yahtzee/) |
 | 124 | Oil Panic | Not Yet |
 | 125 | Chess | Not Yet |
