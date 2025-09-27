@@ -85,7 +85,7 @@ Authoritative status board for challenges #104–#132. Entry points list the mai
 | 115 | Wolfenstein Clone | Backlog | Planned raycaster | — |
 | 116 | Scorched Earth Clone | Solved | Python 3 + pygame | `ScorchedEarth/scorched_earth.py` |
 | 117 | Minesweeper | Solved | Python 3 + tkinter | `Minesweeper/mine.py` |
-| 118 | 64KB Audio/Visual Demo | Backlog | TBD | — |
+| 118 | 64KB Audio/Visual Demo | Solved | WebGL + JavaScript | `64kDemo/dist/index.html` (build first) |
 | 119 | Sudoku | Solved | Python 3 + tkinter + numpy | `Sudoku/sudoku.py` |
 
 | 120 | Danmaku (Bullet Hell) Engine | Backlog | TBD | — |
@@ -226,10 +226,14 @@ The `FirstPersonEngine` project ships its own [README](FirstPersonEngine/README.
    - `Snake/snake.html`
    - `RPS/rps.html`
 
+   - `64kDemo/dist/index.html` (after running `python 64kDemo/build.py`)
+
+
    - `Tron/index.html`
 
 
    - `DanmakuEngine/index.html` (or run `npm run dev` inside `DanmakuEngine/` for PixiJS build tooling)
+
 
 2. For asset-backed games, keep the accompanying `.js`, `.css`, and `assets/` folders in the same directory.
 3. Optional: use a static server for clean module loading (`python -m http.server` from within the game folder).

@@ -246,7 +246,7 @@ The repository includes a GitHub Actions workflow at `.github/workflows/keep-str
 | 115 | Wolfenstein Clone (FPS two-dimensional map that appears to be 3-D) (If you need a starting point search for bisquit's video about DOOM-like Engines) | Not Yet |
 | 116 | Scorched Earth Clone | [View Solution](./Games/ScorchedEarth/) |
 | 117 | Minesweeper | [View Solution](./Games/Minesweeper/) |
-| 118 | An Audio/Visual 64KB Demonstration | Not Yet |
+| 118 | An Audio/Visual 64KB Demonstration | [View Solution](./Games/64kDemo/) |
 | 119 | Sudoku | [View Solution](./Games/Sudoku/) |
 | 120 | Danmaku (Bullet Hell) Engine | Not Yet |
 
