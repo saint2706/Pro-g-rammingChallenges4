@@ -57,7 +57,7 @@ Authoritative status board for challenges #104–#132. Entry points list the mai
 |-----|-----------|---------|--------------------|--------------|
 | 104 | Knight's Tour | Solved | Python 3 (CLI, backtracking) | `Knight Tour/knight.py` |
 | 105 | Monster Raising/Breeding Simulator | Backlog | TBD | — |
-| 106 | Tetris | Backlog | TBD | — |
+| 106 | Tetris | View Solution | Python 3 + pygame | `Tetris/main.py` |
 | 107 | Snake | Solved | Python 3 (turtle), JavaScript + HTML Canvas | `Snake/snake.py`, `Snake/snake.html` |
 | 108 | Pipe Dreams | Backlog | TBD | — |
 | 109 | Pac-Man (behavioural ghosts) | Backlog | TBD | — |
@@ -110,6 +110,7 @@ Each language links to the dedicated game README for deeper context (rules, cont
 
 ```bash
 python "Connect4/connect4.py"   # Requires pygame + numpy
+python "Tetris/main.py"         # Pygame Tetris with DAS/ARR controls
 python "Minesweeper/mine.py"    # tkinter GUI (bundled with most Python installs)
 python "Simon/simon.py"         # Loads Assets/Audio and Assets/Images
 python "Sudoku/sudoku.py"       # Needs numpy + tkinter
@@ -120,7 +121,7 @@ python "Knight Tour/knight.py"  # CLI solver visualises via stdout
 python "RPS/rpsls.py"           # CLI (supports Lizard/Spock variant)
 ```
 
-Per-game documentation: [Connect Four](Connect4/README.md), [Minesweeper](Minesweeper/README.md), [Simon](Simon/README.md), [Sudoku](Sudoku/README.md), [Shuffle](Shuffle/README.md), [Yahtzee](Yahtzee/README.md), [Snake](Snake/README.md), [Knight's Tour]("Knight Tour"/README.md), [Rock Paper Scissors](RPS/README.md).
+Per-game documentation: [Connect Four](Connect4/README.md), [Tetris](Tetris/README.md), [Minesweeper](Minesweeper/README.md), [Simon](Simon/README.md), [Sudoku](Sudoku/README.md), [Shuffle](Shuffle/README.md), [Yahtzee](Yahtzee/README.md), [Snake](Snake/README.md), [Knight's Tour]("Knight Tour"/README.md), [Rock Paper Scissors](RPS/README.md).
 
 Assets are co-located inside each project (e.g., `Simon/Assets/Audio`). Keep relative paths intact when running outside the repo root.
 
