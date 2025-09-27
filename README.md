@@ -13,9 +13,9 @@ The solutions are organized by category and difficulty, making it easy to naviga
 
 ## Progress
 
-<progress value="98" max="131"></progress>
+<progress value="99" max="131"></progress>
 
-**Overall:** 98 / 131 challenges completed (74.8%).
+**Overall:** 99 / 131 challenges completed (75.6%).
 
 | Category | Completed | Total | Progress |
 | --- | --- | --- | --- |
@@ -23,7 +23,7 @@ The solutions are organized by category and difficulty, making it easy to naviga
 | Algorithmic | 27 | 27 | 100% |
 | Artificial Intelligence | 3 | 8 | 37.5% |
 | Emulation/Modeling | 6 | 14 | 42.9% |
-| Games | 9 | 29 | 31.0% |
+| Games | 10 | 29 | 34.5% |
 
 _Progress counts are generated from the actual solution folders in the repository (see tables below)._ 
 
@@ -239,7 +239,7 @@ The repository includes a GitHub Actions workflow at `.github/workflows/keep-str
 | 118 | An Audio/Visual 64KB Demonstration | Not Yet |
 | 119 | Sudoku | [View Solution](./Games/Sudoku/) |
 | 120 | Danmaku (Bullet Hell) Engine | Not Yet |
-| 121 | Roguelike Engine/Dungeon Generator | Not Yet |
+| 121 | Roguelike Engine/Dungeon Generator | [View Solution](./Games/Roguelike/) |
 | 122 | Design a Game Engine in Unity | Not Yet |
 | 123 | Yahtzee | [View Solution](./Games/Yahtzee/) |
 | 124 | Oil Panic | Not Yet |

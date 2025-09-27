@@ -72,7 +72,7 @@ Authoritative status board for challenges #104–#132. Entry points list the mai
 | 118 | 64KB Audio/Visual Demo | Backlog | TBD | — |
 | 119 | Sudoku | Solved | Python 3 + tkinter + numpy | `Sudoku/sudoku.py` |
 | 120 | Danmaku (Bullet Hell) Engine | Backlog | TBD | — |
-| 121 | Roguelike Engine / Dungeon Generator | Backlog | TBD | — |
+| 121 | Roguelike Engine / Dungeon Generator | Solved | Python 3 + tcod | `python -m Games.Roguelike.main` |
 | 122 | Design a Game Engine in Unity | Backlog | Unity (planned) | — |
 | 123 | Yahtzee | Solved | Python 3 (CLI), Java | `Yahtzee/yahtzee.py`, `Yahtzee/yahtzee.java` |
 | 124 | Oil Panic | Backlog | TBD | — |
@@ -118,6 +118,7 @@ python "Yahtzee/yahtzee.py"     # CLI edition
 python "Snake/snake.py"         # Turtle graphics, ensure tkinter is available
 python "Knight Tour/knight.py"  # CLI solver visualises via stdout
 python "RPS/rpsls.py"           # CLI (supports Lizard/Spock variant)
+python -m Games.Roguelike.main   # Terminal roguelike (tcod)
 ```
 
 Per-game documentation: [Connect Four](Connect4/README.md), [Minesweeper](Minesweeper/README.md), [Simon](Simon/README.md), [Sudoku](Sudoku/README.md), [Shuffle](Shuffle/README.md), [Yahtzee](Yahtzee/README.md), [Snake](Snake/README.md), [Knight's Tour]("Knight Tour"/README.md), [Rock Paper Scissors](RPS/README.md).
