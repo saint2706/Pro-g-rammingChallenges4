@@ -244,7 +244,7 @@ The repository includes a GitHub Actions workflow at `.github/workflows/keep-str
 | 113 | Shuffle a Deck of Cards (Include a Visualization) | [View Solution](./Games/Shuffle/) |
 | 114 | Simulate a game of Tag using a multi-agent system | Not Yet |
 | 115 | Wolfenstein Clone (FPS two-dimensional map that appears to be 3-D) (If you need a starting point search for bisquit's video about DOOM-like Engines) | Not Yet |
-| 116 | Scorched Earth Clone | Not Yet |
+| 116 | Scorched Earth Clone | [View Solution](./Games/ScorchedEarth/) |
 | 117 | Minesweeper | [View Solution](./Games/Minesweeper/) |
 | 118 | An Audio/Visual 64KB Demonstration | Not Yet |
 | 119 | Sudoku | [View Solution](./Games/Sudoku/) |

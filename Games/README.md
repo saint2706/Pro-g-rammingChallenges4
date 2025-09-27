@@ -82,7 +82,7 @@ Authoritative status board for challenges #104–#132. Entry points list the mai
 | 113 | Shuffle a Deck (with visualisation) | Solved | Python 3 + matplotlib | `Shuffle/cards.py` |
 | 114 | Multi-agent Tag Simulation | Solved | Python 3 + pygame + matplotlib | `MultiAgentTag/tag_sim.py` |
 | 115 | Wolfenstein Clone | Backlog | Planned raycaster | — |
-| 116 | Scorched Earth Clone | Backlog | TBD | — |
+| 116 | Scorched Earth Clone | Solved | Python 3 + pygame | `ScorchedEarth/scorched_earth.py` |
 | 117 | Minesweeper | Solved | Python 3 + tkinter | `Minesweeper/mine.py` |
 | 118 | 64KB Audio/Visual Demo | Backlog | TBD | — |
 | 119 | Sudoku | Solved | Python 3 + tkinter + numpy | `Sudoku/sudoku.py` |
@@ -140,7 +140,11 @@ python "Minesweeper/mine.py"    # tkinter GUI (bundled with most Python installs
 python "Simon/simon.py"         # Loads Assets/Audio and Assets/Images
 python "Sudoku/sudoku.py"       # Needs numpy + tkinter
 python "Shuffle/cards.py"       # matplotlib visualiser
+
+python "ScorchedEarth/scorched_earth.py"  # Pygame artillery with destructible terrain
+
 python "Pacman/main.py"        # Pygame Pac-Man with behavioural ghosts
+
 python "Yahtzee/yahtzee.py"     # CLI edition
 python "Snake/snake.py"         # Turtle graphics, ensure tkinter is available
 python "Breakout/breakout.py"   # pygame-powered Breakout with JSON levels
