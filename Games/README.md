@@ -1,95 +1,180 @@
-# Games Collection
+# Games Challenge Hub
 
-Welcome to the **Games** folder of the Pro-g-rammingChallenges4 repository! This directory contains a diverse set of classic and algorithmic games implemented in various programming languages, including Python, Java, C++, JavaScript, and HTML/CSS. Each game is designed to be educational, beginner-friendly, and a fun way to explore programming concepts.
+A curated playground of `/g/` games implemented across Python, Java, C++, and web stacks. The `Games/` tree mixes fully playable titles with backlog design notes so you can explore existing builds or claim an open challenge.
 
-## Contents
+This README mirrors the structure of the Practical suite guide: start with a quick environment spin-up, consult the index, and drill into per-language playbooks or contribution patterns when you are ready to extend the catalogue.
 
-- **Connect4** (`Connect4.java`, `connect4.py`): Play the classic Connect Four game in Java or Python.
+---
 
+## 1. Quick Start
 
-- **Knight Tour** (`knight.py`): Solve the Knight's Tour puzzle using Python.
-- **Minesweeper** (`mine.py`): A simple command-line Minesweeper game in Python.
-- **RPS** (Rock Paper Scissors):
-  - `rps.cpp`, `Rps.java`, `rps.js`, `rps.html`, `rps.css`, `rpsls.py`
-  - Play Rock Paper Scissors (and RPSLS) in your favorite language, with both CLI and web versions. SVG assets included.
-- **Shuffle** (`cards.py`): Simulate card shuffling and visualization in Python (uses matplotlib).
-- **Simon** (`simon.py`): The classic Simon memory game with sound and graphics (Python, tkinter, pygame). Assets included.
-- **Snake** (`snake.py`, `snake.js`, `snake.html`, `snake.css`): Play Snake in Python (tkinter) or in your browser (JS/HTML/CSS).
-- **Sudoku** (`sudoku.py`): Sudoku puzzle generator and solver in Python (uses numpy).
-- **Yahtzee** (`Yahtzee.java`, `yahtzee.py`): Play Yahtzee in Java or Python.
+### 1.1. Clone and scope to the games
 
+```bash
+git clone https://github.com/saintwithataint/Pro-g-rammingChallenges4.git
+cd Pro-g-rammingChallenges4/Games
+```
 
-## Using pyproject.toml
+> Working from the repository root? Swap the final line for `cd Pro-g-rammingChallenges4` and prefix game paths with `Games/` in the commands below.
 
-Create a virtual environment, then install the extras for the games you want to run:
+### 1.2. Create a virtual environment (recommended)
 
 ```bash
 python -m venv .venv
-source .venv/bin/activate  # Windows: .venv\Scripts\Activate.ps1
-python -m pip install -e .[games]
-# Optional helpers
-python -m pip install -e .[visual]  # matplotlib-based scoreboards
-python -m pip install -e .[audio]   # shared sound backends (pygame, sounddevice)
+source .venv/bin/activate  # Windows PowerShell: .venv\Scripts\Activate.ps1
 ```
 
-Editable installs keep your local changes immediately playable.
+### 1.3. Install pyproject extras for games
 
-## How to Run
+Use the editable extras defined in the root [`pyproject.toml`](../pyproject.toml) and cross-referenced in the [repository README](../README.md#using-pyprojecttoml):
 
-### Python Games
+```bash
+python -m pip install -e .[games]
+# Optional add-ons
+python -m pip install -e .[visual]  # matplotlib-powered visualisers (Shuffle)
+python -m pip install -e .[audio]   # pygame audio backends (Simon, Connect 4)
+```
 
-- Make sure you have Python 3.8+ installed.
-- Install dependencies via pyproject extras:
+Extras keep Python dependencies lightweight and consistent with the root extras table.
 
-  ```sh
-  python -m pip install -e .[games]
-  # Add .[visual] for matplotlib stats or .[audio] for richer sound
-  ```
+### 1.4. Launch your first build
 
-- Run the desired game:
+```bash
+python "Snake/snake.py"          # Turtle graphics Snake
+python "Simon/simon.py"          # Pygame Simon (loads local assets)
+python "Shuffle/cards.py"        # Matplotlib card shuffler
+```
 
-  ```sh
-  python <game>.py
-  ```
+Prefer Java or C++? Check the run matrix in [Section 4](#4-run-guides-by-language).
 
-- Some games (e.g., Simon, Snake) require `tkinter` and/or `pygame` for GUI and sound.
+---
 
-### Java Games
+## 2. Challenge Index (solved + backlog)
 
-- Compile and run with:
+Authoritative status board for challenges #104–#132. Entry points list the main script or launcher; multi-language games expose multiple commands.
 
-  ```sh
-  javac <Game>.java
-  java <Game>
-  ```
+| #   | Challenge | Status  | Primary Tech Stack | Entry Points |
+|-----|-----------|---------|--------------------|--------------|
+| 104 | Knight's Tour | Solved | Python 3 (CLI, backtracking) | `Knight Tour/knight.py` |
+| 105 | Monster Raising/Breeding Simulator | Backlog | TBD | — |
+| 106 | Tetris | Backlog | TBD | — |
+| 107 | Snake | Solved | Python 3 (turtle), JavaScript + HTML Canvas | `Snake/snake.py`, `Snake/snake.html` |
+| 108 | Pipe Dreams | Backlog | TBD | — |
+| 109 | Pac-Man (behavioural ghosts) | Backlog | TBD | — |
+| 110 | Dragon Quest / Basic RPG Engine | Backlog | TBD | — |
+| 111 | Rock Paper Scissors (+Lizard Spock) | Solved | Python 3 (CLI), C++, Java, JavaScript/Web | `RPS/rpsls.py`, `RPS/rps.cpp`, `RPS/rps.java`, `RPS/rps.html` |
+| 112 | First-Person Engine (OpenGL) | Backlog | Planned OpenGL / C++ | — |
+| 113 | Shuffle a Deck (with visualisation) | Solved | Python 3 + matplotlib | `Shuffle/cards.py` |
+| 114 | Multi-agent Tag Simulation | Backlog | TBD | — |
+| 115 | Wolfenstein Clone | Backlog | Planned raycaster | — |
+| 116 | Scorched Earth Clone | Backlog | TBD | — |
+| 117 | Minesweeper | Solved | Python 3 + tkinter | `Minesweeper/mine.py` |
+| 118 | 64KB Audio/Visual Demo | Backlog | TBD | — |
+| 119 | Sudoku | Solved | Python 3 + tkinter + numpy | `Sudoku/sudoku.py` |
+| 120 | Danmaku (Bullet Hell) Engine | Backlog | TBD | — |
+| 121 | Roguelike Engine / Dungeon Generator | Backlog | TBD | — |
+| 122 | Design a Game Engine in Unity | Backlog | Unity (planned) | — |
+| 123 | Yahtzee | Solved | Python 3 (CLI), Java | `Yahtzee/yahtzee.py`, `Yahtzee/yahtzee.java` |
+| 124 | Oil Panic | Backlog | TBD | — |
+| 125 | Chess | Backlog | TBD | — |
+| 126 | Go (No AI necessary) | Backlog | TBD | — |
+| 127 | Connect Four | Solved | Python 3 + pygame + numpy, Java | `Connect4/connect4.py`, `Connect4/connect4.java` |
+| 128 | Mastermind | Backlog | TBD | — |
+| 129 | Missile Command | Backlog | TBD | — |
+| 130 | Tron | Backlog | TBD | — |
+| 131 | Breakout | Backlog | TBD | — |
+| 132 | Simon | Solved | Python 3 + pygame (audio assets) | `Simon/simon.py` |
 
-### C++ Games
+> When you create a new implementation, update this table with the tech stack and primary launch command so the backlog remains actionable.
 
-- Compile and run with:
+---
 
-  ```sh
-  g++ rps.cpp -o rps
-  ./rps
-  ```
+## 3. Selective Installs (Games-focused extras)
 
-### JavaScript/HTML/CSS Games
+| Focus | Extras | Notes |
+|-------|--------|-------|
+| All Python games | `games` | Installs numpy, matplotlib, and pygame used throughout the solved titles. |
+| Visual analytics (Shuffle stats, future dashboards) | `games,visual` | Adds plotting + rendering helpers beyond the base game set. |
+| Audio-heavy builds (Simon patterns, future rhythm games) | `games,audio` | Pulls in sounddevice/librosa alongside pygame mixers. |
+| Development + linting | `games,developer` | Extends with pytest, ruff, mypy for automated checks. |
 
-- Open the `.html` file in your web browser (e.g., `rps.html`, `snake.html`).
+Need another stack? Refer to the [root extras table](../README.md#using-pyprojecttoml) to combine categories (e.g., `.[games,web]` for multiplayer dashboards).
 
-## Assets
+---
 
-- Some games include assets (images, audio, fonts) in their respective subfolders. No additional downloads are required.
+## 4. Run Guides by Language
 
-## Educational Focus
+Each language links to the dedicated game README for deeper context (rules, controls, screenshots, and assets). Commands assume you are inside `Games/` with the virtual environment activated.
 
-- All code is written with clarity and learning in mind. Each file is well-documented and commented to help new developers understand the logic and structure.
-- Explore different programming paradigms and languages by comparing implementations of the same game.
+### 4.1. Python
 
-## Contributing
+```bash
+python "Connect4/connect4.py"   # Requires pygame + numpy
+python "Minesweeper/mine.py"    # tkinter GUI (bundled with most Python installs)
+python "Simon/simon.py"         # Loads Assets/Audio and Assets/Images
+python "Sudoku/sudoku.py"       # Needs numpy + tkinter
+python "Shuffle/cards.py"       # matplotlib visualiser
+python "Yahtzee/yahtzee.py"     # CLI edition
+python "Snake/snake.py"         # Turtle graphics, ensure tkinter is available
+python "Knight Tour/knight.py"  # CLI solver visualises via stdout
+python "RPS/rpsls.py"           # CLI (supports Lizard/Spock variant)
+```
 
-- Contributions are welcome! Feel free to add new games, improve documentation, or refactor existing code for clarity and performance.
-- Please follow the style and documentation conventions used throughout the repository.
+Per-game documentation: [Connect Four](Connect4/README.md), [Minesweeper](Minesweeper/README.md), [Simon](Simon/README.md), [Sudoku](Sudoku/README.md), [Shuffle](Shuffle/README.md), [Yahtzee](Yahtzee/README.md), [Snake](Snake/README.md), [Knight's Tour]("Knight Tour"/README.md), [Rock Paper Scissors](RPS/README.md).
 
-## License
+Assets are co-located inside each project (e.g., `Simon/Assets/Audio`). Keep relative paths intact when running outside the repo root.
 
-This project is licensed under the MIT License. See the root `LICENSE` file for details.
+### 4.2. Java
+
+```bash
+javac Connect4/connect4.java && java -cp Connect4 connect4
+javac Yahtzee/yahtzee.java && java -cp Yahtzee Yahtzee
+javac RPS/rps.java && java -cp RPS rps
+```
+
+Ensure `javac`/`java` are on your `PATH`. See the linked READMEs for gameplay controls and optional CLI arguments: [Connect Four](Connect4/README.md), [Yahtzee](Yahtzee/README.md), [Rock Paper Scissors](RPS/README.md).
+
+### 4.3. C++
+
+```bash
+g++ RPS/rps.cpp -o RPS/rps
+./RPS/rps
+```
+
+The C++ build uses only the standard library; no external packages required. Details live in [Rock Paper Scissors](RPS/README.md).
+
+### 4.4. JavaScript / Web
+
+1. Open the HTML file directly in a browser:
+   - `Snake/snake.html`
+   - `RPS/rps.html`
+2. For asset-backed games, keep the accompanying `.js`, `.css`, and `assets/` folders in the same directory.
+3. Optional: use a static server for clean module loading (`python -m http.server` from within the game folder).
+
+See [Snake](Snake/README.md) and [Rock Paper Scissors](RPS/README.md) for control schemes and asset notes.
+
+---
+
+## 5. Troubleshooting
+
+| Symptom | Fix |
+|---------|-----|
+| `ModuleNotFoundError: pygame` or `numpy` | Install extras with `python -m pip install -e .[games]` (virtual env recommended). |
+| Python GUI fails with `No module named '_tkinter'` | Install a system package that provides Tk (macOS: `brew install python-tk`; Ubuntu: `sudo apt-get install python3-tk`). Turtle and tkinter-based games (Snake, Minesweeper, Sudoku) depend on it. |
+| Pygame window opens without sound | Ensure `pygame.mixer` can access audio devices. On Linux, install SDL dependencies (`sudo apt-get install libsdl2-mixer-2.0-0`). Assets live under `Simon/Assets`. |
+| Java commands fail with `class not found` | Compile within the game folder and include it on the classpath (`-cp`). Follow the exact commands in [Section 4.2](#42-java). |
+| Browser games cannot load assets when served remotely | Serve via a static server that preserves folder structure (`python -m http.server`) to avoid cross-origin or relative path issues. |
+
+If issues persist, open an issue referencing the challenge number and include OS + dependency versions.
+
+---
+
+## 6. Contribution Guidelines (Games-specific)
+
+1. **Coding style**: Match existing Python conventions (type hints, docstrings, classes for game state) and follow language idioms for Java/C++ (camelCase methods, header comments). Keep logic modules importable so they can be unit-tested.
+2. **Asset handling**: Place media under `<Game>/Assets/` with subfolders (`Audio/`, `Images/`, etc.). Document licensing in the game README and prefer original or CC0/GPL-compatible assets.
+3. **README expectations**: Every playable game must ship a `README.md` containing: challenge number, summary, dependency checklist, run commands for each language variant, and asset notes. Use the new READMEs in this directory as templates.
+4. **Extras alignment**: When introducing new dependencies, extend `pyproject.toml` extras thoughtfully and update the [root extras table](../README.md#using-pyprojecttoml) plus the table in [Section 3](#3-selective-installs-games-focused-extras).
+5. **Testing & linting**: Prefer running `python -m pytest` and `ruff check` (via the `developer` extra) for shared modules. GUI-heavy games should include a CLI-friendly smoke test where feasible.
+
+Ready to contribute? Fork the repo, branch per challenge (`feature/game-<name>`), follow the quick start above, and submit a PR summarising gameplay, assets, and controls.
