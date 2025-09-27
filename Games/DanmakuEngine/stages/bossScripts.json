@@ -1,0 +1,17 @@
+[
+  {
+    "id": "crimsonCountess",
+    "events": [
+      { "time": 1.0, "pattern": "butterflySpiral", "parameters": { "speed": 140 } },
+      { "time": 6.0, "pattern": "crimsonRain", "parameters": { "speed": 180 } }
+    ]
+  },
+  {
+    "id": "skyEmpress",
+    "events": [
+      { "time": 0.5, "pattern": "denseWall", "parameters": { "speed": 220 } },
+      { "time": 4.5, "pattern": "crossSpiral", "parameters": { "spiralDirection": 1 } },
+      { "time": 8.0, "pattern": "lightningStrike", "parameters": { "speed": 260 } }
+    ]
+  }
+]
