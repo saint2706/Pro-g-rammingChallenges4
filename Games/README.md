@@ -61,7 +61,7 @@ Authoritative status board for challenges #104–#132. Entry points list the mai
 | 107 | Snake | Solved | Python 3 (turtle), JavaScript + HTML Canvas | `Snake/snake.py`, `Snake/snake.html` |
 | 108 | Pipe Dreams | Backlog | TBD | — |
 | 109 | Pac-Man (behavioural ghosts) | Backlog | TBD | — |
-| 110 | Dragon Quest / Basic RPG Engine | Backlog | TBD | — |
+| 110 | Dragon Quest / Basic RPG Engine | Solved | Python 3 + pygame RPG engine | `RPGEngine/main.py` |
 | 111 | Rock Paper Scissors (+Lizard Spock) | Solved | Python 3 (CLI), C++, Java, JavaScript/Web | `RPS/rpsls.py`, `RPS/rps.cpp`, `RPS/rps.java`, `RPS/rps.html` |
 | 112 | First-Person Engine (OpenGL) | Backlog | Planned OpenGL / C++ | — |
 | 113 | Shuffle a Deck (with visualisation) | Solved | Python 3 + matplotlib | `Shuffle/cards.py` |
