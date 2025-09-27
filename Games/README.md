@@ -43,6 +43,7 @@ Extras keep Python dependencies lightweight and consistent with the root extras 
 python "Snake/snake.py"          # Turtle graphics Snake
 python "Breakout/breakout.py"    # pygame Breakout with JSON levels
 python "Simon/simon.py"          # Pygame Simon (loads local assets)
+python "OilPanic/oil_panic.py"   # Dual-screen Game & Watch tribute
 python "Shuffle/cards.py"        # Matplotlib card shuffler
 ```
 
@@ -96,7 +97,11 @@ Authoritative status board for challenges #104–#132. Entry points list the mai
 | 122 | Design a Game Engine in Unity | Solved | Unity 2022.3 LTS | `UnityEngine/` |
 
 | 123 | Yahtzee | Solved | Python 3 (CLI), Java | `Yahtzee/yahtzee.py`, `Yahtzee/yahtzee.java` |
+
+| 124 | Oil Panic | Solved | Python 3 + pygame | `OilPanic/oil_panic.py` |
+
 | 124 | Oil Panic | Backlog | TBD | — |
+
 
 | 125 | Chess | Backlog | TBD | — |
 | 126 | Go (No AI necessary) | Solved | Python 3 + PySide6 | `Go/go.py` |
@@ -150,6 +155,7 @@ python "Connect4/connect4.py"   # Requires pygame + numpy
 python "Tetris/main.py"         # Pygame Tetris with DAS/ARR controls
 python "Minesweeper/mine.py"    # tkinter GUI (bundled with most Python installs)
 python "Simon/simon.py"         # Loads Assets/Audio and Assets/Images
+python "OilPanic/oil_panic.py"  # Dual-screen Game & Watch tribute
 python "Sudoku/sudoku.py"       # Needs numpy + tkinter
 python "Shuffle/cards.py"       # matplotlib visualiser
 

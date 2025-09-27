@@ -60,7 +60,7 @@ The repository now ships a `pyproject.toml` so you can install challenge stacks 
 | `algorithmic` | `Algorithmic/` problem set helpers | Steganography, stock analysis, crawler tooling |
 | `visual` | Visualization add-ons used across categories | Matplotlib demos, colour-science palettes, VPython spinny cube |
 | `audio` | Audio processing stacks | WAV equalizer, Shazam clone, music streaming |
-| `games` | Python games in `Games/` | Sudoku solver, Simon, Shuffle stats |
+| `games` | Python games in `Games/` | Sudoku solver, Simon, Oil Panic tribute |
 | `ai` | `Artificial Intelligence/` demos | A* Sudoku, Connect4 AI, neural network |
 | `web` | HTTP and dashboard helpers | Imageboard, IP tracking, web crawlers |
 | `desktop` | GUI/automation conveniences | Window manager, key press bot, Tk front-ends |
@@ -257,7 +257,12 @@ The repository includes a GitHub Actions workflow at `.github/workflows/keep-str
 | 122 | Design a Game Engine in Unity | [View Solution](./Games/UnityEngine/) |
 
 | 123 | Yahtzee | [View Solution](./Games/Yahtzee/) |
+
+
+| 124 | Oil Panic | [View Solution](./Games/OilPanic/) |
+
 | 124 | Oil Panic | Not Yet |
+
 
 | 125 | Chess | Not Yet |
 | 126 | Go (No AI Necessary) | [View Solution](./Games/Go/) |
