@@ -24,9 +24,9 @@ python -m venv .venv
 source .venv/bin/activate  # Windows PowerShell: .venv\Scripts\Activate.ps1
 ```
 
-### 1.3. Install pyproject extras for games
+### 1.3. Install the `pyproject.toml` extras
 
-Use the editable extras defined in the root [`pyproject.toml`](../pyproject.toml) and cross-referenced in the [repository README](../README.md#using-pyprojecttoml):
+The [`games` extra](../pyproject.toml) now bundles `pygame`, `numpy`, `PySide6`, and `tcod` so every solved build (Go, Roguelike, Simon, etc.) runs without manual pinning. Layer on optional stacks from the [repository README](../README.md#using-pyprojecttoml) when you need plotting or audio helpers:
 
 ```bash
 python -m pip install -e .[games]
@@ -35,7 +35,7 @@ python -m pip install -e .[visual]  # matplotlib-powered visualisers (Shuffle)
 python -m pip install -e .[audio]   # pygame audio backends (Simon, Connect 4)
 ```
 
-Extras keep Python dependencies lightweight and consistent with the root extras table.
+Editable extras keep Python dependencies lightweight and consistent across the repository.
 
 ### 1.4. Launch your first build
 
@@ -51,83 +51,42 @@ Prefer Java or C++? Check the run matrix in [Section 4](#4-run-guides-by-languag
 
 ---
 
-## 2. Challenge Index (solved + backlog)
+## 2. Project Index (solved builds)
 
-Authoritative status board for challenges #104–#132. Entry points list the main script or launcher; multi-language games expose multiple commands.
+Authoritative map of every folder under `Games/` and its `/g/` challenge number. Each entry links to the implementation, summarises the shipped features, and lists the primary technologies in use.
 
-| #   | Challenge | Status  | Primary Tech Stack | Entry Points |
-|-----|-----------|---------|--------------------|--------------|
-| 104 | Knight's Tour | Solved | Python 3 (CLI, backtracking) | `Knight Tour/knight.py` |
+| # | Folder | Status | Summary | Key Tech |
+| --- | --- | --- | --- | --- |
+| 104 | [Knight Tour](Knight%20Tour/) | Solved | Command-line backtracking solver with Warnsdorff ordering and configurable board size/start. | Python 3 stdlib |
+| 105 | [Monster Raising](Monster%20Raising/) | Solved | Pygame stable sim with daily care loops, breeding lab, and JSON saves for rosters and events. | Python, pygame |
+| 106 | [Tetris](Tetris/) | Solved | Pygame Tetris featuring seven-piece bag randomiser, DAS/ARR tuning, ghost piece toggle, and modular modules. | Python, pygame |
+| 107 | [Snake](Snake/) | Solved | Classic snake delivered as both a turtle graphics script and an HTML5 canvas build with adjustable speed. | Python turtle, HTML Canvas/JavaScript |
+| 108 | [Pipe Dreams](Pipe%20Dreams/) | Solved | TypeScript + Vite pipe puzzler with procedural boards, drag-and-drop editing, leak detection, and timers. | TypeScript, Vite, Canvas |
+| 109 | [Pacman](Pacman/) | Solved | Pygame homage with JSON-defined mazes, classic ghost AI cycles, and configurable speed tables. | Python, pygame |
+| 110 | [RPGEngine](RPGEngine/) | Solved | Data-driven RPG sandbox covering overworld exploration, dialogue/quest graphs, and menu-driven combat. | Python, pygame, JSON/YAML |
+| 111 | [RPS](RPS/) | Solved | Multi-language Rock Paper Scissors suite with Python Lizard/Spock mode, C++/Java CLIs, and a themed web UI. | Python, C++, Java, HTML/JS |
+| 112 | [FirstPersonEngine](FirstPersonEngine/) | Solved | C++ OpenGL playground with GLFW/GLAD, mouse-look movement, configurable controls, and JSON level loading. | C++17, OpenGL, GLFW/GLAD |
+| 113 | [Shuffle](Shuffle/) | Solved | Matplotlib deck visualiser that shuffles/reset decks interactively for randomness demonstrations. | Python, matplotlib |
+| 114 | [MultiAgentTag](MultiAgentTag/) | Solved | Pygame tag simulation with steering behaviours, replay capture, headless batching, and matplotlib analytics. | Python, pygame, matplotlib |
+| 116 | [ScorchedEarth](ScorchedEarth/) | Solved | Artillery clone sporting destructible terrain, wind, configurable weapons, and human/AI pilots. | Python, pygame |
+| 117 | [Minesweeper](Minesweeper/) | Solved | Tkinter Minesweeper with adjustable board/mine counts and dialog-driven win/loss flow. | Python, tkinter |
+| 118 | [64kDemo](64kDemo/) | Solved | Procedural WebGL/Web Audio demo with a Python build script that packs the bundle under the 64 KB target. | JavaScript, WebGL, Web Audio |
+| 119 | [Sudoku](Sudoku/) | Solved | Tkinter + numpy Sudoku generator/solver with difficulty presets, highlighting, and reusable logic module. | Python, tkinter, numpy |
+| 120 | [DanmakuEngine](DanmakuEngine/) | Solved | PixiJS bullet hell engine supporting scripted patterns, boss phases, and tooling for new bullet behaviours. | TypeScript, PixiJS |
+| 121 | [Roguelike](Roguelike/) | Solved | Terminal roguelike using tcod with procedural dungeons, combat/inventory systems, and JSON save/load. | Python, tcod |
+| 122 | [UnityEngine](UnityEngine/) | Solved | Unity 2022.3 ECS-style foundation with event bus, scene catalog/loader, and JSON serialisation helpers. | Unity C#, ECS |
+| 123 | [Yahtzee](Yahtzee/) | Solved | Yahtzee scoring suite provided as a Python CLI plus a matching Java console implementation. | Python stdlib, Java |
+| 124 | [OilPanic](OilPanic/) | Solved | Dual-screen Game & Watch tribute with difficulty modes, scalable window, and persistent high scores. | Python, pygame |
+| 125 | [Chess](Chess/) | Solved | Python chess engine offering PGN support, minimax AI, CLI shell, and Pygame board UI. | Python, pygame |
+| 126 | [Go](Go/) | Solved | PySide6 Go client with capture/ko enforcement, undo, SGF export, and optional practice AI. | Python, PySide6 |
+| 127 | [Connect4](Connect4/) | Solved | Connect Four delivered via pygame board with audio cues plus a Java console variant. | Python, pygame, Java |
+| 128 | [Mastermind](Mastermind/) | Solved | Mastermind puzzle with CLI and tkinter GUIs, configurable difficulty, and code-maker/breaker modes. | Python, tkinter |
+| 129 | [MissileCommand](MissileCommand/) | Solved | Missile Command remake with progressive waves, cooperative targeting cursor, and procedural audio. | Python, pygame, numpy |
+| 130 | [Tron](Tron/) | Solved | HTML5 canvas lightcycle arena with AI riders, local/remote multiplayer, boosts, and scoring. | JavaScript, Canvas, WebRTC |
+| 131 | [Breakout](Breakout/) | Solved | Feature-rich pygame Breakout with JSON levels, power-ups, particles, and a level editor helper. | Python, pygame |
+| 132 | [Simon](Simon/) | Solved | Pygame Simon clone with audio/visual feedback, increasing difficulty, and bundled assets. | Python, pygame |
 
-| 105 | Monster Raising/Breeding Simulator | Solved | Python 3 + pygame | `Monster Raising/main.py` |
-| 106 | Tetris | Backlog | TBD | — |
-
-| 105 | Monster Raising/Breeding Simulator | Backlog | TBD | — |
-| 106 | Tetris | View Solution | Python 3 + pygame | `Tetris/main.py` |
-
-| 107 | Snake | Solved | Python 3 (turtle), JavaScript + HTML Canvas | `Snake/snake.py`, `Snake/snake.html` |
-
-| 108 | Pipe Dreams | Backlog | TBD | — |
-| 109 | Pac-Man (behavioural ghosts) | Solved | Python 3 + pygame | `Pacman/main.py` |
-
-| 108 | Pipe Dreams | Solved | TypeScript + Vite (HTML5 Canvas) | `Pipe Dreams/index.html` (Vite dev server) |
-| 109 | Pac-Man (behavioural ghosts) | Backlog | TBD | — |
-
-| 110 | Dragon Quest / Basic RPG Engine | Solved | Python 3 + pygame RPG engine | `RPGEngine/main.py` |
-
-
-| 110 | Dragon Quest / Basic RPG Engine | Backlog | TBD | — |
-
-| 111 | Rock Paper Scissors (+Lizard Spock) | Solved | Python 3 (CLI), C++, Java, JavaScript/Web | `RPS/rpsls.py`, `RPS/rps.cpp`, `RPS/rps.java`, `RPS/rps.html` |
-| 112 | First-Person Engine (OpenGL) | Solved | C++17, GLFW, GLAD | `FirstPersonEngine` (see README) |
-| 113 | Shuffle a Deck (with visualisation) | Solved | Python 3 + matplotlib | `Shuffle/cards.py` |
-| 114 | Multi-agent Tag Simulation | Solved | Python 3 + pygame + matplotlib | `MultiAgentTag/tag_sim.py` |
-| 115 | Wolfenstein Clone | Backlog | Planned raycaster | — |
-| 116 | Scorched Earth Clone | Solved | Python 3 + pygame | `ScorchedEarth/scorched_earth.py` |
-| 117 | Minesweeper | Solved | Python 3 + tkinter | `Minesweeper/mine.py` |
-| 118 | 64KB Audio/Visual Demo | Solved | WebGL + JavaScript | `64kDemo/dist/index.html` (build first) |
-| 119 | Sudoku | Solved | Python 3 + tkinter + numpy | `Sudoku/sudoku.py` |
-
-| 120 | Danmaku (Bullet Hell) Engine | Backlog | TBD | — |
-| 121 | Roguelike Engine / Dungeon Generator | Solved | Python 3 + tcod | `python -m Games.Roguelike.main` |
-| 122 | Design a Game Engine in Unity | Backlog | Unity (planned) | — |
-
-| 120 | Danmaku (Bullet Hell) Engine | Solved | TypeScript + PixiJS | `DanmakuEngine/` (`npm run dev`) |
-| 121 | Roguelike Engine / Dungeon Generator | Backlog | TBD | — |
-| 122 | Design a Game Engine in Unity | Solved | Unity 2022.3 LTS | `UnityEngine/` |
-
-| 123 | Yahtzee | Solved | Python 3 (CLI), Java | `Yahtzee/yahtzee.py`, `Yahtzee/yahtzee.java` |
-
-| 124 | Oil Panic | Solved | Python 3 + pygame | `OilPanic/oil_panic.py` |
-
-| 124 | Oil Panic | Backlog | TBD | — |
-
-
-| 125 | Chess | Backlog | TBD | — |
-| 126 | Go (No AI necessary) | Solved | Python 3 + PySide6 | `Go/go.py` |
-
-| 125 | Chess | Solved | Python 3 (CLI + Pygame) | `python -m Games.Chess.cli`, `python -m Games.Chess.pygame_ui` |
-| 126 | Go (No AI necessary) | Backlog | TBD | — |
-
-| 127 | Connect Four | Solved | Python 3 + pygame + numpy, Java | `Connect4/connect4.py`, `Connect4/connect4.java` |
-
-| 128 | Mastermind | Backlog | TBD | — |
-| 129 | Missile Command | Solved | Python 3 + pygame | `MissileCommand/missile_command.py` |
-| 130 | Tron | Backlog | TBD | — |
-
-
-| 128 | Mastermind | Solved | Python 3 (CLI + tkinter GUI) | `Mastermind/mastermind_cli.py`, `Mastermind/mastermind_gui.py` |
-| 129 | Missile Command | Backlog 
-| 130 | Tron | Solved | JavaScript (HTML Canvas + WebRTC) | `Tron/index.html` |
-
-| 131 | Breakout | Backlog | TBD | — |
-
-| 130 | Tron | Backlog | TBD | — |
-| 131 | Breakout | Solved | Python 3 + pygame | `Breakout/breakout.py` |
-
-| 132 | Simon | Solved | Python 3 + pygame (audio assets) | `Simon/simon.py` |
-
-> When you create a new implementation, update this table with the tech stack and primary launch command so the backlog remains actionable.
+> When you add a new build, append it here with the challenge number, summary, and tech stack so contributors can see coverage at a glance.
 
 ---
 
@@ -135,10 +94,10 @@ Authoritative status board for challenges #104–#132. Entry points list the mai
 
 | Focus | Extras | Notes |
 |-------|--------|-------|
-| All Python games | `games` | Installs numpy, matplotlib, and pygame used throughout the solved titles. |
-| Visual analytics (Shuffle stats, future dashboards) | `games,visual` | Adds plotting + rendering helpers beyond the base game set. |
-| Audio-heavy builds (Simon patterns, future rhythm games) | `games,audio` | Pulls in sounddevice/librosa alongside pygame mixers. |
-| Development + linting | `games,developer` | Extends with pytest, ruff, mypy for automated checks. |
+| All Python games | `games` | Installs numpy, pygame, PySide6, and tcod used across the solved catalog. |
+| Visual analytics (Shuffle stats, future dashboards) | `games,visual` | Layers matplotlib/plotly/imageio on top of the base stack for analysis tooling. |
+| Audio-heavy builds (Simon patterns, future rhythm games) | `games,audio` | Adds sounddevice/librosa alongside pygame mixers for richer sound pipelines. |
+| Development + linting | `games,developer` | Extends with pytest, ruff, and mypy for automated checks. |
 
 Need another stack? Refer to the [root extras table](../README.md#using-pyprojecttoml) to combine categories (e.g., `.[games,web]` for multiplayer dashboards).
 
