@@ -5,3 +5,4 @@
 #   python -m pip install -e .[visual]   # matplotlib visualisations
 #   python -m pip install -e .[audio]    # shared sound backends
 # Consult Games/README.md for per-title suggestions.
+# Roguelike depends on python-tcod (install manually: `python -m pip install tcod`).

@@ -223,33 +223,67 @@ The repository includes a GitHub Actions workflow at `.github/workflows/keep-str
 | # | Challenge | Status |
 | --- | --------- | ------ |
 | 104 | Knight's Tour | [View Solution](./Games/Knight%20Tour/) |
-| 105 | Monster Raising/Breeding Simulator | Not Yet |
+
+| 105 | Monster Raising/Breeding Simulator | [View Solution](./Games/Monster%20Raising/) |
 | 106 | Tetris | Not Yet |
+
+| 105 | Monster Raising/Breeding Simulator | Not Yet |
+| 106 | Tetris | [View Solution](./Games/Tetris/) |
+
 | 107 | Snake | [View Solution](./Games/Snake/) |
+
 | 108 | Pipe Dreams | Not Yet |
+| 109 | Pac Man With Different Behaviors for each ghost | [View Solution](./Games/Pacman/) |
+
+| 108 | Pipe Dreams | [View Solution](./Games/Pipe%20Dreams/) |
 | 109 | Pac Man With Different Behaviors for each ghost | Not Yet |
+
 | 110 | Dragon Quest / Basic RPG Engine | Not Yet |
 | 111 | Rock Paper Scissors | [View Solution](./Games/RPS/) |
 | 112 | First-Person Engine in OpenGL (Walking Looking Around Jumping on Obstacles) (BONUS: VR Compatibility) | Not Yet |
 | 113 | Shuffle a Deck of Cards (Include a Visualization) | [View Solution](./Games/Shuffle/) |
 | 114 | Simulate a game of Tag using a multi-agent system | Not Yet |
 | 115 | Wolfenstein Clone (FPS two-dimensional map that appears to be 3-D) (If you need a starting point search for bisquit's video about DOOM-like Engines) | Not Yet |
-| 116 | Scorched Earth Clone | Not Yet |
+| 116 | Scorched Earth Clone | [View Solution](./Games/ScorchedEarth/) |
 | 117 | Minesweeper | [View Solution](./Games/Minesweeper/) |
 | 118 | An Audio/Visual 64KB Demonstration | Not Yet |
 | 119 | Sudoku | [View Solution](./Games/Sudoku/) |
 | 120 | Danmaku (Bullet Hell) Engine | Not Yet |
-| 121 | Roguelike Engine/Dungeon Generator | Not Yet |
+
+| 121 | Roguelike Engine/Dungeon Generator | [View Solution](./Games/Roguelike/) |
 | 122 | Design a Game Engine in Unity | Not Yet |
+
+| 121 | Roguelike Engine/Dungeon Generator | Not Yet |
+| 122 | Design a Game Engine in Unity | [View Solution](./Games/UnityEngine/) |
+
 | 123 | Yahtzee | [View Solution](./Games/Yahtzee/) |
 | 124 | Oil Panic | Not Yet |
+
 | 125 | Chess | Not Yet |
+| 126 | Go (No AI Necessary) | [View Solution](./Games/Go/) |
+
+| 125 | Chess | [View Solution](./Games/Chess/) |
 | 126 | Go (No AI Necessary) | Not Yet |
+
 | 127 | Connect Four | [View Solution](./Games/Connect4/) |
 | 128 | Mastermind | Not Yet |
+
 | 129 | Missile Command Game | [View Solution](./Games/MissileCommand/) |
 | 130 | Tron | Not Yet |
+
+| 129 | Missile Command Game | Not Yet |
+
+| 130 | Tron | [View Solution](./Games/Tron/) |
+
+
+
+
+
 | 131 | Breakout | Not Yet |
+
+| 130 | Tron | Not Yet |
+| 131 | Breakout | [View Solution](./Games/Breakout/) |
+
 | 132 | Simon | [View Solution](./Games/Simon/) |
 
 ## Highlights

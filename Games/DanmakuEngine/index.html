@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Danmaku Engine Demo</title>
+    <style>
+      body {
+        margin: 0;
+        background: #020206;
+        color: #f8f8ff;
+        font-family: 'Fira Sans', system-ui, sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        min-height: 100vh;
+        padding-top: 1rem;
+      }
+      canvas {
+        border: 2px solid #444;
+        box-shadow: 0 0 32px rgba(255, 80, 160, 0.35);
+      }
+      .hud {
+        margin-top: 1rem;
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 1rem;
+      }
+      .hud div {
+        background: rgba(8, 12, 24, 0.9);
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="game"></canvas>
+    <div class="hud">
+      <div><strong>Controls</strong><br />Arrow keys to move, hold Shift to focus, Z to bomb.</div>
+      <div><strong>Mechanics</strong><br />Graze bullets for score and power. Bombs clear bullets.</div>
+      <div><strong>Stages</strong><br />Swap `stages/stage1.json` with `stage2.lua` in <code>main.ts</code> to try Hard mode.</div>
+    </div>
+    <script type="module" src="./src/main.ts"></script>
+  </body>
+</html>
