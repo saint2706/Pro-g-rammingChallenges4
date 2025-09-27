@@ -76,7 +76,7 @@ Authoritative status board for challenges #104–#132. Entry points list the mai
 | 122 | Design a Game Engine in Unity | Backlog | Unity (planned) | — |
 | 123 | Yahtzee | Solved | Python 3 (CLI), Java | `Yahtzee/yahtzee.py`, `Yahtzee/yahtzee.java` |
 | 124 | Oil Panic | Backlog | TBD | — |
-| 125 | Chess | Backlog | TBD | — |
+| 125 | Chess | Solved | Python 3 (CLI + Pygame) | `python -m Games.Chess.cli`, `python -m Games.Chess.pygame_ui` |
 | 126 | Go (No AI necessary) | Backlog | TBD | — |
 | 127 | Connect Four | Solved | Python 3 + pygame + numpy, Java | `Connect4/connect4.py`, `Connect4/connect4.java` |
 | 128 | Mastermind | Backlog | TBD | — |
@@ -118,9 +118,10 @@ python "Yahtzee/yahtzee.py"     # CLI edition
 python "Snake/snake.py"         # Turtle graphics, ensure tkinter is available
 python "Knight Tour/knight.py"  # CLI solver visualises via stdout
 python "RPS/rpsls.py"           # CLI (supports Lizard/Spock variant)
+python -m Chess.cli              # CLI chess with optional AI
 ```
 
-Per-game documentation: [Connect Four](Connect4/README.md), [Minesweeper](Minesweeper/README.md), [Simon](Simon/README.md), [Sudoku](Sudoku/README.md), [Shuffle](Shuffle/README.md), [Yahtzee](Yahtzee/README.md), [Snake](Snake/README.md), [Knight's Tour]("Knight Tour"/README.md), [Rock Paper Scissors](RPS/README.md).
+Per-game documentation: [Connect Four](Connect4/README.md), [Minesweeper](Minesweeper/README.md), [Simon](Simon/README.md), [Sudoku](Sudoku/README.md), [Shuffle](Shuffle/README.md), [Yahtzee](Yahtzee/README.md), [Snake](Snake/README.md), [Knight's Tour]("Knight Tour"/README.md), [Rock Paper Scissors](RPS/README.md), [Chess](Chess/README.md).
 
 Assets are co-located inside each project (e.g., `Simon/Assets/Audio`). Keep relative paths intact when running outside the repo root.
 
