@@ -13,9 +13,9 @@ The solutions are organized by category and difficulty, making it easy to naviga
 
 ## Progress
 
-<progress value="98" max="131"></progress>
+<progress value="99" max="131"></progress>
 
-**Overall:** 98 / 131 challenges completed (74.8%).
+**Overall:** 99 / 131 challenges completed (75.6%).
 
 | Category | Completed | Total | Progress |
 | --- | --- | --- | --- |
@@ -23,7 +23,7 @@ The solutions are organized by category and difficulty, making it easy to naviga
 | Algorithmic | 27 | 27 | 100% |
 | Artificial Intelligence | 3 | 8 | 37.5% |
 | Emulation/Modeling | 6 | 14 | 42.9% |
-| Games | 9 | 29 | 31.0% |
+| Games | 10 | 29 | 34.5% |
 
 _Progress counts are generated from the actual solution folders in the repository (see tables below)._ 
 
@@ -248,7 +248,7 @@ The repository includes a GitHub Actions workflow at `.github/workflows/keep-str
 | 127 | Connect Four | [View Solution](./Games/Connect4/) |
 | 128 | Mastermind | Not Yet |
 | 129 | Missile Command Game | Not Yet |
-| 130 | Tron | Not Yet |
+| 130 | Tron | [View Solution](./Games/Tron/) |
 | 131 | Breakout | Not Yet |
 | 132 | Simon | [View Solution](./Games/Simon/) |
 
