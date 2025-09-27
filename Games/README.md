@@ -65,7 +65,7 @@ Authoritative status board for challenges #104–#132. Entry points list the mai
 | 111 | Rock Paper Scissors (+Lizard Spock) | Solved | Python 3 (CLI), C++, Java, JavaScript/Web | `RPS/rpsls.py`, `RPS/rps.cpp`, `RPS/rps.java`, `RPS/rps.html` |
 | 112 | First-Person Engine (OpenGL) | Backlog | Planned OpenGL / C++ | — |
 | 113 | Shuffle a Deck (with visualisation) | Solved | Python 3 + matplotlib | `Shuffle/cards.py` |
-| 114 | Multi-agent Tag Simulation | Backlog | TBD | — |
+| 114 | Multi-agent Tag Simulation | Solved | Python 3 + pygame + matplotlib | `MultiAgentTag/tag_sim.py` |
 | 115 | Wolfenstein Clone | Backlog | Planned raycaster | — |
 | 116 | Scorched Earth Clone | Backlog | TBD | — |
 | 117 | Minesweeper | Solved | Python 3 + tkinter | `Minesweeper/mine.py` |
