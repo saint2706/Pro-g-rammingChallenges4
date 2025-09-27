@@ -1,0 +1,77 @@
+{
+  "day": 1,
+  "gold": 140,
+  "reputation": 1,
+  "inventory": {
+    "basic_feed": 8,
+    "deluxe_feed": 2
+  },
+  "monsters": [
+    {
+      "name": "Mossy",
+      "species": "Sprigbit",
+      "age_days": 14,
+      "stage": "adult",
+      "stats": {
+        "strength": 18.16,
+        "intelligence": 17.38,
+        "endurance": 18.59,
+        "agility": 23.69,
+        "charisma": 24.6
+      },
+      "energy": 80.0,
+      "hunger": 20.0,
+      "happiness": 70.0,
+      "discipline": 50.0,
+      "training_focus": null,
+      "training_days_remaining": 0,
+      "last_event": "Born at the ranch."
+    },
+    {
+      "name": "Flare",
+      "species": "Embercub",
+      "age_days": 16,
+      "stage": "adult",
+      "stats": {
+        "strength": 24.82,
+        "intelligence": 13.4,
+        "endurance": 20.52,
+        "agility": 18.16,
+        "charisma": 16.98
+      },
+      "energy": 80.0,
+      "hunger": 20.0,
+      "happiness": 70.0,
+      "discipline": 50.0,
+      "training_focus": null,
+      "training_days_remaining": 0,
+      "last_event": "Born at the ranch."
+    }
+  ],
+  "eggs": [
+    {
+      "species": "Sprigbit",
+      "days_until_hatch": 1,
+      "potential": 1.05,
+      "nickname_hint": "Spr-MF",
+      "parents": [
+        "Mossy",
+        "Flare"
+      ],
+      "stat_blueprint": {
+        "strength": 19.710714286807168,
+        "intelligence": 18.51591283487093,
+        "endurance": 23.43198170483887,
+        "agility": 21.683769616088014,
+        "charisma": 22.286769982489925
+      }
+    }
+  ],
+  "event_log": [
+    "Quick-start stable loaded: Mossy and Flare await your orders.",
+    "Egg expected to hatch tomorrow."
+  ],
+  "metadata": {
+    "version": 1
+  }
+}
