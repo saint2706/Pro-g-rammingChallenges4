@@ -64,8 +64,13 @@ Authoritative status board for challenges #104–#132. Entry points list the mai
 | 106 | Tetris | View Solution | Python 3 + pygame | `Tetris/main.py` |
 
 | 107 | Snake | Solved | Python 3 (turtle), JavaScript + HTML Canvas | `Snake/snake.py`, `Snake/snake.html` |
+
+| 108 | Pipe Dreams | Backlog | TBD | — |
+| 109 | Pac-Man (behavioural ghosts) | Solved | Python 3 + pygame | `Pacman/main.py` |
+
 | 108 | Pipe Dreams | Solved | TypeScript + Vite (HTML5 Canvas) | `Pipe Dreams/index.html` (Vite dev server) |
 | 109 | Pac-Man (behavioural ghosts) | Backlog | TBD | — |
+
 | 110 | Dragon Quest / Basic RPG Engine | Backlog | TBD | — |
 | 111 | Rock Paper Scissors (+Lizard Spock) | Solved | Python 3 (CLI), C++, Java, JavaScript/Web | `RPS/rpsls.py`, `RPS/rps.cpp`, `RPS/rps.java`, `RPS/rps.html` |
 | 112 | First-Person Engine (OpenGL) | Backlog | Planned OpenGL / C++ | — |
@@ -120,6 +125,7 @@ python "Minesweeper/mine.py"    # tkinter GUI (bundled with most Python installs
 python "Simon/simon.py"         # Loads Assets/Audio and Assets/Images
 python "Sudoku/sudoku.py"       # Needs numpy + tkinter
 python "Shuffle/cards.py"       # matplotlib visualiser
+python "Pacman/main.py"        # Pygame Pac-Man with behavioural ghosts
 python "Yahtzee/yahtzee.py"     # CLI edition
 python "Snake/snake.py"         # Turtle graphics, ensure tkinter is available
 python "Knight Tour/knight.py"  # CLI solver visualises via stdout
@@ -127,7 +133,11 @@ python "RPS/rpsls.py"           # CLI (supports Lizard/Spock variant)
 python "Monster Raising/main.py"  # pygame ranch sim with JSON saves
 ```
 
+
+Per-game documentation: [Connect Four](Connect4/README.md), [Minesweeper](Minesweeper/README.md), [Simon](Simon/README.md), [Sudoku](Sudoku/README.md), [Shuffle](Shuffle/README.md), [Yahtzee](Yahtzee/README.md), [Snake](Snake/README.md), [Knight's Tour]("Knight Tour"/README.md), [Rock Paper Scissors](RPS/README.md), [Pac-Man](Pacman/README.md).
+
 Per-game documentation: [Connect Four](Connect4/README.md), [Tetris](Tetris/README.md), [Minesweeper](Minesweeper/README.md), [Simon](Simon/README.md), [Sudoku](Sudoku/README.md), [Shuffle](Shuffle/README.md), [Yahtzee](Yahtzee/README.md), [Snake](Snake/README.md), [Knight's Tour]("Knight Tour"/README.md), [Rock Paper Scissors](RPS/README.md).
+
 
 Assets are co-located inside each project (e.g., `Simon/Assets/Audio`). Keep relative paths intact when running outside the repo root.
 
