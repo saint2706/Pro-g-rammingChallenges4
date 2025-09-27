@@ -1,8 +1,12 @@
-# Practical tools share the central pyproject optional extras.
-# Install everything with:
-#   python -m pip install -e .[practical]
-# Or mix and match targeted stacks:
-#   python -m pip install -e .[audio]
-#   python -m pip install -e .[web]
-#   python -m pip install -e .[desktop]
-# See Practical/README.md for a matrix of extras per project.
+streamlit>=1.37  # Practical/app.py hub and every Streamlit tool entry point
+streamlit-drawable-canvas>=0.9.3  # Practical/Paint/streamlit_app.py canvas widget
+numpy>=1.26,<2.0  # Graphing Calculator, Paint, HSV color wheel, Matrix Arithmetic, Verlet Cloth
+pandas>=2.2,<2.3  # IP Tracking visualization, IP URL Obscurifier tables
+sympy>=1.12,<1.13  # Practical/Graphing Calculator/plot_core.py symbolic maths
+matplotlib>=3.8,<3.9  # Graphing Calculator, Bellman Ford Simulation, Bismuth Fractal, Vector Product, Verlet Cloth
+plotly>=5.22,<5.23  # IP Tracking visualization and Verlet Cloth interactive plots
+Pillow>=10.4,<10.5  # Paint, Image Converter, HSV color wheel exports, ImgToASCII
+requests>=2.31,<3.0  # Practical/IP Tracking visualization/trackip.py API lookups
+pygame>=2.6,<2.7  # Practical/Old School cringe/retro_demo.py demo engine
+imageio>=2.34,<2.35  # Old School cringe GIF capture and Verlet Cloth animations
+markdown>=3.6,<3.7  # Practical/Markdown Editor/converter.py Markdown rendering
