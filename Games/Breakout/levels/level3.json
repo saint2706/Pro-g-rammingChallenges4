@@ -1,0 +1,19 @@
+{
+  "name": "Nebula Forge",
+  "ball_speed": 420,
+  "paddle_speed": 500,
+  "brick_size": [60, 22],
+  "layout": [
+    "MMSMMSMMSM",
+    "SBSBSBSBSB",
+    "BMBMBMBMBM",
+    "SBSBSBSBSB",
+    "LLLLLLLLLL"
+  ],
+  "legend": {
+    "B": {"hits": 1, "score": 80},
+    "S": {"hits": 3, "score": 170},
+    "M": {"hits": 2, "score": 140, "powerup": "enlarge"},
+    "L": {"hits": 1, "score": 120, "powerup": "life"}
+  }
+}

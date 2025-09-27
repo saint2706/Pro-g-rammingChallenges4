@@ -1,0 +1,20 @@
+{
+  "name": "Training Grounds",
+  "ball_speed": 320,
+  "paddle_speed": 420,
+  "brick_size": [64, 24],
+  "layout": [
+    "..........",
+    "..P..P..P.",
+    "BBBBBBBBBB",
+    "BSSBBSSBBP",
+    "BBBBLBBBBB"
+  ],
+  "legend": {
+    ".": {"empty": true},
+    "B": {"hits": 1, "score": 60},
+    "S": {"hits": 2, "score": 120},
+    "P": {"hits": 1, "score": 80, "powerup": "enlarge"},
+    "L": {"hits": 1, "score": 100, "powerup": "life"}
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "name": "Orbital Rally",
+  "ball_speed": 360,
+  "paddle_speed": 460,
+  "brick_size": [64, 24],
+  "layout": [
+    "PPPPPPPPPP",
+    "SBSBSBSBSB",
+    "BBBBBBBBBB",
+    "BLSLSLSLSB",
+    "BBBBBBBBBB"
+  ],
+  "legend": {
+    "B": {"hits": 1, "score": 70},
+    "S": {"hits": 3, "score": 160},
+    "P": {"hits": 1, "score": 90, "powerup": "multiball"},
+    "L": {"hits": 1, "score": 110, "powerup": "life"}
+  }
+}

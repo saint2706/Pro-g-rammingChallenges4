@@ -1,0 +1,30 @@
+[
+  {
+    "name": "Sprigbit",
+    "element": "Nature",
+    "temperament": "cheerful",
+    "base_stats": {"strength": 18, "intelligence": 16, "endurance": 20, "agility": 22, "charisma": 24},
+    "growth_rates": {"strength": 1.1, "intelligence": 1.2, "endurance": 1.3, "agility": 1.4, "charisma": 1.2}
+  },
+  {
+    "name": "Embercub",
+    "element": "Fire",
+    "temperament": "brash",
+    "base_stats": {"strength": 24, "intelligence": 14, "endurance": 22, "agility": 20, "charisma": 18},
+    "growth_rates": {"strength": 1.5, "intelligence": 1.0, "endurance": 1.2, "agility": 1.3, "charisma": 1.1}
+  },
+  {
+    "name": "Starlet",
+    "element": "Light",
+    "temperament": "focused",
+    "base_stats": {"strength": 16, "intelligence": 26, "endurance": 18, "agility": 20, "charisma": 28},
+    "growth_rates": {"strength": 1.0, "intelligence": 1.6, "endurance": 1.1, "agility": 1.2, "charisma": 1.5}
+  },
+  {
+    "name": "Tidewhirl",
+    "element": "Water",
+    "temperament": "calm",
+    "base_stats": {"strength": 20, "intelligence": 22, "endurance": 24, "agility": 18, "charisma": 19},
+    "growth_rates": {"strength": 1.2, "intelligence": 1.3, "endurance": 1.5, "agility": 1.0, "charisma": 1.1}
+  }
+]
