@@ -1,0 +1,8 @@
+{
+  "move_forward": "W",
+  "move_backward": "S",
+  "move_left": "A",
+  "move_right": "D",
+  "jump": "SPACE",
+  "sprint": "LEFT_SHIFT"
+}
