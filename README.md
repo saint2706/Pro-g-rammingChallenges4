@@ -224,7 +224,7 @@ The repository includes a GitHub Actions workflow at `.github/workflows/keep-str
 | --- | --------- | ------ |
 | 104 | Knight's Tour | [View Solution](./Games/Knight%20Tour/) |
 | 105 | Monster Raising/Breeding Simulator | Not Yet |
-| 106 | Tetris | Not Yet |
+| 106 | Tetris | [View Solution](./Games/Tetris/) |
 | 107 | Snake | [View Solution](./Games/Snake/) |
 | 108 | Pipe Dreams | Not Yet |
 | 109 | Pac Man With Different Behaviors for each ghost | Not Yet |
