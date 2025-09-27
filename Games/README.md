@@ -71,7 +71,7 @@ Authoritative status board for challenges #104–#132. Entry points list the mai
 | 117 | Minesweeper | Solved | Python 3 + tkinter | `Minesweeper/mine.py` |
 | 118 | 64KB Audio/Visual Demo | Backlog | TBD | — |
 | 119 | Sudoku | Solved | Python 3 + tkinter + numpy | `Sudoku/sudoku.py` |
-| 120 | Danmaku (Bullet Hell) Engine | Backlog | TBD | — |
+| 120 | Danmaku (Bullet Hell) Engine | Solved | TypeScript + PixiJS | `DanmakuEngine/` (`npm run dev`) |
 | 121 | Roguelike Engine / Dungeon Generator | Backlog | TBD | — |
 | 122 | Design a Game Engine in Unity | Backlog | Unity (planned) | — |
 | 123 | Yahtzee | Solved | Python 3 (CLI), Java | `Yahtzee/yahtzee.py`, `Yahtzee/yahtzee.java` |
@@ -148,6 +148,7 @@ The C++ build uses only the standard library; no external packages required. Det
 1. Open the HTML file directly in a browser:
    - `Snake/snake.html`
    - `RPS/rps.html`
+   - `DanmakuEngine/index.html` (or run `npm run dev` inside `DanmakuEngine/` for PixiJS build tooling)
 2. For asset-backed games, keep the accompanying `.js`, `.css`, and `assets/` folders in the same directory.
 3. Optional: use a static server for clean module loading (`python -m http.server` from within the game folder).
 
