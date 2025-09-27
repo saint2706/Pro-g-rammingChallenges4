@@ -77,7 +77,7 @@ Authoritative status board for challenges #104–#132. Entry points list the mai
 | 123 | Yahtzee | Solved | Python 3 (CLI), Java | `Yahtzee/yahtzee.py`, `Yahtzee/yahtzee.java` |
 | 124 | Oil Panic | Backlog | TBD | — |
 | 125 | Chess | Backlog | TBD | — |
-| 126 | Go (No AI necessary) | Backlog | TBD | — |
+| 126 | Go (No AI necessary) | Solved | Python 3 + PySide6 | `Go/go.py` |
 | 127 | Connect Four | Solved | Python 3 + pygame + numpy, Java | `Connect4/connect4.py`, `Connect4/connect4.java` |
 | 128 | Mastermind | Backlog | TBD | — |
 | 129 | Missile Command | Backlog | TBD | — |
