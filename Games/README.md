@@ -90,7 +90,7 @@ Authoritative status board for challenges #104–#132. Entry points list the mai
 | 125 | Chess | Backlog | TBD | — |
 | 126 | Go (No AI necessary) | Backlog | TBD | — |
 | 127 | Connect Four | Solved | Python 3 + pygame + numpy, Java | `Connect4/connect4.py`, `Connect4/connect4.java` |
-| 128 | Mastermind | Backlog | TBD | — |
+| 128 | Mastermind | Solved | Python 3 (CLI + tkinter GUI) | `Mastermind/mastermind_cli.py`, `Mastermind/mastermind_gui.py` |
 | 129 | Missile Command | Backlog | TBD | — |
 | 130 | Tron | Backlog | TBD | — |
 | 131 | Breakout | Solved | Python 3 + pygame | `Breakout/breakout.py` |
@@ -131,6 +131,8 @@ python "Yahtzee/yahtzee.py"     # CLI edition
 python "Snake/snake.py"         # Turtle graphics, ensure tkinter is available
 python "Breakout/breakout.py"   # pygame-powered Breakout with JSON levels
 python "Knight Tour/knight.py"  # CLI solver visualises via stdout
+python "Mastermind/mastermind_cli.py"  # CLI Mastermind with difficulty presets
+python "Mastermind/mastermind_gui.py"  # tkinter GUI with code-maker mode
 python "RPS/rpsls.py"           # CLI (supports Lizard/Spock variant)
 python "Monster Raising/main.py"  # pygame ranch sim with JSON saves
 ```
