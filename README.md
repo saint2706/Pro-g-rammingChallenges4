@@ -258,8 +258,13 @@ The repository includes a GitHub Actions workflow at `.github/workflows/keep-str
 
 | 123 | Yahtzee | [View Solution](./Games/Yahtzee/) |
 | 124 | Oil Panic | Not Yet |
+
+| 125 | Chess | Not Yet |
+| 126 | Go (No AI Necessary) | [View Solution](./Games/Go/) |
+
 | 125 | Chess | [View Solution](./Games/Chess/) |
 | 126 | Go (No AI Necessary) | Not Yet |
+
 | 127 | Connect Four | [View Solution](./Games/Connect4/) |
 | 128 | Mastermind | Not Yet |
 | 129 | Missile Command Game | Not Yet |
