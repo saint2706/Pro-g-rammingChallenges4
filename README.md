@@ -259,7 +259,7 @@ The repository includes a GitHub Actions workflow at `.github/workflows/keep-str
 | 128 | Mastermind | Not Yet |
 | 129 | Missile Command Game | Not Yet |
 | 130 | Tron | Not Yet |
-| 131 | Breakout | Not Yet |
+| 131 | Breakout | [View Solution](./Games/Breakout/) |
 | 132 | Simon | [View Solution](./Games/Simon/) |
 
 ## Highlights

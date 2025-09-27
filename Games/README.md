@@ -41,6 +41,7 @@ Extras keep Python dependencies lightweight and consistent with the root extras 
 
 ```bash
 python "Snake/snake.py"          # Turtle graphics Snake
+python "Breakout/breakout.py"    # pygame Breakout with JSON levels
 python "Simon/simon.py"          # Pygame Simon (loads local assets)
 python "Shuffle/cards.py"        # Matplotlib card shuffler
 ```
@@ -92,7 +93,7 @@ Authoritative status board for challenges #104–#132. Entry points list the mai
 | 128 | Mastermind | Backlog | TBD | — |
 | 129 | Missile Command | Backlog | TBD | — |
 | 130 | Tron | Backlog | TBD | — |
-| 131 | Breakout | Backlog | TBD | — |
+| 131 | Breakout | Solved | Python 3 + pygame | `Breakout/breakout.py` |
 | 132 | Simon | Solved | Python 3 + pygame (audio assets) | `Simon/simon.py` |
 
 > When you create a new implementation, update this table with the tech stack and primary launch command so the backlog remains actionable.
@@ -128,15 +129,20 @@ python "Shuffle/cards.py"       # matplotlib visualiser
 python "Pacman/main.py"        # Pygame Pac-Man with behavioural ghosts
 python "Yahtzee/yahtzee.py"     # CLI edition
 python "Snake/snake.py"         # Turtle graphics, ensure tkinter is available
+python "Breakout/breakout.py"   # pygame-powered Breakout with JSON levels
 python "Knight Tour/knight.py"  # CLI solver visualises via stdout
 python "RPS/rpsls.py"           # CLI (supports Lizard/Spock variant)
 python "Monster Raising/main.py"  # pygame ranch sim with JSON saves
 ```
 
 
+Per-game documentation: [Connect Four](Connect4/README.md), [Minesweeper](Minesweeper/README.md), [Simon](Simon/README.md), [Sudoku](Sudoku/README.md), [Shuffle](Shuffle/README.md), [Yahtzee](Yahtzee/README.md), [Snake](Snake/README.md), [Knight's Tour]("Knight Tour"/README.md), [Rock Paper Scissors](RPS/README.md), [Breakout](Breakout/README.md).
+
+
 Per-game documentation: [Connect Four](Connect4/README.md), [Minesweeper](Minesweeper/README.md), [Simon](Simon/README.md), [Sudoku](Sudoku/README.md), [Shuffle](Shuffle/README.md), [Yahtzee](Yahtzee/README.md), [Snake](Snake/README.md), [Knight's Tour]("Knight Tour"/README.md), [Rock Paper Scissors](RPS/README.md), [Pac-Man](Pacman/README.md).
 
 Per-game documentation: [Connect Four](Connect4/README.md), [Tetris](Tetris/README.md), [Minesweeper](Minesweeper/README.md), [Simon](Simon/README.md), [Sudoku](Sudoku/README.md), [Shuffle](Shuffle/README.md), [Yahtzee](Yahtzee/README.md), [Snake](Snake/README.md), [Knight's Tour]("Knight Tour"/README.md), [Rock Paper Scissors](RPS/README.md).
+
 
 
 Assets are co-located inside each project (e.g., `Simon/Assets/Audio`). Keep relative paths intact when running outside the repo root.
