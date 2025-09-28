@@ -35,7 +35,9 @@ class WMSEngineTests(unittest.TestCase):
         self.server = ServerConfig(
             name="Test",
             url="https://example.com/wms",
-            layers=[LayerConfig(name="foo:bar", title="Foo", styles="", format="image/png")],
+            layers=[
+                LayerConfig(name="foo:bar", title="Foo", styles="", format="image/png")
+            ],
         )
         self.layer = self.server.layers[0]
         self.client = WMSClient(self.cache, timeout=1)
@@ -48,11 +50,15 @@ class WMSEngineTests(unittest.TestCase):
             self.assertEqual(first, b"abc")
             second = self.client.fetch_map(self.server, self.layer, bbox, size)
             self.assertEqual(second, b"abc")
-            self.assertEqual(mocked.call_count, 1, "Expected second call to be served from cache")
+            self.assertEqual(
+                mocked.call_count, 1, "Expected second call to be served from cache"
+            )
 
     def test_map_view_bbox_and_pan(self) -> None:
         projection = Projection("EPSG:3857")
-        view = MapViewState(256, 256, projection, zoom=2, center_lon=0.0, center_lat=0.0)
+        view = MapViewState(
+            256, 256, projection, zoom=2, center_lon=0.0, center_lat=0.0
+        )
         bbox = view.bounding_box()
         expected_half = view.resolution * view.width / 2
         self.assertAlmostEqual(bbox[0], -expected_half, places=3)

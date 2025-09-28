@@ -16,14 +16,16 @@ The functions are written so tests can import them directly without
 spawning subprocesses.  ``main()`` simply wires argparse to
 ``batch_convert`` and optionally launches the GUI.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass
 import argparse
 import logging
+import os
 import sys
 from pathlib import Path
-from typing import Iterable, Iterator, List, Optional, Sequence, Tuple
+from typing import IO, Iterable, Iterator, List, Optional, Sequence, Tuple, Union
 
 try:
     from PIL import Image, ImageOps, PngImagePlugin
@@ -86,12 +88,16 @@ def parse_resize(value: str) -> ResizeSpec:
     """
 
     if "x" not in value:
-        raise argparse.ArgumentTypeError("Resize must be WIDTHxHEIGHT (allowing missing width/height).")
+        raise argparse.ArgumentTypeError(
+            "Resize must be WIDTHxHEIGHT (allowing missing width/height)."
+        )
     width_s, height_s = value.split("x", 1)
     width = int(width_s) if width_s.strip() else None
     height = int(height_s) if height_s.strip() else None
     if width is None and height is None:
-        raise argparse.ArgumentTypeError("Resize requires at least a width or height value.")
+        raise argparse.ArgumentTypeError(
+            "Resize requires at least a width or height value."
+        )
     if width is not None and width <= 0:
         raise argparse.ArgumentTypeError("Width must be > 0.")
     if height is not None and height <= 0:
@@ -129,7 +135,9 @@ def _ensure_mode(image: Image.Image, target_format: str) -> Image.Image:
     return image
 
 
-def _collect_metadata(image: Image.Image) -> Tuple[dict, Optional[bytes], Optional[bytes]]:
+def _collect_metadata(
+    image: Image.Image,
+) -> Tuple[dict, Optional[bytes], Optional[bytes]]:
     """Return (info, exif_bytes, icc_profile)."""
 
     info = {}
@@ -147,7 +155,12 @@ def _collect_metadata(image: Image.Image) -> Tuple[dict, Optional[bytes], Option
     return info, exif_bytes, icc_profile
 
 
-def _build_save_kwargs(target_format: str, info: dict, exif_bytes: Optional[bytes], icc_profile: Optional[bytes]) -> dict:
+def _build_save_kwargs(
+    target_format: str,
+    info: dict,
+    exif_bytes: Optional[bytes],
+    icc_profile: Optional[bytes],
+) -> dict:
     """Create keyword arguments for :meth:`Image.Image.save` preserving metadata."""
 
     save_kwargs: dict = {}
@@ -175,7 +188,9 @@ def _build_save_kwargs(target_format: str, info: dict, exif_bytes: Optional[byte
     return save_kwargs
 
 
-def _infer_output_path(input_path: Path, output_dir: Optional[Path], target_format: str) -> Path:
+def _infer_output_path(
+    input_path: Path, output_dir: Optional[Path], target_format: str
+) -> Path:
     fmt_upper = target_format.upper()
     try:
         extension = SUPPORTED_EXPORT_FORMATS[fmt_upper][0]
@@ -185,35 +200,89 @@ def _infer_output_path(input_path: Path, output_dir: Optional[Path], target_form
     return destination_dir / f"{input_path.stem}{extension}"
 
 
+PathOrStr = Union[str, os.PathLike, Path]
+FileLike = IO[bytes]
+
+
+def _is_path_like(value: object) -> bool:
+    return isinstance(value, (str, Path, os.PathLike))
+
+
 def convert_image(
-    input_path: Path,
+    input_path: Union[PathOrStr, FileLike],
     *,
     target_format: str,
-    output_path: Optional[Path] = None,
+    output_path: Optional[Union[PathOrStr, FileLike]] = None,
     quality: Optional[int] = None,
     resize: Optional[ResizeSpec] = None,
     keep_metadata: bool = True,
-) -> Path:
-    """Convert ``input_path`` to ``target_format`` and return the output path."""
+) -> Optional[Path]:
+    """Convert an image to ``target_format``.
+
+    Parameters accept filesystem paths or file-like objects. When ``input_path``
+    is a file-like, an explicit ``output_path`` must be provided. When
+    ``output_path`` is a file-like, ``None`` is returned instead of a
+    :class:`~pathlib.Path` instance.
+    """
 
     target_format = target_format.upper()
     if target_format not in SUPPORTED_EXPORT_SET:
-        raise ValueError(f"Unsupported target format '{target_format}'. Supported: {sorted(SUPPORTED_EXPORT_SET)}")
+        raise ValueError(
+            f"Unsupported target format '{target_format}'. Supported: {sorted(SUPPORTED_EXPORT_SET)}"
+        )
 
-    input_path = Path(input_path)
-    if not input_path.exists():
-        raise FileNotFoundError(input_path)
-
-    if output_path is None:
-        output_path = _infer_output_path(input_path, None, target_format)
+    resolved_input_path: Optional[Path] = None
+    if _is_path_like(input_path):
+        resolved_input_path = Path(input_path)
+        if not resolved_input_path.exists():
+            raise FileNotFoundError(resolved_input_path)
+        image_source: Union[Path, FileLike] = resolved_input_path
     else:
-        output_path = Path(output_path)
-        if output_path.is_dir():
-            output_path = _infer_output_path(input_path, output_path, target_format)
-        else:
-            output_path.parent.mkdir(parents=True, exist_ok=True)
+        if not hasattr(input_path, "read"):
+            raise TypeError(
+                "input_path must be a filesystem path or binary file-like object"
+            )
+        if hasattr(input_path, "seek"):
+            try:
+                input_path.seek(0)
+            except Exception:  # pragma: no cover - best effort
+                pass
+        image_source = input_path  # type: ignore[assignment]
 
-    with Image.open(input_path) as img:
+    destination: Union[Path, FileLike]
+    written_path: Optional[Path] = None
+    if output_path is None:
+        if resolved_input_path is None:
+            raise ValueError(
+                "output_path must be provided when reading from a file-like object"
+            )
+        destination = _infer_output_path(resolved_input_path, None, target_format)
+        written_path = destination
+    elif _is_path_like(output_path):
+        resolved_output = Path(output_path)
+        if resolved_output.is_dir():
+            if resolved_input_path is not None:
+                resolved_output = _infer_output_path(
+                    resolved_input_path, resolved_output, target_format
+                )
+            else:
+                name_hint = getattr(input_path, "name", None)
+                if not name_hint:
+                    raise ValueError(
+                        "Directory output_path requires the file-like input to provide a 'name' attribute."
+                    )
+                resolved_output = (
+                    resolved_output
+                    / f"{Path(str(name_hint)).stem}{SUPPORTED_EXPORT_FORMATS[target_format][0]}"
+                )
+        else:
+            resolved_output.parent.mkdir(parents=True, exist_ok=True)
+        destination = resolved_output
+        written_path = resolved_output
+    else:
+        destination = output_path  # type: ignore[assignment]
+
+    with Image.open(image_source) as img:
         img = ImageOps.exif_transpose(img)
         info: dict = {}
         exif_bytes: Optional[bytes] = None
@@ -224,18 +293,52 @@ def convert_image(
             img = resize.apply(img)
         img = _ensure_mode(img, target_format)
 
-        save_kwargs = _build_save_kwargs(target_format, info, exif_bytes, icc_profile) if keep_metadata else {}
+        save_kwargs = (
+            _build_save_kwargs(target_format, info, exif_bytes, icc_profile)
+            if keep_metadata
+            else {}
+        )
         if quality is not None:
             if not 1 <= quality <= 100:
                 raise ValueError("Quality must be within 1..100")
             save_kwargs["quality"] = quality
-        img.save(output_path, format=target_format, **save_kwargs)
+        img.save(destination, format=target_format, **save_kwargs)
 
-    return output_path
+    if hasattr(destination, "seek"):
+        try:
+            destination.seek(0)  # type: ignore[union-attr]
+        except Exception:  # pragma: no cover - non seekable output
+            pass
+
+    return written_path
+
+
+BatchInput = Union[PathOrStr, FileLike, Tuple[str, FileLike]]
+
+
+def _normalize_file_like(
+    item: Union[FileLike, Tuple[str, FileLike]],
+) -> Tuple[str, FileLike]:
+    if isinstance(item, tuple):
+        if len(item) != 2:
+            raise ValueError("Tuple file-like inputs must be (name, file_obj)")
+        name, file_obj = item
+        if not hasattr(file_obj, "read"):
+            raise TypeError("Provided file-like object does not support read()")
+        return str(name), file_obj
+
+    if not hasattr(item, "read"):
+        raise TypeError("File-like inputs must implement read()")
+    name = getattr(item, "name", None)
+    if not name:
+        raise ValueError(
+            "File-like inputs must provide a name via attribute or tuple metadata"
+        )
+    return str(name), item
 
 
 def batch_convert(
-    inputs: Sequence[Path],
+    inputs: Sequence[BatchInput],
     *,
     target_format: str,
     output_dir: Optional[Path] = None,
@@ -246,42 +349,98 @@ def batch_convert(
 ) -> List[Path]:
     """Convert multiple files. Returns successfully written paths."""
 
+    fmt_upper = target_format.upper()
+    if fmt_upper not in SUPPORTED_EXPORT_SET:
+        raise ValueError(
+            f"Unsupported target format '{target_format}'. Supported: {sorted(SUPPORTED_EXPORT_SET)}"
+        )
+
     written: List[Path] = []
     output_dir = Path(output_dir) if output_dir else None
-    for input_path in _gather_inputs(inputs, recursive=recursive):
-        try:
-            destination = _infer_output_path(input_path, output_dir, target_format)
-            destination.parent.mkdir(parents=True, exist_ok=True)
-            path = convert_image(
-                input_path,
-                target_format=target_format,
-                output_path=destination,
-                quality=quality,
-                resize=resize,
-                keep_metadata=keep_metadata,
-            )
-            written.append(path)
-        except Exception as exc:
-            LOGGER.error("Failed to convert %s: %s", input_path, exc)
+    for raw_input in inputs:
+        if _is_path_like(raw_input):
+            for input_path in _gather_inputs([Path(raw_input)], recursive=recursive):
+                try:
+                    destination = _infer_output_path(
+                        input_path, output_dir, target_format
+                    )
+                    destination.parent.mkdir(parents=True, exist_ok=True)
+                    path = convert_image(
+                        input_path,
+                        target_format=target_format,
+                        output_path=destination,
+                        quality=quality,
+                        resize=resize,
+                        keep_metadata=keep_metadata,
+                    )
+                    if path is not None:
+                        written.append(path)
+                except Exception as exc:
+                    LOGGER.error("Failed to convert %s: %s", input_path, exc)
+        else:
+            try:
+                if output_dir is None:
+                    raise ValueError(
+                        "output_dir is required when converting file-like inputs"
+                    )
+                name, file_obj = _normalize_file_like(raw_input)
+                extension = SUPPORTED_EXPORT_FORMATS[fmt_upper][0]
+                destination = output_dir / f"{Path(name).stem}{extension}"
+                destination.parent.mkdir(parents=True, exist_ok=True)
+                path = convert_image(
+                    file_obj,
+                    target_format=target_format,
+                    output_path=destination,
+                    quality=quality,
+                    resize=resize,
+                    keep_metadata=keep_metadata,
+                )
+                if path is not None:
+                    written.append(path)
+            except Exception as exc:
+                LOGGER.error(
+                    "Failed to convert in-memory file %s: %s",
+                    getattr(raw_input, "name", raw_input),
+                    exc,
+                )
     return written
 
 
 def build_arg_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Batch image conversion utility")
-    parser.add_argument("inputs", nargs="+", help="Input files or directories to convert")
-    parser.add_argument("--target-format", "-t", required=True, help="Output format (e.g. png, jpeg, webp)")
+    parser.add_argument(
+        "inputs", nargs="+", help="Input files or directories to convert"
+    )
+    parser.add_argument(
+        "--target-format",
+        "-t",
+        required=True,
+        help="Output format (e.g. png, jpeg, webp)",
+    )
     parser.add_argument("--output-dir", "-o", help="Directory to place converted files")
-    parser.add_argument("--quality", "-q", type=int, help="Quality for lossy formats (1-100)")
+    parser.add_argument(
+        "--quality", "-q", type=int, help="Quality for lossy formats (1-100)"
+    )
     parser.add_argument(
         "--resize",
         type=parse_resize,
         metavar="WxH",
         help="Resize images. Examples: 800x600 exact, 1200x keep aspect by width, x720 keep aspect by height.",
     )
-    parser.add_argument("--recursive", action="store_true", help="Recurse into directories when gathering inputs")
-    parser.add_argument("--strip-metadata", action="store_true", help="Do not attempt to copy metadata")
-    parser.add_argument("--gui", action="store_true", help="Launch minimal Tkinter GUI wrapper")
-    parser.add_argument("--verbose", "-v", action="count", default=0, help="Increase logging verbosity")
+    parser.add_argument(
+        "--recursive",
+        action="store_true",
+        help="Recurse into directories when gathering inputs",
+    )
+    parser.add_argument(
+        "--strip-metadata", action="store_true", help="Do not attempt to copy metadata"
+    )
+    parser.add_argument(
+        "--gui", action="store_true", help="Launch minimal Tkinter GUI wrapper"
+    )
+    parser.add_argument(
+        "--verbose", "-v", action="count", default=0, help="Increase logging verbosity"
+    )
     return parser
 
 
@@ -299,36 +458,60 @@ def launch_gui() -> None:
 
             self.columnconfigure(1, weight=1)
 
-            tk.Label(self, text="Inputs:").grid(row=0, column=0, sticky="w", padx=4, pady=4)
-            self.inputs_var = tk.StringVar(value="No files selected")
-            tk.Label(self, textvariable=self.inputs_var, anchor="w", justify="left").grid(
-                row=0, column=1, sticky="ew", padx=4, pady=4
+            tk.Label(self, text="Inputs:").grid(
+                row=0, column=0, sticky="w", padx=4, pady=4
             )
-            tk.Button(self, text="Choose files", command=self.choose_files).grid(row=0, column=2, padx=4, pady=4)
+            self.inputs_var = tk.StringVar(value="No files selected")
+            tk.Label(
+                self, textvariable=self.inputs_var, anchor="w", justify="left"
+            ).grid(row=0, column=1, sticky="ew", padx=4, pady=4)
+            tk.Button(self, text="Choose files", command=self.choose_files).grid(
+                row=0, column=2, padx=4, pady=4
+            )
 
-            tk.Label(self, text="Output directory:").grid(row=1, column=0, sticky="w", padx=4, pady=4)
+            tk.Label(self, text="Output directory:").grid(
+                row=1, column=0, sticky="w", padx=4, pady=4
+            )
             self.output_dir_var = tk.StringVar()
-            tk.Entry(self, textvariable=self.output_dir_var).grid(row=1, column=1, sticky="ew", padx=4, pady=4)
-            tk.Button(self, text="Browse", command=self.choose_output_dir).grid(row=1, column=2, padx=4, pady=4)
+            tk.Entry(self, textvariable=self.output_dir_var).grid(
+                row=1, column=1, sticky="ew", padx=4, pady=4
+            )
+            tk.Button(self, text="Browse", command=self.choose_output_dir).grid(
+                row=1, column=2, padx=4, pady=4
+            )
 
-            tk.Label(self, text="Target format:").grid(row=2, column=0, sticky="w", padx=4, pady=4)
+            tk.Label(self, text="Target format:").grid(
+                row=2, column=0, sticky="w", padx=4, pady=4
+            )
             self.format_var = tk.StringVar(value="png")
-            tk.Entry(self, textvariable=self.format_var).grid(row=2, column=1, sticky="ew", padx=4, pady=4)
+            tk.Entry(self, textvariable=self.format_var).grid(
+                row=2, column=1, sticky="ew", padx=4, pady=4
+            )
 
-            tk.Label(self, text="Quality (1-100):").grid(row=3, column=0, sticky="w", padx=4, pady=4)
+            tk.Label(self, text="Quality (1-100):").grid(
+                row=3, column=0, sticky="w", padx=4, pady=4
+            )
             self.quality_var = tk.StringVar()
-            tk.Entry(self, textvariable=self.quality_var).grid(row=3, column=1, sticky="ew", padx=4, pady=4)
+            tk.Entry(self, textvariable=self.quality_var).grid(
+                row=3, column=1, sticky="ew", padx=4, pady=4
+            )
 
-            tk.Label(self, text="Resize (WxH):").grid(row=4, column=0, sticky="w", padx=4, pady=4)
+            tk.Label(self, text="Resize (WxH):").grid(
+                row=4, column=0, sticky="w", padx=4, pady=4
+            )
             self.resize_var = tk.StringVar()
-            tk.Entry(self, textvariable=self.resize_var).grid(row=4, column=1, sticky="ew", padx=4, pady=4)
+            tk.Entry(self, textvariable=self.resize_var).grid(
+                row=4, column=1, sticky="ew", padx=4, pady=4
+            )
 
             self.keep_metadata_var = tk.BooleanVar(value=True)
-            tk.Checkbutton(self, text="Preserve metadata", variable=self.keep_metadata_var).grid(
-                row=5, column=0, columnspan=2, sticky="w", padx=4, pady=4
-            )
+            tk.Checkbutton(
+                self, text="Preserve metadata", variable=self.keep_metadata_var
+            ).grid(row=5, column=0, columnspan=2, sticky="w", padx=4, pady=4)
 
-            tk.Button(self, text="Convert", command=self.convert).grid(row=6, column=0, columnspan=3, pady=12)
+            tk.Button(self, text="Convert", command=self.convert).grid(
+                row=6, column=0, columnspan=3, pady=12
+            )
 
         def choose_files(self) -> None:
             files = filedialog.askopenfilenames(title="Select images")
@@ -343,7 +526,9 @@ def launch_gui() -> None:
 
         def convert(self) -> None:
             if not self.inputs:
-                messagebox.showwarning("Image Converter", "Please select at least one input file.")
+                messagebox.showwarning(
+                    "Image Converter", "Please select at least one input file."
+                )
                 return
             fmt = self.format_var.get().strip()
             if not fmt:
@@ -355,7 +540,9 @@ def launch_gui() -> None:
                 try:
                     resize_spec = parse_resize(resize_value)
                 except Exception as exc:  # pragma: no cover - GUI path hard to test
-                    messagebox.showerror("Image Converter", f"Invalid resize specification: {exc}")
+                    messagebox.showerror(
+                        "Image Converter", f"Invalid resize specification: {exc}"
+                    )
                     return
             quality_value = self.quality_var.get().strip()
             quality = int(quality_value) if quality_value else None
@@ -363,7 +550,11 @@ def launch_gui() -> None:
             results = batch_convert(
                 [Path(p) for p in self.inputs],
                 target_format=fmt,
-                output_dir=Path(self.output_dir_var.get()) if self.output_dir_var.get() else None,
+                output_dir=(
+                    Path(self.output_dir_var.get())
+                    if self.output_dir_var.get()
+                    else None
+                ),
                 quality=quality,
                 resize=resize_spec,
                 keep_metadata=self.keep_metadata_var.get(),

@@ -12,6 +12,7 @@ progress callbacks make it easy to integrate with GUIs or CLIs that need
 feedback. Each callback receives a :class:`ProgressEvent` dataclass with
 context about the current step.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -166,9 +167,13 @@ class ArchiveManager:
             progress_callback(ProgressEvent(ArchivePhase.SCANNING, 0, total, ""))
 
             if archive_format.is_zip:
-                ArchiveManager._create_zip(members, destination, archive_format, progress_callback)
+                ArchiveManager._create_zip(
+                    members, destination, archive_format, progress_callback
+                )
             elif archive_format.is_tar:
-                ArchiveManager._create_tar(members, destination, archive_format, progress_callback)
+                ArchiveManager._create_tar(
+                    members, destination, archive_format, progress_callback
+                )
             else:
                 raise ArchiveOperationError(f"Unsupported format: {archive_format}")
         except (OSError, zipfile.BadZipFile, tarfile.TarError) as exc:
@@ -191,11 +196,17 @@ class ArchiveManager:
         try:
             fmt = ArchiveManager.detect_format(archive_path)
             if fmt.is_zip:
-                ArchiveManager._extract_zip(archive_path, destination, progress_callback)
+                ArchiveManager._extract_zip(
+                    archive_path, destination, progress_callback
+                )
             elif fmt.is_tar:
-                ArchiveManager._extract_tar(archive_path, destination, progress_callback)
+                ArchiveManager._extract_tar(
+                    archive_path, destination, progress_callback
+                )
             else:
-                raise ArchiveOperationError(f"Unsupported archive format for '{archive_path}'.")
+                raise ArchiveOperationError(
+                    f"Unsupported archive format for '{archive_path}'."
+                )
         except (OSError, zipfile.BadZipFile, tarfile.TarError) as exc:
             raise ArchiveOperationError(str(exc)) from exc
 
@@ -211,7 +222,9 @@ class ArchiveManager:
         with zipfile.ZipFile(destination, mode="w", compression=compression) as zf:
             for index, (member, arcname) in enumerate(members, start=1):
                 progress_callback(
-                    ProgressEvent(ArchivePhase.COMPRESSING, index, len(members), arcname)
+                    ProgressEvent(
+                        ArchivePhase.COMPRESSING, index, len(members), arcname
+                    )
                 )
                 zf.write(member, arcname=arcname)
 

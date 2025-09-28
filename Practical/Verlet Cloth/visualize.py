@@ -15,12 +15,30 @@ from cloth import Cloth
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Animate a Verlet cloth simulation")
-    parser.add_argument("--width", type=float, default=2.0, help="Width of the cloth in world units")
-    parser.add_argument("--height", type=float, default=1.5, help="Height of the cloth in world units")
-    parser.add_argument("--cols", type=int, default=30, help="Number of particles along the x-axis")
-    parser.add_argument("--rows", type=int, default=20, help="Number of particles along the y-axis")
-    parser.add_argument("--iterations", type=int, default=5, help="Constraint solver iterations per frame")
-    parser.add_argument("--dt", type=float, default=0.016, help="Simulation timestep per frame in seconds")
+    parser.add_argument(
+        "--width", type=float, default=2.0, help="Width of the cloth in world units"
+    )
+    parser.add_argument(
+        "--height", type=float, default=1.5, help="Height of the cloth in world units"
+    )
+    parser.add_argument(
+        "--cols", type=int, default=30, help="Number of particles along the x-axis"
+    )
+    parser.add_argument(
+        "--rows", type=int, default=20, help="Number of particles along the y-axis"
+    )
+    parser.add_argument(
+        "--iterations",
+        type=int,
+        default=5,
+        help="Constraint solver iterations per frame",
+    )
+    parser.add_argument(
+        "--dt",
+        type=float,
+        default=0.016,
+        help="Simulation timestep per frame in seconds",
+    )
     return parser.parse_args()
 
 
@@ -33,12 +51,16 @@ def configure_axes(ax: plt.Axes, width: float, height: float) -> None:
     ax.set_title("Verlet Cloth Simulation")
 
 
-def init_plot(ax: plt.Axes, cloth: Cloth) -> Tuple[LineCollection, plt.Line2D, plt.Text]:
+def init_plot(
+    ax: plt.Axes, cloth: Cloth
+) -> Tuple[LineCollection, plt.Line2D, plt.Text]:
     segments = cloth.segments
     collection = LineCollection(segments, colors="tab:blue", linewidths=1.0)
     ax.add_collection(collection)
 
-    scatter = ax.scatter(cloth.positions[:, 0], cloth.positions[:, 1], s=10, c="tab:red")
+    scatter = ax.scatter(
+        cloth.positions[:, 0], cloth.positions[:, 1], s=10, c="tab:red"
+    )
 
     info = ax.text(
         0.02,

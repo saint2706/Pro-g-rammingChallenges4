@@ -1,0 +1,44 @@
+name: Super-Linter
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write    # Required to push changes back
+      packages: read
+      statuses: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0    # Super-Linter needs the full git history
+
+      - name: Run Super-Linter (with Fix)
+        uses: super-linter/super-linter@v8.1.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Enable fix mode for common languages (add/remove as needed)
+          FIX_PYTHON_BLACK: false
+          FIX_MARKDOWN_PRETTIER: false
+          FIX_JSON_PRETTIER: true
+          FIX_YAML_PRETTIER: true
+          FIX_HTML_PRETTIER: true
+          FIX_CSS_PRETTIER: true
+          FIX_JAVASCRIPT_PRETTIER: true
+          VALIDATE_ALL_CODEBASE: true
+
+      - name: Commit & Push changes if any
+        run: |
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          if [[ `git status --porcelain` ]]; then
+            git add .
+            git commit -m "style: super-linter auto-fixes"
+            git push
+          fi

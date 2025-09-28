@@ -1,4 +1,5 @@
 """Tkinter-based Markdown editor with live preview and export helpers."""
+
 from __future__ import annotations
 
 import json
@@ -95,21 +96,35 @@ class MarkdownEditorApp:
 
         file_menu = tk.Menu(menubar, tearoff=False)
         file_menu.add_command(label="New", command=self.new_file, accelerator="Ctrl+N")
-        file_menu.add_command(label="Open…", command=self.open_file, accelerator="Ctrl+O")
-        file_menu.add_command(label="Save", command=self.save_file, accelerator="Ctrl+S")
         file_menu.add_command(
-            label="Save As…", command=lambda: self.save_file(save_as=True), accelerator="Ctrl+Shift+S"
+            label="Open…", command=self.open_file, accelerator="Ctrl+O"
+        )
+        file_menu.add_command(
+            label="Save", command=self.save_file, accelerator="Ctrl+S"
+        )
+        file_menu.add_command(
+            label="Save As…",
+            command=lambda: self.save_file(save_as=True),
+            accelerator="Ctrl+Shift+S",
         )
         file_menu.add_separator()
-        file_menu.add_command(label="Export HTML…", command=self.export_html, accelerator="Ctrl+E")
-        file_menu.add_command(label="Export XML…", command=self.export_xml, accelerator="Ctrl+Shift+E")
+        file_menu.add_command(
+            label="Export HTML…", command=self.export_html, accelerator="Ctrl+E"
+        )
+        file_menu.add_command(
+            label="Export XML…", command=self.export_xml, accelerator="Ctrl+Shift+E"
+        )
         file_menu.add_separator()
         file_menu.add_command(label="Exit", command=self.root.quit)
         menubar.add_cascade(label="File", menu=file_menu)
 
         view_menu = tk.Menu(menubar, tearoff=False)
-        view_menu.add_radiobutton(label="Light", command=lambda: self._apply_theme("Light"), value="Light")
-        view_menu.add_radiobutton(label="Dark", command=lambda: self._apply_theme("Dark"), value="Dark")
+        view_menu.add_radiobutton(
+            label="Light", command=lambda: self._apply_theme("Light"), value="Light"
+        )
+        view_menu.add_radiobutton(
+            label="Dark", command=lambda: self._apply_theme("Dark"), value="Dark"
+        )
         menubar.add_cascade(label="View", menu=view_menu)
 
         self.root.config(menu=menubar)
@@ -126,12 +141,18 @@ class MarkdownEditorApp:
             width=24,
         )
         self.template_combo.pack(side=tk.LEFT)
-        self.template_combo.bind("<<ComboboxSelected>>", lambda _event: self._on_template_selected())
+        self.template_combo.bind(
+            "<<ComboboxSelected>>", lambda _event: self._on_template_selected()
+        )
 
         self._sync_template_combo()
 
-        ttk.Button(toolbar, text="Refresh", command=self.refresh_now).pack(side=tk.LEFT, padx=6)
-        ttk.Button(toolbar, text="Templates Folder", command=self._open_templates_folder).pack(side=tk.LEFT)
+        ttk.Button(toolbar, text="Refresh", command=self.refresh_now).pack(
+            side=tk.LEFT, padx=6
+        )
+        ttk.Button(
+            toolbar, text="Templates Folder", command=self._open_templates_folder
+        ).pack(side=tk.LEFT)
 
     def _build_body(self) -> None:
         paned = ttk.PanedWindow(self.root, orient=tk.HORIZONTAL)
@@ -143,7 +164,9 @@ class MarkdownEditorApp:
         paned.add(self.editor, weight=3)
 
         if HTMLScrolledText is not None:
-            self.preview = HTMLScrolledText(paned, html="<h2>Preview</h2><p>Start typing…</p>")
+            self.preview = HTMLScrolledText(
+                paned, html="<h2>Preview</h2><p>Start typing…</p>"
+            )
         else:
             self.preview = ScrolledText(paned, state=tk.DISABLED, wrap=tk.WORD)
             self.preview.configure(height=10)
@@ -153,7 +176,9 @@ class MarkdownEditorApp:
             self.preview.configure(background="#f1f5f9")
             self.preview.configure(foreground="#0f172a")
             self.preview.configure(font=("Consolas", 11))
-            self._update_preview_fallback("<h2>Preview</h2>\n<p>Install tkhtmlview for rendered output.</p>")
+            self._update_preview_fallback(
+                "<h2>Preview</h2>\n<p>Install tkhtmlview for rendered output.</p>"
+            )
         paned.add(self.preview, weight=2)
 
     def _build_status_bar(self) -> None:
@@ -187,10 +212,18 @@ class MarkdownEditorApp:
             self.editor.tag_remove(tag, "1.0", tk.END)
 
         theme = THEMES[self.theme_var.get()]
-        self.editor.tag_configure("heading", foreground=theme["heading"], font=("Segoe UI", 13, "bold"))
-        self.editor.tag_configure("bold", foreground=theme["bold"], font=("Segoe UI", 11, "bold"))
-        self.editor.tag_configure("italic", foreground=theme["italic"], font=("Segoe UI", 11, "italic"))
-        self.editor.tag_configure("code", foreground=theme["code"], font=("Consolas", 11))
+        self.editor.tag_configure(
+            "heading", foreground=theme["heading"], font=("Segoe UI", 13, "bold")
+        )
+        self.editor.tag_configure(
+            "bold", foreground=theme["bold"], font=("Segoe UI", 11, "bold")
+        )
+        self.editor.tag_configure(
+            "italic", foreground=theme["italic"], font=("Segoe UI", 11, "italic")
+        )
+        self.editor.tag_configure(
+            "code", foreground=theme["code"], font=("Consolas", 11)
+        )
         self.editor.tag_configure("link", foreground=theme["link"], underline=True)
         self.editor.tag_configure("line", background=theme["linehighlight"])
 
@@ -228,19 +261,34 @@ class MarkdownEditorApp:
             self.status_var.set("Empty document")
             return
 
-        template_name = preferred_template or self._template_name_from_label(self.template_var.get())
+        template_name = preferred_template or self._template_name_from_label(
+            self.template_var.get()
+        )
         try:
-            result = convert_markdown(text, template_manager=self.template_manager, preferred_template=template_name)
-        except Exception as exc:  # pragma: no cover - defensive; conversion errors are rare.
+            result = convert_markdown(
+                text,
+                template_manager=self.template_manager,
+                preferred_template=template_name,
+            )
+        except (
+            Exception
+        ) as exc:  # pragma: no cover - defensive; conversion errors are rare.
             self.status_var.set(f"Conversion error: {exc}")
             return
 
         self.current_result = result
         if result.template_used and result.template_used != template_name:
-            self.template_var.set(self.template_manager.labels().get(result.template_used, result.template_used))
+            self.template_var.set(
+                self.template_manager.labels().get(
+                    result.template_used, result.template_used
+                )
+            )
 
         self._update_preview(result.html)
-        meta_summary = ", ".join(f"{key}: {value}" for key, value in result.metadata.items()) or "No front matter"
+        meta_summary = (
+            ", ".join(f"{key}: {value}" for key, value in result.metadata.items())
+            or "No front matter"
+        )
         self.status_var.set(f"Preview updated • {meta_summary}")
 
     def _update_preview(self, html: str) -> None:
@@ -256,7 +304,9 @@ class MarkdownEditorApp:
         self.preview.configure(state=tk.DISABLED)
 
     def _sync_template_combo(self) -> None:
-        labels = sorted(self.template_manager.labels().items(), key=lambda item: item[1])
+        labels = sorted(
+            self.template_manager.labels().items(), key=lambda item: item[1]
+        )
         self._template_choices = labels
         human_labels = [label for _, label in labels]
         self.template_combo.configure(values=human_labels)
@@ -274,7 +324,9 @@ class MarkdownEditorApp:
     def open_file(self) -> None:
         if not self._confirm_discard_changes():
             return
-        path = filedialog.askopenfilename(filetypes=[("Markdown", "*.md"), ("All files", "*.*")])
+        path = filedialog.askopenfilename(
+            filetypes=[("Markdown", "*.md"), ("All files", "*.*")]
+        )
         if not path:
             return
         data = Path(path).read_text(encoding="utf-8")
@@ -301,9 +353,13 @@ class MarkdownEditorApp:
         if self.current_result is None:
             self.refresh_now()
         if self.current_result is None:
-            messagebox.showinfo(APP_TITLE, "Nothing to export yet – type some Markdown first.")
+            messagebox.showinfo(
+                APP_TITLE, "Nothing to export yet – type some Markdown first."
+            )
             return
-        path = filedialog.asksaveasfilename(defaultextension=".html", filetypes=[("HTML", "*.html")])
+        path = filedialog.asksaveasfilename(
+            defaultextension=".html", filetypes=[("HTML", "*.html")]
+        )
         if not path:
             return
         Path(path).write_text(self.current_result.html, encoding="utf-8")
@@ -313,10 +369,14 @@ class MarkdownEditorApp:
         if self.current_result is None:
             self.refresh_now()
         if self.current_result is None:
-            messagebox.showinfo(APP_TITLE, "Nothing to export yet – type some Markdown first.")
+            messagebox.showinfo(
+                APP_TITLE, "Nothing to export yet – type some Markdown first."
+            )
             return
         xml_payload = convert_to_xml(self.current_result)
-        path = filedialog.asksaveasfilename(defaultextension=".xml", filetypes=[("XML", "*.xml")])
+        path = filedialog.asksaveasfilename(
+            defaultextension=".xml", filetypes=[("XML", "*.xml")]
+        )
         if not path:
             return
         Path(path).write_text(xml_payload, encoding="utf-8")
@@ -349,7 +409,9 @@ class MarkdownEditorApp:
             selectbackground=theme["selectbackground"],
         )
         if HTMLScrolledText is None:
-            self.preview.configure(background=theme["linehighlight"], foreground=theme["foreground"])
+            self.preview.configure(
+                background=theme["linehighlight"], foreground=theme["foreground"]
+            )
         self._highlight_markdown()
 
     def toggle_theme(self) -> None:
@@ -368,7 +430,9 @@ class MarkdownEditorApp:
     def _schedule_autosave(self) -> None:
         if self.autosave_job:
             self.root.after_cancel(self.autosave_job)
-        self.autosave_job = self.root.after(AUTOSAVE_INTERVAL_MS, self._autosave_snapshot)
+        self.autosave_job = self.root.after(
+            AUTOSAVE_INTERVAL_MS, self._autosave_snapshot
+        )
 
     def _autosave_snapshot(self) -> None:
         content = self.editor.get("1.0", tk.END).strip()

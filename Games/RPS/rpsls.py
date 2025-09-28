@@ -1,4 +1,3 @@
-
 #
 # Rock Paper Scissors Lizard Spock (RPSLS) Game - Python Implementation
 # Modernized, documented, and beginner-friendly code.
@@ -12,6 +11,7 @@ class Move(IntEnum):
     """
     Enumeration for the possible moves in the game.
     """
+
     ROCK = 0
     PAPER = 1
     SCISSORS = 2
@@ -48,7 +48,9 @@ def get_user_move() -> Move:
             move = Move(selection_int)
             return move
         except (ValueError, IndexError):
-            print(f"\nInvalid choice. Please enter a number between 0 and {len(Move) - 1}.")
+            print(
+                f"\nInvalid choice. Please enter a number between 0 and {len(Move) - 1}."
+            )
 
 
 def get_computer_move() -> Move:
@@ -95,7 +97,7 @@ def main():
 
         while True:
             continue_game = input("\nPlay again? (y/n): ").lower().strip()
-            if continue_game in ['y', 'n']:
+            if continue_game in ["y", "n"]:
                 break
             print("Invalid input. Please enter 'y' or 'n'.")
 
@@ -103,6 +105,7 @@ def main():
             break
 
     print("\nThanks for playing!")
+
 
 if __name__ == "__main__":
     main()

@@ -17,7 +17,9 @@ def iter_queries(path: Path) -> Iterator[Dict[str, str]]:
     if isinstance(payload, dict):
         payload = payload.get("queries", [])
     if not isinstance(payload, list):
-        raise ValueError("Benchmark manifest must be a list or contain a 'queries' list.")
+        raise ValueError(
+            "Benchmark manifest must be a list or contain a 'queries' list."
+        )
     for entry in payload:
         if not isinstance(entry, dict):
             raise ValueError("Each query entry must be a JSON object.")
@@ -60,7 +62,9 @@ def run_benchmark(args: argparse.Namespace) -> Dict[str, object]:
             }
         )
         status = "✓" if is_correct else "✗"
-        print(f"{status} {clip.name}: expected={expected}, predicted={result.track_id}, confidence={result.confidence:.3f}")
+        print(
+            f"{status} {clip.name}: expected={expected}, predicted={result.track_id}, confidence={result.confidence:.3f}"
+        )
 
     summary = {
         "total": len(results),
@@ -76,10 +80,26 @@ def run_benchmark(args: argparse.Namespace) -> Dict[str, object]:
 def parse_args(argv: List[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--database", required=True, help="Fingerprint database path")
-    parser.add_argument("--manifest", required=True, help="JSON manifest with query clips and expected IDs")
-    parser.add_argument("--duration", type=float, default=8.0, help="Clip duration to consider for each query")
-    parser.add_argument("--minhash-threshold", type=float, default=0.3, help="MinHash similarity threshold for candidate filtering")
-    parser.add_argument("--output", type=str, help="Optional path to write benchmark results as JSON")
+    parser.add_argument(
+        "--manifest",
+        required=True,
+        help="JSON manifest with query clips and expected IDs",
+    )
+    parser.add_argument(
+        "--duration",
+        type=float,
+        default=8.0,
+        help="Clip duration to consider for each query",
+    )
+    parser.add_argument(
+        "--minhash-threshold",
+        type=float,
+        default=0.3,
+        help="MinHash similarity threshold for candidate filtering",
+    )
+    parser.add_argument(
+        "--output", type=str, help="Optional path to write benchmark results as JSON"
+    )
     return parser.parse_args(argv)
 
 

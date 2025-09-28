@@ -1,4 +1,5 @@
 """Configuration loading for the curses text editor."""
+
 from __future__ import annotations
 
 import json
@@ -81,7 +82,9 @@ HUMAN_READABLE_KEYS = {
 @dataclass
 class EditorConfig:
     options: Dict[str, object] = field(default_factory=lambda: dict(DEFAULT_OPTIONS))
-    mappings: Dict[str, Dict[str, str]] = field(default_factory=lambda: json.loads(json.dumps(DEFAULT_MAPPINGS)))
+    mappings: Dict[str, Dict[str, str]] = field(
+        default_factory=lambda: json.loads(json.dumps(DEFAULT_MAPPINGS))
+    )
     source: Optional[Path] = None
 
     def merge(self, other: Mapping[str, object]) -> None:
@@ -126,4 +129,10 @@ def load_config(explicit_path: Optional[str] = None) -> EditorConfig:
     return config
 
 
-__all__ = ["EditorConfig", "load_config", "DEFAULT_OPTIONS", "DEFAULT_MAPPINGS", "HUMAN_READABLE_KEYS"]
+__all__ = [
+    "EditorConfig",
+    "load_config",
+    "DEFAULT_OPTIONS",
+    "DEFAULT_MAPPINGS",
+    "HUMAN_READABLE_KEYS",
+]

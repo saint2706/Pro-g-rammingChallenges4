@@ -59,7 +59,9 @@ class TransferOptions:
                 if 8 <= requested <= 65464:
                     block_size = requested
                 else:
-                    LOGGER.debug("Requested blksize %s out of range; using default", requested)
+                    LOGGER.debug(
+                        "Requested blksize %s out of range; using default", requested
+                    )
         return cls(block_size=block_size, requested_blksize=requested)
 
     def reply_options(self) -> Dict[str, str]:
@@ -70,11 +72,26 @@ class TransferOptions:
 
 # Packet builders -------------------------------------------------------
 
-def _encode_request(opcode: int, filename: str, mode: str = "octet", *, options: Optional[Dict[str, str]] = None) -> bytes:
-    parts = [struct.pack("!H", opcode), filename.encode("utf-8"), b"\0", mode.encode("ascii"), b"\0"]
+
+def _encode_request(
+    opcode: int,
+    filename: str,
+    mode: str = "octet",
+    *,
+    options: Optional[Dict[str, str]] = None,
+) -> bytes:
+    parts = [
+        struct.pack("!H", opcode),
+        filename.encode("utf-8"),
+        b"\0",
+        mode.encode("ascii"),
+        b"\0",
+    ]
     if options:
         for key, value in options.items():
-            parts.extend([key.encode("ascii"), b"\0", str(value).encode("ascii"), b"\0"])
+            parts.extend(
+                [key.encode("ascii"), b"\0", str(value).encode("ascii"), b"\0"]
+            )
     return b"".join(parts)
 
 
@@ -143,6 +160,7 @@ def parse_oack(data: bytes) -> Dict[str, str]:
 
 # Client ----------------------------------------------------------------
 
+
 class TFTPClient:
     """Blocking TFTP client."""
 
@@ -163,14 +181,18 @@ class TFTPClient:
 
     # Public API --------------------------------------------------------
 
-    def download(self, remote_filename: str, destination: Path | str, *, block_size: int = 512) -> None:
+    def download(
+        self, remote_filename: str, destination: Path | str, *, block_size: int = 512
+    ) -> None:
         destination_path = Path(destination)
         destination_path.parent.mkdir(parents=True, exist_ok=True)
         options = {"blksize": str(block_size)} if block_size != 512 else None
         request = build_rrq(remote_filename, options=options)
         self._download(request, destination_path)
 
-    def upload(self, source: Path | str, remote_filename: str, *, block_size: int = 512) -> None:
+    def upload(
+        self, source: Path | str, remote_filename: str, *, block_size: int = 512
+    ) -> None:
         source_path = Path(source)
         if not source_path.exists():
             raise FileNotFoundError(source_path)
@@ -181,7 +203,10 @@ class TFTPClient:
     # Internal helpers --------------------------------------------------
 
     def _download(self, request: bytes, destination: Path) -> None:
-        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock, destination.open("wb") as fh:
+        with (
+            socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock,
+            destination.open("wb") as fh,
+        ):
             sock.settimeout(self.timeout)
             server_addr = (self.host, self.port)
             negotiated_block_size = 512
@@ -221,7 +246,9 @@ class TFTPClient:
                     raise TFTPError(code, message)
 
                 if opcode != OP_DATA:
-                    raise TFTPError(ERR_ILLEGAL_OPERATION, f"Unexpected opcode {opcode}")
+                    raise TFTPError(
+                        ERR_ILLEGAL_OPERATION, f"Unexpected opcode {opcode}"
+                    )
 
                 block = struct.unpack("!H", packet[2:4])[0]
                 payload = packet[4:]
@@ -233,7 +260,9 @@ class TFTPClient:
                 elif block < expected_block:
                     self.logger.debug("Duplicate DATA block %s", block)
                 else:
-                    self.logger.debug("Out-of-order block %s (expected %s)", block, expected_block)
+                    self.logger.debug(
+                        "Out-of-order block %s (expected %s)", block, expected_block
+                    )
                     continue
 
                 last_packet = build_ack(block)
@@ -243,7 +272,10 @@ class TFTPClient:
                     break
 
     def _upload(self, request: bytes, source: Path) -> None:
-        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock, source.open("rb") as fh:
+        with (
+            socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock,
+            source.open("rb") as fh,
+        ):
             sock.settimeout(self.timeout)
             server_addr = (self.host, self.port)
             negotiated_block_size = 512
@@ -299,7 +331,9 @@ class TFTPClient:
                         self.logger.debug("Duplicate ACK %s", ack_block)
                         sock.sendto(last_packet, server_addr)
                     else:
-                        self.logger.debug("Unexpected ACK %s (current %s)", ack_block, block_number)
+                        self.logger.debug(
+                            "Unexpected ACK %s (current %s)", ack_block, block_number
+                        )
                     continue
 
                 if opcode == OP_ERROR:
@@ -311,6 +345,7 @@ class TFTPClient:
 
 
 # Server ----------------------------------------------------------------
+
 
 class TFTPServer:
     """Threaded TFTP server bound to a specific root directory."""
@@ -380,7 +415,9 @@ class TFTPServer:
             sock.bind((self.host, self.port))
             self._listen_sock = sock
             self._server_port = sock.getsockname()[1]
-            self.logger.info("TFTP server listening on %s:%s", self.host, self._server_port)
+            self.logger.info(
+                "TFTP server listening on %s:%s", self.host, self._server_port
+            )
             sock.settimeout(0.5)
             self._ready_event.set()
             while not self._stop_event.is_set():
@@ -392,7 +429,9 @@ class TFTPServer:
                     break
                 if not data:
                     continue
-                threading.Thread(target=self._handle_request, args=(data, addr), daemon=True).start()
+                threading.Thread(
+                    target=self._handle_request, args=(data, addr), daemon=True
+                ).start()
 
     def _handle_request(self, data: bytes, addr: Tuple[str, int]) -> None:
         opcode = struct.unpack("!H", data[:2])[0]
@@ -422,7 +461,9 @@ class TFTPServer:
 
     # Request handlers --------------------------------------------------
 
-    def _serve_rrq(self, path: Path, addr: Tuple[str, int], options: TransferOptions) -> None:
+    def _serve_rrq(
+        self, path: Path, addr: Tuple[str, int], options: TransferOptions
+    ) -> None:
         if not path.exists():
             self._send_error(addr, ERR_FILE_NOT_FOUND, "File not found")
             return
@@ -450,7 +491,9 @@ class TFTPServer:
                     break
                 block += 1
 
-    def _serve_wrq(self, path: Path, addr: Tuple[str, int], options: TransferOptions) -> None:
+    def _serve_wrq(
+        self, path: Path, addr: Tuple[str, int], options: TransferOptions
+    ) -> None:
         if path.exists():
             self._send_error(addr, ERR_FILE_EXISTS, "File already exists")
             return
@@ -481,12 +524,16 @@ class TFTPServer:
                 try:
                     packet, peer = sock.recvfrom(4 + block_size + 4)
                 except socket.timeout:
-                    self.logger.debug("WRQ timeout; resending ACK %s", expected_block - 1)
+                    self.logger.debug(
+                        "WRQ timeout; resending ACK %s", expected_block - 1
+                    )
                     if not self._send_packet(sock, last_ack, addr):
                         return
                     continue
                 if peer != addr:
-                    sock.sendto(build_error(ERR_UNKNOWN_TID, "Unknown transfer ID"), peer)
+                    sock.sendto(
+                        build_error(ERR_UNKNOWN_TID, "Unknown transfer ID"), peer
+                    )
                     continue
                 opcode = struct.unpack("!H", packet[:2])[0]
                 if opcode == OP_DATA:
@@ -496,7 +543,9 @@ class TFTPServer:
                         try:
                             fh.write(payload)
                         except OSError:
-                            self._send_error(addr, ERR_DISK_FULL, "Disk full or allocation exceeded")
+                            self._send_error(
+                                addr, ERR_DISK_FULL, "Disk full or allocation exceeded"
+                            )
                             return
                         last_ack = build_ack(block)
                         if not self._send_packet(sock, last_ack, addr):
@@ -508,7 +557,11 @@ class TFTPServer:
                         self.logger.debug("Duplicate DATA block %s", block)
                         self._send_packet(sock, build_ack(block), addr)
                     else:
-                        self.logger.debug("Unexpected DATA block %s (expected %s)", block, expected_block)
+                        self.logger.debug(
+                            "Unexpected DATA block %s (expected %s)",
+                            block,
+                            expected_block,
+                        )
                 elif opcode == OP_ACK:
                     ack_block = struct.unpack("!H", packet[2:4])[0]
                     if ack_block == 0:
@@ -527,7 +580,9 @@ class TFTPServer:
 
     # Utilities ---------------------------------------------------------
 
-    def _send_oack(self, sock: socket.socket, addr: Tuple[str, int], options: Dict[str, str]) -> bool:
+    def _send_oack(
+        self, sock: socket.socket, addr: Tuple[str, int], options: Dict[str, str]
+    ) -> bool:
         packet = build_oack(options)
         for attempt in range(self.retries):
             try:
@@ -549,7 +604,14 @@ class TFTPServer:
         self.logger.warning("OACK handshake failed with %s", addr)
         return False
 
-    def _send_with_ack(self, sock: socket.socket, packet: bytes, addr: Tuple[str, int], *, expected_ack: int) -> bool:
+    def _send_with_ack(
+        self,
+        sock: socket.socket,
+        packet: bytes,
+        addr: Tuple[str, int],
+        *,
+        expected_ack: int,
+    ) -> bool:
         for attempt in range(self.retries):
             try:
                 sock.sendto(packet, addr)
@@ -565,9 +627,15 @@ class TFTPServer:
                 if ack_number == expected_ack:
                     return True
                 if ack_number < expected_ack:
-                    self.logger.debug("Duplicate ACK %s while waiting for %s", ack_number, expected_ack)
+                    self.logger.debug(
+                        "Duplicate ACK %s while waiting for %s",
+                        ack_number,
+                        expected_ack,
+                    )
                     continue
-                self.logger.debug("Unexpected ACK %s (expected %s)", ack_number, expected_ack)
+                self.logger.debug(
+                    "Unexpected ACK %s (expected %s)", ack_number, expected_ack
+                )
                 continue
             if opcode == OP_ERROR:
                 code = struct.unpack("!H", response[2:4])[0]
@@ -577,7 +645,9 @@ class TFTPServer:
         self.logger.warning("Failed to receive ACK %s from %s", expected_ack, addr)
         return False
 
-    def _send_packet(self, sock: socket.socket, packet: bytes, addr: Tuple[str, int]) -> bool:
+    def _send_packet(
+        self, sock: socket.socket, packet: bytes, addr: Tuple[str, int]
+    ) -> bool:
         try:
             sock.sendto(packet, addr)
             return True

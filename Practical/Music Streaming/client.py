@@ -7,6 +7,7 @@ Features
 * Streams audio using a buffered pipe into ``ffplay`` (FFmpeg) for playback.
 * Falls back to saving the streamed media to a temporary file if FFmpeg is absent.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -45,7 +46,9 @@ class ServerInfo:
 
 
 class MusicStreamClient:
-    def __init__(self, server: ServerInfo, buffer_bytes: int = DEFAULT_BUFFER_BYTES) -> None:
+    def __init__(
+        self, server: ServerInfo, buffer_bytes: int = DEFAULT_BUFFER_BYTES
+    ) -> None:
         self.server = server
         self.session = requests.Session()
         self.buffer_bytes = buffer_bytes
@@ -79,7 +82,9 @@ class MusicStreamClient:
         return current
 
     def previous_track(self) -> Optional[Dict[str, object]]:
-        response = self.session.post(f"{self.server.base_url}/playlist/previous", timeout=5)
+        response = self.session.post(
+            f"{self.server.base_url}/playlist/previous", timeout=5
+        )
         response.raise_for_status()
         current = response.json().get("current")
         self.current = current
@@ -128,7 +133,9 @@ class MusicStreamClient:
                     if buffered_bytes >= self.buffer_bytes:
                         started = True
                         elapsed = time.time() - start_time
-                        print(f"Buffered {buffered_bytes/1024:.0f} KiB in {elapsed:.1f}s. Starting playback...")
+                        print(
+                            f"Buffered {buffered_bytes/1024:.0f} KiB in {elapsed:.1f}s. Starting playback..."
+                        )
                     else:
                         print(
                             f"Buffering {buffered_bytes/1024:.0f} KiB / {self.buffer_bytes/1024:.0f} KiB",
@@ -154,7 +161,9 @@ class MusicStreamClient:
             process.wait()
             response.close()
 
-    def _buffer_to_tempfile(self, response: requests.Response, filename: Optional[str]) -> None:
+    def _buffer_to_tempfile(
+        self, response: requests.Response, filename: Optional[str]
+    ) -> None:
         suffix = Path(filename).suffix if filename else ".bin"
         with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as handle:
             total = 0
@@ -179,6 +188,7 @@ class MusicStreamClient:
 # ---------------------------------------------------------------------------
 # Utility functions
 # ---------------------------------------------------------------------------
+
 
 def discover_servers(port: int, timeout: float) -> List[ServerInfo]:
     """Broadcasts a discovery packet and collects responses."""
@@ -261,7 +271,9 @@ def _format_duration(duration_seconds: Optional[float]) -> str:
 
 def _print_playlist(playlist: List[Dict[str, object]]) -> None:
     if not playlist:
-        print("Playlist is empty. Add audio files to the server's media directory and refresh.")
+        print(
+            "Playlist is empty. Add audio files to the server's media directory and refresh."
+        )
         return
     print("Available tracks:")
     for idx, track in enumerate(playlist, start=1):
@@ -280,10 +292,24 @@ def _print_playlist(playlist: List[Dict[str, object]]) -> None:
 def parse_arguments() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Music streaming client")
     parser.add_argument("--host", help="Skip discovery and connect to this host")
-    parser.add_argument("--port", type=int, default=DEFAULT_HTTP_PORT, help="HTTP port of the server")
-    parser.add_argument("--discovery-port", type=int, default=DEFAULT_DISCOVERY_PORT, help="UDP discovery port")
-    parser.add_argument("--timeout", type=float, default=3.0, help="Discovery timeout in seconds")
-    parser.add_argument("--buffer", type=int, default=DEFAULT_BUFFER_BYTES, help="Bytes to buffer before playback")
+    parser.add_argument(
+        "--port", type=int, default=DEFAULT_HTTP_PORT, help="HTTP port of the server"
+    )
+    parser.add_argument(
+        "--discovery-port",
+        type=int,
+        default=DEFAULT_DISCOVERY_PORT,
+        help="UDP discovery port",
+    )
+    parser.add_argument(
+        "--timeout", type=float, default=3.0, help="Discovery timeout in seconds"
+    )
+    parser.add_argument(
+        "--buffer",
+        type=int,
+        default=DEFAULT_BUFFER_BYTES,
+        help="Bytes to buffer before playback",
+    )
     return parser.parse_args()
 
 
@@ -296,7 +322,9 @@ def choose_server(args: argparse.Namespace) -> Optional[ServerInfo]:
     print("Broadcasting discovery packet...")
     servers = discover_servers(args.discovery_port, args.timeout)
     if not servers:
-        print("No servers discovered. Ensure the server is running and reachable on the network.")
+        print(
+            "No servers discovered. Ensure the server is running and reachable on the network."
+        )
         return None
     if len(servers) == 1:
         server = servers[0]
@@ -363,7 +391,9 @@ def interactive_loop(client: MusicStreamClient) -> None:
             except ValueError:
                 print("Provide an integer number of bytes")
         elif command in {"next", "prev", "previous"}:
-            next_track = client.next_track() if command == "next" else client.previous_track()
+            next_track = (
+                client.next_track() if command == "next" else client.previous_track()
+            )
             if not next_track:
                 print("Playlist is empty")
                 continue

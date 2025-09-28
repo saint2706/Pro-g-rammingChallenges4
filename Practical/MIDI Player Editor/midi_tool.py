@@ -1,4 +1,5 @@
 """MIDI playback and editing helpers for the Practical MIDI Player + Editor challenge."""
+
 from __future__ import annotations
 
 import argparse
@@ -16,7 +17,9 @@ from mido import Message, MetaMessage, MidiFile, MidiTrack
 
 def _ensure_track_index(midi: MidiFile, track_index: int) -> None:
     if track_index < 0 or track_index >= len(midi.tracks):
-        raise IndexError(f"Track index {track_index} out of range (0..{len(midi.tracks) - 1})")
+        raise IndexError(
+            f"Track index {track_index} out of range (0..{len(midi.tracks) - 1})"
+        )
 
 
 def _track_to_absolute(track: MidiTrack) -> List[Tuple[int, mido.Message]]:
@@ -112,14 +115,25 @@ class MIDIProject:
             raise ValueError("Tick must be non-negative")
         _ensure_track_index(self.midi, track_index)
         events = _track_to_absolute(self.midi.tracks[track_index])
-        on_message = Message("note_on", note=note, velocity=velocity, channel=channel, time=0)
-        off_message = Message("note_off", note=note, velocity=0, channel=channel, time=0)
+        on_message = Message(
+            "note_on", note=note, velocity=velocity, channel=channel, time=0
+        )
+        off_message = Message(
+            "note_off", note=note, velocity=0, channel=channel, time=0
+        )
         events.append((tick, on_message))
         events.append((tick + duration, off_message))
         self.midi.tracks[track_index] = _absolute_to_track(events)
         self._rebuild_schedule()
 
-    def remove_note(self, track_index: int, note: int, *, start_tick: int = 0, channel: Optional[int] = None) -> None:
+    def remove_note(
+        self,
+        track_index: int,
+        note: int,
+        *,
+        start_tick: int = 0,
+        channel: Optional[int] = None,
+    ) -> None:
         """Remove the first note-on/off pair matching ``note`` occurring after ``start_tick``."""
         _ensure_track_index(self.midi, track_index)
         events = _track_to_absolute(self.midi.tracks[track_index])
@@ -131,7 +145,11 @@ class MIDIProject:
                 continue
             if message.is_meta:
                 continue
-            if message.type == "note_on" and message.velocity > 0 and message.note == note:
+            if (
+                message.type == "note_on"
+                and message.velocity > 0
+                and message.note == note
+            ):
                 if channel is not None and message.channel != channel:
                     continue
                 on_index = idx
@@ -148,7 +166,9 @@ class MIDIProject:
                     continue
                 if matched_channel is not None and message.channel != matched_channel:
                     continue
-                if message.type == "note_off" or (message.type == "note_on" and message.velocity == 0):
+                if message.type == "note_off" or (
+                    message.type == "note_on" and message.velocity == 0
+                ):
                     off_index = idx
                     break
         if off_index is None:
@@ -181,8 +201,12 @@ class MIDIProject:
     def track_summaries(self) -> List[str]:
         summaries = []
         for idx, track in enumerate(self.midi.tracks):
-            note_count = sum(1 for msg in track if msg.type == "note_on" and msg.velocity > 0)
-            summaries.append(f"Track {idx}: {len(track)} events, {note_count} note-on messages")
+            note_count = sum(
+                1 for msg in track if msg.type == "note_on" and msg.velocity > 0
+            )
+            summaries.append(
+                f"Track {idx}: {len(track)} events, {note_count} note-on messages"
+            )
         return summaries
 
     def tempo_map(self) -> List[int]:
@@ -214,8 +238,14 @@ class MIDIProject:
         scheduled: List[ScheduledEvent] = []
         for abs_tick, track_index, message in events:
             delta_tick = abs_tick - last_tick
-            current_time += mido.tick2second(delta_tick, self.midi.ticks_per_beat, tempo)
-            scheduled.append(ScheduledEvent(time=current_time, track_index=track_index, message=message))
+            current_time += mido.tick2second(
+                delta_tick, self.midi.ticks_per_beat, tempo
+            )
+            scheduled.append(
+                ScheduledEvent(
+                    time=current_time, track_index=track_index, message=message
+                )
+            )
             if message.type == "set_tempo":
                 tempo = message.tempo
             last_tick = abs_tick
@@ -334,7 +364,10 @@ class MIDIPlayer:
                         elapsed += slice_
                 if self._stop_flag.is_set():
                     break
-                if event.track_index not in self.project.muted_tracks and not event.message.is_meta:
+                if (
+                    event.track_index not in self.project.muted_tracks
+                    and not event.message.is_meta
+                ):
                     output.send(event.message)
                 last_time = event.time
                 idx += 1
@@ -359,7 +392,9 @@ def _build_command_parsers() -> Dict[str, argparse.ArgumentParser]:
     parsers["unmute"] = unmute_parser
 
     tempo_parser = argparse.ArgumentParser(add_help=False, prog="tempo")
-    tempo_parser.add_argument("--scale", type=float, required=True, help="Multiply tempo by this factor")
+    tempo_parser.add_argument(
+        "--scale", type=float, required=True, help="Multiply tempo by this factor"
+    )
     parsers["tempo"] = tempo_parser
 
     insert_parser = argparse.ArgumentParser(add_help=False, prog="insert-note")
@@ -391,13 +426,17 @@ def _build_command_parsers() -> Dict[str, argparse.ArgumentParser]:
 
     play_parser = argparse.ArgumentParser(add_help=False, prog="play")
     play_parser.add_argument("--duration", type=float, help="Stop after N seconds")
-    play_parser.add_argument("--output", type=str, help="Explicit MIDI output port name")
+    play_parser.add_argument(
+        "--output", type=str, help="Explicit MIDI output port name"
+    )
     parsers["play"] = play_parser
 
     return parsers
 
 
-def _parse_command_sequence(raw_args: Sequence[str]) -> List[Tuple[str, argparse.Namespace]]:
+def _parse_command_sequence(
+    raw_args: Sequence[str],
+) -> List[Tuple[str, argparse.Namespace]]:
     parsers = _build_command_parsers()
     commands: List[Tuple[str, argparse.Namespace]] = []
     idx = 0

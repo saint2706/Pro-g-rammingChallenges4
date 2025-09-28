@@ -19,7 +19,9 @@ class _AckProtocol(asyncio.DatagramProtocol):
         self.ack_waiters: Dict[int, asyncio.Future[None]] = {}
         self.incoming: asyncio.Queue[dict] = asyncio.Queue()
 
-    def connection_made(self, transport: asyncio.BaseTransport) -> None:  # pragma: no cover
+    def connection_made(
+        self, transport: asyncio.BaseTransport
+    ) -> None:  # pragma: no cover
         self.transport = transport  # type: ignore[assignment]
 
     def datagram_received(self, data: bytes, addr) -> None:  # pragma: no cover
@@ -147,7 +149,12 @@ class UdpChatClient:
 
     async def _send_join(self, room: str) -> None:
         self.room = room
-        payload = {"type": "join", "room": room, "user": self.user, "id": self._next_id()}
+        payload = {
+            "type": "join",
+            "room": room,
+            "user": self.user,
+            "id": self._next_id(),
+        }
         await self._send_with_retry(payload)
 
     async def _send_message(self, text: str) -> None:

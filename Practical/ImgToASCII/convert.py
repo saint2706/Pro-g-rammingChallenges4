@@ -22,7 +22,8 @@ import sys
 import time
 from dataclasses import dataclass
 from pathlib import Path
-from typing import List, Optional
+from contextlib import nullcontext
+from typing import IO, List, Optional
 
 from PIL import Image, UnidentifiedImageError
 import numpy as np
@@ -140,27 +141,47 @@ def parse_args(argv: Optional[list[str]]) -> Config:
     return cfg
 
 
-def convert(cfg: Config) -> dict:
+def convert(cfg: Config, image_source: Optional[IO[bytes]] = None) -> dict:
+    cfg.validate()
     start = time.time()
-    with Image.open(cfg.input_path) as img:
+
+    if image_source is not None and hasattr(image_source, "seek"):
+        try:
+            image_source.seek(0)
+        except (OSError, ValueError):
+            pass
+
+    opener = (
+        Image.open(image_source)
+        if image_source is not None
+        else Image.open(cfg.input_path)
+    )
+    input_label = (
+        getattr(image_source, "name", None)
+        if image_source is not None
+        else str(cfg.input_path)
+    )
+    cm = opener if hasattr(opener, "__enter__") else nullcontext(opener)
+    with cm as img:
+        orig_size = img.size
         resized_img = resize_image(img, cfg.width, cfg.aspect)
         ascii_chars_flat = image_to_ascii(
             resized_img, list(cfg.chars), invert=cfg.invert
         )
         ascii_art = format_ascii_art(ascii_chars_flat, cfg.width)
+        resized_size = resized_img.size
     meta = {
-        "input": str(cfg.input_path),
+        "input": input_label or str(cfg.input_path),
         "width": cfg.width,
         "chars": len(cfg.chars),
         "invert": cfg.invert,
         "aspect": cfg.aspect,
         "output": str(cfg.output_path) if cfg.output_path else None,
         "elapsed_sec": round(time.time() - start, 4),
-        "dimensions": {"orig": None, "resized": None},
-    }
-    meta["dimensions"]["resized"] = {
-        "width": resized_img.size[0],
-        "height": resized_img.size[1],
+        "dimensions": {
+            "orig": {"width": orig_size[0], "height": orig_size[1]},
+            "resized": {"width": resized_size[0], "height": resized_size[1]},
+        },
     }
     return {"ascii": ascii_art, "meta": meta}
 

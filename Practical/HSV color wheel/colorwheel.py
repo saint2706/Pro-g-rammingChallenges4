@@ -25,21 +25,91 @@ import time
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
-from typing import Literal, Optional, Dict, Any
+from typing import Optional, Dict, Any
 
 import numpy as np
 import matplotlib.pyplot as plt
 
-try:  # dependency guard
-    import colour
-    from colour.utilities import tstack, tsplit, orient  # type: ignore
-    from colour.plotting import colour_style, plot_image  # type: ignore
+try:  # Optional dependency for colour-science helpers
+    import colour  # type: ignore
 except ImportError:  # pragma: no cover
-    print(
-        "Error: The 'colour-science' library is required. Install with: pip install colour-science",
-        file=sys.stderr,
-    )
-    raise SystemExit(2)
+    colour = None  # type: ignore
+
+try:  # pragma: no cover - plotting helpers only available with colour-science
+    from colour.plotting import colour_style as _colour_style, plot_image as _colour_plot_image  # type: ignore
+except ImportError:  # pragma: no cover
+    _colour_style = None
+    _colour_plot_image = None
+
+try:  # pragma: no cover - prefer colour utilities when present
+    from colour.utilities import orient as _colour_orient  # type: ignore
+except ImportError:  # pragma: no cover
+    _colour_orient = None
+
+
+COLOUR_SCIENCE_AVAILABLE = colour is not None
+COLOUR_SCIENCE_GUIDANCE = (
+    "The optional 'colour-science' library is not installed. Install it with "
+    "`pip install colour-science` to enable colour-science plotting helpers."
+)
+
+
+def _orient(array: np.ndarray, how: str) -> np.ndarray:
+    """Rotate/flip helper mirroring colour.utilities.orient."""
+
+    if _colour_orient is not None:  # pragma: no cover - defer to library implementation
+        return _colour_orient(array, how)
+
+    if how == "90 CW":
+        return np.rot90(array, k=-1, axes=(0, 1))
+    if how == "Flip":
+        return np.flipud(array)
+    raise ValueError(f"Unsupported orientation operation: {how}")
+
+
+def _hsv_to_rgb(hsv: np.ndarray) -> np.ndarray:
+    """Vectorised HSV→RGB conversion with optional colour-science acceleration."""
+
+    if (
+        COLOUR_SCIENCE_AVAILABLE
+    ):  # pragma: no branch - fast path when dependency available
+        return colour.HSV_to_RGB(hsv)  # type: ignore[attr-defined]
+
+    h = hsv[..., 0]
+    s = np.clip(hsv[..., 1], 0.0, 1.0)
+    v = np.clip(hsv[..., 2], 0.0, 1.0)
+
+    h6 = (h % 1.0) * 6.0
+    i = np.floor(h6).astype(np.int32) % 6
+    f = h6 - np.floor(h6)
+
+    p = v * (1.0 - s)
+    q = v * (1.0 - f * s)
+    t = v * (1.0 - (1.0 - f) * s)
+
+    r = np.empty_like(v)
+    g = np.empty_like(v)
+    b = np.empty_like(v)
+
+    mask = i == 0
+    r[mask], g[mask], b[mask] = v[mask], t[mask], p[mask]
+
+    mask = i == 1
+    r[mask], g[mask], b[mask] = q[mask], v[mask], p[mask]
+
+    mask = i == 2
+    r[mask], g[mask], b[mask] = p[mask], v[mask], t[mask]
+
+    mask = i == 3
+    r[mask], g[mask], b[mask] = p[mask], q[mask], v[mask]
+
+    mask = i == 4
+    r[mask], g[mask], b[mask] = t[mask], p[mask], v[mask]
+
+    mask = i == 5
+    r[mask], g[mask], b[mask] = v[mask], p[mask], q[mask]
+
+    return np.stack([r, g, b], axis=-1)
 
 
 class Orientation(str, Enum):
@@ -91,18 +161,18 @@ def generate_colour_wheel(cfg: Config) -> np.ndarray:
     S = np.sqrt(xx**2 + yy**2)
     H = (np.arctan2(xx, yy) + np.pi) / (2 * np.pi)
 
-    HSV = tstack([H, S, np.ones_like(S)])
-    RGB = colour.HSV_to_RGB(HSV)
+    HSV = np.stack([H, np.clip(S, 0, 1), np.ones_like(S)], axis=-1, dtype=np.float32)
+    RGB = _hsv_to_rgb(HSV)
 
     # Orientation transforms
     if cfg.method == Orientation.MATPLOTLIB:
-        RGB = orient(RGB, "90 CW")
-        S = orient(S, "90 CW")
+        RGB = _orient(RGB, "90 CW")
+        S = _orient(S, "90 CW")
     elif cfg.method == Orientation.NUKE:
-        RGB = orient(RGB, "Flip")
-        RGB = orient(RGB, "90 CW")
-        S = orient(S, "Flip")
-        S = orient(S, "90 CW")
+        RGB = _orient(RGB, "Flip")
+        RGB = _orient(RGB, "90 CW")
+        S = _orient(S, "Flip")
+        S = _orient(S, "90 CW")
 
     # Alpha channel construction
     if cfg.clip_circle:
@@ -118,19 +188,34 @@ def generate_colour_wheel(cfg: Config) -> np.ndarray:
     else:
         A = np.ones_like(S)
 
-    R, G, B = tsplit(RGB)
-    RGBA = tstack([R, G, B, A])
-    return RGBA
+    rgba = np.stack([RGB[..., 0], RGB[..., 1], RGB[..., 2], A], axis=-1)
+    return np.ascontiguousarray(rgba.astype(np.float32))
 
 
 # ----------------------------- Plotting ----------------------------- #
 
 
 def plot_wheel(rgba: np.ndarray, cfg: Config) -> None:
-    colour_style()
+    if _colour_style is not None:  # pragma: no branch - apply style if available
+        _colour_style()
     plt.style.use("dark_background")
-    title = f"HSV Colour Wheel\nMethod: {cfg.method} | Samples: {cfg.samples} | Clipped: {cfg.clip_circle} | Feather: {cfg.feather}px"
-    plot_image(rgba, title=title)
+    title = (
+        "HSV Colour Wheel\n"
+        f"Method: {cfg.method} | Samples: {cfg.samples} | Clipped: {cfg.clip_circle} | Feather: {cfg.feather}px"
+    )
+
+    if (
+        _colour_plot_image is not None
+    ):  # pragma: no branch - prefer colour-science visualisation
+        _colour_plot_image(rgba, title=title)
+        return
+
+    plt.figure(figsize=(6, 6), dpi=cfg.dpi)
+    plt.imshow(np.clip(rgba, 0.0, 1.0))
+    plt.title(title)
+    plt.axis("off")
+    plt.tight_layout()
+    plt.show()
 
 
 # ----------------------------- CLI ----------------------------- #
@@ -204,6 +289,8 @@ def main(argv: Optional[list[str]] = None) -> int:
     cfg = parse_args(argv)
     if cfg.verbose:
         print(f"Config: {cfg}")
+        if not COLOUR_SCIENCE_AVAILABLE:
+            print(COLOUR_SCIENCE_GUIDANCE, file=sys.stderr)
     t0 = time.time()
     rgba = generate_colour_wheel(cfg)
     elapsed = time.time() - t0

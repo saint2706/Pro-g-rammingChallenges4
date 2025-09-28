@@ -7,7 +7,7 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(PROJECT_ROOT))
 
-from cloth import Cloth
+from cloth import Cloth, simulate_cloth, simulate_positions, simulate_segments
 
 
 def test_static_cloth_remains_at_rest():
@@ -23,3 +23,21 @@ def test_pinned_particles_do_not_move_under_gravity():
     for _ in range(10):
         cloth.step(0.016)
     np.testing.assert_allclose(cloth.pinned_positions(), initial)
+
+
+def test_simulate_cloth_returns_expected_number_of_frames():
+    frames = simulate_cloth(
+        steps=5, dt=0.01, num_x=4, num_y=4, gravity=(0.0, 0.0), wind=(0.0, 0.0)
+    )
+    assert len(frames) == 6  # includes initial state
+    assert frames[0]["step"] == 0
+    assert frames[-1]["step"] == 5
+
+
+def test_simulate_helpers_return_arrays():
+    positions = simulate_positions(steps=2, dt=0.01, num_x=4, num_y=4)
+    segments = simulate_segments(steps=2, dt=0.01, num_x=4, num_y=4)
+    assert len(positions) == 3
+    assert len(segments) == 3
+    assert isinstance(positions[0], np.ndarray)
+    assert isinstance(segments[0], np.ndarray)

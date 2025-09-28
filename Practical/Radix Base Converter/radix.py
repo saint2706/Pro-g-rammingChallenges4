@@ -33,7 +33,7 @@ _DIGITS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 _CHAR_TO_VAL = {ch: i for i, ch in enumerate(_DIGITS)}
 
 
-def _validate_base(base: int) -> None:
+def validate_base(base: int) -> None:
     if not (2 <= base <= 36):
         raise ValueError("Base must be between 2 and 36")
 
@@ -43,7 +43,7 @@ def to_decimal(number: str, base: int) -> int:
 
     Supports optional leading '-' for negatives.
     """
-    _validate_base(base)
+    validate_base(base)
     s = str(number).strip().upper()
     if not s:
         raise ValueError("Empty string")
@@ -66,7 +66,7 @@ def to_decimal(number: str, base: int) -> int:
 
 def from_decimal(number: int, base: int) -> str:
     """Convert a non-negative integer to a given base (2..36)."""
-    _validate_base(base)
+    validate_base(base)
     if number == 0:
         return "0"
     neg = number < 0
@@ -113,6 +113,42 @@ def batch_convert(
     return results
 
 
+def normalize_bases(bases: Iterable[int]) -> list[int]:
+    """Validate and normalize an iterable of bases into a list.
+
+    Raises:
+        ValueError: If any base falls outside the supported range (2..36).
+    """
+
+    normalized: list[int] = []
+    for base in bases:
+        base_int = int(base)
+        validate_base(base_int)
+        normalized.append(base_int)
+    return normalized
+
+
+def format_output(value: str, *, lower: bool = False, pad: int = 0) -> str:
+    """Apply common formatting options to a converted value string."""
+
+    out = value.lower() if lower else value.upper()
+    if pad > 0:
+        sign = ""
+        if out.startswith("-"):
+            sign, out = "-", out[1:]
+        out = sign + out.rjust(pad, "0")
+    return out
+
+
+def convert_formatted(
+    number: str, from_base: int, to_base: int, *, lower: bool = False, pad: int = 0
+) -> str:
+    """Convert and format a value using the provided options."""
+
+    raw = convert(number, from_base, to_base)
+    return format_output(raw, lower=lower, pad=pad)
+
+
 def _parse_cli(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Radix / Base converter")
     parser.add_argument("value", nargs="?", help="The value to convert (string).")
@@ -147,18 +183,7 @@ def _parse_cli(argv: list[str] | None = None) -> argparse.Namespace:
     return parser.parse_args(argv)
 
 
-def _format_output(out: str, lower: bool, pad: int) -> str:
-    if lower:
-        out = out.lower()
-    if pad > 0:
-        sign = ""
-        if out.startswith("-"):
-            sign, out = "-", out[1:]
-        out = sign + out.rjust(pad, "0")
-    return out
-
-
-def _cli(argv: list[str] | None = None) -> int:
+def run_cli(argv: list[str] | None = None) -> int:
     ns = _parse_cli(argv)
     if ns.value is None:
         print("No value provided. Use --help for usage.")
@@ -190,10 +215,10 @@ def _cli(argv: list[str] | None = None) -> int:
         print(f"Error: {e}")
         return 1
 
-    formatted = _format_output(result, lower=ns.lower, pad=ns.pad)
+    formatted = format_output(result, lower=ns.lower, pad=ns.pad)
     print(formatted)
     return 0
 
 
 if __name__ == "__main__":  # pragma: no cover
-    raise SystemExit(_cli())
+    raise SystemExit(run_cli())

@@ -60,7 +60,9 @@ class Table:
         }
         self._rows: List[Dict[str, Any]] = []
         pk_cols = [col for col in self._columns if col.primary_key]
-        self._primary_key: Optional[str] = pk_cols[0].normalised_name if pk_cols else None
+        self._primary_key: Optional[str] = (
+            pk_cols[0].normalised_name if pk_cols else None
+        )
         self._pk_index: Dict[Any, Dict[str, Any]] = {}
 
     def column_names(self) -> List[str]:
@@ -117,7 +119,9 @@ class Table:
     def snapshot(self) -> "Table":
         cloned = Table(self.name, self._columns)
         cloned._rows = [row.copy() for row in self._rows]
-        cloned._pk_index = {k: cloned._rows[self._rows.index(v)] for k, v in self._pk_index.items()}
+        cloned._pk_index = {
+            k: cloned._rows[self._rows.index(v)] for k, v in self._pk_index.items()
+        }
         return cloned
 
 
@@ -127,7 +131,9 @@ class Database:
     def __init__(self) -> None:
         self._tables: Dict[str, Table] = {}
         self._fk_children: Dict[str, List[Tuple[str, str]]] = {}
-        self._snapshots: List[Tuple[Dict[str, Table], Dict[str, List[Tuple[str, str]]]]] = []
+        self._snapshots: List[
+            Tuple[Dict[str, Table], Dict[str, List[Tuple[str, str]]]]
+        ] = []
 
     # ------------------------------------------------------------------
     # Schema management
@@ -274,7 +280,9 @@ class Database:
     # Transactions
     # ------------------------------------------------------------------
     def begin(self) -> None:
-        table_snapshot = {name: copy.deepcopy(table) for name, table in self._tables.items()}
+        table_snapshot = {
+            name: copy.deepcopy(table) for name, table in self._tables.items()
+        }
         fk_snapshot = copy.deepcopy(self._fk_children)
         self._snapshots.append((table_snapshot, fk_snapshot))
 
@@ -332,7 +340,9 @@ class Database:
             return str(value)
         raise ValueError(f"Unsupported column type: {column.col_type}")
 
-    def _register_foreign_keys(self, table_name: str, columns: Iterable[Column]) -> None:
+    def _register_foreign_keys(
+        self, table_name: str, columns: Iterable[Column]
+    ) -> None:
         for column in columns:
             if column.foreign_key is None:
                 continue
@@ -342,7 +352,9 @@ class Database:
                     f"Referenced table '{column.foreign_key.referenced_table}' does not exist"
                 )
             ref_table_obj = self._tables[ref_table]
-            if ref_table_obj.primary_key() != _normalise(column.foreign_key.referenced_column):
+            if ref_table_obj.primary_key() != _normalise(
+                column.foreign_key.referenced_column
+            ):
                 raise ValueError(
                     "Foreign keys must reference the primary key of the parent table"
                 )
@@ -380,4 +392,3 @@ class Database:
                     raise ValueError(
                         f"Cannot modify or delete row because of existing references in table '{child_table.name}'"
                     )
-

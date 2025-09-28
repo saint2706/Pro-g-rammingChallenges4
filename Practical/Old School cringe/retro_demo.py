@@ -1,4 +1,5 @@
 """Retro multi-effect demo with synchronized audio timeline."""
+
 from __future__ import annotations
 
 import argparse
@@ -159,8 +160,12 @@ def generate_audio_track(cfg: DemoConfig, length: float) -> np.ndarray:
     # Hi-hat ticks on every 8th beat
     hat = np.zeros_like(t)
     hat_period = beat_period / 2
-    phases = (t % hat_period)
-    hat += 0.2 * np.exp(-phases * 40) * np.random.default_rng(42).uniform(-1, 1, size=t.shape)
+    phases = t % hat_period
+    hat += (
+        0.2
+        * np.exp(-phases * 40)
+        * np.random.default_rng(42).uniform(-1, 1, size=t.shape)
+    )
 
     mix = bass + lead + hat
     mix = np.clip(mix, -1.0, 1.0)
@@ -218,7 +223,7 @@ class PlasmaTunnelEffect(Effect):
     def render(self, timeline_t: float, dt: float) -> pygame.Surface:
         self.lfo = max(self.lfo - dt * 0.15, 0.0)
         t = timeline_t * 1.7
-        depth = (1.0 / (self.radius + 0.3 + self.lfo))
+        depth = 1.0 / (self.radius + 0.3 + self.lfo)
         swirl = np.sin(4.0 * self.angle + t * 1.5)
         rings = np.sin(12.0 * self.radius - t * 2.2)
         r = 0.5 + 0.5 * np.sin(5 * depth + swirl)
@@ -235,7 +240,13 @@ class PlasmaTunnelEffect(Effect):
 class TextScrollerEffect(Effect):
     """Horizontally scrolling marquee text with a parallax star field."""
 
-    def __init__(self, cfg: DemoConfig, lines: Optional[List[str]] = None, *, speed: float = 120.0):
+    def __init__(
+        self,
+        cfg: DemoConfig,
+        lines: Optional[List[str]] = None,
+        *,
+        speed: float = 120.0,
+    ):
         super().__init__(cfg)
         self.speed = speed
         self.font_large = pygame.font.SysFont("Share Tech Mono", 40)
@@ -256,14 +267,18 @@ class TextScrollerEffect(Effect):
 
     def _create_text_surface(self) -> pygame.Surface:
         padding = 80
-        width = padding + sum(self.font_large.size(line + "   ")[0] for line in self.lines)
+        width = padding + sum(
+            self.font_large.size(line + "   ")[0] for line in self.lines
+        )
         surface = pygame.Surface((width, self.cfg.height), pygame.SRCALPHA)
         x = padding // 2
         for idx, line in enumerate(self.lines):
             color = pygame.Color(240, 240, 255)
             text = self.font_large.render(line, True, color)
             surface.blit(text, (x, self.cfg.height // 2 - text.get_height() // 2))
-            sub = self.font_small.render("::" + line.lower() + "::", True, (120, 200, 255))
+            sub = self.font_small.render(
+                "::" + line.lower() + "::", True, (120, 200, 255)
+            )
             surface.blit(sub, (x, self.cfg.height // 2 + text.get_height() // 2))
             x += text.get_width() + padding
         return surface.convert_alpha()
@@ -298,7 +313,9 @@ class TextScrollerEffect(Effect):
             brightness = int(120 + 135 * depth + self.flash * 100)
             brightness = max(0, min(255, brightness))
             color = (brightness, brightness, 255)
-            surface.fill(color, (int(x) % self.cfg.width, int(y) % self.cfg.height, 2, 2))
+            surface.fill(
+                color, (int(x) % self.cfg.width, int(y) % self.cfg.height, 2, 2)
+            )
         surface.unlock()
 
         offset = (timeline_t * self.speed) % self.text_surface.get_width()
@@ -356,8 +373,14 @@ class ZoomerEffect(Effect):
             surface.fill(base_color, rect)
             if chroma > 0.01:
                 shift = int(chroma * 4)
-                surface.fill((base_color[0], 30, 30), (rect[0] + shift, rect[1], rect[2], rect[3]))
-                surface.fill((30, base_color[1], 30), (rect[0], rect[1] + shift, rect[2], rect[3]))
+                surface.fill(
+                    (base_color[0], 30, 30),
+                    (rect[0] + shift, rect[1], rect[2], rect[3]),
+                )
+                surface.fill(
+                    (30, base_color[1], 30),
+                    (rect[0], rect[1] + shift, rect[2], rect[3]),
+                )
 
         # Subtle scanlines
         for y in range(0, h, 4):
@@ -485,12 +508,16 @@ class DemoRuntime:
             alpha = 1.0
             if self.elapsed < state.start:
                 if seg.fade_in > 0:
-                    alpha = max(0.0, min(1.0, 1.0 - (state.start - self.elapsed) / seg.fade_in))
+                    alpha = max(
+                        0.0, min(1.0, 1.0 - (state.start - self.elapsed) / seg.fade_in)
+                    )
                 else:
                     alpha = 1.0
             elif self.elapsed > state.end:
                 if seg.fade_out > 0:
-                    alpha = max(0.0, min(1.0, 1.0 - (self.elapsed - state.end) / seg.fade_out))
+                    alpha = max(
+                        0.0, min(1.0, 1.0 - (self.elapsed - state.end) / seg.fade_out)
+                    )
                 else:
                     alpha = 0.0
             surface = state.effect.render(max(local_t, 0.0), dt)
@@ -507,7 +534,9 @@ class DemoRuntime:
     def _draw_overlay(self, frame: pygame.Surface) -> None:
         self.info_surface.fill((0, 0, 0, 0))
         active_name = " / ".join(
-            state.spec.name for state in self.timeline.active_states(self.elapsed) if state.started
+            state.spec.name
+            for state in self.timeline.active_states(self.elapsed)
+            if state.started
         )
         text = f"t={self.elapsed:05.2f}s | fps~{self.clock.get_fps():05.1f} | {active_name or 'waiting'}"
         label = self.overlay_font.render(text, True, (220, 240, 250))
@@ -520,18 +549,24 @@ class DemoRuntime:
 
     def _capture(self, frame_surface: pygame.Surface) -> None:
         self.frame_index += 1
-        if self.cfg.capture_frames and (self.frame_index % self.cfg.capture_stride == 0):
+        if self.cfg.capture_frames and (
+            self.frame_index % self.cfg.capture_stride == 0
+        ):
             self.cfg.capture_frames.mkdir(parents=True, exist_ok=True)
             out = self.cfg.capture_frames / f"frame_{self.frame_index:05d}.png"
             pygame.image.save(frame_surface, out)
-        if self.cfg.capture_gif is not None and (self.frame_index % self.cfg.capture_stride == 0):
+        if self.cfg.capture_gif is not None and (
+            self.frame_index % self.cfg.capture_stride == 0
+        ):
             array = pygame.surfarray.array3d(frame_surface)
             self.gif_frames.append(np.transpose(array, (1, 0, 2)))
 
     def _finalize_capture(self) -> None:
         if self.cfg.capture_gif is not None and self.gif_frames:
             if imageio is None:
-                raise SystemExit("imageio is required for GIF export; install with `pip install imageio`." )
+                raise SystemExit(
+                    "imageio is required for GIF export; install with `pip install imageio`."
+                )
             self.cfg.capture_gif.parent.mkdir(parents=True, exist_ok=True)
             fps = max(1, self.cfg.fps // self.cfg.capture_stride)
             imageio.mimsave(self.cfg.capture_gif, self.gif_frames, fps=fps)
@@ -551,7 +586,13 @@ def build_timeline(cfg: DemoConfig) -> Timeline:
     ]
 
     segments = [
-        Segment("Plasma Tunnel", lambda c: PlasmaTunnelEffect(c), duration=12.0, fade_in=1.2, fade_out=1.0),
+        Segment(
+            "Plasma Tunnel",
+            lambda c: PlasmaTunnelEffect(c),
+            duration=12.0,
+            fade_in=1.2,
+            fade_out=1.0,
+        ),
         Segment(
             "Scroller",
             lambda c: TextScrollerEffect(c, lines=lines, speed=140.0),
@@ -559,7 +600,13 @@ def build_timeline(cfg: DemoConfig) -> Timeline:
             fade_in=1.0,
             fade_out=1.0,
         ),
-        Segment("Zoomer", lambda c: ZoomerEffect(c), duration=10.0, fade_in=1.0, fade_out=1.2),
+        Segment(
+            "Zoomer",
+            lambda c: ZoomerEffect(c),
+            duration=10.0,
+            fade_in=1.0,
+            fade_out=1.2,
+        ),
     ]
     timeline = Timeline(cfg, segments)
     if cfg.stop_after is None:
@@ -570,19 +617,39 @@ def build_timeline(cfg: DemoConfig) -> Timeline:
 
 
 def parse_args() -> DemoConfig:
-    parser = argparse.ArgumentParser(description="Retro multi-effect demo (plasma tunnel, scroller, zoomer)")
+    parser = argparse.ArgumentParser(
+        description="Retro multi-effect demo (plasma tunnel, scroller, zoomer)"
+    )
     parser.add_argument("--width", type=int, default=960, help="Viewport width")
     parser.add_argument("--height", type=int, default=540, help="Viewport height")
     parser.add_argument("--fps", type=int, default=60, help="Frame rate cap")
     parser.add_argument("--bpm", type=int, default=120, help="Audio timeline BPM")
-    parser.add_argument("--no-audio", action="store_true", help="Disable audio playback")
-    parser.add_argument("--fullscreen", action="store_true", help="Launch in fullscreen")
-    parser.add_argument("--capture-frames", type=Path, help="Capture frames to directory")
-    parser.add_argument("--capture-gif", type=Path, help="Capture an animated GIF to path")
-    parser.add_argument("--capture-stride", type=int, default=2, help="Capture every Nth frame")
-    parser.add_argument("--headless", action="store_true", help="Hide the window (useful for capture)")
-    parser.add_argument("--overlay", action="store_true", default=False, help="Force overlay display")
-    parser.add_argument("--stop-after", type=float, help="Stop after N seconds (useful when capturing snippets)")
+    parser.add_argument(
+        "--no-audio", action="store_true", help="Disable audio playback"
+    )
+    parser.add_argument(
+        "--fullscreen", action="store_true", help="Launch in fullscreen"
+    )
+    parser.add_argument(
+        "--capture-frames", type=Path, help="Capture frames to directory"
+    )
+    parser.add_argument(
+        "--capture-gif", type=Path, help="Capture an animated GIF to path"
+    )
+    parser.add_argument(
+        "--capture-stride", type=int, default=2, help="Capture every Nth frame"
+    )
+    parser.add_argument(
+        "--headless", action="store_true", help="Hide the window (useful for capture)"
+    )
+    parser.add_argument(
+        "--overlay", action="store_true", default=False, help="Force overlay display"
+    )
+    parser.add_argument(
+        "--stop-after",
+        type=float,
+        help="Stop after N seconds (useful when capturing snippets)",
+    )
     args = parser.parse_args()
 
     cfg = DemoConfig(

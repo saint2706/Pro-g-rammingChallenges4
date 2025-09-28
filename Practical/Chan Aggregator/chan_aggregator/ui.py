@@ -12,11 +12,17 @@ from .core import ChanAggregator, AggregatedThread
 
 
 def parse_args(argv: Optional[Iterable[str]] = None) -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Aggregate threads from multiple boards")
+    parser = argparse.ArgumentParser(
+        description="Aggregate threads from multiple boards"
+    )
     parser.add_argument("--boards", help="Comma separated board IDs", default="")
-    parser.add_argument("--limit", type=int, default=None, help="Maximum number of threads to show")
+    parser.add_argument(
+        "--limit", type=int, default=None, help="Maximum number of threads to show"
+    )
     parser.add_argument("--search", default=None, help="Case insensitive search filter")
-    parser.add_argument("--json", action="store_true", help="Output JSON instead of table")
+    parser.add_argument(
+        "--json", action="store_true", help="Output JSON instead of table"
+    )
     parser.add_argument(
         "--config",
         type=Path,
@@ -76,7 +82,9 @@ def render_table(threads: List[AggregatedThread]) -> str:
     sep = "  "
     header_line = sep.join(h.ljust(widths[i]) for i, h in enumerate(headers))
     divider = sep.join("-" * widths[i] for i in range(len(headers)))
-    body_lines = [sep.join(row[i].ljust(widths[i]) for i in range(len(headers))) for row in rows]
+    body_lines = [
+        sep.join(row[i].ljust(widths[i]) for i in range(len(headers))) for row in rows
+    ]
     return "\n".join([header_line, divider, *body_lines])
 
 

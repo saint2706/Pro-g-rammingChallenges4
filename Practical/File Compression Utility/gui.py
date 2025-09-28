@@ -1,4 +1,5 @@
 """Tkinter GUI for the File Compression Utility project."""
+
 from __future__ import annotations
 
 import queue
@@ -26,7 +27,12 @@ except Exception:  # pragma: no cover - fallback path
 if __package__ in {None, ""}:
     sys.path.append(str(Path(__file__).resolve().parent))
 
-from backend import ArchiveFormat, ArchiveManager, ArchiveOperationError, ProgressEvent  # noqa: E402
+from backend import (
+    ArchiveFormat,
+    ArchiveManager,
+    ArchiveOperationError,
+    ProgressEvent,
+)  # noqa: E402
 
 
 class CompressionApp:
@@ -82,7 +88,9 @@ class CompressionApp:
         list_frame.pack(fill="both", expand=True, padx=10, pady=10)
 
         self.sources_box = tk.Listbox(list_frame, height=12)
-        self.sources_box.pack(side="left", fill="both", expand=True, padx=(0, 8), pady=8)
+        self.sources_box.pack(
+            side="left", fill="both", expand=True, padx=(0, 8), pady=8
+        )
 
         if DND_AVAILABLE:
             self.sources_box.drop_target_register(DND_FILES)  # type: ignore[attr-defined]
@@ -91,7 +99,9 @@ class CompressionApp:
         button_frame = ttk.Frame(list_frame)
         button_frame.pack(side="left", fill="y", pady=8)
 
-        add_files_btn = ttk.Button(button_frame, text="Add Files", command=self._add_files)
+        add_files_btn = ttk.Button(
+            button_frame, text="Add Files", command=self._add_files
+        )
         add_files_btn.pack(fill="x", pady=2)
 
         add_dir_btn = ttk.Button(
@@ -99,7 +109,9 @@ class CompressionApp:
         )
         add_dir_btn.pack(fill="x", pady=2)
 
-        remove_btn = ttk.Button(button_frame, text="Remove Selected", command=self._remove_selected)
+        remove_btn = ttk.Button(
+            button_frame, text="Remove Selected", command=self._remove_selected
+        )
         remove_btn.pack(fill="x", pady=2)
 
         clear_btn = ttk.Button(button_frame, text="Clear", command=self._clear_sources)
@@ -112,7 +124,9 @@ class CompressionApp:
         dest_entry = ttk.Entry(dest_frame, textvariable=self.dest_var)
         dest_entry.pack(side="left", fill="x", expand=True, padx=(8, 4), pady=8)
 
-        browse_dest_btn = ttk.Button(dest_frame, text="Browse", command=self._choose_destination)
+        browse_dest_btn = ttk.Button(
+            dest_frame, text="Browse", command=self._choose_destination
+        )
         browse_dest_btn.pack(side="left", padx=(0, 8))
 
         name_frame = ttk.Frame(frame)
@@ -144,7 +158,9 @@ class CompressionApp:
         self.format_combo.set("ZIP (Deflated)")
         self.format_combo.pack(side="left", width=140)
 
-        create_btn = ttk.Button(frame, text="Create Archive", command=self._start_create)
+        create_btn = ttk.Button(
+            frame, text="Create Archive", command=self._start_create
+        )
         create_btn.pack(padx=10, pady=(0, 12), anchor="e")
 
     # ------------------------------------------------------------------
@@ -185,7 +201,9 @@ class CompressionApp:
     # ------------------------------------------------------------------
     # Event handlers and helpers
     def _add_files(self) -> None:
-        files = filedialog.askopenfilenames(parent=self.root, title="Select files to compress")
+        files = filedialog.askopenfilenames(
+            parent=self.root, title="Select files to compress"
+        )
         self._extend_sources(Path(f) for f in files)
 
     def _add_directories(self) -> None:
@@ -194,7 +212,9 @@ class CompressionApp:
             self._extend_sources([Path(directory)])
 
     def _extend_sources(self, new_paths: Iterable[Path]) -> None:
-        existing = {Path(self.sources_box.get(idx)) for idx in range(self.sources_box.size())}
+        existing = {
+            Path(self.sources_box.get(idx)) for idx in range(self.sources_box.size())
+        }
         for path in new_paths:
             if path and path not in existing:
                 self.sources_box.insert("end", str(path))
@@ -209,7 +229,9 @@ class CompressionApp:
         self.sources_box.delete(0, "end")
 
     def _choose_destination(self) -> None:
-        folder = filedialog.askdirectory(parent=self.root, title="Select destination folder")
+        folder = filedialog.askdirectory(
+            parent=self.root, title="Select destination folder"
+        )
         if folder:
             self.dest_var.set(folder)
 
@@ -219,7 +241,9 @@ class CompressionApp:
             self.archive_path_var.set(archive)
 
     def _choose_extract_destination(self) -> None:
-        folder = filedialog.askdirectory(parent=self.root, title="Select destination folder")
+        folder = filedialog.askdirectory(
+            parent=self.root, title="Select destination folder"
+        )
         if folder:
             self.extract_dest_var.set(folder)
 
@@ -228,9 +252,13 @@ class CompressionApp:
             messagebox.showinfo("Busy", "An operation is already in progress.")
             return
 
-        sources = [Path(self.sources_box.get(i)) for i in range(self.sources_box.size())]
+        sources = [
+            Path(self.sources_box.get(i)) for i in range(self.sources_box.size())
+        ]
         if not sources:
-            messagebox.showerror("Validation", "Add at least one file or folder to compress.")
+            messagebox.showerror(
+                "Validation", "Add at least one file or folder to compress."
+            )
             return
 
         dest_folder = Path(self.dest_var.get() or ".")

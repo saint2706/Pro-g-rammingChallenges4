@@ -14,6 +14,7 @@ import requests
 
 HistoricalPriceFrame = pd.DataFrame
 
+
 class FileResponseCache:
     """Very small file-based cache for HTTP responses."""
 
@@ -153,7 +154,11 @@ class YahooFinanceDataClient:
             csv_text = response.text
             self.cache.set(cache_key, csv_text)
 
-        data = pd.read_csv(io.StringIO(csv_text), parse_dates=["Date"]).set_index("Date").sort_index()
+        data = (
+            pd.read_csv(io.StringIO(csv_text), parse_dates=["Date"])
+            .set_index("Date")
+            .sort_index()
+        )
         required_columns = {"Open", "High", "Low", "Close", "Volume"}
         missing = required_columns.difference(set(data.columns))
         if missing:

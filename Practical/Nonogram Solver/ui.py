@@ -1,4 +1,5 @@
 """Entry point for the Nonogram GUI."""
+
 from __future__ import annotations
 
 import sys

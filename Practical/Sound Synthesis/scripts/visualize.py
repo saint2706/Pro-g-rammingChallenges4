@@ -1,4 +1,5 @@
 """Waveform visualisation utility for the sound synthesis engine."""
+
 from __future__ import annotations
 
 import argparse
@@ -27,14 +28,26 @@ PRESETS_DIR = pathlib.Path(__file__).resolve().parents[1] / "presets"
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--preset", default="ambient_pad", help="Preset name (defaults to ambient_pad)")
     parser.add_argument(
-        "--output", type=pathlib.Path, default=pathlib.Path("waveform.png"), help="Output PNG path"
+        "--preset", default="ambient_pad", help="Preset name (defaults to ambient_pad)"
     )
-    parser.add_argument("--duration", type=float, default=4.0, help="Duration in seconds")
-    parser.add_argument("--root-note", type=int, default=60, help="Root MIDI note for demo sequence")
     parser.add_argument(
-        "--sample-rate", type=int, default=DEFAULT_SAMPLE_RATE, help="Sample rate for rendering"
+        "--output",
+        type=pathlib.Path,
+        default=pathlib.Path("waveform.png"),
+        help="Output PNG path",
+    )
+    parser.add_argument(
+        "--duration", type=float, default=4.0, help="Duration in seconds"
+    )
+    parser.add_argument(
+        "--root-note", type=int, default=60, help="Root MIDI note for demo sequence"
+    )
+    parser.add_argument(
+        "--sample-rate",
+        type=int,
+        default=DEFAULT_SAMPLE_RATE,
+        help="Sample rate for rendering",
     )
     return parser.parse_args()
 
@@ -51,7 +64,9 @@ def main() -> None:
     args = parse_args()
     preset = load_preset(args.preset)
     sequence = create_demo_sequence(args.root_note)
-    audio, amplitude = render_waveform_preview(preset, sequence, args.duration, args.sample_rate)
+    audio, amplitude = render_waveform_preview(
+        preset, sequence, args.duration, args.sample_rate
+    )
     t = np.linspace(0, args.duration, audio.size)
 
     fig, ax = plt.subplots(2, 1, figsize=(10, 6), sharex=True)

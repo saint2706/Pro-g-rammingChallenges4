@@ -67,9 +67,15 @@ def build_database(args: argparse.Namespace) -> None:
         track_id = entry.get("track_id") or file_path.stem
         title = entry.get("title") or track_id
         artist = entry.get("artist") or ""
-        extra = {key: str(value) for key, value in entry.items() if key not in {"track_id", "path", "title", "artist"}}
+        extra = {
+            key: str(value)
+            for key, value in entry.items()
+            if key not in {"track_id", "path", "title", "artist"}
+        }
         print(f"Fingerprinting {track_id} ({file_path})...")
-        database.ingest_file(file_path, track_id=track_id, title=title, artist=artist, extra=extra)
+        database.ingest_file(
+            file_path, track_id=track_id, title=title, artist=artist, extra=extra
+        )
 
     output_path = Path(args.output)
     output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -80,9 +86,18 @@ def build_database(args: argparse.Namespace) -> None:
 def parse_args(argv: List[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     input_group = parser.add_mutually_exclusive_group(required=True)
-    input_group.add_argument("--audio-dir", type=str, help="Directory to recursively scan for audio files")
-    input_group.add_argument("--manifest", type=str, help="JSON manifest listing tracks to fingerprint")
-    parser.add_argument("--output", type=str, required=True, help="Destination gzip JSON path for the fingerprint database")
+    input_group.add_argument(
+        "--audio-dir", type=str, help="Directory to recursively scan for audio files"
+    )
+    input_group.add_argument(
+        "--manifest", type=str, help="JSON manifest listing tracks to fingerprint"
+    )
+    parser.add_argument(
+        "--output",
+        type=str,
+        required=True,
+        help="Destination gzip JSON path for the fingerprint database",
+    )
     parser.add_argument("--sample-rate", type=int, default=22_050)
     parser.add_argument("--n-fft", type=int, default=4_096)
     parser.add_argument("--hop-length", type=int, default=512)

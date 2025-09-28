@@ -1,4 +1,5 @@
 """Real-time multi-band equalizer for WAV files."""
+
 from __future__ import annotations
 
 import argparse
@@ -86,7 +87,9 @@ class RealTimeEqualizer:
         self._gains_db = np.zeros(len(BANDS), dtype=np.float32)
         if preset is not None:
             self.set_all_gains(preset)
-        self.visual_queue: queue.Queue[Tuple[np.ndarray, np.ndarray]] = queue.Queue(maxsize=4)
+        self.visual_queue: queue.Queue[Tuple[np.ndarray, np.ndarray]] = queue.Queue(
+            maxsize=4
+        )
         self._stream: sd.OutputStream | None = None
         self._finished = threading.Event()
 
@@ -254,9 +257,13 @@ class EqualizerApp:
 
         button_frame = ttk.Frame(controls)
         button_frame.pack(pady=10)
-        self.start_button = ttk.Button(button_frame, text="Start", command=self._start_playback)
+        self.start_button = ttk.Button(
+            button_frame, text="Start", command=self._start_playback
+        )
         self.start_button.grid(row=0, column=0, padx=5)
-        ttk.Button(button_frame, text="Stop", command=self._stop_playback).grid(row=0, column=1, padx=5)
+        ttk.Button(button_frame, text="Stop", command=self._stop_playback).grid(
+            row=0, column=1, padx=5
+        )
 
         latency = self.pipeline.latency_status()
         self.latency_label = ttk.Label(controls, text=latency.warning_text())
@@ -273,7 +280,7 @@ class EqualizerApp:
         self.ax.set_xscale("log")
         self.ax.set_xlim(20, self.pipeline.samplerate / 2)
         self.ax.set_ylim(-80, 10)
-        self.line, = self.ax.plot([], [], color="tab:blue")
+        (self.line,) = self.ax.plot([], [], color="tab:blue")
         canvas = FigureCanvasTkAgg(figure, master=top)
         canvas.draw()
         canvas.get_tk_widget().pack(side=tk.RIGHT, fill=tk.BOTH, expand=True)

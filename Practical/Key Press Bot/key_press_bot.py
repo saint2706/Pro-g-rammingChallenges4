@@ -1,4 +1,5 @@
 """CLI entry point for the Key Press Bot automation toolkit."""
+
 from __future__ import annotations
 
 import argparse
@@ -55,7 +56,14 @@ class SequenceStep:
         seconds = float(payload.get("seconds", payload.get("delay", 0.0)))
         hold = float(payload.get("hold", 0.1))
         delay_after = float(payload.get("delay_after", payload.get("after", 0.0)))
-        return cls(action=action, keys=keys, text=text, seconds=seconds, hold=hold, delay_after=delay_after)
+        return cls(
+            action=action,
+            keys=keys,
+            text=text,
+            seconds=seconds,
+            hold=hold,
+            delay_after=delay_after,
+        )
 
     def to_dict(self) -> Dict[str, Any]:
         data: Dict[str, Any] = {
@@ -82,7 +90,11 @@ class RecordedEvent:
 
     @classmethod
     def from_dict(cls, payload: Dict[str, Any]) -> "RecordedEvent":
-        return cls(timestamp=float(payload["timestamp"]), event=str(payload["event"]), key=str(payload["key"]))
+        return cls(
+            timestamp=float(payload["timestamp"]),
+            event=str(payload["event"]),
+            key=str(payload["key"]),
+        )
 
     def to_dict(self) -> Dict[str, Any]:
         return {"timestamp": self.timestamp, "event": self.event, "key": self.key}
@@ -114,7 +126,10 @@ def load_script(path: Path) -> Script:
         return Script(mode=mode, name=name, metadata=metadata, sequence_steps=steps)
 
     if mode == "recording":
-        events = [RecordedEvent.from_dict(item) for item in data.get("events", data.get("steps", []))]
+        events = [
+            RecordedEvent.from_dict(item)
+            for item in data.get("events", data.get("steps", []))
+        ]
         return Script(mode=mode, name=name, metadata=metadata, recorded_events=events)
 
     raise ValueError(f"Unsupported script mode: {mode}")
@@ -231,13 +246,17 @@ class KeyPressBot:
         self.controller = controller or kb.Controller()
         self.typist = typist or _require_pyautogui()
 
-    def play(self, script: Script, stop_event: Optional[threading.Event] = None) -> None:
+    def play(
+        self, script: Script, stop_event: Optional[threading.Event] = None
+    ) -> None:
         if script.is_recording:
             self._play_recorded(script.recorded_events, stop_event)
         else:
             self._play_sequence(script.sequence_steps, stop_event)
 
-    def _play_sequence(self, steps: Iterable[SequenceStep], stop_event: Optional[threading.Event]) -> None:
+    def _play_sequence(
+        self, steps: Iterable[SequenceStep], stop_event: Optional[threading.Event]
+    ) -> None:
         for step in steps:
             if _should_stop(stop_event):
                 break
@@ -264,7 +283,9 @@ class KeyPressBot:
             if step.delay_after and not _should_stop(stop_event):
                 _sleep(step.delay_after, stop_event)
 
-    def _play_recorded(self, events: Iterable[RecordedEvent], stop_event: Optional[threading.Event]) -> None:
+    def _play_recorded(
+        self, events: Iterable[RecordedEvent], stop_event: Optional[threading.Event]
+    ) -> None:
         last_timestamp = 0.0
         for event in events:
             if _should_stop(stop_event):
@@ -323,7 +344,11 @@ class KeyRecorder:
             now = time.time()
             if start_time is None:
                 start_time = now
-            events.append(RecordedEvent(timestamp=now - start_time, event="press", key=serialise_key(key)))
+            events.append(
+                RecordedEvent(
+                    timestamp=now - start_time, event="press", key=serialise_key(key)
+                )
+            )
 
         def on_release(key: Any) -> None:
             nonlocal start_time
@@ -332,14 +357,19 @@ class KeyRecorder:
             if start_time is None:
                 return
             now = time.time()
-            events.append(RecordedEvent(timestamp=now - start_time, event="release", key=serialise_key(key)))
+            events.append(
+                RecordedEvent(
+                    timestamp=now - start_time, event="release", key=serialise_key(key)
+                )
+            )
 
         def stop_listener() -> None:
             self._stop_event.set()
 
-        with kb.Listener(on_press=on_press, on_release=on_release) as listener, kb.GlobalHotKeys(
-            {self.stop_hotkey: stop_listener}
-        ) as hotkeys:
+        with (
+            kb.Listener(on_press=on_press, on_release=on_release) as listener,
+            kb.GlobalHotKeys({self.stop_hotkey: stop_listener}) as hotkeys,
+        ):
             while not self._stop_event.is_set():
                 time.sleep(0.05)
 
@@ -350,7 +380,9 @@ class KeyRecorder:
         return filtered
 
 
-def _trim_stop_combination(events: List[RecordedEvent], combo: str) -> List[RecordedEvent]:
+def _trim_stop_combination(
+    events: List[RecordedEvent], combo: str
+) -> List[RecordedEvent]:
     combo_keys = set(_normalise_hotkey(combo))
     trimmed = list(events)
     while trimmed and trimmed[-1].key in combo_keys:
@@ -399,7 +431,9 @@ class HotkeyPlayback:
         if self._thread and self._thread.is_alive():
             return
         self._stop_event.clear()
-        self._thread = threading.Thread(target=self._playback, name="KeyPressBotPlayback", daemon=True)
+        self._thread = threading.Thread(
+            target=self._playback, name="KeyPressBotPlayback", daemon=True
+        )
         self._thread.start()
 
     def _playback(self) -> None:
@@ -412,7 +446,11 @@ class HotkeyPlayback:
         self._stop_event.set()
 
 
-def save_recording(events: Iterable[RecordedEvent], path: Path, metadata: Optional[Dict[str, Any]] = None) -> None:
+def save_recording(
+    events: Iterable[RecordedEvent],
+    path: Path,
+    metadata: Optional[Dict[str, Any]] = None,
+) -> None:
     payload = {
         "mode": "recording",
         "meta": metadata or {},
@@ -422,14 +460,38 @@ def save_recording(events: Iterable[RecordedEvent], path: Path, metadata: Option
 
 
 def build_arg_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Keyboard automation toolkit with recording and scripting support.")
-    parser.add_argument("--script", type=Path, help="Path to a JSON script to execute", default=None)
-    parser.add_argument("--record", type=Path, help="Record keystrokes to this JSON file", default=None)
-    parser.add_argument("--play", type=Path, help="Play back a recording JSON file", default=None)
-    parser.add_argument("--watch-hotkeys", action="store_true", help="Listen for global hotkeys to start/stop playback")
-    parser.add_argument("--start-hotkey", default=DEFAULT_PLAY_START, help="Override the playback start hotkey")
-    parser.add_argument("--stop-hotkey", default=DEFAULT_PLAY_STOP, help="Override the playback stop hotkey")
-    parser.add_argument("--record-stop-hotkey", default=DEFAULT_RECORD_STOP, help="Hotkey to stop a recording session")
+    parser = argparse.ArgumentParser(
+        description="Keyboard automation toolkit with recording and scripting support."
+    )
+    parser.add_argument(
+        "--script", type=Path, help="Path to a JSON script to execute", default=None
+    )
+    parser.add_argument(
+        "--record", type=Path, help="Record keystrokes to this JSON file", default=None
+    )
+    parser.add_argument(
+        "--play", type=Path, help="Play back a recording JSON file", default=None
+    )
+    parser.add_argument(
+        "--watch-hotkeys",
+        action="store_true",
+        help="Listen for global hotkeys to start/stop playback",
+    )
+    parser.add_argument(
+        "--start-hotkey",
+        default=DEFAULT_PLAY_START,
+        help="Override the playback start hotkey",
+    )
+    parser.add_argument(
+        "--stop-hotkey",
+        default=DEFAULT_PLAY_STOP,
+        help="Override the playback stop hotkey",
+    )
+    parser.add_argument(
+        "--record-stop-hotkey",
+        default=DEFAULT_RECORD_STOP,
+        help="Hotkey to stop a recording session",
+    )
     return parser
 
 
@@ -458,7 +520,12 @@ def main(argv: Optional[List[str]] = None) -> None:
     if args.play:
         script = load_script(args.play)
         if args.watch_hotkeys:
-            runner = HotkeyPlayback(bot, script, start_hotkey=args.start_hotkey, stop_hotkey=args.stop_hotkey)
+            runner = HotkeyPlayback(
+                bot,
+                script,
+                start_hotkey=args.start_hotkey,
+                stop_hotkey=args.stop_hotkey,
+            )
             print("Listening for hotkeys. Press Ctrl+C to exit.")
             try:
                 runner.run()

@@ -1,0 +1,30 @@
+[
+  {
+    "name": "Grenade",
+    "explosion_radius": 45.0,
+    "base_damage": 35.0,
+    "projectile_speed": 85.0,
+    "splash_falloff": 0.6
+  },
+  {
+    "name": "Heavy Rocket",
+    "explosion_radius": 60.0,
+    "base_damage": 50.0,
+    "projectile_speed": 95.0,
+    "splash_falloff": 0.5
+  },
+  {
+    "name": "Cluster",
+    "explosion_radius": 35.0,
+    "base_damage": 20.0,
+    "projectile_speed": 90.0,
+    "splash_falloff": 0.4
+  },
+  {
+    "name": "Nuke",
+    "explosion_radius": 85.0,
+    "base_damage": 80.0,
+    "projectile_speed": 80.0,
+    "splash_falloff": 0.7
+  }
+]

@@ -1,4 +1,5 @@
 """Command line interface for the Torrent Client."""
+
 from __future__ import annotations
 
 import argparse
@@ -11,7 +12,9 @@ from torrent_client import TorrentClient, load_torrent
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Minimal BitTorrent client (single-file)")
+    parser = argparse.ArgumentParser(
+        description="Minimal BitTorrent client (single-file)"
+    )
     parser.add_argument("torrent", type=Path, help="Path to the .torrent file")
     parser.add_argument(
         "--output",
@@ -19,9 +22,14 @@ def build_parser() -> argparse.ArgumentParser:
         default=Path("downloads"),
         help="Directory where the downloaded file will be placed",
     )
-    parser.add_argument("--port", type=int, default=6881, help="Port used for tracker announces")
     parser.add_argument(
-        "--no-resume", dest="resume", action="store_false", help="Ignore resume data and re-download"
+        "--port", type=int, default=6881, help="Port used for tracker announces"
+    )
+    parser.add_argument(
+        "--no-resume",
+        dest="resume",
+        action="store_false",
+        help="Ignore resume data and re-download",
     )
     parser.add_argument("--verbose", action="store_true", help="Enable debug logging")
     return parser
@@ -37,11 +45,16 @@ def main(argv: list[str] | None = None) -> int:
     )
 
     metainfo = load_torrent(args.torrent)
-    client = TorrentClient(metainfo=metainfo, download_dir=args.output, resume=args.resume, port=args.port)
+    client = TorrentClient(
+        metainfo=metainfo, download_dir=args.output, resume=args.resume, port=args.port
+    )
 
     total_pieces = client.piece_manager.total_pieces
     initial = client.piece_manager.completed_count
-    with tqdm(total=total_pieces, initial=initial, unit="piece", desc=metainfo.name) as bar:
+    with tqdm(
+        total=total_pieces, initial=initial, unit="piece", desc=metainfo.name
+    ) as bar:
+
         def update(completed: int, total: int) -> None:
             bar.total = total
             bar.n = completed

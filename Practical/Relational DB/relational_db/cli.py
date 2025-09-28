@@ -33,7 +33,9 @@ def _format_result(result: Dict[str, Any]) -> str:
         body_lines = []
         for row in rows:
             body_lines.append(
-                " | ".join(str(value).ljust(widths[idx]) for idx, value in enumerate(row))
+                " | ".join(
+                    str(value).ljust(widths[idx]) for idx, value in enumerate(row)
+                )
             )
         return "\n".join([header, separator, *body_lines])
     return str(result)

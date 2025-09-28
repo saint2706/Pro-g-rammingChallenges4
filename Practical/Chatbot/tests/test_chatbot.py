@@ -28,17 +28,15 @@ save_history = chatbot.save_history
 @pytest.fixture()
 def sample_rules() -> RuleSet:
     rules = RuleSet(
-        responses={
-            "hello": ["Hi", "Greetings"],
-            "bye": ["Bye"],
-            "default": ["..."]
-        }
+        responses={"hello": ["Hi", "Greetings"], "bye": ["Bye"], "default": ["..."]}
     )
     rules.ensure_default()
     return rules
 
 
-def test_history_persistence_across_sessions(tmp_path: Path, sample_rules: RuleSet) -> None:
+def test_history_persistence_across_sessions(
+    tmp_path: Path, sample_rules: RuleSet
+) -> None:
     history_path = tmp_path / "history.json"
 
     random.seed(123)

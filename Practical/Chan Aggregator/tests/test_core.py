@@ -50,15 +50,33 @@ class ChanAggregatorTests(unittest.TestCase):
         payload_a = [
             {
                 "threads": [
-                    {"no": 1, "sub": "Tech thread", "com": "Discussion", "replies": 10, "last_modified": 1700000000},
-                    {"no": 2, "sub": "Offtopic", "com": "Random", "replies": 1, "last_modified": 1600000000},
+                    {
+                        "no": 1,
+                        "sub": "Tech thread",
+                        "com": "Discussion",
+                        "replies": 10,
+                        "last_modified": 1700000000,
+                    },
+                    {
+                        "no": 2,
+                        "sub": "Offtopic",
+                        "com": "Random",
+                        "replies": 1,
+                        "last_modified": 1600000000,
+                    },
                 ]
             }
         ]
         payload_b = [
             {
                 "threads": [
-                    {"no": 3, "sub": "History of Python", "com": "Python origins", "replies": 4, "last_modified": 1800000000}
+                    {
+                        "no": 3,
+                        "sub": "History of Python",
+                        "com": "Python origins",
+                        "replies": 4,
+                        "last_modified": 1800000000,
+                    }
                 ]
             }
         ]
@@ -75,7 +93,11 @@ class ChanAggregatorTests(unittest.TestCase):
     def test_caching_prevents_duplicate_requests(self):
         session = mock.Mock()
         payload = [
-            {"threads": [{"no": 1, "sub": "One", "replies": 0, "last_modified": 1500000000}]}
+            {
+                "threads": [
+                    {"no": 1, "sub": "One", "replies": 0, "last_modified": 1500000000}
+                ]
+            }
         ]
         session.get.return_value = DummyResponse(payload)
         aggregator = ChanAggregator([self.board_a], session=session)
@@ -90,12 +112,14 @@ class ChanAggregatorTests(unittest.TestCase):
 
 class CLITests(unittest.TestCase):
     def test_main_outputs_json(self):
-        boards = [BoardConfig(
-            board_id="a",
-            title="Board A",
-            catalog_url="https://example.com/a/catalog.json",
-            thread_url="https://example.com/a/thread/{thread}.json",
-        )]
+        boards = [
+            BoardConfig(
+                board_id="a",
+                title="Board A",
+                catalog_url="https://example.com/a/catalog.json",
+                thread_url="https://example.com/a/thread/{thread}.json",
+            )
+        ]
         fake_threads = [
             AggregatedThread(
                 board="a",
@@ -107,9 +131,10 @@ class CLITests(unittest.TestCase):
                 last_modified=datetime.fromtimestamp(1700000000, tz=timezone.utc),
             )
         ]
-        with mock.patch.object(ui, "load_configs_from_args", return_value=boards), mock.patch.object(
-            ui, "ChanAggregator"
-        ) as aggregator_class:
+        with (
+            mock.patch.object(ui, "load_configs_from_args", return_value=boards),
+            mock.patch.object(ui, "ChanAggregator") as aggregator_class,
+        ):
             aggregator_instance = aggregator_class.return_value
             aggregator_instance.aggregate_threads.return_value = fake_threads
             buf = io.StringIO()

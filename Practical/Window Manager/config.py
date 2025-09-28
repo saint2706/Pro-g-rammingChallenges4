@@ -1,4 +1,5 @@
 """Configuration for the lightweight tiling window manager."""
+
 from dataclasses import dataclass
 from typing import Sequence, Tuple
 

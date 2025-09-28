@@ -56,39 +56,70 @@ class FingerprintExtractor:
     def __init__(self, config: FingerprintConfig | None = None) -> None:
         self.config = config or FingerprintConfig()
         rng = np.random.default_rng(self.config.minhash_seed)
-        self._minhash_seeds = rng.integers(low=1, high=np.iinfo(np.uint64).max, size=self.config.minhash_size, dtype=np.uint64)
+        self._minhash_seeds = rng.integers(
+            low=1,
+            high=np.iinfo(np.uint64).max,
+            size=self.config.minhash_size,
+            dtype=np.uint64,
+        )
 
     # ------------------------------------------------------------------
     # Loading / preprocessing
     # ------------------------------------------------------------------
-    def load_audio(self, path: str, *, duration: float | None = None, offset: float = 0.0) -> Tuple[np.ndarray, int]:
+    def load_audio(
+        self, path: str, *, duration: float | None = None, offset: float = 0.0
+    ) -> Tuple[np.ndarray, int]:
         """Load audio from disk, returning mono samples and the sampling rate."""
 
-        audio, sr = librosa.load(path, sr=self.config.sample_rate, mono=True, duration=duration, offset=offset)
+        audio, sr = librosa.load(
+            path,
+            sr=self.config.sample_rate,
+            mono=True,
+            duration=duration,
+            offset=offset,
+        )
         return audio, sr
 
-    def compute_spectrogram(self, audio: np.ndarray, sr: int) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+    def compute_spectrogram(
+        self, audio: np.ndarray, sr: int
+    ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
         """Compute a magnitude spectrogram in decibel scale."""
 
-        stft = librosa.stft(audio, n_fft=self.config.n_fft, hop_length=self.config.hop_length, window="hann")
+        stft = librosa.stft(
+            audio,
+            n_fft=self.config.n_fft,
+            hop_length=self.config.hop_length,
+            window="hann",
+        )
         magnitude = np.abs(stft)
         db = librosa.amplitude_to_db(magnitude, ref=np.max)
         freqs = librosa.fft_frequencies(sr=sr, n_fft=self.config.n_fft)
-        times = librosa.frames_to_time(np.arange(db.shape[1]), sr=sr, hop_length=self.config.hop_length)
+        times = librosa.frames_to_time(
+            np.arange(db.shape[1]), sr=sr, hop_length=self.config.hop_length
+        )
         return db, freqs, times
 
     # ------------------------------------------------------------------
     # Peak detection
     # ------------------------------------------------------------------
-    def find_peaks(self, spectrogram_db: np.ndarray, freqs: np.ndarray, times: np.ndarray) -> List[SpectralPeak]:
+    def find_peaks(
+        self, spectrogram_db: np.ndarray, freqs: np.ndarray, times: np.ndarray
+    ) -> List[SpectralPeak]:
         """Return the list of local maxima above the amplitude threshold."""
 
-        neighborhood_size = (self.config.peak_neighborhood_freq, self.config.peak_neighborhood_time)
+        neighborhood_size = (
+            self.config.peak_neighborhood_freq,
+            self.config.peak_neighborhood_time,
+        )
         footprint = np.ones(neighborhood_size, dtype=bool)
-        local_max = maximum_filter(spectrogram_db, footprint=footprint) == spectrogram_db
+        local_max = (
+            maximum_filter(spectrogram_db, footprint=footprint) == spectrogram_db
+        )
 
         background = spectrogram_db < self.config.amplitude_threshold
-        eroded_background = binary_erosion(background, structure=footprint, border_value=1)
+        eroded_background = binary_erosion(
+            background, structure=footprint, border_value=1
+        )
         detected = local_max & ~eroded_background
 
         peak_indices = np.argwhere(detected)
@@ -135,7 +166,11 @@ class FingerprintExtractor:
     def minhash_signature(self, fingerprint_hashes: Iterable[int]) -> List[int]:
         """Compute a MinHash signature for a collection of fingerprint hashes."""
 
-        signature = np.full(shape=self.config.minhash_size, fill_value=np.iinfo(np.uint64).max, dtype=np.uint64)
+        signature = np.full(
+            shape=self.config.minhash_size,
+            fill_value=np.iinfo(np.uint64).max,
+            dtype=np.uint64,
+        )
         for fp_hash in fingerprint_hashes:
             value = np.uint64(fp_hash)
             for idx, seed in enumerate(self._minhash_seeds):
@@ -153,7 +188,9 @@ class FingerprintExtractor:
         buffer = io.BytesIO()
         dtype = np.dtype([("hash", np.uint64), ("time", np.float32)])
         with gzip.GzipFile(fileobj=buffer, mode="wb") as gz_file:
-            array = np.array([(fp.hash, fp.time_offset) for fp in fingerprints], dtype=dtype)
+            array = np.array(
+                [(fp.hash, fp.time_offset) for fp in fingerprints], dtype=dtype
+            )
             gz_file.write(array.tobytes())
         return buffer.getvalue()
 
@@ -164,7 +201,10 @@ class FingerprintExtractor:
         with gzip.GzipFile(fileobj=io.BytesIO(payload), mode="rb") as gz_file:
             data = gz_file.read()
         array = np.frombuffer(data, dtype=dtype)
-        return [Fingerprint(hash=int(item["hash"]), time_offset=float(item["time"])) for item in array]
+        return [
+            Fingerprint(hash=int(item["hash"]), time_offset=float(item["time"]))
+            for item in array
+        ]
 
 
 __all__ = [

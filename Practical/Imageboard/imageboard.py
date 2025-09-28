@@ -65,7 +65,9 @@ def _split_allowed_ext(raw: str) -> frozenset[str]:
 
 def load_config() -> Config:
     root = Path(__file__).parent.resolve()
-    data_dir = Path(os.getenv("IMAGEBOARD_DATA_DIR", root / "data")).expanduser().resolve()
+    data_dir = (
+        Path(os.getenv("IMAGEBOARD_DATA_DIR", root / "data")).expanduser().resolve()
+    )
     allowed = _split_allowed_ext(
         os.getenv("IMAGEBOARD_ALLOWED_EXT", "jpg,jpeg,png,gif,webp")
     )
@@ -78,7 +80,9 @@ def load_config() -> Config:
         password_hash = generate_password_hash(admin_password)
     return Config(
         data_dir=data_dir,
-        allowed_ext=allowed if allowed else frozenset({"jpg", "jpeg", "png", "gif", "webp"}),
+        allowed_ext=(
+            allowed if allowed else frozenset({"jpg", "jpeg", "png", "gif", "webp"})
+        ),
         thumb_size=(200, 200),
         rate_limit_window=8,
         max_message_len=2000,
@@ -102,6 +106,7 @@ def _safe_url(candidate: Optional[str], fallback: str) -> str:
     if candidate and candidate.startswith("/") and not candidate.startswith("//"):
         return candidate
     return fallback
+
 
 # Ensure directories exist (idempotent)
 for d in (CFG.data_dir, UPLOAD_DIR, THUMB_DIR):
@@ -467,8 +472,9 @@ def admin_login():
         ):
             session[ADMIN_SESSION_KEY] = True
             flash("Logged in as administrator.", "info")
-            next_url = _safe_url(request.args.get("next") or request.form.get("next"), 
-                                 url_for("index"))
+            next_url = _safe_url(
+                request.args.get("next") or request.form.get("next"), url_for("index")
+            )
             return redirect(next_url)
         flash("Invalid credentials.", "error")
     return render_template("admin_login.html")

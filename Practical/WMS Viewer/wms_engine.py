@@ -4,6 +4,7 @@ This module handles configuration loading, map-view math, disk caching, and
 issuing OGC WMS `GetMap` requests.  The GUI layer (Tkinter, PyQt, etc.) can
 remain thin by delegating the heavy lifting here.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -91,7 +92,9 @@ def load_config(path: Path) -> AppConfig:
     for server_raw in data["servers"]:
         layers_raw = server_raw.get("layers", [])
         if not layers_raw:
-            raise ConfigError(f"Server '{server_raw.get('name', 'Unnamed')}' has no layers")
+            raise ConfigError(
+                f"Server '{server_raw.get('name', 'Unnamed')}' has no layers"
+            )
         layers = [
             LayerConfig(
                 name=layer_raw["name"],
@@ -181,7 +184,7 @@ class MapViewState:
 
     @property
     def resolution(self) -> float:
-        return BASE_RESOLUTION / (2 ** self.zoom)
+        return BASE_RESOLUTION / (2**self.zoom)
 
     def pan_pixels(self, dx: float, dy: float) -> None:
         res = self.resolution
@@ -228,7 +231,9 @@ class WMSCache:
         self.cache_dir.mkdir(parents=True, exist_ok=True)
 
     def _key_to_path(self, key: Dict[str, object]) -> Path:
-        digest = hashlib.sha1(json.dumps(key, sort_keys=True).encode("utf-8")).hexdigest()
+        digest = hashlib.sha1(
+            json.dumps(key, sort_keys=True).encode("utf-8")
+        ).hexdigest()
         extension = str(key.get("format", "image/png")).split("/")[-1]
         subdir = self.cache_dir / digest[:2] / digest[2:4]
         subdir.mkdir(parents=True, exist_ok=True)

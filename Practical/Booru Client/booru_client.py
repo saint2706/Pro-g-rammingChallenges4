@@ -1,4 +1,5 @@
 """Unified Booru API client with caching and rate limiting."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -159,7 +160,9 @@ class BooruClient:
     ) -> None:
         booru_key = booru.lower()
         if booru_key not in self._CONFIGS:
-            raise ValueError(f"Unsupported booru '{booru}'. Configure it in BooruClient._CONFIGS")
+            raise ValueError(
+                f"Unsupported booru '{booru}'. Configure it in BooruClient._CONFIGS"
+            )
         self.config = self._CONFIGS[booru_key]
         self.base_url = self.config["base_url"].rstrip("/")
         self.session = session or requests.Session()
@@ -217,7 +220,9 @@ class BooruClient:
             return [Post(**item) for item in cached["posts"]]
 
         params = self._build_query_params(query_tags, limit, page, extra_filters)
-        data = self._request_json("GET", self._build_url(self.config["search_endpoint"]), params)
+        data = self._request_json(
+            "GET", self._build_url(self.config["search_endpoint"]), params
+        )
         posts = self._normalise_posts(data)
 
         if use_cache:
@@ -256,7 +261,8 @@ class BooruClient:
                         id=int(item.get("id")),
                         rating=str(item.get("rating", "unknown")),
                         tags=self._split_tags(item),
-                        file_url=item.get("file_url") or item.get("file_url".upper(), ""),
+                        file_url=item.get("file_url")
+                        or item.get("file_url".upper(), ""),
                         preview_url=item.get("preview_file_url")
                         or item.get("preview_url")
                         or item.get("preview_url".upper()),
@@ -278,7 +284,9 @@ class BooruClient:
 
     # ------------------------------- Posts ---------------------------------
     def get_post(self, post_id: int, use_cache: bool = True) -> Optional[Post]:
-        cache_key = json.dumps({"action": "post", "id": post_id, "booru": self.base_url})
+        cache_key = json.dumps(
+            {"action": "post", "id": post_id, "booru": self.base_url}
+        )
         if use_cache and (cached := self.cache.get(cache_key)) is not None:
             return Post(**cached["post"])
 
@@ -286,7 +294,9 @@ class BooruClient:
         qp = self.config["query_params"]
         params[qp.get("limit", "limit")] = "1"
         params["id"] = str(post_id)
-        data = self._request_json("GET", self._build_url(self.config["post_endpoint"]), params)
+        data = self._request_json(
+            "GET", self._build_url(self.config["post_endpoint"]), params
+        )
         posts = self._normalise_posts(data)
         post = posts[0] if posts else None
         if post and use_cache:

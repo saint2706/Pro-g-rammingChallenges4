@@ -1,4 +1,5 @@
 """Core puzzle dataclasses and helpers for Nonogram boards."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -41,7 +42,9 @@ class NonogramPuzzle:
         if self.solution is not None:
             height = len(self.row_clues)
             width = len(self.column_clues)
-            if len(self.solution) != height or any(len(row) != width for row in self.solution):
+            if len(self.solution) != height or any(
+                len(row) != width for row in self.solution
+            ):
                 raise ValueError("Solution shape does not match clues")
 
     @property
@@ -116,7 +119,9 @@ def puzzle_to_json(puzzle: NonogramPuzzle, board: Optional[Board] = None) -> str
         "rows": puzzle.row_clues,
         "columns": puzzle.column_clues,
         "board": board_to_lists(board) if board is not None else None,
-        "solution": board_to_lists(puzzle.solution) if puzzle.solution is not None else None,
+        "solution": (
+            board_to_lists(puzzle.solution) if puzzle.solution is not None else None
+        ),
     }
     return json.dumps(payload, indent=2)
 
@@ -151,7 +156,9 @@ def render_board_to_image(
 ) -> Image.Image:
     """Render the puzzle (and optional player board) to a Pillow image."""
 
-    board = board or (puzzle.solution if puzzle.solution is not None else puzzle.empty_board())
+    board = board or (
+        puzzle.solution if puzzle.solution is not None else puzzle.empty_board()
+    )
     height = puzzle.height
     width = puzzle.width
 
@@ -187,7 +194,9 @@ def render_board_to_image(
         for clue in reversed(display):
             text = str(clue)
             text_width, text_height = measure(text)
-            draw.text((x - text_width, y - text_height // 2), text, fill="black", font=font)
+            draw.text(
+                (x - text_width, y - text_height // 2), text, fill="black", font=font
+            )
             x -= cell_size
 
     for c, clues in enumerate(puzzle.column_clues):
@@ -197,7 +206,9 @@ def render_board_to_image(
         for clue in reversed(display):
             text = str(clue)
             text_width, text_height = measure(text)
-            draw.text((x - text_width // 2, y - text_height), text, fill="black", font=font)
+            draw.text(
+                (x - text_width // 2, y - text_height), text, fill="black", font=font
+            )
             y -= cell_size
 
     # Draw grid

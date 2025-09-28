@@ -1,4 +1,5 @@
 """Torrent metadata loading and minimal bencode parsing utilities."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -33,7 +34,7 @@ def bdecode(data: bytes, index: int = 0) -> Tuple[BValue, int]:
     Returns a tuple of (value, next_index).
     """
 
-    prefix = data[index:index + 1]
+    prefix = data[index : index + 1]
     if not prefix:
         raise BencodeError("Unexpected end of data")
 
@@ -42,14 +43,14 @@ def bdecode(data: bytes, index: int = 0) -> Tuple[BValue, int]:
     if prefix == b"l":
         items: List[BValue] = []
         i = index + 1
-        while data[i:i + 1] != b"e":
+        while data[i : i + 1] != b"e":
             value, i = bdecode(data, i)
             items.append(value)
         return items, i + 1
     if prefix == b"d":
         result: Dict[bytes, BValue] = {}
         i = index + 1
-        while data[i:i + 1] != b"e":
+        while data[i : i + 1] != b"e":
             key, i = bdecode(data, i)
             if not isinstance(key, bytes):
                 raise BencodeError("Dictionary keys must be bytes")
@@ -90,7 +91,7 @@ class TorrentMetaInfo:
         pieces_blob = info.get(b"pieces")
         if not isinstance(pieces_blob, bytes) or len(pieces_blob) % 20:
             raise BencodeError("Pieces blob must be 20 byte aligned")
-        pieces = [pieces_blob[i:i + 20] for i in range(0, len(pieces_blob), 20)]
+        pieces = [pieces_blob[i : i + 20] for i in range(0, len(pieces_blob), 20)]
         piece_length = info.get(b"piece length")
         length = info.get(b"length")
         name = info.get(b"name")

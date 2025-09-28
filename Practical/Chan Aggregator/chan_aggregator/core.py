@@ -55,7 +55,9 @@ class TTLCache:
                 return None
             return value
 
-    def set(self, key: str, value: object, ttl: float, now: Optional[float] = None) -> None:
+    def set(
+        self, key: str, value: object, ttl: float, now: Optional[float] = None
+    ) -> None:
         if now is None:
             now = time.monotonic()
         with self._lock:
@@ -123,13 +125,17 @@ class ChanAggregator:
             return data
         if isinstance(data, dict) and "threads" in data:
             return [data]
-        raise ValueError(f"Unexpected catalog payload for {board.board_id}: {type(data)!r}")
+        raise ValueError(
+            f"Unexpected catalog payload for {board.board_id}: {type(data)!r}"
+        )
 
     def fetch_thread(self, board: BoardConfig, thread_id: int) -> Dict[str, object]:
         data = self._request_json(board.thread_endpoint(thread_id), board)
         if isinstance(data, dict):
             return data
-        raise ValueError(f"Unexpected thread payload for {board.board_id}: {type(data)!r}")
+        raise ValueError(
+            f"Unexpected thread payload for {board.board_id}: {type(data)!r}"
+        )
 
     def aggregate_threads(
         self,
@@ -173,7 +179,9 @@ class ChanAggregator:
         requested = {b.strip() for b in board_ids if b.strip()}
         return [board for board in self.boards if board.board_id in requested]
 
-    def _normalise_thread(self, board: BoardConfig, thread: Dict[str, object]) -> Optional[AggregatedThread]:
+    def _normalise_thread(
+        self, board: BoardConfig, thread: Dict[str, object]
+    ) -> Optional[AggregatedThread]:
         try:
             thread_id = int(thread.get("no") or thread.get("num"))
         except (TypeError, ValueError):
@@ -185,10 +193,7 @@ class ChanAggregator:
             or "(no subject)"
         )
         excerpt = str(
-            thread.get("com")
-            or thread.get("comment")
-            or thread.get("teaser")
-            or ""
+            thread.get("com") or thread.get("comment") or thread.get("teaser") or ""
         )
         replies = _safe_int(
             thread.get("replies")

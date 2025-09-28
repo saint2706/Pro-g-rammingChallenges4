@@ -1,4 +1,5 @@
 """Simple Tkinter GUI for the ID3 Reader."""
+
 from __future__ import annotations
 
 import importlib.util
@@ -36,7 +37,9 @@ class ID3ReaderApp(tk.Tk):
         open_btn = tk.Button(toolbar, text="Open File…", command=self.open_file)
         open_btn.pack(side=tk.LEFT, padx=(0, 6))
 
-        export_json_btn = tk.Button(toolbar, text="Export JSON", command=self.export_json)
+        export_json_btn = tk.Button(
+            toolbar, text="Export JSON", command=self.export_json
+        )
         export_json_btn.pack(side=tk.LEFT, padx=(0, 6))
 
         export_csv_btn = tk.Button(toolbar, text="Export CSV", command=self.export_csv)
@@ -68,7 +71,9 @@ class ID3ReaderApp(tk.Tk):
         if not self._ensure_metadata():
             return
         output_path = filedialog.asksaveasfilename(
-            title="Export JSON", defaultextension=".json", filetypes=(("JSON", "*.json"),)
+            title="Export JSON",
+            defaultextension=".json",
+            filetypes=(("JSON", "*.json"),),
         )
         if not output_path:
             return
@@ -90,7 +95,9 @@ class ID3ReaderApp(tk.Tk):
         self.tree.delete(*self.tree.get_children())
 
         root_id = self.tree.insert("", tk.END, text=Path(metadata.file_path).name)
-        versions_id = self.tree.insert(root_id, tk.END, text=f"Versions: {', '.join(metadata.versions)}")
+        versions_id = self.tree.insert(
+            root_id, tk.END, text=f"Versions: {', '.join(metadata.versions)}"
+        )
         self.tree.item(root_id, open=True)
         self.tree.item(versions_id, open=True)
 

@@ -3,6 +3,7 @@
 The buffer is independent from the UI layer so it can be tested
 and reused for other frontends.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -110,7 +111,9 @@ class TextBuffer:
         if text == "":
             return
         line = self.lines[self.cursor.row]
-        self.lines[self.cursor.row] = line[: self.cursor.col] + text + line[self.cursor.col :]
+        self.lines[self.cursor.row] = (
+            line[: self.cursor.col] + text + line[self.cursor.col :]
+        )
         self.cursor.col += len(text)
         self.dirty = True
 
@@ -126,7 +129,9 @@ class TextBuffer:
     def backspace(self) -> None:
         if self.cursor.col > 0:
             line = self.lines[self.cursor.row]
-            self.lines[self.cursor.row] = line[: self.cursor.col - 1] + line[self.cursor.col :]
+            self.lines[self.cursor.row] = (
+                line[: self.cursor.col - 1] + line[self.cursor.col :]
+            )
             self.cursor.col -= 1
             self.dirty = True
         elif self.cursor.row > 0:
@@ -140,7 +145,9 @@ class TextBuffer:
     def delete(self) -> None:
         line = self.lines[self.cursor.row]
         if self.cursor.col < len(line):
-            self.lines[self.cursor.row] = line[: self.cursor.col] + line[self.cursor.col + 1 :]
+            self.lines[self.cursor.row] = (
+                line[: self.cursor.col] + line[self.cursor.col + 1 :]
+            )
             self.dirty = True
         elif self.cursor.row < len(self.lines) - 1:
             next_line = self.lines.pop(self.cursor.row + 1)
@@ -182,7 +189,13 @@ class TextBuffer:
     # ------------------------------------------------------------------
     # Search & replace
     # ------------------------------------------------------------------
-    def search(self, needle: str, start: Optional[Tuple[int, int]] = None, *, backward: bool = False) -> Optional[Tuple[int, int]]:
+    def search(
+        self,
+        needle: str,
+        start: Optional[Tuple[int, int]] = None,
+        *,
+        backward: bool = False,
+    ) -> Optional[Tuple[int, int]]:
         if not needle:
             return None
         if start is None:
@@ -217,7 +230,9 @@ class TextBuffer:
                 if count is None:
                     new_line, num = line.replace(old, new), line.count(old)
                 else:
-                    new_line, num = self._replace_limited(line, old, new, count - replacements)
+                    new_line, num = self._replace_limited(
+                        line, old, new, count - replacements
+                    )
                 if num:
                     self.lines[i] = new_line
                     replacements += num
@@ -249,7 +264,9 @@ class TextBuffer:
         self.__init__(data, Path(path))
         self.dirty = False
 
-    def save_to_file(self, path: Optional[Path] = None, encoding: str = "utf-8") -> None:
+    def save_to_file(
+        self, path: Optional[Path] = None, encoding: str = "utf-8"
+    ) -> None:
         target = Path(path) if path else self.filename
         if target is None:
             raise ValueError("No filename specified for save")

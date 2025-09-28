@@ -6,6 +6,7 @@ Usage::
 The server exposes a JSON API for playlist management and streams audio
 content using chunked HTTP responses suitable for large media files.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -205,7 +206,9 @@ class DiscoveryResponder:
     def start(self) -> None:
         if self._thread and self._thread.is_alive():
             return
-        self._thread = threading.Thread(target=self._serve, name="discovery", daemon=True)
+        self._thread = threading.Thread(
+            target=self._serve, name="discovery", daemon=True
+        )
         self._thread.start()
 
     def stop(self) -> None:
@@ -330,10 +333,21 @@ def create_app(playlist: PlaylistManager) -> Flask:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Audio streaming server")
-    parser.add_argument("--media", type=Path, default=Path("media"), help="Directory containing audio files")
-    parser.add_argument("--host", default="0.0.0.0", help="Host/interface to bind the HTTP server")
-    parser.add_argument("--port", type=int, default=8000, help="Port for the HTTP server")
-    parser.add_argument("--discovery-port", type=int, default=9999, help="UDP discovery port")
+    parser.add_argument(
+        "--media",
+        type=Path,
+        default=Path("media"),
+        help="Directory containing audio files",
+    )
+    parser.add_argument(
+        "--host", default="0.0.0.0", help="Host/interface to bind the HTTP server"
+    )
+    parser.add_argument(
+        "--port", type=int, default=8000, help="Port for the HTTP server"
+    )
+    parser.add_argument(
+        "--discovery-port", type=int, default=9999, help="UDP discovery port"
+    )
     parser.add_argument("--debug", action="store_true", help="Enable Flask debug mode")
     return parser.parse_args()
 
@@ -350,10 +364,14 @@ def main() -> None:
     discovery.start()
     atexit.register(discovery.stop)
 
-    print(f"Audio streaming server ready on http://{discovery.advertised_host}:{args.port}")
+    print(
+        f"Audio streaming server ready on http://{discovery.advertised_host}:{args.port}"
+    )
     print(f"Serving media from: {media.resolve()}")
     if not playlist.all_tracks():
-        print("No audio tracks found yet. Drop MP3/FLAC/WAV files into the media directory.")
+        print(
+            "No audio tracks found yet. Drop MP3/FLAC/WAV files into the media directory."
+        )
 
     app.run(host=args.host, port=args.port, debug=args.debug, threaded=True)
 

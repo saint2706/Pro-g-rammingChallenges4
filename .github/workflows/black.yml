@@ -1,0 +1,36 @@
+name: Black Auto Formatter
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+
+jobs:
+  black-format:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Install Black
+        run: pip install black
+
+      - name: Run Black to format code
+        run: black .
+
+      - name: Commit changes if any
+        run: |
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          if [[ `git status --porcelain` ]]; then
+            git add .
+            git commit -m "Format code with Black"
+            git push
+          fi

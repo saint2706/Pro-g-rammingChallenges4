@@ -23,17 +23,27 @@ def _build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--log-level", default="INFO", help="Root logging level")
     subparsers = parser.add_subparsers(dest="command", required=True)
 
-    tcp_server_parser = subparsers.add_parser("tcp-server", help="Run the TCP chat server")
+    tcp_server_parser = subparsers.add_parser(
+        "tcp-server", help="Run the TCP chat server"
+    )
     tcp_server_parser.add_argument("--config", default=str(DEFAULT_TCP_SERVER_CONFIG))
 
-    tcp_client_parser = subparsers.add_parser("tcp-client", help="Run the TCP chat client")
+    tcp_client_parser = subparsers.add_parser(
+        "tcp-client", help="Run the TCP chat client"
+    )
     tcp_client_parser.add_argument("--config", default=str(DEFAULT_TCP_CLIENT_CONFIG))
-    tcp_client_parser.add_argument("--user", required=True, help="Username to present to the server")
+    tcp_client_parser.add_argument(
+        "--user", required=True, help="Username to present to the server"
+    )
 
-    udp_server_parser = subparsers.add_parser("udp-server", help="Run the UDP chat server")
+    udp_server_parser = subparsers.add_parser(
+        "udp-server", help="Run the UDP chat server"
+    )
     udp_server_parser.add_argument("--config", default=str(DEFAULT_UDP_CONFIG))
 
-    udp_client_parser = subparsers.add_parser("udp-client", help="Run the UDP chat client")
+    udp_client_parser = subparsers.add_parser(
+        "udp-client", help="Run the UDP chat client"
+    )
     udp_client_parser.add_argument("--config", default=str(DEFAULT_UDP_CONFIG))
     udp_client_parser.add_argument("--user", required=True)
 

@@ -83,7 +83,9 @@ def _cmd_log(args: argparse.Namespace) -> None:
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Simple file-based version control tool")
+    parser = argparse.ArgumentParser(
+        description="Simple file-based version control tool"
+    )
     parser.add_argument(
         "--path",
         default=".",
@@ -93,7 +95,9 @@ def build_parser() -> argparse.ArgumentParser:
 
     # init
     parser_init = subparsers.add_parser("init", help="Initialise a new repository")
-    parser_init.add_argument("--force", action="store_true", help="Overwrite existing repository")
+    parser_init.add_argument(
+        "--force", action="store_true", help="Overwrite existing repository"
+    )
     parser_init.set_defaults(func=_cmd_init)
 
     # commit
@@ -103,24 +107,36 @@ def build_parser() -> argparse.ArgumentParser:
     parser_commit.set_defaults(func=_cmd_commit)
 
     # checkout
-    parser_checkout = subparsers.add_parser("checkout", help="Restore a committed revision")
+    parser_checkout = subparsers.add_parser(
+        "checkout", help="Restore a committed revision"
+    )
     parser_checkout.add_argument("file", help="File to restore")
     parser_checkout.add_argument("--revision", help="Specific revision identifier")
     parser_checkout.set_defaults(func=_cmd_checkout)
 
     # config
-    parser_config = subparsers.add_parser("config", help="Inspect or modify repository configuration")
+    parser_config = subparsers.add_parser(
+        "config", help="Inspect or modify repository configuration"
+    )
     config_subparsers = parser_config.add_subparsers(dest="action", required=True)
 
-    parser_config_show = config_subparsers.add_parser("show", help="Display tracked files")
+    parser_config_show = config_subparsers.add_parser(
+        "show", help="Display tracked files"
+    )
     parser_config_show.set_defaults(func=_cmd_config)
 
-    parser_config_limit = config_subparsers.add_parser("set-limit", help="Set revision limit for a file")
+    parser_config_limit = config_subparsers.add_parser(
+        "set-limit", help="Set revision limit for a file"
+    )
     parser_config_limit.add_argument("file", help="File to update")
-    parser_config_limit.add_argument("limit", type=int, help="Number of revisions to keep")
+    parser_config_limit.add_argument(
+        "limit", type=int, help="Number of revisions to keep"
+    )
     parser_config_limit.set_defaults(func=_cmd_config)
 
-    parser_config_lock = config_subparsers.add_parser("lock", help="Lock a file against commits")
+    parser_config_lock = config_subparsers.add_parser(
+        "lock", help="Lock a file against commits"
+    )
     parser_config_lock.add_argument("file", help="File to lock")
     parser_config_lock.set_defaults(func=_cmd_config)
 
@@ -129,7 +145,9 @@ def build_parser() -> argparse.ArgumentParser:
     parser_config_unlock.set_defaults(func=_cmd_config)
 
     # diff
-    parser_diff = subparsers.add_parser("diff", help="Show differences from a committed revision")
+    parser_diff = subparsers.add_parser(
+        "diff", help="Show differences from a committed revision"
+    )
     parser_diff.add_argument("file", help="File to compare")
     parser_diff.add_argument("--revision", help="Specific revision identifier")
     parser_diff.set_defaults(func=_cmd_diff)

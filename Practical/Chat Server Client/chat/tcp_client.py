@@ -24,7 +24,9 @@ class TcpChatClient:
     async def connect(self) -> None:
         while True:
             try:
-                self._reader, self._writer = await asyncio.open_connection(self.config.host, self.config.port)
+                self._reader, self._writer = await asyncio.open_connection(
+                    self.config.host, self.config.port
+                )
                 break
             except OSError as exc:
                 logging.getLogger(__name__).warning("Connection failed: %s", exc)

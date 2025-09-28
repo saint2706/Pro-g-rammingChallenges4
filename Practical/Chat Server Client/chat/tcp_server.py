@@ -35,18 +35,25 @@ class ChatRoomServer:
         self.clients: Set[ClientSession] = set()
         self.logger = setup_rotating_log(Path(config.log_path))
         self.sequence = 0
-        self.history: Dict[str, Deque[dict]] = defaultdict(lambda: deque(maxlen=config.history_size))
+        self.history: Dict[str, Deque[dict]] = defaultdict(
+            lambda: deque(maxlen=config.history_size)
+        )
         self._lock = asyncio.Lock()
 
-    async def handle_client(self, reader: asyncio.StreamReader, writer: asyncio.StreamWriter) -> None:
+    async def handle_client(
+        self, reader: asyncio.StreamReader, writer: asyncio.StreamWriter
+    ) -> None:
         address = writer.get_extra_info("peername")
         session = ClientSession(reader=reader, writer=writer, address=address)
         if len(self.clients) >= self.config.max_connections:
-            await self._send_payload(session, {
-                "type": "error",
-                "text": "Server busy, try again later",
-                "seq": self.sequence,
-            })
+            await self._send_payload(
+                session,
+                {
+                    "type": "error",
+                    "text": "Server busy, try again later",
+                    "seq": self.sequence,
+                },
+            )
             writer.close()
             await writer.wait_closed()
             return
@@ -69,14 +76,17 @@ class ChatRoomServer:
 
     async def _send_greeting(self, session: ClientSession) -> None:
         message = (
-            "Welcome! Send {\"type\": \"join\", \"room\": \"lobby\", \"user\": \"alice\"} to start."
+            'Welcome! Send {"type": "join", "room": "lobby", "user": "alice"} to start.'
         )
-        await self._send_payload(session, {
-            "type": "system",
-            "text": message,
-            "room": "system",
-            "seq": self.sequence,
-        })
+        await self._send_payload(
+            session,
+            {
+                "type": "system",
+                "text": message,
+                "room": "system",
+                "seq": self.sequence,
+            },
+        )
 
     async def _dispatch(self, session: ClientSession, payload: dict) -> None:
         msg_type = payload.get("type")
@@ -105,11 +115,21 @@ class ChatRoomServer:
         async with self._lock:
             if old_room and session in self.rooms.get(old_room, set()):
                 self.rooms[old_room].remove(session)
-                await self._broadcast(protocols.system_payload(f"{old_user or session.transport_id()} left", old_room, self._next_seq()))
+                await self._broadcast(
+                    protocols.system_payload(
+                        f"{old_user or session.transport_id()} left",
+                        old_room,
+                        self._next_seq(),
+                    )
+                )
             session.room = new_room
             self.rooms[new_room].add(session)
             await self._send_recent_history(session, new_room)
-            await self._broadcast(protocols.system_payload(f"{session.user} joined", new_room, self._next_seq()))
+            await self._broadcast(
+                protocols.system_payload(
+                    f"{session.user} joined", new_room, self._next_seq()
+                )
+            )
 
     async def _handle_message(self, session: ClientSession, payload: dict) -> None:
         if not session.room:
@@ -127,11 +147,14 @@ class ChatRoomServer:
 
     async def _handle_rooms_request(self, session: ClientSession) -> None:
         rooms = sorted(self.rooms.keys())
-        await self._send_payload(session, {
-            "type": "rooms",
-            "rooms": rooms,
-            "seq": self.sequence,
-        })
+        await self._send_payload(
+            session,
+            {
+                "type": "rooms",
+                "rooms": rooms,
+                "seq": self.sequence,
+            },
+        )
 
     async def _disconnect(self, session: ClientSession) -> None:
         if session in self.clients:
@@ -139,7 +162,13 @@ class ChatRoomServer:
         room = session.room
         if room and session in self.rooms.get(room, set()):
             self.rooms[room].remove(session)
-            await self._broadcast(protocols.system_payload(f"{session.user or session.transport_id()} left", room, self._next_seq()))
+            await self._broadcast(
+                protocols.system_payload(
+                    f"{session.user or session.transport_id()} left",
+                    room,
+                    self._next_seq(),
+                )
+            )
         with contextlib.suppress(Exception):
             session.writer.close()
             await session.writer.wait_closed()
@@ -152,7 +181,10 @@ class ChatRoomServer:
         room = payload.get("room", "system")
         self.history[room].append(payload)
         self.logger.info("%s %s: %s", room, payload.get("user"), payload.get("text"))
-        coros = [self._safe_send(client, payload) for client in list(self.rooms.get(room, set()))]
+        coros = [
+            self._safe_send(client, payload)
+            for client in list(self.rooms.get(room, set()))
+        ]
         if coros:
             await asyncio.gather(*coros, return_exceptions=True)
 
@@ -167,11 +199,14 @@ class ChatRoomServer:
         return self.sequence
 
     async def _send_error(self, session: ClientSession, message: str) -> None:
-        await self._send_payload(session, {
-            "type": "error",
-            "text": message,
-            "seq": self.sequence,
-        })
+        await self._send_payload(
+            session,
+            {
+                "type": "error",
+                "text": message,
+                "seq": self.sequence,
+            },
+        )
 
     async def _send_recent_history(self, session: ClientSession, room: str) -> None:
         if history := list(self.history.get(room, [])):
@@ -184,7 +219,9 @@ async def serve(config: TcpServerConfig) -> None:
     server_coroutine = await asyncio.start_server(
         server.handle_client, config.host, config.port
     )
-    sockets = ", ".join(str(sock.getsockname()) for sock in server_coroutine.sockets or [])
+    sockets = ", ".join(
+        str(sock.getsockname()) for sock in server_coroutine.sockets or []
+    )
     logging.getLogger(__name__).info("TCP chat listening on %s", sockets)
     async with server_coroutine:
         await server_coroutine.serve_forever()

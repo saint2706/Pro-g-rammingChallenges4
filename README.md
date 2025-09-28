@@ -13,9 +13,9 @@ The solutions are organized by category and difficulty, making it easy to naviga
 
 ## Progress
 
-<progress value="98" max="131"></progress>
+<progress value="99" max="131"></progress>
 
-**Overall:** 98 / 131 challenges completed (74.8%).
+**Overall:** 99 / 131 challenges completed (75.6%).
 
 | Category | Completed | Total | Progress |
 | --- | --- | --- | --- |
@@ -23,7 +23,7 @@ The solutions are organized by category and difficulty, making it easy to naviga
 | Algorithmic | 27 | 27 | 100% |
 | Artificial Intelligence | 3 | 8 | 37.5% |
 | Emulation/Modeling | 6 | 14 | 42.9% |
-| Games | 9 | 29 | 31.0% |
+| Games | 10 | 29 | 34.5% |
 
 _Progress counts are generated from the actual solution folders in the repository (see tables below)._ 
 
@@ -60,7 +60,7 @@ The repository now ships a `pyproject.toml` so you can install challenge stacks 
 | `algorithmic` | `Algorithmic/` problem set helpers | Steganography, stock analysis, crawler tooling |
 | `visual` | Visualization add-ons used across categories | Matplotlib demos, colour-science palettes, VPython spinny cube |
 | `audio` | Audio processing stacks | WAV equalizer, Shazam clone, music streaming |
-| `games` | Python games in `Games/` | Sudoku solver, Simon, Shuffle stats |
+| `games` | Python games in `Games/` | Sudoku solver, Simon, Oil Panic tribute |
 | `ai` | `Artificial Intelligence/` demos | A* Sudoku, Connect4 AI, neural network |
 | `web` | HTTP and dashboard helpers | Imageboard, IP tracking, web crawlers |
 | `desktop` | GUI/automation conveniences | Window manager, key press bot, Tk front-ends |
@@ -73,6 +73,22 @@ The repository now ships a `pyproject.toml` so you can install challenge stacks 
 | `developer` | Repo test/lint helpers | pytest, ruff, mypy |
 
 See the category READMEs for per-project suggestions; each now points back to these extras.
+
+## Streamlit deployment keep-alive workflow
+
+The repository includes a GitHub Actions workflow at `.github/workflows/keep-streamlit-alive.yml` that pings the deployed Streamlit app on a schedule. The job runs hourly to keep the hosted instance warm and also supports manual runs so maintainers can verify that the endpoint is still responding.
+
+### Configure the `STREAMLIT_PING_URL` secret
+
+1. In GitHub, open **Settings → Secrets and variables → Actions** for this repository.
+2. Add a new repository secret named `STREAMLIT_PING_URL` that contains the fully qualified URL of the Streamlit deployment (e.g., `https://example.streamlit.app/`).
+3. Save the secret; the workflow will automatically read the value when it runs on its hourly schedule.
+
+### Manually test the keep-alive workflow
+
+1. Navigate to **Actions → Keep Streamlit deployment alive** in GitHub.
+2. Click **Run workflow** to launch it on demand. You may leave the `target_url` field blank to use the `STREAMLIT_PING_URL` secret, or provide a one-off URL for testing.
+3. Review the workflow run logs to ensure the keep-alive request succeeded.
 
 ## Challenges
 
@@ -207,33 +223,72 @@ See the category READMEs for per-project suggestions; each now points back to th
 | # | Challenge | Status |
 | --- | --------- | ------ |
 | 104 | Knight's Tour | [View Solution](./Games/Knight%20Tour/) |
-| 105 | Monster Raising/Breeding Simulator | Not Yet |
+
+| 105 | Monster Raising/Breeding Simulator | [View Solution](./Games/Monster%20Raising/) |
 | 106 | Tetris | Not Yet |
+
+| 105 | Monster Raising/Breeding Simulator | Not Yet |
+| 106 | Tetris | [View Solution](./Games/Tetris/) |
+
 | 107 | Snake | [View Solution](./Games/Snake/) |
+
 | 108 | Pipe Dreams | Not Yet |
+| 109 | Pac Man With Different Behaviors for each ghost | [View Solution](./Games/Pacman/) |
+
+| 108 | Pipe Dreams | [View Solution](./Games/Pipe%20Dreams/) |
 | 109 | Pac Man With Different Behaviors for each ghost | Not Yet |
+
 | 110 | Dragon Quest / Basic RPG Engine | Not Yet |
 | 111 | Rock Paper Scissors | [View Solution](./Games/RPS/) |
 | 112 | First-Person Engine in OpenGL (Walking Looking Around Jumping on Obstacles) (BONUS: VR Compatibility) | Not Yet |
 | 113 | Shuffle a Deck of Cards (Include a Visualization) | [View Solution](./Games/Shuffle/) |
 | 114 | Simulate a game of Tag using a multi-agent system | Not Yet |
 | 115 | Wolfenstein Clone (FPS two-dimensional map that appears to be 3-D) (If you need a starting point search for bisquit's video about DOOM-like Engines) | Not Yet |
-| 116 | Scorched Earth Clone | Not Yet |
+| 116 | Scorched Earth Clone | [View Solution](./Games/ScorchedEarth/) |
 | 117 | Minesweeper | [View Solution](./Games/Minesweeper/) |
-| 118 | An Audio/Visual 64KB Demonstration | Not Yet |
+| 118 | An Audio/Visual 64KB Demonstration | [View Solution](./Games/64kDemo/) |
 | 119 | Sudoku | [View Solution](./Games/Sudoku/) |
 | 120 | Danmaku (Bullet Hell) Engine | Not Yet |
-| 121 | Roguelike Engine/Dungeon Generator | Not Yet |
+
+| 121 | Roguelike Engine/Dungeon Generator | [View Solution](./Games/Roguelike/) |
 | 122 | Design a Game Engine in Unity | Not Yet |
+
+| 121 | Roguelike Engine/Dungeon Generator | Not Yet |
+| 122 | Design a Game Engine in Unity | [View Solution](./Games/UnityEngine/) |
+
 | 123 | Yahtzee | [View Solution](./Games/Yahtzee/) |
+
+
+| 124 | Oil Panic | [View Solution](./Games/OilPanic/) |
+
 | 124 | Oil Panic | Not Yet |
+
+
 | 125 | Chess | Not Yet |
+| 126 | Go (No AI Necessary) | [View Solution](./Games/Go/) |
+
+| 125 | Chess | [View Solution](./Games/Chess/) |
 | 126 | Go (No AI Necessary) | Not Yet |
+
 | 127 | Connect Four | [View Solution](./Games/Connect4/) |
 | 128 | Mastermind | Not Yet |
-| 129 | Missile Command Game | Not Yet |
+
+| 129 | Missile Command Game | [View Solution](./Games/MissileCommand/) |
 | 130 | Tron | Not Yet |
+
+| 129 | Missile Command Game | Not Yet |
+
+| 130 | Tron | [View Solution](./Games/Tron/) |
+
+
+
+
+
 | 131 | Breakout | Not Yet |
+
+| 130 | Tron | Not Yet |
+| 131 | Breakout | [View Solution](./Games/Breakout/) |
+
 | 132 | Simon | [View Solution](./Games/Simon/) |
 
 ## Highlights

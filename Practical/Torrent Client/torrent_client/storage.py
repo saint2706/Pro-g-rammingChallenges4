@@ -1,4 +1,5 @@
 """Disk storage primitives for torrent downloads."""
+
 from __future__ import annotations
 
 import hashlib

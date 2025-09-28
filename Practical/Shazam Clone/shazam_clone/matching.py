@@ -35,7 +35,9 @@ class QueryResult:
 class QueryService:
     """High-level interface for querying the fingerprint database."""
 
-    def __init__(self, database: FingerprintDatabase, *, minhash_threshold: float = 0.3) -> None:
+    def __init__(
+        self, database: FingerprintDatabase, *, minhash_threshold: float = 0.3
+    ) -> None:
         self.database = database
         self.extractor = FingerprintExtractor(database.config)
         self.minhash_threshold = minhash_threshold
@@ -48,7 +50,9 @@ class QueryService:
         peaks = self.extractor.find_peaks(spectrogram, freqs, times)
         return self.extractor.generate_fingerprints(peaks)
 
-    def fingerprint_file(self, path: str, *, duration: Optional[float] = None) -> List[Fingerprint]:
+    def fingerprint_file(
+        self, path: str, *, duration: Optional[float] = None
+    ) -> List[Fingerprint]:
         audio, sr = self.extractor.load_audio(path, duration=duration)
         return self._fingerprint_audio(audio, sr)
 
@@ -157,8 +161,14 @@ class QueryService:
     # ------------------------------------------------------------------
     def record_microphone(self, *, duration: float = 5.0) -> Tuple[np.ndarray, int]:
         if sd is None:
-            raise RuntimeError("sounddevice is not installed; microphone capture is unavailable.")
-        audio = sd.rec(int(duration * self.database.config.sample_rate), samplerate=self.database.config.sample_rate, channels=1)
+            raise RuntimeError(
+                "sounddevice is not installed; microphone capture is unavailable."
+            )
+        audio = sd.rec(
+            int(duration * self.database.config.sample_rate),
+            samplerate=self.database.config.sample_rate,
+            channels=1,
+        )
         sd.wait()
         return audio.flatten(), self.database.config.sample_rate
 

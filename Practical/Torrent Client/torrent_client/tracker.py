@@ -1,4 +1,5 @@
 """HTTP tracker communication helpers."""
+
 from __future__ import annotations
 
 import ipaddress
@@ -102,8 +103,12 @@ class TrackerClient:
         interval = data.get(b"interval", 1800)
         peers_blob = data.get(b"peers")
         peers = _parse_peers(peers_blob)
-        warning_message = warning.decode("utf-8", "ignore") if isinstance(warning, bytes) else None
-        return TrackerResponse(interval=int(interval), peers=peers, warning_message=warning_message)
+        warning_message = (
+            warning.decode("utf-8", "ignore") if isinstance(warning, bytes) else None
+        )
+        return TrackerResponse(
+            interval=int(interval), peers=peers, warning_message=warning_message
+        )
 
 
 def _parse_peers(peers_blob: Optional[bytes]) -> List[Peer]:

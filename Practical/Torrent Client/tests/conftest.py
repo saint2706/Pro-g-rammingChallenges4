@@ -1,4 +1,5 @@
 """Test configuration for the torrent client package."""
+
 import sys
 from pathlib import Path
 

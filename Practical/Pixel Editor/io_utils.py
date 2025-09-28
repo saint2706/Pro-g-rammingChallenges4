@@ -8,7 +8,15 @@ from typing import Iterable, List, Optional, Sequence, Tuple
 
 from PIL import Image
 
-from .core import Palette, PaletteIndex, PixelDocument, PixelFrame, PixelLayer, TRANSPARENT, composite_to_rgba
+from .core import (
+    Palette,
+    PaletteIndex,
+    PixelDocument,
+    PixelFrame,
+    PixelLayer,
+    TRANSPARENT,
+    composite_to_rgba,
+)
 
 
 @dataclass
@@ -23,7 +31,9 @@ class SpriteSheetSpec:
             raise ValueError("Frame dimensions must be positive")
 
 
-def _to_image_data(composite: Sequence[Sequence[PaletteIndex]], palette: Palette) -> Image.Image:
+def _to_image_data(
+    composite: Sequence[Sequence[PaletteIndex]], palette: Palette
+) -> Image.Image:
     rgba = composite_to_rgba(composite, palette)
     height = len(rgba)
     width = len(rgba[0]) if height else 0
@@ -47,7 +57,9 @@ def export_png_sprite_sheet(
 
     frames_per_row = frames_per_row or len(indices)
     rows = (len(indices) + frames_per_row - 1) // frames_per_row
-    sheet = Image.new("RGBA", (document.width * frames_per_row, document.height * rows), (0, 0, 0, 0))
+    sheet = Image.new(
+        "RGBA", (document.width * frames_per_row, document.height * rows), (0, 0, 0, 0)
+    )
 
     for i, frame_idx in enumerate(indices):
         composite = document.composite_frame(frame_idx)
@@ -60,24 +72,38 @@ def export_png_sprite_sheet(
     return destination
 
 
-def export_gif(document: PixelDocument, destination: Path, duration: int = 120, loop: int = 0) -> Path:
+def export_gif(
+    document: PixelDocument, destination: Path, duration: int = 120, loop: int = 0
+) -> Path:
     destination = Path(destination)
     destination.parent.mkdir(parents=True, exist_ok=True)
     frames: List[Image.Image] = []
     for frame_idx in range(len(document.frames)):
         composite = document.composite_frame(frame_idx)
-        frame_img = _to_image_data(composite, document.palette).convert("P", palette=Image.ADAPTIVE, colors=256)
+        frame_img = _to_image_data(composite, document.palette).convert(
+            "P", palette=Image.ADAPTIVE, colors=256
+        )
         frames.append(frame_img)
 
     if not frames:
         raise ValueError("Document has no frames to export")
 
     first, *rest = frames
-    first.save(destination, format="GIF", save_all=True, append_images=rest, duration=duration, loop=loop, transparency=0)
+    first.save(
+        destination,
+        format="GIF",
+        save_all=True,
+        append_images=rest,
+        duration=duration,
+        loop=loop,
+        transparency=0,
+    )
     return destination
 
 
-def import_sprite_sheet(path: Path, spec: SpriteSheetSpec, palette: Optional[Palette] = None) -> PixelDocument:
+def import_sprite_sheet(
+    path: Path, spec: SpriteSheetSpec, palette: Optional[Palette] = None
+) -> PixelDocument:
     path = Path(path)
     if not path.exists():
         raise FileNotFoundError(path)
@@ -88,7 +114,9 @@ def import_sprite_sheet(path: Path, spec: SpriteSheetSpec, palette: Optional[Pal
     columns = spec.columns or max(1, image.width // spec.frame_width)
     rows = spec.rows or max(1, image.height // spec.frame_height)
 
-    document = PixelDocument(spec.frame_width, spec.frame_height, palette=palette, frames=[])
+    document = PixelDocument(
+        spec.frame_width, spec.frame_height, palette=palette, frames=[]
+    )
 
     for row in range(rows):
         for col in range(columns):

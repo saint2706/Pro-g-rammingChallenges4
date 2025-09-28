@@ -1,4 +1,5 @@
 """AES-GCM encrypted upload CLI supporting S3 and generic HTTP targets."""
+
 from __future__ import annotations
 
 import argparse
@@ -34,9 +35,13 @@ def load_config(config_path: Path) -> Dict[str, Any]:
     try:
         data = json.loads(config_path.read_text(encoding="utf-8"))
     except FileNotFoundError as exc:  # pragma: no cover - defensive
-        raise ConfigurationError(f"Configuration file not found: {config_path}") from exc
+        raise ConfigurationError(
+            f"Configuration file not found: {config_path}"
+        ) from exc
     except json.JSONDecodeError as exc:
-        raise ConfigurationError(f"Invalid JSON in configuration file: {config_path}") from exc
+        raise ConfigurationError(
+            f"Invalid JSON in configuration file: {config_path}"
+        ) from exc
 
     if "endpoints" not in data or not isinstance(data["endpoints"], list):
         raise ConfigurationError("Configuration must contain an 'endpoints' list")
@@ -84,7 +89,9 @@ def derive_key(password: Optional[str], key_hex: Optional[str]) -> Tuple[bytes, 
     raise ValueError("A password or hex key is required")
 
 
-def encrypt_file(path: Path, key: bytes, salt: bytes, associated_data: bytes) -> EncryptionResult:
+def encrypt_file(
+    path: Path, key: bytes, salt: bytes, associated_data: bytes
+) -> EncryptionResult:
     data = path.read_bytes()
     nonce = os.urandom(12)
     aesgcm = AESGCM(key)
@@ -144,7 +151,9 @@ def generate_object_key(filename: str, prefix: str = "") -> str:
     return f"{prefix}{timestamp}_{safe_name}.enc"
 
 
-def upload_to_s3(payload: bytes, endpoint: Dict[str, Any], object_key: str, content_type: str) -> str:
+def upload_to_s3(
+    payload: bytes, endpoint: Dict[str, Any], object_key: str, content_type: str
+) -> str:
     boto3_mod = ensure_boto3()
     region = endpoint.get("region")
     bucket = endpoint.get("bucket")
@@ -152,9 +161,13 @@ def upload_to_s3(payload: bytes, endpoint: Dict[str, Any], object_key: str, cont
         raise ConfigurationError("S3 endpoint requires 'bucket' and 'region'")
 
     profile = endpoint.get("profile")
-    session = boto3_mod.Session(profile_name=profile) if profile else boto3_mod.Session()
+    session = (
+        boto3_mod.Session(profile_name=profile) if profile else boto3_mod.Session()
+    )
     client = session.client("s3", region_name=region)
-    client.put_object(Bucket=bucket, Key=object_key, Body=payload, ContentType=content_type)
+    client.put_object(
+        Bucket=bucket, Key=object_key, Body=payload, ContentType=content_type
+    )
 
     expires_in = int(endpoint.get("expires_in", 3600))
     return client.generate_presigned_url(
@@ -164,7 +177,13 @@ def upload_to_s3(payload: bytes, endpoint: Dict[str, Any], object_key: str, cont
     )
 
 
-def upload_to_http(payload: bytes, endpoint: Dict[str, Any], object_key: str, content_type: str, filename: str) -> str:
+def upload_to_http(
+    payload: bytes,
+    endpoint: Dict[str, Any],
+    object_key: str,
+    content_type: str,
+    filename: str,
+) -> str:
     url = endpoint.get("url")
     if not url:
         raise ConfigurationError("HTTP endpoint requires a 'url'")
@@ -176,10 +195,18 @@ def upload_to_http(payload: bytes, endpoint: Dict[str, Any], object_key: str, co
         field_name = endpoint.get("field_name", "file")
         data = {"object_key": object_key}
         files = {field_name: (filename + ".enc", payload, content_type)}
-        response = requests.post(url, data=data, files=files, headers=headers, timeout=endpoint.get("timeout", 30))
+        response = requests.post(
+            url,
+            data=data,
+            files=files,
+            headers=headers,
+            timeout=endpoint.get("timeout", 30),
+        )
     elif method == "PUT":
         headers = {**headers, "Content-Type": content_type, "X-Object-Key": object_key}
-        response = requests.put(url, data=payload, headers=headers, timeout=endpoint.get("timeout", 30))
+        response = requests.put(
+            url, data=payload, headers=headers, timeout=endpoint.get("timeout", 30)
+        )
     else:
         raise ConfigurationError(f"Unsupported HTTP method '{method}'")
 
@@ -255,7 +282,9 @@ def handle_upload(args: argparse.Namespace) -> int:
     if endpoint.get("type") == "s3":
         share_url = upload_to_s3(result.payload, endpoint, object_key, content_type)
     elif endpoint.get("type") == "http":
-        share_url = upload_to_http(result.payload, endpoint, object_key, content_type, file_path.name)
+        share_url = upload_to_http(
+            result.payload, endpoint, object_key, content_type, file_path.name
+        )
     else:
         raise ConfigurationError(f"Unsupported endpoint type '{endpoint.get('type')}'")
 
@@ -277,19 +306,31 @@ def handle_upload(args: argparse.Namespace) -> int:
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Encrypt a file and upload it to a remote endpoint.")
+    parser = argparse.ArgumentParser(
+        description="Encrypt a file and upload it to a remote endpoint."
+    )
     subparsers = parser.add_subparsers(dest="command")
 
     upload_parser = subparsers.add_parser("upload", help="Encrypt and upload a file")
-    upload_parser.add_argument("--file", required=True, help="Path to the file to encrypt")
-    upload_parser.add_argument("--config", required=True, help="Path to the endpoints configuration JSON")
-    upload_parser.add_argument("--endpoint", required=True, help="Name of the endpoint to use")
+    upload_parser.add_argument(
+        "--file", required=True, help="Path to the file to encrypt"
+    )
+    upload_parser.add_argument(
+        "--config", required=True, help="Path to the endpoints configuration JSON"
+    )
+    upload_parser.add_argument(
+        "--endpoint", required=True, help="Name of the endpoint to use"
+    )
     group = upload_parser.add_mutually_exclusive_group(required=True)
     group.add_argument("--password", help="Password used to derive the AES key")
     group.add_argument("--key", help="Hex-encoded AES key (16/24/32 bytes)")
     upload_parser.add_argument("--manifest", help="Path to write the manifest JSON")
-    upload_parser.add_argument("--signing-key", help="Hex-encoded HMAC key for signing the manifest")
-    upload_parser.add_argument("--content-type", help="Override the uploaded content type")
+    upload_parser.add_argument(
+        "--signing-key", help="Hex-encoded HMAC key for signing the manifest"
+    )
+    upload_parser.add_argument(
+        "--content-type", help="Override the uploaded content type"
+    )
     upload_parser.set_defaults(func=handle_upload)
 
     return parser

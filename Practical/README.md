@@ -52,6 +52,16 @@ python "Seam Carving/resize.py" --help
 python "ToDoList-CLI/todo.py" add "Ship awesome README"
 ```
 
+### 1.5. Launch the Streamlit hub
+
+Spin up the browser-based tools (Paint clone, HSV colour wheel, matrix playgrounds, etc.) from one place:
+
+```pwsh
+streamlit run app.py
+```
+
+The app opens a sidebar selector with descriptions for every Streamlit-powered project. Pick a tool to load its dedicated UI and swap between them without restarting Streamlit.
+
 ## Using pyproject.toml
 
 All Practical projects share the repo-wide optional extras defined in `pyproject.toml`. Install `.[practical]` for the full toolkit or combine targeted extras (audio, web, desktop, markdown, geo, midi) depending on what you plan to explore. Editable installs (`pip install -e .[extra]`) keep your changes instantly runnable. See the table below for combinations and the [root extras table](../README.md#using-pyprojecttoml) for cross-category options.

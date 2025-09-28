@@ -11,12 +11,28 @@ from shazam_clone import FingerprintDatabase, QueryService
 
 def parse_args(argv: list[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--database", required=True, help="Path to the fingerprint database (.json.gz)")
+    parser.add_argument(
+        "--database", required=True, help="Path to the fingerprint database (.json.gz)"
+    )
     source = parser.add_mutually_exclusive_group(required=True)
     source.add_argument("--file", help="Audio file to query")
-    source.add_argument("--microphone", action="store_true", help="Record from the microphone instead of using a file")
-    parser.add_argument("--duration", type=float, default=8.0, help="Duration (seconds) for file trimming or microphone capture")
-    parser.add_argument("--minhash-threshold", type=float, default=0.3, help="Minimum MinHash similarity required to consider a track")
+    source.add_argument(
+        "--microphone",
+        action="store_true",
+        help="Record from the microphone instead of using a file",
+    )
+    parser.add_argument(
+        "--duration",
+        type=float,
+        default=8.0,
+        help="Duration (seconds) for file trimming or microphone capture",
+    )
+    parser.add_argument(
+        "--minhash-threshold",
+        type=float,
+        default=0.3,
+        help="Minimum MinHash similarity required to consider a track",
+    )
     return parser.parse_args(argv)
 
 

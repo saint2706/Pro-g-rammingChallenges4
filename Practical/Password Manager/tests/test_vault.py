@@ -19,7 +19,9 @@ class PasswordVaultTests(unittest.TestCase):
         self.vault = PasswordVault.create(self.vault_path, self.password)
 
     def test_round_trip_encryption(self) -> None:
-        entry = self.vault.add_entry("Email", "alice", "hunter2", category="personal", notes="IMAP")
+        entry = self.vault.add_entry(
+            "Email", "alice", "hunter2", category="personal", notes="IMAP"
+        )
         reloaded = PasswordVault.load(self.vault_path, self.password)
         entries = reloaded.list_entries()
         self.assertEqual(len(entries), 1)

@@ -20,7 +20,12 @@ from tkinter import colorchooser, filedialog, messagebox, simpledialog, ttk
 from PIL import Image, ImageTk
 
 from core import PaletteIndex, PixelDocument, TRANSPARENT, composite_to_rgba
-from io_utils import SpriteSheetSpec, export_gif, export_png_sprite_sheet, import_sprite_sheet
+from io_utils import (
+    SpriteSheetSpec,
+    export_gif,
+    export_png_sprite_sheet,
+    import_sprite_sheet,
+)
 
 
 @dataclass
@@ -33,10 +38,14 @@ class PixelAction:
     after: PaletteIndex
 
     def undo(self, document: PixelDocument) -> None:
-        document.frames[self.frame_index].layers[self.layer_index].set_pixel(self.x, self.y, self.before)
+        document.frames[self.frame_index].layers[self.layer_index].set_pixel(
+            self.x, self.y, self.before
+        )
 
     def redo(self, document: PixelDocument) -> None:
-        document.frames[self.frame_index].layers[self.layer_index].set_pixel(self.x, self.y, self.after)
+        document.frames[self.frame_index].layers[self.layer_index].set_pixel(
+            self.x, self.y, self.after
+        )
 
 
 class UndoManager:
@@ -142,10 +151,18 @@ class PixelEditorApp(tk.Tk):
 
         palette_buttons = ttk.Frame(palette_tab)
         palette_buttons.grid(row=1, column=0, sticky="ew", padx=4, pady=4)
-        ttk.Button(palette_buttons, text="Add", command=self._add_color).grid(row=0, column=0, padx=2, pady=2)
-        ttk.Button(palette_buttons, text="Remove", command=self._remove_color).grid(row=0, column=1, padx=2, pady=2)
-        ttk.Button(palette_buttons, text="Up", command=lambda: self._shift_palette(-1)).grid(row=0, column=2, padx=2, pady=2)
-        ttk.Button(palette_buttons, text="Down", command=lambda: self._shift_palette(1)).grid(row=0, column=3, padx=2, pady=2)
+        ttk.Button(palette_buttons, text="Add", command=self._add_color).grid(
+            row=0, column=0, padx=2, pady=2
+        )
+        ttk.Button(palette_buttons, text="Remove", command=self._remove_color).grid(
+            row=0, column=1, padx=2, pady=2
+        )
+        ttk.Button(
+            palette_buttons, text="Up", command=lambda: self._shift_palette(-1)
+        ).grid(row=0, column=2, padx=2, pady=2)
+        ttk.Button(
+            palette_buttons, text="Down", command=lambda: self._shift_palette(1)
+        ).grid(row=0, column=3, padx=2, pady=2)
 
         # Layers tab
         layers_tab.columnconfigure(0, weight=1)
@@ -156,12 +173,24 @@ class PixelEditorApp(tk.Tk):
 
         layer_buttons = ttk.Frame(layers_tab)
         layer_buttons.grid(row=1, column=0, sticky="ew", padx=4, pady=4)
-        ttk.Button(layer_buttons, text="Add", command=self._add_layer).grid(row=0, column=0, padx=2, pady=2)
-        ttk.Button(layer_buttons, text="Duplicate", command=self._duplicate_layer).grid(row=0, column=1, padx=2, pady=2)
-        ttk.Button(layer_buttons, text="Delete", command=self._delete_layer).grid(row=0, column=2, padx=2, pady=2)
-        ttk.Button(layer_buttons, text="Up", command=lambda: self._shift_layer(-1)).grid(row=1, column=0, padx=2, pady=2)
-        ttk.Button(layer_buttons, text="Down", command=lambda: self._shift_layer(1)).grid(row=1, column=1, padx=2, pady=2)
-        ttk.Button(layer_buttons, text="Toggle", command=self._toggle_layer_visibility).grid(row=1, column=2, padx=2, pady=2)
+        ttk.Button(layer_buttons, text="Add", command=self._add_layer).grid(
+            row=0, column=0, padx=2, pady=2
+        )
+        ttk.Button(layer_buttons, text="Duplicate", command=self._duplicate_layer).grid(
+            row=0, column=1, padx=2, pady=2
+        )
+        ttk.Button(layer_buttons, text="Delete", command=self._delete_layer).grid(
+            row=0, column=2, padx=2, pady=2
+        )
+        ttk.Button(
+            layer_buttons, text="Up", command=lambda: self._shift_layer(-1)
+        ).grid(row=1, column=0, padx=2, pady=2)
+        ttk.Button(
+            layer_buttons, text="Down", command=lambda: self._shift_layer(1)
+        ).grid(row=1, column=1, padx=2, pady=2)
+        ttk.Button(
+            layer_buttons, text="Toggle", command=self._toggle_layer_visibility
+        ).grid(row=1, column=2, padx=2, pady=2)
 
         # Frames tab
         frames_tab.columnconfigure(0, weight=1)
@@ -172,46 +201,84 @@ class PixelEditorApp(tk.Tk):
 
         frame_buttons = ttk.Frame(frames_tab)
         frame_buttons.grid(row=1, column=0, sticky="ew", padx=4, pady=4)
-        ttk.Button(frame_buttons, text="Add", command=self._add_frame).grid(row=0, column=0, padx=2, pady=2)
-        ttk.Button(frame_buttons, text="Duplicate", command=self._duplicate_frame).grid(row=0, column=1, padx=2, pady=2)
-        ttk.Button(frame_buttons, text="Delete", command=self._delete_frame).grid(row=0, column=2, padx=2, pady=2)
-        ttk.Button(frame_buttons, text="Play", command=self._toggle_playback).grid(row=1, column=0, padx=2, pady=2)
-        ttk.Button(frame_buttons, text="Prev", command=lambda: self._step_frame(-1)).grid(row=1, column=1, padx=2, pady=2)
-        ttk.Button(frame_buttons, text="Next", command=lambda: self._step_frame(1)).grid(row=1, column=2, padx=2, pady=2)
+        ttk.Button(frame_buttons, text="Add", command=self._add_frame).grid(
+            row=0, column=0, padx=2, pady=2
+        )
+        ttk.Button(frame_buttons, text="Duplicate", command=self._duplicate_frame).grid(
+            row=0, column=1, padx=2, pady=2
+        )
+        ttk.Button(frame_buttons, text="Delete", command=self._delete_frame).grid(
+            row=0, column=2, padx=2, pady=2
+        )
+        ttk.Button(frame_buttons, text="Play", command=self._toggle_playback).grid(
+            row=1, column=0, padx=2, pady=2
+        )
+        ttk.Button(
+            frame_buttons, text="Prev", command=lambda: self._step_frame(-1)
+        ).grid(row=1, column=1, padx=2, pady=2)
+        ttk.Button(
+            frame_buttons, text="Next", command=lambda: self._step_frame(1)
+        ).grid(row=1, column=2, padx=2, pady=2)
 
         # Settings tab
         settings_tab.columnconfigure(0, weight=1)
         zoom_frame = ttk.Frame(settings_tab)
         zoom_frame.grid(row=0, column=0, sticky="ew", padx=4, pady=4)
         ttk.Label(zoom_frame, text="Zoom").grid(row=0, column=0, sticky="w")
-        zoom_scale = ttk.Scale(zoom_frame, from_=1, to=64, orient="horizontal", command=self._on_zoom_change)
+        zoom_scale = ttk.Scale(
+            zoom_frame,
+            from_=1,
+            to=64,
+            orient="horizontal",
+            command=self._on_zoom_change,
+        )
         zoom_scale.set(self.zoom.get())
         zoom_scale.grid(row=1, column=0, sticky="ew")
 
-        ttk.Checkbutton(settings_tab, text="Show Grid", variable=self.grid_visible, command=self._render_canvas).grid(
-            row=1, column=0, sticky="w", padx=4, pady=4
+        ttk.Checkbutton(
+            settings_tab,
+            text="Show Grid",
+            variable=self.grid_visible,
+            command=self._render_canvas,
+        ).grid(row=1, column=0, sticky="w", padx=4, pady=4)
+        ttk.Checkbutton(
+            settings_tab,
+            text="Onion Skin",
+            variable=self.onion_skin,
+            command=self._render_canvas,
+        ).grid(row=2, column=0, sticky="w", padx=4, pady=4)
+        ttk.Label(settings_tab, text="Playback delay (ms)").grid(
+            row=3, column=0, sticky="w", padx=4, pady=4
         )
-        ttk.Checkbutton(settings_tab, text="Onion Skin", variable=self.onion_skin, command=self._render_canvas).grid(
-            row=2, column=0, sticky="w", padx=4, pady=4
-        )
-        ttk.Label(settings_tab, text="Playback delay (ms)").grid(row=3, column=0, sticky="w", padx=4, pady=4)
-        ttk.Spinbox(settings_tab, from_=30, to=1000, increment=10, textvariable=self.animation_delay).grid(
-            row=4, column=0, sticky="ew", padx=4, pady=4
-        )
+        ttk.Spinbox(
+            settings_tab,
+            from_=30,
+            to=1000,
+            increment=10,
+            textvariable=self.animation_delay,
+        ).grid(row=4, column=0, sticky="ew", padx=4, pady=4)
 
         tool_frame = ttk.Frame(settings_tab)
         tool_frame.grid(row=5, column=0, sticky="ew", padx=4, pady=4)
         ttk.Label(tool_frame, text="Tool").grid(row=0, column=0, sticky="w")
-        ttk.Radiobutton(tool_frame, text="Pen", value="pen", variable=self.tool).grid(row=1, column=0, sticky="w")
-        ttk.Radiobutton(tool_frame, text="Eraser", value="eraser", variable=self.tool).grid(row=1, column=1, sticky="w")
+        ttk.Radiobutton(tool_frame, text="Pen", value="pen", variable=self.tool).grid(
+            row=1, column=0, sticky="w"
+        )
+        ttk.Radiobutton(
+            tool_frame, text="Eraser", value="eraser", variable=self.tool
+        ).grid(row=1, column=1, sticky="w")
 
         export_frame = ttk.Frame(settings_tab)
         export_frame.grid(row=6, column=0, sticky="ew", padx=4, pady=4)
-        ttk.Button(export_frame, text="Export PNG", command=self._export_png).grid(row=0, column=0, padx=2, pady=2)
-        ttk.Button(export_frame, text="Export GIF", command=self._export_gif).grid(row=0, column=1, padx=2, pady=2)
-        ttk.Button(export_frame, text="Import Sprite Sheet", command=self._import_sprite_sheet).grid(
-            row=1, column=0, columnspan=2, padx=2, pady=2
+        ttk.Button(export_frame, text="Export PNG", command=self._export_png).grid(
+            row=0, column=0, padx=2, pady=2
         )
+        ttk.Button(export_frame, text="Export GIF", command=self._export_gif).grid(
+            row=0, column=1, padx=2, pady=2
+        )
+        ttk.Button(
+            export_frame, text="Import Sprite Sheet", command=self._import_sprite_sheet
+        ).grid(row=1, column=0, columnspan=2, padx=2, pady=2)
 
         # Status bar
         self.status_var = tk.StringVar(value="")
@@ -270,7 +337,9 @@ class PixelEditorApp(tk.Tk):
             self.document.remove_palette_color(index)
         except IndexError:
             return
-        self.current_color_index = max(0, min(self.current_color_index, len(self.document.palette.colors) - 1))
+        self.current_color_index = max(
+            0, min(self.current_color_index, len(self.document.palette.colors) - 1)
+        )
         self._refresh_palette()
         self._render_canvas()
 
@@ -337,7 +406,10 @@ class PixelEditorApp(tk.Tk):
         index = self.current_layer_index
         target = index + direction
         if 0 <= target < len(frame.layers):
-            frame.layers[index], frame.layers[target] = frame.layers[target], frame.layers[index]
+            frame.layers[index], frame.layers[target] = (
+                frame.layers[target],
+                frame.layers[index],
+            )
             self.current_layer_index = target
             self._refresh_layers()
             self._render_canvas()
@@ -371,7 +443,10 @@ class PixelEditorApp(tk.Tk):
         selection = self.frames_list.curselection()
         if selection:
             self.current_frame_index = selection[0]
-            self.current_layer_index = min(self.current_layer_index, len(self.document.frames[self.current_frame_index].layers) - 1)
+            self.current_layer_index = min(
+                self.current_layer_index,
+                len(self.document.frames[self.current_frame_index].layers) - 1,
+            )
             self._refresh_layers()
             self._render_canvas()
 
@@ -396,7 +471,11 @@ class PixelEditorApp(tk.Tk):
         self._render_canvas()
 
     def _rename_frame(self) -> None:
-        name = simpledialog.askstring("Rename Frame", "Label", initialvalue=self.frames_list.get(self.current_frame_index))
+        name = simpledialog.askstring(
+            "Rename Frame",
+            "Label",
+            initialvalue=self.frames_list.get(self.current_frame_index),
+        )
         if name:
             self.frames_list.delete(self.current_frame_index)
             self.frames_list.insert(self.current_frame_index, name)
@@ -409,14 +488,18 @@ class PixelEditorApp(tk.Tk):
     def _play_next_frame(self) -> None:
         if not self.is_playing:
             return
-        self.current_frame_index = (self.current_frame_index + 1) % len(self.document.frames)
+        self.current_frame_index = (self.current_frame_index + 1) % len(
+            self.document.frames
+        )
         self._refresh_frames()
         self._render_canvas()
         delay = max(30, self.animation_delay.get())
         self.after(delay, self._play_next_frame)
 
     def _step_frame(self, direction: int) -> None:
-        self.current_frame_index = (self.current_frame_index + direction) % len(self.document.frames)
+        self.current_frame_index = (self.current_frame_index + direction) % len(
+            self.document.frames
+        )
         self._refresh_frames()
         self._render_canvas()
 
@@ -435,12 +518,23 @@ class PixelEditorApp(tk.Tk):
                         r = int(color[1:3], 16)
                         g = int(color[3:5], 16)
                         b = int(color[5:7], 16)
-                        rgba[y][x] = ((r + 255) // 2, (g + 255) // 2, (b + 255) // 2, 160)
+                        rgba[y][x] = (
+                            (r + 255) // 2,
+                            (g + 255) // 2,
+                            (b + 255) // 2,
+                            160,
+                        )
 
         base = Image.new("RGBA", (self.document.width, self.document.height))
         flat = [tuple(pixel) for row in rgba for pixel in row]
         base.putdata(flat)
-        zoomed = base.resize((self.document.width * self.zoom.get(), self.document.height * self.zoom.get()), Image.NEAREST)
+        zoomed = base.resize(
+            (
+                self.document.width * self.zoom.get(),
+                self.document.height * self.zoom.get(),
+            ),
+            Image.NEAREST,
+        )
 
         self.canvas.delete("all")
         self._photo = ImageTk.PhotoImage(zoomed)
@@ -466,7 +560,9 @@ class PixelEditorApp(tk.Tk):
     def _on_canvas_hover(self, event: tk.Event[tk.Canvas]) -> None:  # type: ignore[name-defined]
         coords = self._canvas_to_pixel(event)
         if coords:
-            self.status_var.set(f"x={coords[0]} y={coords[1]} frame={self.current_frame_index + 1}")
+            self.status_var.set(
+                f"x={coords[0]} y={coords[1]} frame={self.current_frame_index + 1}"
+            )
         else:
             self.status_var.set("")
 
@@ -480,17 +576,25 @@ class PixelEditorApp(tk.Tk):
         if event.num == 3:
             self._apply_pixel(coords[0], coords[1], TRANSPARENT)
         else:
-            value = self.current_color_index if self.tool.get() == "pen" else TRANSPARENT
+            value = (
+                self.current_color_index if self.tool.get() == "pen" else TRANSPARENT
+            )
             self._apply_pixel(coords[0], coords[1], value)
 
     def _on_canvas_drag(self, event: tk.Event[tk.Canvas]) -> None:  # type: ignore[name-defined]
         coords = self._canvas_to_pixel(event)
         if not coords:
             return
-        value = self.current_color_index if (self.tool.get() == "pen" and event.num == 1) else TRANSPARENT
+        value = (
+            self.current_color_index
+            if (self.tool.get() == "pen" and event.num == 1)
+            else TRANSPARENT
+        )
         self._apply_pixel(coords[0], coords[1], value, record_undo=False)
 
-    def _apply_pixel(self, x: int, y: int, value: PaletteIndex, record_undo: bool = True) -> None:
+    def _apply_pixel(
+        self, x: int, y: int, value: PaletteIndex, record_undo: bool = True
+    ) -> None:
         frame = self.document.frames[self.current_frame_index]
         layer = frame.layers[self.current_layer_index]
         previous = layer.get_pixel(x, y)
@@ -498,7 +602,14 @@ class PixelEditorApp(tk.Tk):
             return
         layer.set_pixel(x, y, value)
         if record_undo:
-            action = PixelAction(self.current_frame_index, self.current_layer_index, x, y, previous, value)
+            action = PixelAction(
+                self.current_frame_index,
+                self.current_layer_index,
+                x,
+                y,
+                previous,
+                value,
+            )
             self.undo_manager.push(action)
         self._render_canvas()
 
@@ -541,13 +652,23 @@ class PixelEditorApp(tk.Tk):
 
     # ------------------------------------------------------------------ FILE OPS
     def _new_project(self) -> None:
-        width = simpledialog.askinteger("New", "Width", initialvalue=self.document.width, minvalue=1, maxvalue=256)
+        width = simpledialog.askinteger(
+            "New", "Width", initialvalue=self.document.width, minvalue=1, maxvalue=256
+        )
         if width is None:
             return
-        height = simpledialog.askinteger("New", "Height", initialvalue=self.document.height, minvalue=1, maxvalue=256)
+        height = simpledialog.askinteger(
+            "New", "Height", initialvalue=self.document.height, minvalue=1, maxvalue=256
+        )
         if height is None:
             return
-        frames = simpledialog.askinteger("New", "Frame count", initialvalue=len(self.document.frames), minvalue=1, maxvalue=64)
+        frames = simpledialog.askinteger(
+            "New",
+            "Frame count",
+            initialvalue=len(self.document.frames),
+            minvalue=1,
+            maxvalue=64,
+        )
         if frames is None:
             return
         self.document = PixelDocument(width, height)
@@ -559,7 +680,9 @@ class PixelEditorApp(tk.Tk):
         self._refresh_all()
 
     def _export_png(self) -> None:
-        path = filedialog.asksaveasfilename(defaultextension=".png", filetypes=[("PNG", "*.png")])
+        path = filedialog.asksaveasfilename(
+            defaultextension=".png", filetypes=[("PNG", "*.png")]
+        )
         if not path:
             return
         try:
@@ -568,7 +691,9 @@ class PixelEditorApp(tk.Tk):
             messagebox.showerror("Export", str(exc))
 
     def _export_gif(self) -> None:
-        path = filedialog.asksaveasfilename(defaultextension=".gif", filetypes=[("GIF", "*.gif")])
+        path = filedialog.asksaveasfilename(
+            defaultextension=".gif", filetypes=[("GIF", "*.gif")]
+        )
         if not path:
             return
         try:
@@ -577,18 +702,26 @@ class PixelEditorApp(tk.Tk):
             messagebox.showerror("Export", str(exc))
 
     def _import_sprite_sheet(self) -> None:
-        path = filedialog.askopenfilename(filetypes=[("Images", "*.png;*.gif;*.bmp;*.jpg;*.jpeg")])
+        path = filedialog.askopenfilename(
+            filetypes=[("Images", "*.png;*.gif;*.bmp;*.jpg;*.jpeg")]
+        )
         if not path:
             return
-        frame_width = simpledialog.askinteger("Import", "Frame width", initialvalue=self.document.width, minvalue=1)
+        frame_width = simpledialog.askinteger(
+            "Import", "Frame width", initialvalue=self.document.width, minvalue=1
+        )
         if frame_width is None:
             return
-        frame_height = simpledialog.askinteger("Import", "Frame height", initialvalue=self.document.height, minvalue=1)
+        frame_height = simpledialog.askinteger(
+            "Import", "Frame height", initialvalue=self.document.height, minvalue=1
+        )
         if frame_height is None:
             return
         spec = SpriteSheetSpec(frame_width, frame_height)
         try:
-            document = import_sprite_sheet(Path(path), spec, palette=self.document.palette)
+            document = import_sprite_sheet(
+                Path(path), spec, palette=self.document.palette
+            )
         except Exception as exc:
             messagebox.showerror("Import", str(exc))
             return
@@ -599,7 +732,9 @@ class PixelEditorApp(tk.Tk):
         self._refresh_all()
 
     def _save_project(self) -> None:
-        path = filedialog.asksaveasfilename(defaultextension=".json", filetypes=[("Pixel Project", "*.json")])
+        path = filedialog.asksaveasfilename(
+            defaultextension=".json", filetypes=[("Pixel Project", "*.json")]
+        )
         if not path:
             return
         data = {
@@ -642,7 +777,9 @@ class PixelEditorApp(tk.Tk):
                     layer = frame.add_layer(name=layer_data.get("name", "Layer"))
                     layer.visible = layer_data.get("visible", True)
                     layer.pixels = [row[:] for row in layer_data["pixels"]]
-            document.frames.pop(0)  # remove the placeholder frame created by add_frame()
+            document.frames.pop(
+                0
+            )  # remove the placeholder frame created by add_frame()
         except Exception as exc:
             messagebox.showerror("Open", f"Invalid project file: {exc}")
             return

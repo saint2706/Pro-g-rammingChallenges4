@@ -1,4 +1,5 @@
 """Constraint-propagation Nonogram solver."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -13,7 +14,9 @@ ClueTuple = Tuple[int, ...]
 
 
 @lru_cache(maxsize=None)
-def _generate_line_patterns(length: int, clues: ClueTuple, constraint: Line) -> Tuple[Line, ...]:
+def _generate_line_patterns(
+    length: int, clues: ClueTuple, constraint: Line
+) -> Tuple[Line, ...]:
     """Generate all line permutations compatible with the constraint."""
 
     def fits(line: Sequence[int]) -> bool:
@@ -78,7 +81,9 @@ def _generate_line_patterns(length: int, clues: ClueTuple, constraint: Line) -> 
             for pos in range(index, start):
                 line[pos] = UNKNOWN
 
-    return tuple(pattern for pattern in recurse(0, 0, [UNKNOWN] * length) if fits(pattern))
+    return tuple(
+        pattern for pattern in recurse(0, 0, [UNKNOWN] * length) if fits(pattern)
+    )
 
 
 def _merge_patterns(patterns: Sequence[Line]) -> Line:
@@ -154,7 +159,9 @@ class NonogramSolver:
 
         yield from search(initial_state)
 
-    def _propagate(self, state: SolverState) -> Tuple[Board, List[Tuple[Line, ...]], List[Tuple[Line, ...]]]:
+    def _propagate(
+        self, state: SolverState
+    ) -> Tuple[Board, List[Tuple[Line, ...]], List[Tuple[Line, ...]]]:
         height = self.puzzle.height
         width = self.puzzle.width
         board = [list(row) for row in state.board]
@@ -167,7 +174,9 @@ class NonogramSolver:
 
             for r in range(height):
                 constraint = _line_constraint(board[r])
-                possibilities = _generate_line_patterns(width, tuple(self.puzzle.row_clues[r]), constraint)
+                possibilities = _generate_line_patterns(
+                    width, tuple(self.puzzle.row_clues[r]), constraint
+                )
                 if not possibilities:
                     raise ValueError("No valid row configuration")
                 row_poss[r] = possibilities
@@ -179,7 +188,9 @@ class NonogramSolver:
 
             for c in range(width):
                 constraint = _line_constraint([board[r][c] for r in range(height)])
-                possibilities = _generate_line_patterns(height, tuple(self.puzzle.column_clues[c]), constraint)
+                possibilities = _generate_line_patterns(
+                    height, tuple(self.puzzle.column_clues[c]), constraint
+                )
                 if not possibilities:
                     raise ValueError("No valid column configuration")
                 col_poss[c] = possibilities

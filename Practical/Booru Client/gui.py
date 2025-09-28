@@ -1,4 +1,5 @@
 """Tkinter GUI for browsing Booru posts."""
+
 from __future__ import annotations
 
 import io
@@ -65,7 +66,9 @@ class BooruBrowser:
         self.rating_combo.grid(row=0, column=3, sticky="w")
         self.rating_combo.current(0)
 
-        self.search_button = ttk.Button(control_frame, text="Search", command=self.refresh)
+        self.search_button = ttk.Button(
+            control_frame, text="Search", command=self.refresh
+        )
         self.search_button.grid(row=0, column=4, padx=(10, 0))
 
         main_frame = ttk.Frame(self.root)
@@ -80,7 +83,9 @@ class BooruBrowser:
         self.preview_panel.grid(row=0, column=1, sticky="nsew")
         self.preview_panel.columnconfigure(0, weight=1)
 
-        self.preview_label = ttk.Label(self.preview_panel, text="Select a post to preview", anchor="center")
+        self.preview_label = ttk.Label(
+            self.preview_panel, text="Select a post to preview", anchor="center"
+        )
         self.preview_label.grid(row=0, column=0, sticky="nwe", padx=10, pady=10)
 
         self.metadata_text = tk.Text(self.preview_panel, height=10, wrap="word")
@@ -91,7 +96,9 @@ class BooruBrowser:
         nav_frame.grid(row=2, column=0, sticky="ew", padx=10, pady=5)
         nav_frame.columnconfigure(1, weight=1)
 
-        self.prev_button = ttk.Button(nav_frame, text="◀ Previous", command=self.prev_page)
+        self.prev_button = ttk.Button(
+            nav_frame, text="◀ Previous", command=self.prev_page
+        )
         self.prev_button.grid(row=0, column=0, sticky="w")
 
         self.page_label = ttk.Label(nav_frame, text="Page 1")
@@ -100,7 +107,9 @@ class BooruBrowser:
         self.next_button = ttk.Button(nav_frame, text="Next ▶", command=self.next_page)
         self.next_button.grid(row=0, column=2, sticky="e")
 
-        self.download_button = ttk.Button(nav_frame, text="Download Selected", command=self.download_selected)
+        self.download_button = ttk.Button(
+            nav_frame, text="Download Selected", command=self.download_selected
+        )
         self.download_button.grid(row=0, column=3, padx=(10, 0))
 
     def _bind_events(self) -> None:
@@ -113,7 +122,9 @@ class BooruBrowser:
         rating_filter = None if rating == "any" else rating
         tags = [tag for tag in self.tags_var.get().split() if tag]
         try:
-            posts = self.client.search_posts(tags=tags, rating=rating_filter, limit=self.page_size, page=self.page)
+            posts = self.client.search_posts(
+                tags=tags, rating=rating_filter, limit=self.page_size, page=self.page
+            )
         except Exception as exc:  # pragma: no cover - UI feedback only
             messagebox.showerror("Search failed", str(exc))
             return
@@ -121,7 +132,9 @@ class BooruBrowser:
         self.posts = posts
         self.results.delete(0, tk.END)
         for post in posts:
-            self.results.insert(tk.END, f"#{post.id} [{post.rating}] {' '.join(post.tags[:5])}")
+            self.results.insert(
+                tk.END, f"#{post.id} [{post.rating}] {' '.join(post.tags[:5])}"
+            )
         self.page_label.config(text=f"Page {self.page}")
         self.preview_label.configure(image="", text="Select a post to preview")
         self.metadata_text.configure(state="normal")
@@ -192,7 +205,9 @@ class BooruBrowser:
         self.root.mainloop()
 
 
-def launch_gui(*, booru: str, cache_dir: Path, download_dir: Path, page_size: int, cache_ttl: int) -> None:
+def launch_gui(
+    *, booru: str, cache_dir: Path, download_dir: Path, page_size: int, cache_ttl: int
+) -> None:
     browser = BooruBrowser(
         booru=booru,
         cache_dir=cache_dir,

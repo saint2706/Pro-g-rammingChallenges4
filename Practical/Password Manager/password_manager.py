@@ -1,4 +1,5 @@
 """Command line interface for the Practical Password Manager."""
+
 from __future__ import annotations
 
 import argparse
@@ -57,7 +58,9 @@ def _print_entries(entries: Iterable) -> None:
     print(header)
     print("-" * len(header))
     for e in entries:
-        print(f"{e.entry_id}  {e.name.ljust(width_name)}  {e.username.ljust(width_user)}  {e.category.ljust(width_cat)}")
+        print(
+            f"{e.entry_id}  {e.name.ljust(width_name)}  {e.username.ljust(width_user)}  {e.category.ljust(width_cat)}"
+        )
 
 
 def cmd_list(args: argparse.Namespace) -> None:
@@ -148,7 +151,9 @@ def cmd_export(args: argparse.Namespace) -> None:
     path = Path(args.output)
     fmt = args.format or path.suffix.lstrip(".").lower()
     if fmt == "json":
-        path.write_text(json.dumps(entries, indent=2, ensure_ascii=False), encoding="utf-8")
+        path.write_text(
+            json.dumps(entries, indent=2, ensure_ascii=False), encoding="utf-8"
+        )
     elif fmt == "csv":
         fieldnames = ["name", "username", "password", "category", "notes"]
         with path.open("w", encoding="utf-8", newline="") as fh:
@@ -183,17 +188,25 @@ def cmd_audit(args: argparse.Namespace) -> None:
     if args.reverse:
         events = list(reversed(events))
     for event in events:
-        print(f"{event.timestamp} | {event.action:<6} | {event.entry_id or '-'} | {event.detail}")
+        print(
+            f"{event.timestamp} | {event.action:<6} | {event.entry_id or '-'} | {event.detail}"
+        )
 
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Password Manager CLI")
-    parser.add_argument("--vault", default="vault.pm", help="Path to the encrypted vault")
-    parser.add_argument("--password", help="Master password (discouraged; prefer prompt)")
+    parser.add_argument(
+        "--vault", default="vault.pm", help="Path to the encrypted vault"
+    )
+    parser.add_argument(
+        "--password", help="Master password (discouraged; prefer prompt)"
+    )
     sub = parser.add_subparsers(dest="command", required=True)
 
     p_init = sub.add_parser("init", help="Create a new vault")
-    p_init.add_argument("--overwrite", action="store_true", help="Overwrite existing vault")
+    p_init.add_argument(
+        "--overwrite", action="store_true", help="Overwrite existing vault"
+    )
     p_init.add_argument("--password", help="Provide master password via CLI")
     p_init.set_defaults(func=cmd_init)
 
@@ -208,8 +221,15 @@ def build_parser() -> argparse.ArgumentParser:
     p_add = sub.add_parser("add", help="Add a new entry")
     p_add.add_argument("name")
     p_add.add_argument("username")
-    p_add.add_argument("--entry-password", dest="entry_password", help="Password for the entry")
-    p_add.add_argument("--length", type=int, default=16, help="Generated password length if not provided")
+    p_add.add_argument(
+        "--entry-password", dest="entry_password", help="Password for the entry"
+    )
+    p_add.add_argument(
+        "--length",
+        type=int,
+        default=16,
+        help="Generated password length if not provided",
+    )
     p_add.add_argument("--category", default="general")
     p_add.add_argument("--notes")
     p_add.set_defaults(func=cmd_add)
@@ -242,7 +262,11 @@ def build_parser() -> argparse.ArgumentParser:
     p_import = sub.add_parser("import", help="Import entries")
     p_import.add_argument("--input", required=True)
     p_import.add_argument("--format", choices=["json", "csv"])
-    p_import.add_argument("--replace", action="store_true", help="Replace current entries with imported ones")
+    p_import.add_argument(
+        "--replace",
+        action="store_true",
+        help="Replace current entries with imported ones",
+    )
     p_import.set_defaults(func=cmd_import)
 
     p_audit = sub.add_parser("audit", help="Show audit log")

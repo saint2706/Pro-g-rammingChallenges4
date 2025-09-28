@@ -21,10 +21,16 @@ PRESETS_DIR = pathlib.Path(__file__).resolve().parents[1] / "presets"
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--preset", default="ambient_pad", help="Preset name (defaults to ambient_pad)")
+    parser.add_argument(
+        "--preset", default="ambient_pad", help="Preset name (defaults to ambient_pad)"
+    )
     parser.add_argument("--midi", help="Optional MIDI input device name", default=None)
-    parser.add_argument("--duration", type=float, default=6.0, help="Demo duration for offline fallback")
-    parser.add_argument("--output", type=pathlib.Path, default=pathlib.Path("demo_output.wav"))
+    parser.add_argument(
+        "--duration", type=float, default=6.0, help="Demo duration for offline fallback"
+    )
+    parser.add_argument(
+        "--output", type=pathlib.Path, default=pathlib.Path("demo_output.wav")
+    )
     parser.add_argument("--sample-rate", type=int, default=DEFAULT_SAMPLE_RATE)
     return parser.parse_args()
 
@@ -37,7 +43,9 @@ def load_preset(name: str) -> InstrumentPreset:
     return presets[name]
 
 
-def offline_render(preset: InstrumentPreset, duration: float, output: pathlib.Path, sample_rate: int) -> None:
+def offline_render(
+    preset: InstrumentPreset, duration: float, output: pathlib.Path, sample_rate: int
+) -> None:
     from ..sound_synth import SynthEngine
 
     engine = SynthEngine(preset, sample_rate)
@@ -65,7 +73,9 @@ def main() -> None:
                 midi_port = performer.open_midi(args.midi)
                 print(f"Listening to MIDI input '{args.midi}'...")
             else:
-                print("No MIDI device specified. Playing demo pattern (Ctrl+C to quit)...")
+                print(
+                    "No MIDI device specified. Playing demo pattern (Ctrl+C to quit)..."
+                )
             import time
 
             step = 0.5

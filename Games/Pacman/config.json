@@ -1,0 +1,14 @@
+{
+  "starting_lives": 3,
+  "base_pacman_speed": 90,
+  "base_ghost_speed": 80,
+  "frightened_speed": 60,
+  "frightened_duration": 6.0,
+  "elroy_threshold": 40,
+  "scatter_chase_cycle": [7, 20, 7, 20, 5, 20, 5],
+  "level_speed_modifiers": [
+    {"pacman": 1.0, "ghost": 1.0, "frightened": 1.0},
+    {"pacman": 1.05, "ghost": 1.05, "frightened": 1.0},
+    {"pacman": 1.1, "ghost": 1.1, "frightened": 0.95}
+  ]
+}

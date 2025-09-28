@@ -33,7 +33,9 @@ class PortfolioReport:
         else:
             cagr = (equity.iloc[-1] / equity.iloc[0]) ** (365 / duration_days) - 1
         returns = equity.pct_change().dropna()
-        volatility = float(returns.std() * math.sqrt(252)) if not returns.empty else None
+        volatility = (
+            float(returns.std() * math.sqrt(252)) if not returns.empty else None
+        )
         running_max = equity.cummax()
         drawdowns = (equity / running_max) - 1
         max_drawdown = float(drawdowns.min()) if not drawdowns.empty else 0.0
@@ -50,7 +52,9 @@ class PortfolioReport:
         trades: Iterable[Trade] = self.result.trades
         trade_pairs = list(zip(trades[::2], trades[1::2]))
         for buy, sell in trade_pairs:
-            pnl = (sell.price - buy.price) * sell.quantity - 2 * self.result.metadata.get("commission", 0.0)
+            pnl = (
+                sell.price - buy.price
+            ) * sell.quantity - 2 * self.result.metadata.get("commission", 0.0)
             if pnl >= 0:
                 wins += 1
             else:
@@ -64,9 +68,17 @@ class PortfolioReport:
             f"Strategy: {self.result.strategy_name}",
             f"Symbol:   {self.result.symbol}",
             f"Return:   {metrics.total_return:.2%}",
-            f"CAGR:     {metrics.cagr:.2%}" if metrics.cagr is not None else "CAGR:     n/a",
+            (
+                f"CAGR:     {metrics.cagr:.2%}"
+                if metrics.cagr is not None
+                else "CAGR:     n/a"
+            ),
             f"Max DD:   {metrics.max_drawdown:.2%}",
-            f"Vol:      {metrics.volatility:.2%}" if metrics.volatility is not None else "Vol:      n/a",
+            (
+                f"Vol:      {metrics.volatility:.2%}"
+                if metrics.volatility is not None
+                else "Vol:      n/a"
+            ),
             f"Trades:   {len(self.result.trades)}",  # each trade entry is buy or sell
             f"Wins/Losses: {wins}/{losses}",
         ]
@@ -76,7 +88,9 @@ class PortfolioReport:
         print(self.to_cli())
 
     def plot(self) -> None:
-        if importlib.util.find_spec("matplotlib.pyplot") is None:  # pragma: no cover - depends on optional dep
+        if (
+            importlib.util.find_spec("matplotlib.pyplot") is None
+        ):  # pragma: no cover - depends on optional dep
             raise RuntimeError("matplotlib is required for plotting")
         plt = importlib.import_module("matplotlib.pyplot")
 

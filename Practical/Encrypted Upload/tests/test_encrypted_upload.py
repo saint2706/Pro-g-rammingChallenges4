@@ -128,7 +128,9 @@ def test_http_upload_flow(tmp_path, http_server, monkeypatch):
 
     assert module.handle_upload(args) == 0
     assert MultipartCaptureHandler.stored_payload is not None
-    salt, nonce, ciphertext = module.parse_payload(MultipartCaptureHandler.stored_payload)
+    salt, nonce, ciphertext = module.parse_payload(
+        MultipartCaptureHandler.stored_payload
+    )
     assert len(nonce) == 12
     manifest = json.loads(manifest_path.read_text())
     assert base64.b64encode(salt).decode() == manifest["encryption"]["salt"]
@@ -180,7 +182,9 @@ def test_s3_upload_and_manifest(tmp_path):
     # Validate signature
     signature = manifest.pop("signature")
     serialized = json.dumps(manifest, sort_keys=True).encode()
-    expected_sig = hmac.new(bytes.fromhex(args.signing_key), serialized, module.hashlib.sha256).digest()
+    expected_sig = hmac.new(
+        bytes.fromhex(args.signing_key), serialized, module.hashlib.sha256
+    ).digest()
     assert base64.b64encode(expected_sig).decode() == signature["value"]
 
     obj = client.get_object(Bucket="test-bucket", Key=manifest["upload"]["object_key"])

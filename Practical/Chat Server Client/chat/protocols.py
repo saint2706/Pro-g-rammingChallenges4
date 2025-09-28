@@ -53,7 +53,9 @@ def ensure_fields(data: Dict[str, Any], required: Iterable[str]) -> None:
 
 
 def system_payload(message: str, room: str, seq: int) -> Dict[str, Any]:
-    return Broadcast(room=room, user=SYSTEM_USER, text=message, seq=seq, type="system").to_payload()
+    return Broadcast(
+        room=room, user=SYSTEM_USER, text=message, seq=seq, type="system"
+    ).to_payload()
 
 
 def ack_payload(message_id: int) -> Dict[str, Any]:

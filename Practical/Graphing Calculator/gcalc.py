@@ -23,53 +23,13 @@ from __future__ import annotations
 
 import tkinter as tk
 from tkinter import ttk, messagebox, filedialog
-from dataclasses import dataclass
-from typing import List, Callable, Tuple, Dict
-
-import numpy as np
-import sympy as sp
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
+from plot_core import PlotSettings, evaluate_functions, parse_functions
+
 # ----------------------------- Data Model ----------------------------- #
 
-
-@dataclass(slots=True)
-class PlotSettings:
-    x_min: float = -10.0
-    x_max: float = 10.0
-    samples: int = 1000
-    show_derivative: bool = False
-
-    def validate(self) -> None:
-        if self.x_min >= self.x_max:
-            raise ValueError("x-min must be less than x-max")
-        if self.samples < 10 or self.samples > 20000:
-            raise ValueError("samples must be between 10 and 20000")
-
-
-# Allowed symbols for safer sympify environment
-ALLOWED_FUNCS: Dict[str, sp.Function] = {
-    name: getattr(sp, name)
-    for name in [
-        "sin",
-        "cos",
-        "tan",
-        "exp",
-        "log",
-        "sqrt",
-        "abs",
-        "asin",
-        "acos",
-        "atan",
-        "sinh",
-        "cosh",
-        "tanh",
-    ]
-    if hasattr(sp, name)
-}
-ALLOWED_SYMBOLS = {"x": sp.Symbol("x")}
-SAFE_NAMESPACE = {**ALLOWED_FUNCS, **ALLOWED_SYMBOLS, "E": sp.E, "pi": sp.pi}
 
 # ----------------------------- Main Application ----------------------------- #
 
@@ -164,22 +124,6 @@ class GraphingCalculator:
         except ValueError as e:
             raise ValueError(f"Invalid settings: {e}")
 
-    def _parse_functions(self, raw: str) -> List[str]:
-        # Split on semicolons or newlines, strip whitespace, ignore empties
-        funcs = [f.strip() for chunk in raw.split("\n") for f in chunk.split(";")]
-        return [f for f in funcs if f]
-
-    def _sympify(self, expr: str) -> sp.Expr:
-        # Use restricted namespace for safety
-        try:
-            return sp.sympify(expr, locals=SAFE_NAMESPACE)
-        except (sp.SympifyError, TypeError) as e:
-            raise ValueError(f"Cannot parse expression '{expr}': {e}")
-
-    def _build_lambda(self, expression: sp.Expr) -> Callable[[np.ndarray], np.ndarray]:
-        x = ALLOWED_SYMBOLS["x"]
-        return sp.lambdify(x, expression, modules="numpy")
-
     # ------------------ Actions ------------------ #
     def clear_plot(self) -> None:
         self.ax.clear()
@@ -206,17 +150,11 @@ class GraphingCalculator:
             return
         try:
             self._update_settings_from_ui()
-            fn_strings = self._parse_functions(raw)
+            fn_strings = parse_functions(raw)
             if not fn_strings:
                 self.status_var.set("No valid functions found.")
                 return
-            expressions = [self._sympify(s) for s in fn_strings]
-            lambdas = [self._build_lambda(expr) for expr in expressions]
-
-            # Prepare domain
-            x_vals = np.linspace(
-                self.settings.x_min, self.settings.x_max, self.settings.samples
-            )
+            result = evaluate_functions(fn_strings, self.settings)
 
             # Clear and re-init axes
             self.ax.clear()
@@ -224,46 +162,45 @@ class GraphingCalculator:
             self.ax.axhline(0, color="black", linewidth=0.5)
             self.ax.axvline(0, color="black", linewidth=0.5)
 
-            derivative_flag = self.settings.show_derivative
-            x_symbol = ALLOWED_SYMBOLS["x"]
-            for s, expr, fn in zip(fn_strings, expressions, lambdas):
-                try:
-                    y_vals = fn(x_vals)
-                    # Filter invalid (complex or nan)
-                    if np.iscomplexobj(y_vals):
-                        y_vals = np.real(y_vals)
-                    y_vals = np.where(np.isfinite(y_vals), y_vals, np.nan)
-                    self.ax.plot(x_vals, y_vals, label=f"f(x)={s}")
+            for line in result.lines:
+                self.ax.plot(
+                    result.x,
+                    line.values,
+                    label=line.label,
+                    linestyle=line.linestyle,
+                )
 
-                    if derivative_flag:
-                        deriv_expr = sp.diff(expr, x_symbol)
-                        deriv_fn = self._build_lambda(deriv_expr)
-                        d_vals = deriv_fn(x_vals)
-                        if np.iscomplexobj(d_vals):
-                            d_vals = np.real(d_vals)
-                        d_vals = np.where(np.isfinite(d_vals), d_vals, np.nan)
-                        self.ax.plot(
-                            x_vals,
-                            d_vals,
-                            linestyle="--",
-                            label=f"f'(x)={sp.srepr(deriv_expr)[:25]}...",
-                        )
-                except Exception as inner_e:  # continue plotting others
-                    self.ax.text(
-                        0.02,
-                        0.95,
-                        f"Error plotting {s}: {inner_e}",
-                        transform=self.ax.transAxes,
-                        fontsize=8,
-                        color="red",
-                    )
+            for line in result.derivative_lines:
+                self.ax.plot(
+                    result.x,
+                    line.values,
+                    label=line.label,
+                    linestyle=line.linestyle,
+                )
+
+            for idx, error in enumerate(result.errors):
+                self.ax.text(
+                    0.02,
+                    0.95 - idx * 0.05,
+                    error,
+                    transform=self.ax.transAxes,
+                    fontsize=8,
+                    color="red",
+                )
+
+            if result.lines or result.derivative_lines:
+                self.ax.legend(loc="upper right", fontsize="small")
 
             self.ax.set_xlabel("x")
             self.ax.set_ylabel("y")
             self.ax.set_title("Graph")
-            self.ax.legend(loc="upper right", fontsize="small")
             self.canvas.draw()
-            self.status_var.set(f"Plotted {len(fn_strings)} function(s).")
+            summary = f"Plotted {len(result.lines)} function(s)."
+            if result.derivative_lines:
+                summary += " Derivatives shown."
+            if result.errors:
+                summary += f" {len(result.errors)} error(s)."
+            self.status_var.set(summary)
         except ValueError as e:
             messagebox.showerror("Input Error", str(e))
             self.status_var.set("Input error.")

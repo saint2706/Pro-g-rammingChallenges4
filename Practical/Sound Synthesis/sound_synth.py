@@ -1,4 +1,5 @@
 """Modular sound synthesis engine with MIDI-aware realtime playback support."""
+
 from __future__ import annotations
 
 import json
@@ -51,7 +52,9 @@ class InstrumentPreset:
     def from_dict(cls, data: Dict) -> "InstrumentPreset":
         return cls(
             name=data.get("name", "Untitled"),
-            oscillators=[OscillatorConfig(**osc) for osc in data.get("oscillators", [])],
+            oscillators=[
+                OscillatorConfig(**osc) for osc in data.get("oscillators", [])
+            ],
             envelope=EnvelopeConfig(**data.get("envelope", {})),
             filter=FilterConfig(**data.get("filter", {})),
         )
@@ -64,7 +67,9 @@ class InstrumentPreset:
 class ADSREnvelope:
     """Linear ADSR envelope generator."""
 
-    def __init__(self, config: EnvelopeConfig, sample_rate: int = DEFAULT_SAMPLE_RATE) -> None:
+    def __init__(
+        self, config: EnvelopeConfig, sample_rate: int = DEFAULT_SAMPLE_RATE
+    ) -> None:
         self.config = config
         self.sample_rate = sample_rate
         self.state = "idle"
@@ -122,7 +127,9 @@ class ADSREnvelope:
 class Oscillator:
     """Oscillator supporting multiple waveform types."""
 
-    def __init__(self, config: OscillatorConfig, sample_rate: int = DEFAULT_SAMPLE_RATE) -> None:
+    def __init__(
+        self, config: OscillatorConfig, sample_rate: int = DEFAULT_SAMPLE_RATE
+    ) -> None:
         self.config = config
         self.sample_rate = sample_rate
         self.phase = 0.0
@@ -152,7 +159,9 @@ class Oscillator:
 class OnePoleFilter:
     """Simple one-pole filter for tone shaping."""
 
-    def __init__(self, config: FilterConfig, sample_rate: int = DEFAULT_SAMPLE_RATE) -> None:
+    def __init__(
+        self, config: FilterConfig, sample_rate: int = DEFAULT_SAMPLE_RATE
+    ) -> None:
         self.config = config
         self.sample_rate = sample_rate
         self._prev = 0.0
@@ -178,7 +187,13 @@ class OnePoleFilter:
 
 
 class SynthVoice:
-    def __init__(self, preset: InstrumentPreset, note: int, velocity: int, sample_rate: int = DEFAULT_SAMPLE_RATE):
+    def __init__(
+        self,
+        preset: InstrumentPreset,
+        note: int,
+        velocity: int,
+        sample_rate: int = DEFAULT_SAMPLE_RATE,
+    ):
         self.preset = preset
         self.note = note
         self.velocity = velocity
@@ -208,13 +223,17 @@ class SynthVoice:
 class SynthEngine:
     """Polyphonic synth engine that supports realtime streaming and offline rendering."""
 
-    def __init__(self, preset: InstrumentPreset, sample_rate: int = DEFAULT_SAMPLE_RATE) -> None:
+    def __init__(
+        self, preset: InstrumentPreset, sample_rate: int = DEFAULT_SAMPLE_RATE
+    ) -> None:
         self.sample_rate = sample_rate
         self.preset = preset
         self.active_voices: Dict[int, SynthVoice] = {}
 
     def note_on(self, note: int, velocity: int = 100) -> None:
-        self.active_voices[note] = SynthVoice(self.preset, note, velocity, self.sample_rate)
+        self.active_voices[note] = SynthVoice(
+            self.preset, note, velocity, self.sample_rate
+        )
 
     def note_off(self, note: int) -> None:
         voice = self.active_voices.get(note)
@@ -336,11 +355,15 @@ class RealtimePerformer:
             callback=self._callback,
         )
 
-    def _callback(self, outdata, frames, _time, _status) -> None:  # pragma: no cover - realtime
+    def _callback(
+        self, outdata, frames, _time, _status
+    ) -> None:  # pragma: no cover - realtime
         chunk = self.synth.render(frames)
         outdata[:, 0] = chunk
 
-    def open_midi(self, device_name: Optional[str] = None):  # pragma: no cover - realtime
+    def open_midi(
+        self, device_name: Optional[str] = None
+    ):  # pragma: no cover - realtime
         if not self.mido:
             raise RuntimeError("mido + python-rtmidi are required for MIDI input")
         if device_name:

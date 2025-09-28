@@ -115,7 +115,11 @@ class SQLParser:
                 stream.consume("(")
                 ref_column = stream.consume()
                 stream.consume(")")
-                fk = ForeignKey(column=column_name, referenced_table=ref_table, referenced_column=ref_column)
+                fk = ForeignKey(
+                    column=column_name,
+                    referenced_table=ref_table,
+                    referenced_column=ref_column,
+                )
                 col_kwargs["foreign_key"] = fk
             columns.append(Column(name=column_name, col_type=column_type, **col_kwargs))
             if stream.match(","):

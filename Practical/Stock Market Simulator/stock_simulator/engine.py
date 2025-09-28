@@ -72,7 +72,9 @@ class SimulationEngine:
             interval=interval,
             adjust_close=adjust_close,
         )
-        price_field = "Adj Close" if adjust_close and "Adj Close" in prices.columns else "Close"
+        price_field = (
+            "Adj Close" if adjust_close and "Adj Close" in prices.columns else "Close"
+        )
         signals = strategy.generate_signals(prices)
         if not isinstance(signals, pd.Series):
             raise TypeError("Strategy.generate_signals must return a pandas Series")
@@ -84,7 +86,9 @@ class SimulationEngine:
         trades: List[Trade] = []
 
         for timestamp, row in prices.iterrows():
-            signal = float(signals.loc[timestamp]) if timestamp in signals.index else 0.0
+            signal = (
+                float(signals.loc[timestamp]) if timestamp in signals.index else 0.0
+            )
             price = float(row[price_field])
             trade_qty = 0
 
@@ -95,7 +99,9 @@ class SimulationEngine:
                     cost = quantity * execution_price + self.commission
                     cash -= cost
                     shares += quantity
-                    trades.append(Trade(timestamp, "BUY", execution_price, quantity, cash))
+                    trades.append(
+                        Trade(timestamp, "BUY", execution_price, quantity, cash)
+                    )
                     trade_qty = quantity
             elif signal < -0.5 and shares > 0:
                 execution_price = max(price - self.slippage, 0)

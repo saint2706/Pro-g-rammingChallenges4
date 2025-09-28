@@ -24,7 +24,12 @@ def _write_id3v1_file(path: Path) -> None:
     year = "1999"
     comment = ("Comment" + "\x00" * 20).ljust(30, "\x00")
     genre = bytes([17])  # Rock
-    data = b"TAG" + title.encode("latin-1") + artist.encode("latin-1") + album.encode("latin-1")
+    data = (
+        b"TAG"
+        + title.encode("latin-1")
+        + artist.encode("latin-1")
+        + album.encode("latin-1")
+    )
     data += year.encode("latin-1") + comment.encode("latin-1") + genre
     path.write_bytes(data)
 

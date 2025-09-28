@@ -40,7 +40,9 @@ class TranslationUnitCache:
     """An in-memory and on-disk cache for clang translation units."""
 
     def __init__(self) -> None:
-        self._items: "OrderedDict[str, Tuple[cindex.TranslationUnit, str]]" = OrderedDict()
+        self._items: "OrderedDict[str, Tuple[cindex.TranslationUnit, str]]" = (
+            OrderedDict()
+        )
         self._lock = threading.Lock()
 
     def get(self, key: str, content_hash: str) -> Optional[cindex.TranslationUnit]:
@@ -55,7 +57,9 @@ class TranslationUnitCache:
                 del self._items[key]
         return None
 
-    def put(self, key: str, tu: "cindex.TranslationUnit", content_hash: str, max_items: int) -> None:
+    def put(
+        self, key: str, tu: "cindex.TranslationUnit", content_hash: str, max_items: int
+    ) -> None:
         with self._lock:
             self._items[key] = (tu, content_hash)
             self._items.move_to_end(key)
@@ -103,7 +107,9 @@ def _configure_clang(settings: sublime.Settings) -> None:
             cindex = loaded_index
         except Exception as exc:  # pragma: no cover - surfaces via popup
             sublime.error_message(
-                "Unable to import clang.cindex. Install llvm's python bindings.\n{}".format(exc)
+                "Unable to import clang.cindex. Install llvm's python bindings.\n{}".format(
+                    exc
+                )
             )
             return
 
@@ -121,13 +127,17 @@ def _make_index() -> Optional["cindex.Index"]:
 def _get_compile_args(settings: sublime.Settings) -> List[str]:
     args = list(settings.get("clang_arguments") or [])
     project_settings = sublime.active_window().project_data() or {}
-    cpp_settings = project_settings.get("cpp") if isinstance(project_settings, dict) else None
+    cpp_settings = (
+        project_settings.get("cpp") if isinstance(project_settings, dict) else None
+    )
     if isinstance(cpp_settings, dict):
         args.extend(cpp_settings.get("extra_args", []))
     return args
 
 
-def _get_translation_unit(view: sublime.View, index: "cindex.Index") -> Optional["cindex.TranslationUnit"]:
+def _get_translation_unit(
+    view: sublime.View, index: "cindex.Index"
+) -> Optional["cindex.TranslationUnit"]:
     file_name = view.file_name() or "<untitled>"
     content = view.substr(sublime.Region(0, view.size()))
     content_hash = _hash_content(content)
@@ -139,7 +149,10 @@ def _get_translation_unit(view: sublime.View, index: "cindex.Index") -> Optional
 
     unsaved = [(file_name, content)]
     args = _get_compile_args(cache_settings)
-    options = cindex.TranslationUnit.PARSE_DETAILED_PROCESSING_RECORD | cindex.TranslationUnit.PARSE_INCOMPLETE
+    options = (
+        cindex.TranslationUnit.PARSE_DETAILED_PROCESSING_RECORD
+        | cindex.TranslationUnit.PARSE_INCOMPLETE
+    )
 
     try:
         tu = index.parse(file_name, args=args, unsaved_files=unsaved, options=options)
@@ -148,7 +161,9 @@ def _get_translation_unit(view: sublime.View, index: "cindex.Index") -> Optional
         if compile_commands_dir and os.path.isdir(compile_commands_dir):
             cmake_args = list(args)
             cmake_args.append("-I" + compile_commands_dir)
-            tu = index.parse(file_name, args=cmake_args, unsaved_files=unsaved, options=options)
+            tu = index.parse(
+                file_name, args=cmake_args, unsaved_files=unsaved, options=options
+            )
         else:
             raise
 
@@ -156,7 +171,9 @@ def _get_translation_unit(view: sublime.View, index: "cindex.Index") -> Optional
     return tu
 
 
-def _cursor_from_location(tu: "cindex.TranslationUnit", file_path: str, row: int, col: int) -> "cindex.Cursor":
+def _cursor_from_location(
+    tu: "cindex.TranslationUnit", file_path: str, row: int, col: int
+) -> "cindex.Cursor":
     file_obj = tu.get_file(file_path)
     location = cindex.SourceLocation.from_position(tu, file_obj, row, col)
     return cindex.Cursor.from_location(tu, location)
@@ -182,7 +199,9 @@ def _run_clangd(command: List[str], input_payload: str) -> str:
 
 
 class CppAutoComplete(sublime_plugin.EventListener):
-    def on_query_completions(self, view: sublime.View, prefix: str, locations: List[int]):
+    def on_query_completions(
+        self, view: sublime.View, prefix: str, locations: List[int]
+    ):
         if not view.match_selector(locations[0], "source.c++"):
             return None
 
@@ -254,7 +273,10 @@ class CppGoToDefinitionCommand(sublime_plugin.TextCommand):
             window = view.window()
             if not window:
                 return
-            window.open_file("{}:{}:{}".format(location.file.name, location.line, location.column), sublime.ENCODED_POSITION)
+            window.open_file(
+                "{}:{}:{}".format(location.file.name, location.line, location.column),
+                sublime.ENCODED_POSITION,
+            )
         else:
             sublime.status_message("No definition found via clang")
 
@@ -287,7 +309,10 @@ class CppGoToDeclarationCommand(sublime_plugin.TextCommand):
             window = view.window()
             if not window:
                 return
-            window.open_file("{}:{}:{}".format(location.file.name, location.line, location.column), sublime.ENCODED_POSITION)
+            window.open_file(
+                "{}:{}:{}".format(location.file.name, location.line, location.column),
+                sublime.ENCODED_POSITION,
+            )
         else:
             sublime.status_message("No declaration found via clang")
 
@@ -336,7 +361,9 @@ class CppIndexSymbolsCommand(sublime_plugin.WindowCommand):
             symbols = list(_walk_symbols(tu.cursor))
             with PROJECT_INDEX_LOCK:
                 with open(cache_path, "w", encoding="utf-8") as handle:
-                    json.dump({"symbols": symbols, "generated": time.time()}, handle, indent=2)
+                    json.dump(
+                        {"symbols": symbols, "generated": time.time()}, handle, indent=2
+                    )
             sublime.status_message("Indexed {} symbols".format(len(symbols)))
 
         threading.Thread(target=worker, daemon=True).start()
@@ -420,10 +447,13 @@ class CppClangdCheckCommand(sublime_plugin.WindowCommand):
 
 class CppOpenSettingsCommand(sublime_plugin.WindowCommand):
     def run(self):
-        self.window.run_command("edit_settings", {
-            "base_file": "Packages/User/{file}".format(file=SETTINGS_FILE),
-            "default": _default_settings_template(),
-        })
+        self.window.run_command(
+            "edit_settings",
+            {
+                "base_file": "Packages/User/{file}".format(file=SETTINGS_FILE),
+                "default": _default_settings_template(),
+            },
+        )
 
 
 def _default_settings_template() -> str:

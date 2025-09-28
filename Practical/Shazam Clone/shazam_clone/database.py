@@ -36,8 +36,14 @@ class TrackMetadata:
         return payload
 
     @classmethod
-    def from_json(cls, track_id: str, payload: MutableMapping[str, object]) -> "TrackMetadata":
-        extra_keys = {key for key in payload.keys() if key not in {"title", "artist", "duration", "path", "minhash"}}
+    def from_json(
+        cls, track_id: str, payload: MutableMapping[str, object]
+    ) -> "TrackMetadata":
+        extra_keys = {
+            key
+            for key in payload.keys()
+            if key not in {"title", "artist", "duration", "path", "minhash"}
+        }
         extra = {key: str(payload[key]) for key in extra_keys}
         return cls(
             track_id=track_id,
@@ -97,7 +103,9 @@ class FingerprintDatabase:
 
         self.tracks[track_id] = metadata
         for fingerprint in fingerprints:
-            self.hash_buckets[str(fingerprint.hash)].append((track_id, fingerprint.time_offset))
+            self.hash_buckets[str(fingerprint.hash)].append(
+                (track_id, fingerprint.time_offset)
+            )
         return metadata
 
     def build_from_paths(self, paths: Iterable[str | Path]) -> None:
@@ -124,8 +132,12 @@ class FingerprintDatabase:
                 "min_time_delta": self.config.min_time_delta,
                 "max_time_delta": self.config.max_time_delta,
             },
-            "tracks": {track_id: meta.to_json() for track_id, meta in self.tracks.items()},
-            "hash_buckets": {bucket: pairs for bucket, pairs in self.hash_buckets.items()},
+            "tracks": {
+                track_id: meta.to_json() for track_id, meta in self.tracks.items()
+            },
+            "hash_buckets": {
+                bucket: pairs for bucket, pairs in self.hash_buckets.items()
+            },
         }
 
     def save(self, path: str | Path) -> None:
@@ -149,11 +161,25 @@ class FingerprintDatabase:
             hop_length=int(config_payload.get("hop_length", defaults.hop_length)),
             fan_value=int(config_payload.get("fan_value", defaults.fan_value)),
             minhash_size=int(config_payload.get("min_hashes", defaults.minhash_size)),
-            peak_neighborhood_freq=int(config_payload.get("peak_neighborhood_freq", defaults.peak_neighborhood_freq)),
-            peak_neighborhood_time=int(config_payload.get("peak_neighborhood_time", defaults.peak_neighborhood_time)),
-            amplitude_threshold=float(config_payload.get("amplitude_threshold", defaults.amplitude_threshold)),
-            min_time_delta=float(config_payload.get("min_time_delta", defaults.min_time_delta)),
-            max_time_delta=float(config_payload.get("max_time_delta", defaults.max_time_delta)),
+            peak_neighborhood_freq=int(
+                config_payload.get(
+                    "peak_neighborhood_freq", defaults.peak_neighborhood_freq
+                )
+            ),
+            peak_neighborhood_time=int(
+                config_payload.get(
+                    "peak_neighborhood_time", defaults.peak_neighborhood_time
+                )
+            ),
+            amplitude_threshold=float(
+                config_payload.get("amplitude_threshold", defaults.amplitude_threshold)
+            ),
+            min_time_delta=float(
+                config_payload.get("min_time_delta", defaults.min_time_delta)
+            ),
+            max_time_delta=float(
+                config_payload.get("max_time_delta", defaults.max_time_delta)
+            ),
         )
         database = cls(config=config)
         tracks_payload = payload.get("tracks", {})
@@ -161,7 +187,9 @@ class FingerprintDatabase:
             database.tracks[track_id] = TrackMetadata.from_json(track_id, meta)
         hash_buckets_payload = payload.get("hash_buckets", {})
         for bucket, pairs in hash_buckets_payload.items():
-            database.hash_buckets[bucket] = [(str(track), float(offset)) for track, offset in pairs]
+            database.hash_buckets[bucket] = [
+                (str(track), float(offset)) for track, offset in pairs
+            ]
         return database
 
     # ------------------------------------------------------------------

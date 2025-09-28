@@ -22,14 +22,20 @@ class UdpChatProtocol(asyncio.DatagramProtocol):
         self.sequence = 0
         self.rooms: Dict[str, Set[Address]] = defaultdict(set)
         self.peers: Dict[Address, Dict[str, str]] = {}
-        self.history: Dict[str, Deque[dict]] = defaultdict(lambda: deque(maxlen=config.history_size))
+        self.history: Dict[str, Deque[dict]] = defaultdict(
+            lambda: deque(maxlen=config.history_size)
+        )
 
-    def connection_made(self, transport: asyncio.BaseTransport) -> None:  # pragma: no cover - callback
+    def connection_made(
+        self, transport: asyncio.BaseTransport
+    ) -> None:  # pragma: no cover - callback
         self.transport = transport  # type: ignore[assignment]
         sock = transport.get_extra_info("sockname")
         logging.getLogger(__name__).info("UDP chat listening on %s", sock)
 
-    def datagram_received(self, data: bytes, addr: Address) -> None:  # pragma: no cover - callback
+    def datagram_received(
+        self, data: bytes, addr: Address
+    ) -> None:  # pragma: no cover - callback
         try:
             payload = protocols.decode_json(data)
         except protocols.ProtocolError as exc:
@@ -45,7 +51,9 @@ class UdpChatProtocol(asyncio.DatagramProtocol):
         else:
             self._send_error(addr, f"Unknown message type: {msg_type}")
 
-    def connection_lost(self, exc: Optional[Exception]) -> None:  # pragma: no cover - callback
+    def connection_lost(
+        self, exc: Optional[Exception]
+    ) -> None:  # pragma: no cover - callback
         if exc:
             logging.getLogger(__name__).error("UDP server error: %s", exc)
 
@@ -61,12 +69,18 @@ class UdpChatProtocol(asyncio.DatagramProtocol):
         if info and info.get("room") == room and info.get("user") == user:
             return
         if info and info.get("room"):
-            self._broadcast(protocols.system_payload(f"{info['user']} left", info["room"], self._next_seq()))
+            self._broadcast(
+                protocols.system_payload(
+                    f"{info['user']} left", info["room"], self._next_seq()
+                )
+            )
             self.rooms[info["room"]].discard(addr)
         self.peers[addr] = {"room": room, "user": user}
         self.rooms[room].add(addr)
         self._send_history(addr, room)
-        self._broadcast(protocols.system_payload(f"{user} joined", room, self._next_seq()))
+        self._broadcast(
+            protocols.system_payload(f"{user} joined", room, self._next_seq())
+        )
 
     def _handle_message(self, addr: Address, payload: dict) -> None:
         protocols.ensure_fields(payload, ["text", "id"])
@@ -94,7 +108,11 @@ class UdpChatProtocol(asyncio.DatagramProtocol):
             room = info.get("room")
             if room:
                 self.rooms[room].discard(addr)
-                self._broadcast(protocols.system_payload(f"{info['user']} left", room, self._next_seq()))
+                self._broadcast(
+                    protocols.system_payload(
+                        f"{info['user']} left", room, self._next_seq()
+                    )
+                )
 
     def _broadcast(self, payload: dict) -> None:
         room = payload.get("room", "system")

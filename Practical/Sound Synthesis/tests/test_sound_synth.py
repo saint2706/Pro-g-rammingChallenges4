@@ -7,7 +7,8 @@ MODULE_PATH = pathlib.Path(__file__).resolve().parents[1] / "sound_synth.py"
 spec = importlib.util.spec_from_file_location("sound_synth", MODULE_PATH)
 synth = importlib.util.module_from_spec(spec)
 import sys
-sys.modules.setdefault('sound_synth', synth)
+
+sys.modules.setdefault("sound_synth", synth)
 assert spec.loader is not None
 spec.loader.exec_module(synth)  # type: ignore[attr-defined]
 
@@ -42,7 +43,9 @@ def test_noise_oscillator_statistics():
 
 
 def test_adsr_envelope_stages():
-    env = synth.ADSREnvelope(synth.EnvelopeConfig(attack=0.01, decay=0.01, sustain=0.5, release=0.01))
+    env = synth.ADSREnvelope(
+        synth.EnvelopeConfig(attack=0.01, decay=0.01, sustain=0.5, release=0.01)
+    )
     env.note_on()
     attack = env.render(100)
     assert attack.max() <= 1.0
@@ -64,7 +67,9 @@ def test_render_sequence_uses_events():
     preset = synth.InstrumentPreset(
         name="Test",
         oscillators=[synth.OscillatorConfig(type="sine")],
-        envelope=synth.EnvelopeConfig(attack=0.01, decay=0.01, sustain=0.9, release=0.01),
+        envelope=synth.EnvelopeConfig(
+            attack=0.01, decay=0.01, sustain=0.9, release=0.01
+        ),
     )
     engine = synth.SynthEngine(preset)
     events = [(0.0, "note_on", 60, 100), (0.5, "note_off", 60, 0)]

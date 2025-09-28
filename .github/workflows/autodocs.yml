@@ -1,0 +1,24 @@
+name: Markdown Autodocs
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+
+jobs:
+  markdown-autodocs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Markdown Autodocs
+        uses: dineshsonachalam/markdown-autodocs@v1.0.7
+        with:
+          commit_author: "github-actions[bot] <github-actions[bot]@users.noreply.github.com>"
+          commit_user_email: github-actions[bot]@users.noreply.github.com
+          commit_message: "Apply automatic markdown formatting"
+          output_file_paths: '[./README.md]'
+          categories: '[code-block,json-to-html-table,workflow-artifact-table]'

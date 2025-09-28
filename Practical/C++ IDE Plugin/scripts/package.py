@@ -19,7 +19,9 @@ FILES = [
 def main() -> None:
     DIST.mkdir(exist_ok=True)
     archive_path = DIST / PACKAGE_NAME
-    with zipfile.ZipFile(archive_path, "w", compression=zipfile.ZIP_DEFLATED) as archive:
+    with zipfile.ZipFile(
+        archive_path, "w", compression=zipfile.ZIP_DEFLATED
+    ) as archive:
         for relative in FILES:
             archive.write(ROOT / relative, arcname=relative)
     print(f"Wrote {archive_path}")

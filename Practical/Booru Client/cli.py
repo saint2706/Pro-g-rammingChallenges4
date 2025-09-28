@@ -1,4 +1,5 @@
 """Command line interface for the Booru client."""
+
 from __future__ import annotations
 
 import argparse
@@ -10,21 +11,46 @@ from booru_client import BooruClient, CacheManager
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Search and download posts from Booru-style APIs")
-    parser.add_argument("--booru", default="danbooru", help="Target booru (danbooru, gelbooru, safebooru)")
-    parser.add_argument("--cache-dir", default="cache", help="Directory for cached responses")
-    parser.add_argument("--cache-ttl", type=int, default=900, help="Cache freshness window in seconds")
-    parser.add_argument("--download-dir", default="downloads", help="Default download directory")
+    parser = argparse.ArgumentParser(
+        description="Search and download posts from Booru-style APIs"
+    )
+    parser.add_argument(
+        "--booru",
+        default="danbooru",
+        help="Target booru (danbooru, gelbooru, safebooru)",
+    )
+    parser.add_argument(
+        "--cache-dir", default="cache", help="Directory for cached responses"
+    )
+    parser.add_argument(
+        "--cache-ttl", type=int, default=900, help="Cache freshness window in seconds"
+    )
+    parser.add_argument(
+        "--download-dir", default="downloads", help="Default download directory"
+    )
 
     subparsers = parser.add_subparsers(dest="command", required=True)
 
-    search = subparsers.add_parser("search", help="Search posts and optionally download them")
+    search = subparsers.add_parser(
+        "search", help="Search posts and optionally download them"
+    )
     search.add_argument("--tags", default="", help="Space separated tags")
-    search.add_argument("--rating", choices=["safe", "questionable", "explicit"], help="Filter by rating")
-    search.add_argument("--limit", type=int, default=10, help="Number of posts to fetch")
+    search.add_argument(
+        "--rating",
+        choices=["safe", "questionable", "explicit"],
+        help="Filter by rating",
+    )
+    search.add_argument(
+        "--limit", type=int, default=10, help="Number of posts to fetch"
+    )
     search.add_argument("--page", type=int, default=1, help="Page number (1-based)")
     search.add_argument("--extra", nargs="*", help="Additional key=value filters")
-    search.add_argument("--download", nargs="?", const=".", help="Download results to optional directory")
+    search.add_argument(
+        "--download",
+        nargs="?",
+        const=".",
+        help="Download results to optional directory",
+    )
     search.add_argument("--json", action="store_true", help="Print full JSON payload")
 
     download = subparsers.add_parser("download", help="Download a specific post by id")
@@ -36,7 +62,9 @@ def build_parser() -> argparse.ArgumentParser:
     tag.add_argument("tags", nargs="+", help="Tags to append to metadata")
 
     browse = subparsers.add_parser("browse", help="Launch the Tkinter GUI browser")
-    browse.add_argument("--page-size", type=int, default=20, help="Results per page in the GUI")
+    browse.add_argument(
+        "--page-size", type=int, default=20, help="Results per page in the GUI"
+    )
 
     return parser
 
@@ -78,7 +106,9 @@ def handle_search(args: argparse.Namespace) -> None:
     else:
         for post in posts:
             preview = post.preview_url or "(no preview)"
-            print(f"#{post.id} rating={post.rating} file={post.file_url} preview={preview}")
+            print(
+                f"#{post.id} rating={post.rating} file={post.file_url} preview={preview}"
+            )
             print(f"  tags: {' '.join(post.tags)}")
 
     if args.download is not None:
@@ -93,7 +123,9 @@ def handle_download(args: argparse.Namespace) -> None:
     post = client.get_post(args.id)
     if not post:
         raise SystemExit(f"Post {args.id} not found")
-    path = client.download_post(post, destination=Path(args.output) if args.output else None)
+    path = client.download_post(
+        post, destination=Path(args.output) if args.output else None
+    )
     print(path.resolve())
 
 

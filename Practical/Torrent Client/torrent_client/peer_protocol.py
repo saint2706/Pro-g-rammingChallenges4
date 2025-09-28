@@ -1,4 +1,5 @@
 """Peer wire protocol primitives (handshake, messages, piece manager)."""
+
 from __future__ import annotations
 
 import logging
@@ -33,7 +34,13 @@ def build_handshake(info_hash: bytes, peer_id: bytes) -> bytes:
     if len(info_hash) != 20 or len(peer_id) != 20:
         raise ValueError("info_hash and peer_id must be 20 bytes")
     pstrlen = len(PROTOCOL_STRING)
-    return struct.pack("!B", pstrlen) + PROTOCOL_STRING + HANDSHAKE_RESERVED + info_hash + peer_id
+    return (
+        struct.pack("!B", pstrlen)
+        + PROTOCOL_STRING
+        + HANDSHAKE_RESERVED
+        + info_hash
+        + peer_id
+    )
 
 
 def parse_handshake(payload: bytes) -> Tuple[bytes, bytes]:
@@ -77,9 +84,16 @@ class PieceManager:
         cls, piece_hashes: Iterable[bytes], piece_length: int, storage: "FileStorage"
     ) -> "PieceManager":
         pieces = list(piece_hashes)
-        completed = [storage.has_piece(i, piece_hash) for i, piece_hash in enumerate(pieces)]
+        completed = [
+            storage.has_piece(i, piece_hash) for i, piece_hash in enumerate(pieces)
+        ]
         total_size = storage.total_size
-        return cls(total_pieces=len(pieces), piece_length=piece_length, total_size=total_size, completed=completed)
+        return cls(
+            total_pieces=len(pieces),
+            piece_length=piece_length,
+            total_size=total_size,
+            completed=completed,
+        )
 
     def next_request(self) -> Optional[PieceWork]:
         for index, done in enumerate(self.completed):
@@ -114,7 +128,14 @@ class PieceManager:
 class PeerConnection:
     """Blocking TCP connection to a peer that can request pieces sequentially."""
 
-    def __init__(self, host: str, port: int, info_hash: bytes, peer_id: bytes, timeout: float = 10.0) -> None:
+    def __init__(
+        self,
+        host: str,
+        port: int,
+        info_hash: bytes,
+        peer_id: bytes,
+        timeout: float = 10.0,
+    ) -> None:
         self.host = host
         self.port = port
         self.info_hash = info_hash

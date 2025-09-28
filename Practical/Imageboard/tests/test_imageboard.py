@@ -37,9 +37,7 @@ def client(imageboard_module):
 
 
 def test_format_post_quotes_and_greentext(imageboard_module):
-    rendered = imageboard_module.format_post_filter(
-        ">hello\n>>12 reference"
-    )
+    rendered = imageboard_module.format_post_filter(">hello\n>>12 reference")
     html = str(rendered)
     assert "class='gt'" in html
     assert "href='#p12'" in html

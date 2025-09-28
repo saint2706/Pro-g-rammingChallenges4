@@ -9,7 +9,10 @@ from torrent_client.tracker import Peer, TrackerResponse
 def create_torrent(tmp_path: Path) -> Path:
     data = b"hello world"
     piece_length = 4
-    pieces = [hashlib.sha1(data[i : i + piece_length]).digest() for i in range(0, len(data), piece_length)]
+    pieces = [
+        hashlib.sha1(data[i : i + piece_length]).digest()
+        for i in range(0, len(data), piece_length)
+    ]
     info = {
         b"piece length": piece_length,
         b"pieces": b"".join(pieces),
@@ -48,7 +51,10 @@ def test_torrent_client_download(monkeypatch, tmp_path: Path) -> None:
     target_dir = tmp_path / "out"
     target_dir.mkdir()
 
-    pieces = [data[i : i + metainfo.piece_length] for i in range(0, len(data), metainfo.piece_length)]
+    pieces = [
+        data[i : i + metainfo.piece_length]
+        for i in range(0, len(data), metainfo.piece_length)
+    ]
 
     def fake_announce(self, **kwargs):
         return TrackerResponse(interval=1, peers=[Peer("127.0.0.1", 6881)])

@@ -1,4 +1,5 @@
 import importlib.util
+import io
 import sys
 from pathlib import Path
 
@@ -24,7 +25,9 @@ def sample_jpeg(tmp_path: Path) -> Path:
     return path
 
 
-def test_convert_image_resizes_and_preserves_exif(sample_jpeg: Path, tmp_path: Path) -> None:
+def test_convert_image_resizes_and_preserves_exif(
+    sample_jpeg: Path, tmp_path: Path
+) -> None:
     output_dir = tmp_path / "converted"
     output_dir.mkdir()
     resize_spec = MODULE.ResizeSpec(width=400)
@@ -40,6 +43,30 @@ def test_convert_image_resizes_and_preserves_exif(sample_jpeg: Path, tmp_path: P
     with Image.open(output_path) as result:
         assert result.size == (400, 300)
         exif = result.getexif()
+        assert exif[0x010E] == "Unit Test Description"
+
+
+def test_convert_image_file_like_output(sample_jpeg: Path) -> None:
+    with sample_jpeg.open("rb") as fh:
+        data = fh.read()
+
+    source = io.BytesIO(data)
+    output_buffer = io.BytesIO()
+
+    resize_spec = MODULE.ResizeSpec(width=200)
+    result = MODULE.convert_image(
+        source,
+        target_format="jpeg",
+        output_path=output_buffer,
+        resize=resize_spec,
+        keep_metadata=True,
+    )
+
+    assert result is None
+    output_buffer.seek(0)
+    with Image.open(output_buffer) as converted:
+        assert converted.size == (200, 150)
+        exif = converted.getexif()
         assert exif[0x010E] == "Unit Test Description"
 
 
@@ -68,3 +95,19 @@ def test_batch_convert_directory(tmp_path: Path) -> None:
         assert path.exists()
         with Image.open(path) as image:
             assert image.height == 128
+
+
+def test_batch_convert_file_like(tmp_path: Path) -> None:
+    image = Image.new("RGB", (320, 240), color="orange")
+    buffer = io.BytesIO()
+    image.save(buffer, "PNG")
+    buffer.seek(0)
+    buffer.name = "example.png"
+
+    results = MODULE.batch_convert([buffer], target_format="jpeg", output_dir=tmp_path)
+
+    assert len(results) == 1
+    output_path = results[0]
+    assert output_path.exists()
+    with Image.open(output_path) as converted:
+        assert converted.format == "JPEG"

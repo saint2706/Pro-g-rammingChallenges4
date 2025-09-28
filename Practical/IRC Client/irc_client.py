@@ -11,6 +11,7 @@ This module provides a small asyncio-powered IRC client that can:
 The entrypoint is :func:`main` which parses CLI arguments and runs
 :class:`IRCClient`.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -56,7 +57,9 @@ class IRCClient:
         self.reader: Optional[asyncio.StreamReader] = None
         self.writer: Optional[asyncio.StreamWriter] = None
         self.stop_requested = asyncio.Event()
-        self.primary_target: Optional[str] = config.channels[0] if config.channels else None
+        self.primary_target: Optional[str] = (
+            config.channels[0] if config.channels else None
+        )
 
     async def run(self) -> None:
         """Entry point for running the client with reconnection logic."""
@@ -88,7 +91,10 @@ class IRCClient:
                 break
 
             retries += 1
-            if self.config.max_retries is not None and retries > self.config.max_retries:
+            if (
+                self.config.max_retries is not None
+                and retries > self.config.max_retries
+            ):
                 self._print_status("Maximum reconnect attempts reached; exiting.")
                 break
 
@@ -225,7 +231,9 @@ class IRCClient:
                 if channel in self.config.channels:
                     self.config.channels.remove(channel)
                 if self.primary_target == channel:
-                    self.primary_target = self.config.channels[0] if self.config.channels else None
+                    self.primary_target = (
+                        self.config.channels[0] if self.config.channels else None
+                    )
             case "msg":
                 if len(args) < 2:
                     self._print_status("Usage: /msg <target> <message>")
@@ -369,7 +377,9 @@ def build_argument_parser() -> argparse.ArgumentParser:
     )
     tls_group = parser.add_mutually_exclusive_group()
     tls_group.add_argument("--tls", dest="tls", action="store_true", help="Enable TLS")
-    tls_group.add_argument("--no-tls", dest="tls", action="store_false", help="Disable TLS")
+    tls_group.add_argument(
+        "--no-tls", dest="tls", action="store_false", help="Disable TLS"
+    )
     parser.set_defaults(tls=False)
     parser.add_argument(
         "--log-file",

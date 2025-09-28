@@ -79,7 +79,9 @@ def test_lock_prevents_commits(repo_dir: Path) -> None:
     assert exit_code == 1
 
 
-def test_diff_and_log_commands(repo_dir: Path, capsys: pytest.CaptureFixture[str]) -> None:
+def test_diff_and_log_commands(
+    repo_dir: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
     run_cli(repo_dir, "init")
     target = repo_dir / "log.txt"
     target.write_text("one", encoding="utf8")
@@ -98,7 +100,9 @@ def test_diff_and_log_commands(repo_dir: Path, capsys: pytest.CaptureFixture[str
     assert "two plus" in captured.out
 
 
-def test_config_show_outputs_json(repo_dir: Path, capsys: pytest.CaptureFixture[str]) -> None:
+def test_config_show_outputs_json(
+    repo_dir: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
     run_cli(repo_dir, "init")
     file_path = repo_dir / "data.txt"
     file_path.write_text("data", encoding="utf8")

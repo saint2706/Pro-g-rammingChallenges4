@@ -58,7 +58,10 @@ def load_config(path: str | Path, schema: Type[T]) -> T:
     """Load a configuration dataclass from TOML or JSON."""
 
     raw = _load_raw_config(Path(path))
-    data = {field: raw.get(field, getattr(schema(), field)) for field in schema.__dataclass_fields__}
+    data = {
+        field: raw.get(field, getattr(schema(), field))
+        for field in schema.__dataclass_fields__
+    }
     instance = schema(**data)
     _normalize_paths(instance)
     return instance

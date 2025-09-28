@@ -8,7 +8,10 @@ from torrent_client.peer_protocol import build_handshake, parse_handshake
 def create_test_torrent(tmp_path: Path) -> Path:
     data = b"hello world"
     piece_length = 4
-    pieces = [hashlib.sha1(data[i : i + piece_length]).digest() for i in range(0, len(data), piece_length)]
+    pieces = [
+        hashlib.sha1(data[i : i + piece_length]).digest()
+        for i in range(0, len(data), piece_length)
+    ]
     info = {
         b"piece length": piece_length,
         b"pieces": b"".join(pieces),

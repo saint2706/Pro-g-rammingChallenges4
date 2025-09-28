@@ -1,4 +1,5 @@
 """Tests for the Booru client using mocked responses."""
+
 from __future__ import annotations
 
 import json
@@ -8,6 +9,7 @@ from typing import Any, Dict, List, Optional
 import pytest
 
 import sys
+
 sys.path.append(str(Path(__file__).resolve().parents[1]))
 
 from booru_client import BooruClient, CacheManager, Post
@@ -42,12 +44,20 @@ class RecordingSession:
         self.calls: List[Dict[str, Any]] = []
         self.download_content = b"test-bytes"
 
-    def request(self, method: str, url: str, params: Optional[Dict[str, Any]] = None, timeout: int = 0):
+    def request(
+        self,
+        method: str,
+        url: str,
+        params: Optional[Dict[str, Any]] = None,
+        timeout: int = 0,
+    ):
         self.calls.append({"method": method, "url": url, "params": dict(params or {})})
         return FakeResponse(self.payload)
 
     def get(self, url: str, stream: bool = False, timeout: int = 0):
-        self.calls.append({"method": "GET", "url": url, "stream": stream, "timeout": timeout})
+        self.calls.append(
+            {"method": "GET", "url": url, "stream": stream, "timeout": timeout}
+        )
         return FakeResponse(content=self.download_content)
 
 
@@ -95,17 +105,21 @@ def test_get_post_fetches_single_post(cache_dir: CacheManager) -> None:
     assert session.calls[0]["params"]["id"] == "42"
 
 
-def test_download_post_writes_metadata_and_custom_tags(tmp_path: Path, cache_dir: CacheManager) -> None:
+def test_download_post_writes_metadata_and_custom_tags(
+    tmp_path: Path, cache_dir: CacheManager
+) -> None:
     session = RecordingSession(make_post_payload())
-    client = BooruClient("danbooru", session=session, cache=cache_dir, download_dir=tmp_path)
+    client = BooruClient(
+        "danbooru", session=session, cache=cache_dir, download_dir=tmp_path
+    )
     post_data = make_post_payload()[0]
     post = Post(
-        id=post_data['id'],
-        rating=post_data['rating'],
-        tags=post_data['tag_string'].split(),
-        file_url=post_data['file_url'],
-        preview_url=post_data['preview_file_url'],
-        source=post_data['source'],
+        id=post_data["id"],
+        rating=post_data["rating"],
+        tags=post_data["tag_string"].split(),
+        file_url=post_data["file_url"],
+        preview_url=post_data["preview_file_url"],
+        source=post_data["source"],
     )
     downloaded = client.download_post(post)
 

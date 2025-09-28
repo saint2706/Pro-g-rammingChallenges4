@@ -1,4 +1,5 @@
 """High-level torrent client orchestration."""
+
 from __future__ import annotations
 
 import logging
@@ -45,7 +46,9 @@ class TorrentClient:
         if self.piece_manager.finished():
             LOGGER.info("All pieces already present; nothing to do")
             if progress_callback:
-                progress_callback(self.piece_manager.completed_count, self.piece_manager.total_pieces)
+                progress_callback(
+                    self.piece_manager.completed_count, self.piece_manager.total_pieces
+                )
             return
 
         left = self.metainfo.length - self.storage.bytes_completed
@@ -72,7 +75,9 @@ class TorrentClient:
                     left=0,
                     event="completed",
                 )
-            except Exception as exc:  # pragma: no cover - tracker completion best effort
+            except (
+                Exception
+            ) as exc:  # pragma: no cover - tracker completion best effort
                 LOGGER.debug("Failed to send completion announce: %s", exc)
         else:
             raise RuntimeError("Unable to complete download from available peers")
@@ -89,7 +94,9 @@ class TorrentClient:
                 LOGGER.warning("Peer %s:%s failed: %s", peer.host, peer.port, exc)
                 continue
 
-    def _download_from_peer(self, peer: Peer, progress_callback: Optional[ProgressCallback]) -> None:
+    def _download_from_peer(
+        self, peer: Peer, progress_callback: Optional[ProgressCallback]
+    ) -> None:
         LOGGER.info("Attempting peer %s:%s", peer.host, peer.port)
         with PeerConnection(
             peer.host,
@@ -116,7 +123,8 @@ class TorrentClient:
                 self.piece_manager.mark_complete(work.index)
                 if progress_callback:
                     progress_callback(
-                        self.piece_manager.completed_count, self.piece_manager.total_pieces
+                        self.piece_manager.completed_count,
+                        self.piece_manager.total_pieces,
                     )
 
 

@@ -1,4 +1,5 @@
 """Puzzle generation helpers for Nonograms."""
+
 from __future__ import annotations
 
 import random
@@ -8,7 +9,9 @@ from .puzzle import Board, NonogramPuzzle, compute_clues
 from .solver import NonogramSolver
 
 
-def _random_solution(width: int, height: int, density: float, rng: random.Random) -> Board:
+def _random_solution(
+    width: int, height: int, density: float, rng: random.Random
+) -> Board:
     board: Board = []
     for _ in range(height):
         row = [1 if rng.random() < density else 0 for _ in range(width)]
@@ -39,7 +42,9 @@ def generate_puzzle(
     for attempt in range(1, max_attempts + 1):
         board = _random_solution(width, height, density, rng)
         row_clues, col_clues = compute_clues(board)
-        puzzle = NonogramPuzzle(row_clues, col_clues, name=f"Generated {width}x{height}", solution=board)
+        puzzle = NonogramPuzzle(
+            row_clues, col_clues, name=f"Generated {width}x{height}", solution=board
+        )
         solver = NonogramSolver(puzzle)
         solutions = solver.solve(max_solutions=2)
         if not solutions:

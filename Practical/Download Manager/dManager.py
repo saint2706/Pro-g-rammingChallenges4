@@ -240,13 +240,16 @@ def single_thread_download(
                     else None
                 )
             )
-            with open(file_path, mode) as f, tqdm(
-                total=total,
-                initial=existing,
-                unit="B",
-                unit_scale=True,
-                desc=file_path.name,
-            ) as pbar:
+            with (
+                open(file_path, mode) as f,
+                tqdm(
+                    total=total,
+                    initial=existing,
+                    unit="B",
+                    unit_scale=True,
+                    desc=file_path.name,
+                ) as pbar,
+            ):
                 for chunk in r.iter_content(chunk_size=cfg.chunk_size):
                     if not chunk:
                         continue

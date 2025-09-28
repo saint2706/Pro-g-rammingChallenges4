@@ -1,4 +1,5 @@
 """Tkinter based Nonogram player and visualiser."""
+
 from __future__ import annotations
 
 import datetime as _dt
@@ -8,7 +9,14 @@ import tkinter as tk
 from tkinter import filedialog, messagebox
 
 from .generator import generate_puzzle
-from .puzzle import FILLED, EMPTY, UNKNOWN, NonogramPuzzle, puzzle_to_json, render_board_to_image
+from .puzzle import (
+    FILLED,
+    EMPTY,
+    UNKNOWN,
+    NonogramPuzzle,
+    puzzle_to_json,
+    render_board_to_image,
+)
 from .solver import NonogramSolver
 
 
@@ -30,11 +38,21 @@ class NonogramApp(tk.Tk):
         toolbar = tk.Frame(self)
         toolbar.pack(side=tk.TOP, fill=tk.X)
 
-        tk.Button(toolbar, text="New Puzzle", command=self.new_puzzle).pack(side=tk.LEFT, padx=4, pady=4)
-        tk.Button(toolbar, text="Hint", command=self.give_hint).pack(side=tk.LEFT, padx=4)
-        tk.Button(toolbar, text="Solve", command=self.solve_current).pack(side=tk.LEFT, padx=4)
-        tk.Button(toolbar, text="Export PNG", command=self.export_png).pack(side=tk.LEFT, padx=4)
-        tk.Button(toolbar, text="Export JSON", command=self.export_json).pack(side=tk.LEFT, padx=4)
+        tk.Button(toolbar, text="New Puzzle", command=self.new_puzzle).pack(
+            side=tk.LEFT, padx=4, pady=4
+        )
+        tk.Button(toolbar, text="Hint", command=self.give_hint).pack(
+            side=tk.LEFT, padx=4
+        )
+        tk.Button(toolbar, text="Solve", command=self.solve_current).pack(
+            side=tk.LEFT, padx=4
+        )
+        tk.Button(toolbar, text="Export PNG", command=self.export_png).pack(
+            side=tk.LEFT, padx=4
+        )
+        tk.Button(toolbar, text="Export JSON", command=self.export_json).pack(
+            side=tk.LEFT, padx=4
+        )
 
         self.canvas = tk.Canvas(self, background="white")
         self.canvas.pack(expand=True, fill=tk.BOTH)
@@ -134,7 +152,9 @@ class NonogramApp(tk.Tk):
             x = origin_x - self.cell_size // 2
             y = origin_y + r * self.cell_size + self.cell_size // 2
             for clue in reversed(display):
-                self.canvas.create_text(x, y, text=str(clue), font=("TkDefaultFont", 12))
+                self.canvas.create_text(
+                    x, y, text=str(clue), font=("TkDefaultFont", 12)
+                )
                 x -= self.cell_size
 
         for c, clues in enumerate(self.puzzle.column_clues):
@@ -142,7 +162,9 @@ class NonogramApp(tk.Tk):
             x = origin_x + c * self.cell_size + self.cell_size // 2
             y = origin_y - self.cell_size // 2
             for clue in reversed(display):
-                self.canvas.create_text(x, y, text=str(clue), font=("TkDefaultFont", 12))
+                self.canvas.create_text(
+                    x, y, text=str(clue), font=("TkDefaultFont", 12)
+                )
                 y -= self.cell_size
 
         # Draw grid and cells
@@ -155,10 +177,16 @@ class NonogramApp(tk.Tk):
                 self.canvas.create_rectangle(x0, y0, x1, y1, outline="black", width=1)
                 value = self.board[r][c]
                 if value == FILLED:
-                    self.canvas.create_rectangle(x0 + 2, y0 + 2, x1 - 2, y1 - 2, fill="black")
+                    self.canvas.create_rectangle(
+                        x0 + 2, y0 + 2, x1 - 2, y1 - 2, fill="black"
+                    )
                 elif value == EMPTY:
-                    self.canvas.create_line(x0 + 3, y0 + 3, x1 - 3, y1 - 3, fill="gray", width=2)
-                    self.canvas.create_line(x0 + 3, y1 - 3, x1 - 3, y0 + 3, fill="gray", width=2)
+                    self.canvas.create_line(
+                        x0 + 3, y0 + 3, x1 - 3, y1 - 3, fill="gray", width=2
+                    )
+                    self.canvas.create_line(
+                        x0 + 3, y1 - 3, x1 - 3, y0 + 3, fill="gray", width=2
+                    )
 
         self._origin = (origin_x, origin_y)
 

@@ -257,10 +257,7 @@ def save_history(path: Optional[Path], history: Sequence[tuple[str, str]]) -> No
         return
     try:
         path.parent.mkdir(parents=True, exist_ok=True)
-        serializable = [
-            {"user": user, "bot": bot}
-            for user, bot in history
-        ]
+        serializable = [{"user": user, "bot": bot} for user, bot in history]
         path.write_text(json.dumps(serializable, indent=2), encoding="utf-8")
     except Exception as exc:
         print(f"Warning: could not persist history to {path}: {exc}", file=sys.stderr)

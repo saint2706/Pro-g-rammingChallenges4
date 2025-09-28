@@ -4,6 +4,7 @@ The module exposes the :class:`PasswordVault` class for loading/creating
 AES-GCM encrypted vaults, along with data helpers for entries and audit
 records.
 """
+
 from __future__ import annotations
 
 import base64
@@ -30,7 +31,12 @@ ASSOCIATED_DATA = b"PracticalPasswordManager::vault"
 
 def _utc_now() -> str:
     """Return a Z-suffixed ISO 8601 timestamp without microseconds."""
-    return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+    return (
+        datetime.now(timezone.utc)
+        .replace(microsecond=0)
+        .isoformat()
+        .replace("+00:00", "Z")
+    )
 
 
 @dataclass
@@ -76,7 +82,9 @@ class PasswordVault:
 
     version = 1
 
-    def __init__(self, path: Path, key: bytes, *, salt: bytes, iterations: int, data: Dict):
+    def __init__(
+        self, path: Path, key: bytes, *, salt: bytes, iterations: int, data: Dict
+    ):
         self._path = Path(path)
         self._key = key
         self._salt = salt
@@ -200,7 +208,9 @@ class PasswordVault:
             if entry["entry_id"] == entry_id:
                 removed = entries.pop(idx)
                 self._touch_updated()
-                self._log_event("delete", entry_id, f"Deleted entry '{removed['name']}'")
+                self._log_event(
+                    "delete", entry_id, f"Deleted entry '{removed['name']}'"
+                )
                 self.save()
                 return
         raise KeyError(f"Entry not found: {entry_id}")
@@ -221,7 +231,9 @@ class PasswordVault:
         if replace:
             count = len(self._data.get("entries", []))
             if count:
-                self._log_event("import", None, f"Cleared {count} entries before import")
+                self._log_event(
+                    "import", None, f"Cleared {count} entries before import"
+                )
             self._data["entries"] = []
 
         imported = 0
@@ -237,7 +249,9 @@ class PasswordVault:
             imported += 1
 
         if imported:
-            self._log_event("import", None, f"Imported {imported} entries from {source}")
+            self._log_event(
+                "import", None, f"Imported {imported} entries from {source}"
+            )
             self.save()
         return imported
 
@@ -278,10 +292,16 @@ class PasswordVault:
 
     def _log_event(self, action: str, entry_id: Optional[str], detail: str) -> None:
         log = self._data.setdefault("audit_log", [])
-        log.append(AuditEvent(timestamp=_utc_now(), action=action, entry_id=entry_id, detail=detail).to_dict())
+        log.append(
+            AuditEvent(
+                timestamp=_utc_now(), action=action, entry_id=entry_id, detail=detail
+            ).to_dict()
+        )
 
     @staticmethod
-    def _derive_key(password: str, salt: bytes, *, iterations: int = KDF_ITERATIONS) -> bytes:
+    def _derive_key(
+        password: str, salt: bytes, *, iterations: int = KDF_ITERATIONS
+    ) -> bytes:
         kdf = PBKDF2HMAC(
             algorithm=hashes.SHA256(),
             length=AES_KEY_BYTES,

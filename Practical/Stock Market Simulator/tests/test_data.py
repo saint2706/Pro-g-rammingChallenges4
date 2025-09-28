@@ -40,7 +40,9 @@ class YahooFinanceDataClientTests(unittest.TestCase):
     def test_fetch_price_history_uses_cache(self) -> None:
         session = mock.Mock()
         session.get.return_value = FakeResponse(self.csv_text)
-        client = YahooFinanceDataClient(cache_dir=Path(self.tmpdir.name), session=session)
+        client = YahooFinanceDataClient(
+            cache_dir=Path(self.tmpdir.name), session=session
+        )
 
         df_first = client.fetch_price_history(
             "FAKE",

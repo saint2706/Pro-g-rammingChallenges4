@@ -1,4 +1,5 @@
 """Tkinter-based desktop client for the WMS viewer challenge."""
+
 from __future__ import annotations
 
 import io
@@ -60,18 +61,31 @@ class WMSViewerApp:
         self.server_combo.bind("<<ComboboxSelected>>", self._on_server_change)
 
         ttk.Label(control_frame, text="Layer:").pack(side=tk.LEFT)
-        self.layer_combo = ttk.Combobox(control_frame, textvariable=self._layer_var, state="readonly")
+        self.layer_combo = ttk.Combobox(
+            control_frame, textvariable=self._layer_var, state="readonly"
+        )
         self.layer_combo.pack(side=tk.LEFT, padx=(4, 12))
         self.layer_combo.bind("<<ComboboxSelected>>", self._on_layer_change)
 
-        ttk.Button(control_frame, text="+", width=3, command=lambda: self._on_zoom(1)).pack(side=tk.LEFT)
-        ttk.Button(control_frame, text="-", width=3, command=lambda: self._on_zoom(-1)).pack(side=tk.LEFT, padx=(4, 0))
+        ttk.Button(
+            control_frame, text="+", width=3, command=lambda: self._on_zoom(1)
+        ).pack(side=tk.LEFT)
+        ttk.Button(
+            control_frame, text="-", width=3, command=lambda: self._on_zoom(-1)
+        ).pack(side=tk.LEFT, padx=(4, 0))
 
         self.status_var = tk.StringVar(value="")
-        self.status_label = ttk.Label(self.root, textvariable=self.status_var, anchor=tk.W)
+        self.status_label = ttk.Label(
+            self.root, textvariable=self.status_var, anchor=tk.W
+        )
         self.status_label.pack(side=tk.BOTTOM, fill=tk.X, padx=4, pady=2)
 
-        self.canvas = tk.Canvas(self.root, width=self.config.view.width, height=self.config.view.height, bg="#1f1f1f")
+        self.canvas = tk.Canvas(
+            self.root,
+            width=self.config.view.width,
+            height=self.config.view.height,
+            bg="#1f1f1f",
+        )
         self.canvas.pack(fill=tk.BOTH, expand=True)
         self.canvas.bind("<Configure>", self._on_resize)
         self.canvas.bind("<ButtonPress-1>", self._on_drag_start)
@@ -105,7 +119,9 @@ class WMSViewerApp:
 
     # ------------------------------------------------------------------ Helpers
     def _populate_layers(self, server: ServerConfig) -> None:
-        self.layer_combo["values"] = [layer.title or layer.name for layer in server.layers]
+        self.layer_combo["values"] = [
+            layer.title or layer.name for layer in server.layers
+        ]
         default_layer = server.layers[0]
         self._layer_var.set(default_layer.title or default_layer.name)
 
@@ -165,7 +181,10 @@ class WMSViewerApp:
     def _on_resize(self, event: tk.Event) -> None:  # type: ignore[override]
         if not self._view_state:
             return
-        if event.width != self._view_state.width or event.height != self._view_state.height:
+        if (
+            event.width != self._view_state.width
+            or event.height != self._view_state.height
+        ):
             self._view_state.resize(event.width, event.height)
             self._update_map()
 

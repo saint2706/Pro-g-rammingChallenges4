@@ -22,6 +22,7 @@ from pathlib import Path
 from typing import Dict, List, Optional, Sequence, Tuple
 
 import matplotlib.pyplot as plt
+from matplotlib.figure import Figure
 from matplotlib.patches import Circle, FancyArrowPatch
 from matplotlib.widgets import Button
 
@@ -57,7 +58,9 @@ class BellmanFordSimulation:
         if not edges:
             raise ValueError("Graph must contain at least one edge.")
 
-        nodes = sorted({edge.source for edge in edges} | {edge.target for edge in edges})
+        nodes = sorted(
+            {edge.source for edge in edges} | {edge.target for edge in edges}
+        )
         if len(nodes) < 5:
             raise ValueError("Bellman–Ford challenge requires at least five vertices.")
         if start not in nodes:
@@ -250,7 +253,9 @@ class BellmanFordSimulation:
             "distances": distances,
             "predecessors": self.predecessors,
             "negative_cycle": self.negative_cycle_detected,
-            "negative_cycle_edges": [edge.__dict__ for edge in self.negative_cycle_edges],
+            "negative_cycle_edges": [
+                edge.__dict__ for edge in self.negative_cycle_edges
+            ],
         }
         output_path.write_text(json.dumps(data, indent=2), encoding="utf-8")
 
@@ -260,7 +265,11 @@ class BellmanFordSimulation:
             writer.writerow(["start", self.start])
             writer.writerow(["node", "distance", "predecessor"])
             for node in self.nodes:
-                distance = "" if math.isinf(self.final_distances[node]) else f"{self.final_distances[node]:.6f}"
+                distance = (
+                    ""
+                    if math.isinf(self.final_distances[node])
+                    else f"{self.final_distances[node]:.6f}"
+                )
                 predecessor = self.predecessors[node] or ""
                 writer.writerow([node, distance, predecessor])
             writer.writerow([])
@@ -280,10 +289,127 @@ class BellmanFordSimulation:
         return f"{distance:.2f}"
 
 
+def render_step(step: Step, nodes: Sequence[str], edges: Sequence[Edge]) -> Figure:
+    """Create a Matplotlib figure visualizing a single simulation step."""
+
+    positions = generate_layout(nodes)
+    fig, ax = plt.subplots(figsize=(10, 7))
+    fig.subplots_adjust(right=0.65)
+    ax.set_title("Bellman–Ford Simulation")
+    ax.axis("off")
+    ax.set_aspect("equal")
+
+    for edge in edges:
+        start = positions[edge.source]
+        end = positions[edge.target]
+        color = "#888888"
+        linewidth = 1.8
+        zorder = 1
+        is_active_edge = (
+            step.edge
+            and edge.source == step.edge.source
+            and edge.target == step.edge.target
+        )
+        if is_active_edge:
+            color = "#d62728" if step.updated else "#ff7f0e"
+            if step.negative_cycle:
+                color = "#9467bd"
+            linewidth = 3.0
+            zorder = 4
+        arrow = FancyArrowPatch(
+            posA=start,
+            posB=end,
+            arrowstyle="-|>",
+            mutation_scale=15,
+            linewidth=linewidth,
+            color=color,
+            zorder=zorder,
+        )
+        ax.add_patch(arrow)
+        mid_x = start[0] + 0.6 * (end[0] - start[0])
+        mid_y = start[1] + 0.6 * (end[1] - start[1])
+        label_color = color if is_active_edge else "#444444"
+        ax.text(
+            mid_x,
+            mid_y,
+            f"{edge.weight}",
+            fontsize=9,
+            ha="center",
+            va="center",
+            backgroundcolor="white",
+            color=label_color,
+            zorder=5,
+        )
+
+    for node in nodes:
+        x, y = positions[node]
+        distance = step.distances.get(node, math.inf)
+        facecolor = "#dddddd"
+        text_color = "black"
+        if not math.isinf(distance):
+            facecolor = "#1f77b4"
+            text_color = "white"
+        if step.edge and node == step.edge.target and step.updated:
+            facecolor = "#2ca02c"
+            text_color = "white"
+        circle = Circle(
+            (x, y),
+            0.35,
+            facecolor=facecolor,
+            edgecolor="black",
+            linewidth=1.5,
+            zorder=3,
+        )
+        ax.add_patch(circle)
+        ax.text(
+            x,
+            y,
+            f"{node}\n{BellmanFordSimulation._fmt_distance(distance)}",
+            ha="center",
+            va="center",
+            color=text_color,
+            fontsize=11,
+            fontweight="bold",
+            zorder=4,
+        )
+
+    ax.set_xlim(-5, 5)
+    ax.set_ylim(-5, 5)
+
+    iteration_label = (
+        f"Iteration {step.iteration}"
+        if step.phase in {"relax", "check"}
+        else "Initialization"
+    )
+    phase_label = step.phase.capitalize()
+    header = f"Step {step.index + 1} — {phase_label} ({iteration_label})"
+    fig.text(0.68, 0.92, header, va="top", ha="left", fontsize=12, fontweight="bold")
+    fig.text(0.68, 0.88, textwrap.fill(step.note, 40), va="top", ha="left", fontsize=10)
+
+    distance_lines = ["Node  Dist   Pred"]
+    for node in nodes:
+        dist = BellmanFordSimulation._fmt_distance(step.distances.get(node, math.inf))
+        pred = step.predecessors.get(node) or "-"
+        distance_lines.append(f"{node:>4}  {dist:>5}  {pred:>4}")
+    fig.text(
+        0.68,
+        0.72,
+        "\n".join(distance_lines),
+        va="top",
+        ha="left",
+        fontfamily="monospace",
+        fontsize=10,
+    )
+
+    return fig
+
+
 class BellmanFordVisualizer:
     """Matplotlib figure that animates Bellman–Ford steps with controls."""
 
-    def __init__(self, simulation: BellmanFordSimulation, auto_interval: float = 1.0) -> None:
+    def __init__(
+        self, simulation: BellmanFordSimulation, auto_interval: float = 1.0
+    ) -> None:
         self.simulation = simulation
         self.auto_interval = auto_interval
         self.current_index = 0
@@ -313,7 +439,14 @@ class BellmanFordVisualizer:
 
     def _add_node(self, node: str) -> None:
         x, y = self.positions[node]
-        circle = Circle((x, y), 0.35, facecolor="#bbbbbb", edgecolor="black", linewidth=1.5, zorder=3)
+        circle = Circle(
+            (x, y),
+            0.35,
+            facecolor="#bbbbbb",
+            edgecolor="black",
+            linewidth=1.5,
+            zorder=3,
+        )
         self.ax.add_patch(circle)
         label = self.ax.text(
             x,
@@ -483,7 +616,9 @@ class BellmanFordVisualizer:
             label.set_text(f"{node}\n{BellmanFordSimulation._fmt_distance(distance)}")
 
         iteration_label = (
-            f"Iteration {step.iteration}" if step.phase in {"relax", "check"} else "Initialization"
+            f"Iteration {step.iteration}"
+            if step.phase in {"relax", "check"}
+            else "Initialization"
         )
         phase_label = step.phase.capitalize()
         header = f"Step {self.current_index + 1}/{len(self.simulation.steps)} — {phase_label} ({iteration_label})"
@@ -505,6 +640,7 @@ class BellmanFordVisualizer:
 # ----------------------------------------------------------------------
 # CLI helpers
 # ----------------------------------------------------------------------
+
 
 def load_graph(path: Path, fmt: Optional[str] = None) -> List[Edge]:
     if not path.exists():
@@ -551,7 +687,9 @@ def load_csv_graph(path: Path) -> List[Edge]:
             try:
                 weight = float(row["weight"])
             except (TypeError, ValueError) as exc:
-                raise ValueError(f"Invalid weight on row {idx}: {row['weight']}") from exc
+                raise ValueError(
+                    f"Invalid weight on row {idx}: {row['weight']}"
+                ) from exc
             edges.append(Edge(source=source, target=target, weight=weight))
     if not edges:
         raise ValueError("CSV graph did not contain any usable edges.")

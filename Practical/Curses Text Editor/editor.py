@@ -47,7 +47,9 @@ class EditorApp:
         self.last_input_time = time.time()
         self.last_change_time = 0.0
         self.autosave_interval = (
-            autosave_interval if autosave_interval is not None else int(config.options.get("autosave_interval", 10))
+            autosave_interval
+            if autosave_interval is not None
+            else int(config.options.get("autosave_interval", 10))
         )
         self.autosave_suffix = str(config.options.get("autosave_suffix", ".autosave"))
         self.tab_width = int(config.options.get("tab_width", 4))
@@ -121,7 +123,7 @@ class EditorApp:
         while True:
             pos = line.find(term, start)
             if pos == -1:
-                self.stdscr.addstr(idx, start, line[start: width - 1])
+                self.stdscr.addstr(idx, start, line[start : width - 1])
                 break
             self.stdscr.addstr(idx, start, line[start:pos])
             self.stdscr.addstr(idx, pos, line[pos : pos + len(term)], curses.A_REVERSE)
@@ -145,7 +147,9 @@ class EditorApp:
         if middle_space < 1:
             middle_space = 1
         bar = left + msg[: middle_space - 1].ljust(middle_space - 1) + right
-        self.stdscr.addstr(self.stdscr.getmaxyx()[0] - 1, 0, bar[: width - 1], curses.A_REVERSE)
+        self.stdscr.addstr(
+            self.stdscr.getmaxyx()[0] - 1, 0, bar[: width - 1], curses.A_REVERSE
+        )
 
     def _draw_help_overlay(self, height: int, width: int) -> None:
         if height < 5 or width < 20:
@@ -504,7 +508,9 @@ class EditorApp:
         if command.startswith("w "):
             _, _, rest = command.partition(" ")
             try:
-                self.buffer.save_to_file(Path(rest).expanduser(), encoding=self.encoding)
+                self.buffer.save_to_file(
+                    Path(rest).expanduser(), encoding=self.encoding
+                )
             except Exception as exc:
                 self.set_status(f"Write failed: {exc}", 4)
                 return
@@ -624,13 +630,18 @@ class EditorApp:
                 if col < len(self.buffer.lines[row]):
                     col += 1
             start = (row, col)
-        result = self.buffer.search(self.search_term, start=start, backward=self.search_backward)
+        result = self.buffer.search(
+            self.search_term, start=start, backward=self.search_backward
+        )
         if result is None:
             self.set_status("Pattern not found", 2)
             return
         row, col = result
         self.buffer.cursor.row, self.buffer.cursor.col = row, col
-        self.search_position = (row, col + (0 if self.search_backward else len(self.search_term)))
+        self.search_position = (
+            row,
+            col + (0 if self.search_backward else len(self.search_term)),
+        )
         self.set_status(f"Match {row + 1}:{col + 1}", 1)
 
     # ------------------------------------------------------------------
@@ -761,11 +772,18 @@ class EditorApp:
 # CLI
 # ----------------------------------------------------------------------
 
+
 def parse_args(argv: Optional[list[str]] = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Curses text editor")
-    parser.add_argument("--file", dest="file", type=str, help="File to open", default=None)
-    parser.add_argument("--config", dest="config", type=str, help="Path to JSON config", default=None)
-    parser.add_argument("--autosave-interval", dest="autosave_interval", type=int, default=None)
+    parser.add_argument(
+        "--file", dest="file", type=str, help="File to open", default=None
+    )
+    parser.add_argument(
+        "--config", dest="config", type=str, help="Path to JSON config", default=None
+    )
+    parser.add_argument(
+        "--autosave-interval", dest="autosave_interval", type=int, default=None
+    )
     parser.add_argument("--encoding", dest="encoding", type=str, default="utf-8")
     return parser.parse_args(argv)
 

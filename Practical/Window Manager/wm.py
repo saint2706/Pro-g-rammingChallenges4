@@ -4,6 +4,7 @@ The implementation focuses on a master/stack tiling layout, ICCCM/EWMH
 basics, and keyboard-driven control. It is intentionally compact but
 well-documented to serve as a practical reference implementation.
 """
+
 from __future__ import annotations
 
 import logging
@@ -115,19 +116,14 @@ class WindowManager:
         self.supporting_window.change_property(
             wm_check, Xatom.WINDOW, 32, [self.supporting_window.id]
         )
-        self.supporting_window.change_property(
-            wm_name,
-            utf8,
-            8,
-            b'PracticalWM'
-        )
+        self.supporting_window.change_property(wm_name, utf8, 8, b"PracticalWM")
         self.supporting_window.set_wm_name("PracticalWM")
         self.supporting_window.map()
         self.root.change_property(
             supported,
             Xatom.ATOM,
             32,
-            [active, wm_check, wm_name, protocols, delete_window]
+            [active, wm_check, wm_name, protocols, delete_window],
         )
         self.root.set_wm_name("PracticalWM")
         self.disp.flush()
@@ -140,7 +136,13 @@ class WindowManager:
             keycode = self._keysym_to_keycode(binding.key)
             modifiers = self._modifiers_to_mask(binding.modifiers)
             for variant in variants:
-                self.root.grab_key(keycode, modifiers | (variant & ignored), True, X.GrabModeAsync, X.GrabModeAsync)
+                self.root.grab_key(
+                    keycode,
+                    modifiers | (variant & ignored),
+                    True,
+                    X.GrabModeAsync,
+                    X.GrabModeAsync,
+                )
         self.disp.sync()
 
     def shutdown(self) -> None:
@@ -289,7 +291,9 @@ class WindowManager:
             master_width = width
             stack_width = 0
 
-        self._configure_window(master.window, gap, gap, master_width - 2 * gap, height - 2 * gap)
+        self._configure_window(
+            master.window, gap, gap, master_width - 2 * gap, height - 2 * gap
+        )
 
         if stack:
             stack_height = height - 2 * gap
@@ -310,8 +314,16 @@ class WindowManager:
 
         self.disp.sync()
 
-    def _configure_window(self, window: "display.Window", x: int, y: int, width: int, height: int) -> None:
-        window.configure(x=x, y=y, width=max(width, 1), height=max(height, 1), border_width=self.config.border_width)
+    def _configure_window(
+        self, window: "display.Window", x: int, y: int, width: int, height: int
+    ) -> None:
+        window.configure(
+            x=x,
+            y=y,
+            width=max(width, 1),
+            height=max(height, 1),
+            border_width=self.config.border_width,
+        )
         window.map()
 
     # ------------------------------------------------------------------
@@ -425,8 +437,6 @@ class WindowManager:
         for mod in modifiers:
             mask |= MODIFIER_MASKS.get(mod, 0)
         return mask
-
-
 
     def _color_pixel(self, color: str) -> int:
         if color not in self._color_cache:

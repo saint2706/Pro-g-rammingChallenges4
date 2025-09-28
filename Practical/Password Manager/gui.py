@@ -1,4 +1,5 @@
 """Tkinter GUI wrapper for the Practical Password Manager."""
+
 from __future__ import annotations
 
 import argparse
@@ -22,25 +23,39 @@ class PasswordManagerApp:
     # ------------------------------------------------------------------
     def _build_ui(self) -> None:
         self.listbox = tk.Listbox(self.root, width=80)
-        self.listbox.grid(row=0, column=0, columnspan=4, sticky="nsew", padx=10, pady=10)
+        self.listbox.grid(
+            row=0, column=0, columnspan=4, sticky="nsew", padx=10, pady=10
+        )
         self.listbox.bind("<<ListboxSelect>>", lambda _event: self._on_select())
 
-        scrollbar = tk.Scrollbar(self.root, orient=tk.VERTICAL, command=self.listbox.yview)
+        scrollbar = tk.Scrollbar(
+            self.root, orient=tk.VERTICAL, command=self.listbox.yview
+        )
         scrollbar.grid(row=0, column=4, sticky="ns", pady=10)
         self.listbox.configure(yscrollcommand=scrollbar.set)
 
         btn_add = tk.Button(self.root, text="Add Entry", command=self.add_entry)
         btn_add.grid(row=1, column=0, padx=5, pady=5, sticky="ew")
-        self.btn_view = tk.Button(self.root, text="View", command=self.view_entry, state=tk.DISABLED)
+        self.btn_view = tk.Button(
+            self.root, text="View", command=self.view_entry, state=tk.DISABLED
+        )
         self.btn_view.grid(row=1, column=1, padx=5, pady=5, sticky="ew")
-        self.btn_edit = tk.Button(self.root, text="Edit", command=self.edit_entry, state=tk.DISABLED)
+        self.btn_edit = tk.Button(
+            self.root, text="Edit", command=self.edit_entry, state=tk.DISABLED
+        )
         self.btn_edit.grid(row=1, column=2, padx=5, pady=5, sticky="ew")
-        self.btn_delete = tk.Button(self.root, text="Delete", command=self.delete_entry, state=tk.DISABLED)
+        self.btn_delete = tk.Button(
+            self.root, text="Delete", command=self.delete_entry, state=tk.DISABLED
+        )
         self.btn_delete.grid(row=1, column=3, padx=5, pady=5, sticky="ew")
 
-        btn_generate = tk.Button(self.root, text="Generate Password", command=self.copy_generated_password)
+        btn_generate = tk.Button(
+            self.root, text="Generate Password", command=self.copy_generated_password
+        )
         btn_generate.grid(row=2, column=0, padx=5, pady=5, sticky="ew")
-        btn_export = tk.Button(self.root, text="Export JSON", command=self.export_entries)
+        btn_export = tk.Button(
+            self.root, text="Export JSON", command=self.export_entries
+        )
         btn_export.grid(row=2, column=1, padx=5, pady=5, sticky="ew")
         btn_audit = tk.Button(self.root, text="View Audit Log", command=self.show_audit)
         btn_audit.grid(row=2, column=2, padx=5, pady=5, sticky="ew")
@@ -126,7 +141,9 @@ class PasswordManagerApp:
         if not path:
             return
         entries = [entry.to_dict() for entry in self.vault.list_entries()]
-        Path(path).write_text(json.dumps(entries, indent=2, ensure_ascii=False), encoding="utf-8")
+        Path(path).write_text(
+            json.dumps(entries, indent=2, ensure_ascii=False), encoding="utf-8"
+        )
         messagebox.showinfo("Export Complete", f"Exported {len(entries)} entries.")
 
     def show_audit(self) -> None:
@@ -134,15 +151,25 @@ class PasswordManagerApp:
         if not events:
             messagebox.showinfo("Audit Log", "No events recorded yet.")
             return
-        text = "\n".join(f"{e.timestamp} | {e.action} | {e.entry_id or '-'} | {e.detail}" for e in events)
+        text = "\n".join(
+            f"{e.timestamp} | {e.action} | {e.entry_id or '-'} | {e.detail}"
+            for e in events
+        )
         messagebox.showinfo("Audit Log", text)
 
     # ------------------------------------------------------------------
     def _prompt_entry(self, entry=None) -> Optional[dict]:
-        name = simpledialog.askstring("Entry", "Name", initialvalue=getattr(entry, "name", ""), parent=self.root)
+        name = simpledialog.askstring(
+            "Entry", "Name", initialvalue=getattr(entry, "name", ""), parent=self.root
+        )
         if not name:
             return None
-        username = simpledialog.askstring("Entry", "Username", initialvalue=getattr(entry, "username", ""), parent=self.root)
+        username = simpledialog.askstring(
+            "Entry",
+            "Username",
+            initialvalue=getattr(entry, "username", ""),
+            parent=self.root,
+        )
         if username is None:
             return None
         password = simpledialog.askstring(
@@ -164,7 +191,9 @@ class PasswordManagerApp:
         )
         if category is None:
             return None
-        notes = simpledialog.askstring("Entry", "Notes", initialvalue=getattr(entry, "notes", ""), parent=self.root)
+        notes = simpledialog.askstring(
+            "Entry", "Notes", initialvalue=getattr(entry, "notes", ""), parent=self.root
+        )
         if notes is None:
             return None
         return {
@@ -193,7 +222,9 @@ def _prompt_password(confirm: bool = False) -> str:
         if not password:
             continue
         if confirm:
-            confirm_pw = simpledialog.askstring("Vault Password", "Confirm password", show="*")
+            confirm_pw = simpledialog.askstring(
+                "Vault Password", "Confirm password", show="*"
+            )
             if password != confirm_pw:
                 messagebox.showerror("Password", "Passwords do not match")
                 continue

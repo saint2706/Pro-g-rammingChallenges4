@@ -129,7 +129,9 @@ class Repository:
         """Initialise a repository."""
 
         if self.config_path.exists() and not force:
-            raise RuntimeError("Repository already initialised. Use force=True to overwrite.")
+            raise RuntimeError(
+                "Repository already initialised. Use force=True to overwrite."
+            )
         self.config_dir.mkdir(parents=True, exist_ok=True)
         self.store_dir.mkdir(parents=True, exist_ok=True)
         self._config = {"files": {}}
@@ -175,11 +177,18 @@ class Repository:
             relative = self._get_relative_path(absolute)
             entry = self._get_file_entry(relative)
             if entry.locked:
-                raise RuntimeError(f"File '{relative}' is locked and cannot be committed.")
-            revision_id = time.strftime("%Y%m%d%H%M%S", time.gmtime()) + f"-{int(time.time() * 1000) % 1000:03d}"
+                raise RuntimeError(
+                    f"File '{relative}' is locked and cannot be committed."
+                )
+            revision_id = (
+                time.strftime("%Y%m%d%H%M%S", time.gmtime())
+                + f"-{int(time.time() * 1000) % 1000:03d}"
+            )
             storage_path = self._store_revision_path(relative, revision_id)
             shutil.copy2(absolute, storage_path)
-            revision = Revision(revision_id=revision_id, message=message, timestamp=time.time())
+            revision = Revision(
+                revision_id=revision_id, message=message, timestamp=time.time()
+            )
             entry.revisions.append(revision)
             # Enforce revision limit
             while len(entry.revisions) > entry.revision_limit:

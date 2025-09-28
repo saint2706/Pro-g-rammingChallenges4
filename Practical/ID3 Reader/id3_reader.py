@@ -5,6 +5,7 @@ formatting and exporting the discovered tags. The module is importable for use
 in other scripts but can also be executed directly to inspect one or more MP3
 files.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -191,7 +192,9 @@ def _parse_id3v2(path: Path, metadata: ID3Metadata) -> None:
         metadata.versions.append(version_name)
 
     for frame in tag.values():
-        frame_id = getattr(frame, "FrameID", None) or getattr(frame, "__name__", "Unknown")
+        frame_id = getattr(frame, "FrameID", None) or getattr(
+            frame, "__name__", "Unknown"
+        )
         values = _extract_frame_text(frame)
         if not values:
             continue
@@ -273,7 +276,12 @@ def export_json(metadata: Sequence[ID3Metadata], output_path: Path | str) -> Non
     path.write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8")
 
 
-def export_csv(metadata: Sequence[ID3Metadata], output_path: Path | str, *, fields: Optional[Sequence[str]] = None) -> None:
+def export_csv(
+    metadata: Sequence[ID3Metadata],
+    output_path: Path | str,
+    *,
+    fields: Optional[Sequence[str]] = None,
+) -> None:
     path = Path(output_path)
     if fields is None:
         fields = _collect_all_fields(metadata)
@@ -302,7 +310,9 @@ def _collect_all_fields(metadata: Iterable[ID3Metadata]) -> List[str]:
     return fields
 
 
-def _format_for_cli(metadata: Sequence[ID3Metadata], fields: Optional[Sequence[str]]) -> str:
+def _format_for_cli(
+    metadata: Sequence[ID3Metadata], fields: Optional[Sequence[str]]
+) -> str:
     if not metadata:
         return "No files parsed."
 
@@ -311,10 +321,14 @@ def _format_for_cli(metadata: Sequence[ID3Metadata], fields: Optional[Sequence[s
 
     column_widths: Dict[str, int] = {
         "file_path": max(len("File"), *(len(str(item.file_path)) for item in metadata)),
-        "versions": max(len("Versions"), *(len(", ".join(item.versions)) for item in metadata)),
+        "versions": max(
+            len("Versions"), *(len(", ".join(item.versions)) for item in metadata)
+        ),
     }
     for field in fields:
-        column_widths[field] = max(len(field), *(len(item.tags.get(field, "")) for item in metadata))
+        column_widths[field] = max(
+            len(field), *(len(item.tags.get(field, "")) for item in metadata)
+        )
 
     headers = [
         ("File", column_widths["file_path"]),
@@ -340,10 +354,16 @@ def _format_for_cli(metadata: Sequence[ID3Metadata], fields: Optional[Sequence[s
 
 
 def build_arg_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Inspect ID3 metadata and export results.")
+    parser = argparse.ArgumentParser(
+        description="Inspect ID3 metadata and export results."
+    )
     parser.add_argument("files", nargs="+", help="One or more MP3 files to inspect.")
-    parser.add_argument("--json", dest="json_path", help="Export parsed tags to this JSON file.")
-    parser.add_argument("--csv", dest="csv_path", help="Export parsed tags to this CSV file.")
+    parser.add_argument(
+        "--json", dest="json_path", help="Export parsed tags to this JSON file."
+    )
+    parser.add_argument(
+        "--csv", dest="csv_path", help="Export parsed tags to this CSV file."
+    )
     parser.add_argument(
         "--fields",
         nargs="*",
