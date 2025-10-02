@@ -1,9 +1,8 @@
 import java.util.Scanner;
 
 /**
- * Console-based Connect 4 game for two players.
- * Modernized, well-documented, and beginner-friendly implementation.
- * Board is 6 rows x 7 columns. Players alternate dropping pieces into columns.
+ * Console-based Connect 4 game for two players. Modernized, well-documented, and beginner-friendly
+ * implementation. Board is 6 rows x 7 columns. Players alternate dropping pieces into columns.
  */
 public class Connect4 {
   // Board dimensions
@@ -13,10 +12,7 @@ public class Connect4 {
   private static final char PLAYER_A = 'A';
   private static final char PLAYER_B = 'B';
 
-  /**
-   * Main entry point for the Connect 4 game.
-   * Handles game loop, input, and win/tie detection.
-   */
+  /** Main entry point for the Connect 4 game. Handles game loop, input, and win/tie detection. */
   public static void main(String[] args) {
     try (Scanner inp = new Scanner(System.in)) {
       char[][] board = new char[ROWS][COLS];
@@ -82,9 +78,9 @@ public class Connect4 {
 
   /**
    * Checks if the given player has a winning sequence on the board.
-   * 
+   *
    * @param player The player character ('A' or 'B')
-   * @param board  The game board
+   * @param board The game board
    * @return true if the player has won, false otherwise
    */
   private static boolean checkWinner(char player, char[][] board) {
@@ -93,31 +89,33 @@ public class Connect4 {
       for (int col = 0; col < COLS; col++) {
         if (board[row][col] == player) {
           // Vertical
-          if (row + 3 < ROWS &&
-              board[row + 1][col] == player &&
-              board[row + 2][col] == player &&
-              board[row + 3][col] == player) {
+          if (row + 3 < ROWS
+              && board[row + 1][col] == player
+              && board[row + 2][col] == player
+              && board[row + 3][col] == player) {
             return true;
           }
           // Horizontal
-          if (col + 3 < COLS &&
-              board[row][col + 1] == player &&
-              board[row][col + 2] == player &&
-              board[row][col + 3] == player) {
+          if (col + 3 < COLS
+              && board[row][col + 1] == player
+              && board[row][col + 2] == player
+              && board[row][col + 3] == player) {
             return true;
           }
           // Diagonal down-right
-          if (row + 3 < ROWS && col + 3 < COLS &&
-              board[row + 1][col + 1] == player &&
-              board[row + 2][col + 2] == player &&
-              board[row + 3][col + 3] == player) {
+          if (row + 3 < ROWS
+              && col + 3 < COLS
+              && board[row + 1][col + 1] == player
+              && board[row + 2][col + 2] == player
+              && board[row + 3][col + 3] == player) {
             return true;
           }
           // Diagonal up-right
-          if (row - 3 >= 0 && col + 3 < COLS &&
-              board[row - 1][col + 1] == player &&
-              board[row - 2][col + 2] == player &&
-              board[row - 3][col + 3] == player) {
+          if (row - 3 >= 0
+              && col + 3 < COLS
+              && board[row - 1][col + 1] == player
+              && board[row - 2][col + 2] == player
+              && board[row - 3][col + 3] == player) {
             return true;
           }
         }
@@ -128,7 +126,7 @@ public class Connect4 {
 
   /**
    * Prints the current state of the board to the console.
-   * 
+   *
    * @param board The game board
    */
   public static void display(char[][] board) {
