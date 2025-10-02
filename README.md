@@ -440,7 +440,34 @@ just that script.
 | GUI window invisible | Running headless | Use CLI version or run locally |
 | `OSError: [Errno ...] image file truncated` | Corrupt input image | Re-download / validate file |
 
-### 8. Next Steps / Improvements
+### 8. Running Tests Locally
+
+To mirror the automated checks:
+
+1. Install the developer and practical extras in editable mode so intra-repo imports work the same way as CI:
+
+   ```bash
+   python -m pip install --upgrade pip
+   python -m pip install -e .[developer,practical]
+   ```
+
+2. From the repository root, run the full test suite:
+
+   ```bash
+   pytest
+   ```
+
+   The included `pytest.ini` sets `PYTHONPATH=.` so tests in `Practical/Imageboard/tests` and `Algorithmic/MBR` resolve local modules without extra flags.
+
+3. If you need to replicate the imageboard tests manually, export the environment variables they expect before invoking the app or running individual tests:
+
+   ```bash
+   export IMAGEBOARD_DATA_DIR=$(mktemp -d)
+   export IMAGEBOARD_SECRET_KEY=testing-secret
+   export IMAGEBOARD_ADMIN_PASSWORD=letmein
+   ```
+
+### 9. Next Steps / Improvements
 
 * Introduce `pyproject.toml` with extras: `imageboard`, `visual`, `ml`, `geo`.
 * Add `pytest` smoke tests (import + `--help` execution) to CI.
