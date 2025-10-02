@@ -416,6 +416,20 @@ for m in mods:
 PY
 ```
 
+Run the repository's automated CLI smoke tests when you want to ensure
+`--help` continues to execute successfully across the command-line tools:
+
+```bash
+pytest tests/test_cli_help.py
+```
+
+If you add a new GUI-only program (or a script that needs network access or
+large optional dependencies), include its relative path in the
+`SKIP_PATTERNS` dictionary in `tests/test_cli_help.py` along with a short
+reason. The test module treats each entry as a prefix, so adding
+`"Games"` skips the entire games tree, while a specific file path affects
+just that script.
+
 ### 7. Troubleshooting Quick Reference
 
 | Issue | Cause | Fix |
