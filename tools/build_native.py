@@ -146,7 +146,9 @@ def smoke_test(project: Project, artifact: Path) -> None:
         cmd = [str(artifact), *project.run_args]
     elif project.language == "java":
         if not project.main_class:
-            raise RuntimeError(f"Java project {project.name} is missing main_class metadata")
+            raise RuntimeError(
+                f"Java project {project.name} is missing main_class metadata"
+            )
         cmd = [
             "java",
             "-cp",
@@ -155,7 +157,9 @@ def smoke_test(project: Project, artifact: Path) -> None:
             *project.run_args,
         ]
     else:
-        raise ValueError(f"Unsupported language for project {project.name}: {project.language}")
+        raise ValueError(
+            f"Unsupported language for project {project.name}: {project.language}"
+        )
     run(cmd)
 
 
