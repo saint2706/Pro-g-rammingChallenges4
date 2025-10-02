@@ -10,6 +10,8 @@ on:
 jobs:
   black-format:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -26,6 +28,7 @@ jobs:
         run: black .
 
       - name: Commit changes if any
+        if: github.event_name == 'push'
         run: |
           git config --local user.name "github-actions[bot]"
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
