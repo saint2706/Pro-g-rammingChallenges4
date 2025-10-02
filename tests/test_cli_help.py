@@ -77,7 +77,7 @@ def discover_entry_points() -> Iterable[Path]:
                 contents = script.read_text(encoding="utf-8")
             except UnicodeDecodeError:
                 contents = script.read_text(encoding="utf-8", errors="ignore")
-            if "if __name__ == \"__main__\"" in contents:
+            if 'if __name__ == "__main__"' in contents:
                 yield script
 
 
