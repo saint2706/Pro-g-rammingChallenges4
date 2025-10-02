@@ -42,3 +42,29 @@ jobs:
             git commit -m "style: super-linter auto-fixes"
             git push
           fi
+
+  native-build:
+    name: Native smoke tests (${{ matrix.name }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - name: linux-gcc-gpp-openjdk
+            java-version: "17"
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install native toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential openjdk-${{ matrix.java-version }}-jdk
+
+      - name: Display toolchain versions
+        run: |
+          gcc --version
+          g++ --version
+          javac -version
+
+      - name: Run native build script
+        run: python tools/build_native.py --base "Practical/Producer Consumer" --ci
