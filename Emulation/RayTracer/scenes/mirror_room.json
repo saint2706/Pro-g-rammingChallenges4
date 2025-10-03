@@ -1,0 +1,115 @@
+{
+  "camera": {
+    "position": [0.0, 1.0, -4.5],
+    "look_at": [0.0, 0.75, 0.0],
+    "up": [0.0, 1.0, 0.0],
+    "fov": 42.0
+  },
+  "background": [26, 28, 40],
+  "max_depth": 3,
+  "lights": [
+    {
+      "position": [3.0, 5.5, -4.0],
+      "color": [255, 255, 255],
+      "intensity": 1.2
+    },
+    {
+      "position": [-3.5, 4.0, -2.0],
+      "color": [255, 200, 160],
+      "intensity": 0.6
+    }
+  ],
+  "objects": [
+    {
+      "type": "sphere",
+      "center": [0.0, 0.75, 0.5],
+      "radius": 0.75,
+      "material": {
+        "color": [250, 150, 120],
+        "ambient": 0.1,
+        "diffuse": 0.7,
+        "specular": 0.5,
+        "shininess": 80.0,
+        "reflection": 0.35
+      }
+    },
+    {
+      "type": "sphere",
+      "center": [-1.5, 0.5, 1.5],
+      "radius": 0.5,
+      "material": {
+        "color": [120, 180, 255],
+        "ambient": 0.1,
+        "diffuse": 0.65,
+        "specular": 0.45,
+        "shininess": 64.0,
+        "reflection": 0.25
+      }
+    },
+    {
+      "type": "sphere",
+      "center": [1.5, 0.4, 1.0],
+      "radius": 0.4,
+      "material": {
+        "color": [220, 220, 220],
+        "ambient": 0.15,
+        "diffuse": 0.6,
+        "specular": 0.7,
+        "shininess": 120.0,
+        "reflection": 0.6
+      }
+    },
+    {
+      "type": "plane",
+      "point": [0.0, 0.0, 0.0],
+      "normal": [0.0, 1.0, 0.0],
+      "material": {
+        "color": [230, 230, 230],
+        "ambient": 0.2,
+        "diffuse": 0.7,
+        "specular": 0.2,
+        "shininess": 24.0,
+        "reflection": 0.1
+      }
+    },
+    {
+      "type": "plane",
+      "point": [0.0, 0.0, 6.0],
+      "normal": [0.0, 0.0, -1.0],
+      "material": {
+        "color": [210, 210, 210],
+        "ambient": 0.2,
+        "diffuse": 0.7,
+        "specular": 0.2,
+        "shininess": 24.0,
+        "reflection": 0.05
+      }
+    },
+    {
+      "type": "plane",
+      "point": [3.5, 0.0, 0.0],
+      "normal": [-1.0, 0.0, 0.0],
+      "material": {
+        "color": [255, 220, 220],
+        "ambient": 0.2,
+        "diffuse": 0.7,
+        "specular": 0.15,
+        "shininess": 16.0,
+        "reflection": 0.05
+      }
+    },
+    {
+      "type": "plane",
+      "point": [-3.5, 0.0, 0.0],
+      "normal": [1.0, 0.0, 0.0],
+      "material": {
+        "color": [220, 240, 255],
+        "ambient": 0.2,
+        "diffuse": 0.7,
+        "specular": 0.15,
+        "shininess": 16.0,
+        "reflection": 0.05
+      }
+    }
+  ]
+}

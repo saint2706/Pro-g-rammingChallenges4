@@ -206,7 +206,7 @@ The repository includes a GitHub Actions workflow at `.github/workflows/keep-str
 | 91 | Chip - 8 Emulator (Hard Mode: Cached Interpreter. Fuck You: Dynamic Recompiler use dynarec/jit library) | Not Yet |
 | 92 | Double Pendulum Simulation | Not Yet |
 | 93 | Constructive Solid Geometry | Not Yet |
-| 94 | Ray Tracer | Not Yet |
+| 94 | Ray Tracer | [View Solution](./Emulation/RayTracer/) |
 | 95 | Real-Time Fast Fourier Transform Spectrum Visualizer | Not Yet |
 | 96 | Generate a Complimentary Color from any input color | [View Solution](./Emulation/CompColor/) |
 | 97 | Generate a 5-Color Scheme from the most dominant tones in any image | [View Solution](./Emulation/5%20color%20scheme/) |
