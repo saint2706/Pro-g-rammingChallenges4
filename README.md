@@ -80,6 +80,24 @@ The repository now ships a `pyproject.toml` so you can install challenge stacks 
 
 See the category READMEs for per-project suggestions; each now points back to these extras.
 
+## Troubleshooting & Debugging
+
+Consult the consolidated [debugging guide](docs/debugging.md) for a full matrix of automated coverage, dependency notes, and category-specific smoke tests.
+
+**Quick commands**
+
+- `pytest tests/test_cli_help.py -k "Practical"` &mdash; exercise CLI entry points for Practical utilities headlessly. 【F:tests/test_cli_help.py†L1-L82】
+- `pytest tests/test_raytracer.py` &mdash; render deterministic sample scenes from `Emulation/RayTracer/scenes/minimal.json`. 【F:tests/test_raytracer.py†L11-L26】
+- `pytest tests/test_wolfenstein_clone.py` &mdash; boot the Wolfenstein raycasting engine with SDL's dummy backend. 【F:tests/test_wolfenstein_clone.py†L1-L45】
+- `pytest tests/test_ai_roguelike_smoke.py` &mdash; run the roguelike agent end-to-end using the bundled `tcod` stub. 【F:tests/test_ai_roguelike_smoke.py†L1-L194】
+- `pytest tests/test_cnn_framework.py` &mdash; perform a one-epoch MNIST training/evaluation cycle and verify checkpoints. 【F:tests/test_cnn_framework.py†L1-L49】
+
+**Manual spot checks**
+
+- Launch headless-friendly games with `python Games/WolfensteinClone/game.py --help` before interactive debugging to confirm argument parsing. 【F:Games/WolfensteinClone/game.py†L440-L520】
+- Ray tracer scenes live under `Emulation/RayTracer/scenes/`; `minimal.json` mirrors the asset used in the hash regression test. 【F:tests/test_raytracer.py†L16-L23】
+- CNN framework runs emit checkpoints under `Artificial Intelligence/CNN_Framework/checkpoints/` (configurable via `TrainConfig.checkpoint_path`). 【F:tests/test_cnn_framework.py†L24-L49】
+
 ## Streamlit deployment keep-alive workflow
 
 The repository includes a GitHub Actions workflow at `.github/workflows/keep-streamlit-alive.yml` that pings the deployed Streamlit app on a schedule. The job runs hourly to keep the hosted instance warm and also supports manual runs so maintainers can verify that the endpoint is still responding.
