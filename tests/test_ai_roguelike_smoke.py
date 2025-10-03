@@ -12,9 +12,7 @@ import pytest
 
 # Ensure the ai_roguelike package (stored under Artificial Intelligence) is importable.
 PACKAGE_DIR = (
-    Path(__file__).resolve().parents[1]
-    / "Artificial Intelligence"
-    / "AI Roguelike"
+    Path(__file__).resolve().parents[1] / "Artificial Intelligence" / "AI Roguelike"
 )
 if str(PACKAGE_DIR) not in sys.path:
     sys.path.insert(0, str(PACKAGE_DIR))

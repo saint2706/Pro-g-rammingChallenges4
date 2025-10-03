@@ -80,7 +80,9 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="Headless roguelike runner powered by a Monte Carlo agent.",
     )
-    parser.add_argument("--turns", type=int, default=20, help="Maximum number of turns to simulate")
+    parser.add_argument(
+        "--turns", type=int, default=20, help="Maximum number of turns to simulate"
+    )
     parser.add_argument(
         "--iterations", type=int, default=96, help="MCTS iterations to run each turn"
     )
@@ -90,7 +92,9 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--exploration", type=float, default=1.1, help="Exploration constant for UCT"
     )
-    parser.add_argument("--seed", type=int, default=None, help="Seed for deterministic runs")
+    parser.add_argument(
+        "--seed", type=int, default=None, help="Seed for deterministic runs"
+    )
     parser.add_argument(
         "--log-file",
         default=None,

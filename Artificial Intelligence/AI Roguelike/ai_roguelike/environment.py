@@ -134,7 +134,11 @@ class RoguelikeEnvironment:
                 # Wall or obstacle – the only time we allow stepping into it is
                 # if an enemy blocks the way so we can attack.
                 target = game_map.get_blocking_entity_at_location(dest_x, dest_y)
-                if isinstance(target, Actor) and target is not player and target.is_alive:
+                if (
+                    isinstance(target, Actor)
+                    and target is not player
+                    and target.is_alive
+                ):
                     actions.append(action)
                 continue
             blocker = game_map.get_blocking_entity_at_location(dest_x, dest_y)
@@ -198,8 +202,11 @@ class RoguelikeEnvironment:
         explored_ratio /= max(1, self.engine.game_map.explored.size)
         # Weight terms: HP is critical, hostiles penalise, exploration encourages
         # moving through the dungeon instead of waiting in place.
-        return (player_hp * 2.0) - (hostile_hp * 0.75) - (hostile_count * 1.5) + (
-            explored_ratio * 10.0
+        return (
+            (player_hp * 2.0)
+            - (hostile_hp * 0.75)
+            - (hostile_count * 1.5)
+            + (explored_ratio * 10.0)
         )
 
     def summary(self) -> dict:
@@ -232,7 +239,11 @@ class RoguelikeEnvironment:
         count = 0
         total_hp = 0
         for entity in self.engine.game_map.entities:
-            if isinstance(entity, Actor) and entity is not self.engine.player and entity.is_alive:
+            if (
+                isinstance(entity, Actor)
+                and entity is not self.engine.player
+                and entity.is_alive
+            ):
                 count += 1
                 total_hp += int(entity.fighter.hp if entity.fighter else 0)
         return count, total_hp

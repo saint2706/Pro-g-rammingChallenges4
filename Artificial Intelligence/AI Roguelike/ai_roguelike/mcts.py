@@ -74,7 +74,11 @@ class _TreeNode:
     def expand(self, rng: random.Random) -> "_TreeNode":
         if not self.untried_actions:
             raise RuntimeError("expand called on fully expanded node")
-        index = rng.randrange(len(self.untried_actions)) if len(self.untried_actions) > 1 else 0
+        index = (
+            rng.randrange(len(self.untried_actions))
+            if len(self.untried_actions) > 1
+            else 0
+        )
         action = self.untried_actions.pop(index)
         child_env = self.env.clone()
         child_env.step(action)
@@ -133,7 +137,11 @@ class MCTSAgent:
 
         best_child = max(root.children, key=lambda child: child.visits)
         evaluations = tuple(
-            ActionEvaluation(action=child.action, visits=child.visits, total_reward=child.total_reward)
+            ActionEvaluation(
+                action=child.action,
+                visits=child.visits,
+                total_reward=child.total_reward,
+            )
             for child in sorted(root.children, key=lambda c: c.visits, reverse=True)
         )
         return best_child.action, evaluations
