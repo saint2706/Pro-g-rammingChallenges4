@@ -199,6 +199,34 @@ The repository includes a GitHub Actions workflow at `.github/workflows/keep-str
 | 76 | Convolutional Neural Network: Implement a convolutional N.N. for a handwritten digit recognition test on MNIST dataset (Use TensorFlow Theano etc...) | Not Yet |
 | 77 | Convolutional Neural Network: Implement your own convolutional neural network for handwritten digit recognition test on MNIST Dataset (Without TensorFlow Theano etc...) | [View Solution](./Artificial%20Intelligence/CNN_Scratch/) |
 
+#### OpenAI Gym DQN Trainer
+
+Reinforcement learning experiments now live in [`Artificial Intelligence/OpenAI Gym/`](./Artificial%20Intelligence/OpenAI%20Gym/).
+The folder ships a reproducible CartPole DQN baseline built on Stable-Baselines3 with command-line
+flags for training and evaluation, checkpointing, deterministic seeding, and a binary-free heuristic for quick checks.
+
+```bash
+# Create an environment and install the AI stack (Gymnasium + Stable-Baselines3 + Torch)
+python -m venv .venv
+source .venv/bin/activate  # Windows: .venv\Scripts\Activate.ps1
+python -m pip install -e .[ai]
+
+# Train for 80k timesteps and save checkpoints/models under the project folder
+python "Artificial Intelligence/OpenAI Gym/train.py" --mode train \
+    --total-timesteps 80000 \
+    --checkpoint-dir "Artificial Intelligence/OpenAI Gym/checkpoints" \
+    --model-path "Artificial Intelligence/OpenAI Gym/models/dqn_cartpole"
+
+# Quickly sanity-check the heuristic CartPole controller used in tests
+python - <<'PY'
+from runpy import run_path
+
+module_globals = run_path('Artificial Intelligence/OpenAI Gym/policies.py')
+policy = module_globals['cartpole_balance_policy']()
+print('Policy action for zero-state:', policy([0, 0, 0.05, 0]))
+PY
+```
+
 ### Emulation/Modeling
 
 | # | Challenge | Status |
