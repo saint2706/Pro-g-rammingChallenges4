@@ -1,4 +1,5 @@
 """Realtime FFT spectrum visualizer for microphone or WAV input."""
+
 from __future__ import annotations
 
 import argparse
@@ -46,7 +47,9 @@ def _to_float32(samples: np.ndarray) -> np.ndarray:
     return samples.astype(np.float32)
 
 
-def chunk_to_fft(samples: np.ndarray, config: SpectrumConfig) -> Tuple[np.ndarray, np.ndarray]:
+def chunk_to_fft(
+    samples: np.ndarray, config: SpectrumConfig
+) -> Tuple[np.ndarray, np.ndarray]:
     """Compute FFT magnitude spectrum for the provided audio chunk."""
 
     array = np.asarray(samples)
@@ -112,9 +115,13 @@ class MicrophoneStream:
         try:
             import sounddevice as sd  # type: ignore
         except ImportError as exc:  # pragma: no cover - optional dependency
-            raise RuntimeError("sounddevice is required for microphone capture") from exc
+            raise RuntimeError(
+                "sounddevice is required for microphone capture"
+            ) from exc
 
-        def callback(indata, frames, time, status):  # pragma: no cover - requires hardware
+        def callback(
+            indata, frames, time, status
+        ):  # pragma: no cover - requires hardware
             if status:
                 print(status, file=sys.stderr)
             self._queue.put(indata.copy())
@@ -135,7 +142,9 @@ class MicrophoneStream:
             self._stream.close()
             self._stream = None
 
-    def __iter__(self) -> Generator[np.ndarray, None, None]:  # pragma: no cover - requires hardware
+    def __iter__(
+        self,
+    ) -> Generator[np.ndarray, None, None]:  # pragma: no cover - requires hardware
         while True:
             yield self._queue.get()
 
@@ -152,7 +161,7 @@ def _run_visualizer(
     source_iter = iter(source)
     fig, ax = plt.subplots()
     base_freqs = np.fft.rfftfreq(config.window_size, d=1.0 / config.sample_rate)
-    line, = ax.plot(base_freqs, np.zeros_like(base_freqs))
+    (line,) = ax.plot(base_freqs, np.zeros_like(base_freqs))
     ax.set_xlabel("Frequency (Hz)")
     ax.set_ylabel("Magnitude" if scale == "linear" else "dBFS")
     ax.set_xlim(0, config.sample_rate / 2)
@@ -184,14 +193,37 @@ def _run_visualizer(
 
 def main(argv: Optional[Iterable[str]] = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--source", choices=["mic", "wav"], default="mic", help="Audio input source")
-    parser.add_argument("--wav-path", type=Path, help="Path to WAV file when using --source=wav")
-    parser.add_argument("--samplerate", type=int, default=None, help="Sample rate to request")
-    parser.add_argument("--window-size", type=int, default=2048, help="FFT window size (samples)")
-    parser.add_argument("--window", choices=["hann", "hamming", "rect"], default="hann", help="Window function")
+    parser.add_argument(
+        "--source", choices=["mic", "wav"], default="mic", help="Audio input source"
+    )
+    parser.add_argument(
+        "--wav-path", type=Path, help="Path to WAV file when using --source=wav"
+    )
+    parser.add_argument(
+        "--samplerate", type=int, default=None, help="Sample rate to request"
+    )
+    parser.add_argument(
+        "--window-size", type=int, default=2048, help="FFT window size (samples)"
+    )
+    parser.add_argument(
+        "--window",
+        choices=["hann", "hamming", "rect"],
+        default="hann",
+        help="Window function",
+    )
     parser.add_argument("--device", help="Optional sounddevice input identifier")
-    parser.add_argument("--refresh", type=float, default=30.0, help="Plot refresh rate (frames per second)")
-    parser.add_argument("--scale", choices=["linear", "log"], default="linear", help="Display magnitude scale")
+    parser.add_argument(
+        "--refresh",
+        type=float,
+        default=30.0,
+        help="Plot refresh rate (frames per second)",
+    )
+    parser.add_argument(
+        "--scale",
+        choices=["linear", "log"],
+        default="linear",
+        help="Display magnitude scale",
+    )
     parser.add_argument("--loop", action="store_true", help="Loop WAV file playback")
     args = parser.parse_args(list(argv) if argv is not None else None)
 
