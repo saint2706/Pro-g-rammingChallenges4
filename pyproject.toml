@@ -63,6 +63,7 @@ algorithmic = [
     "yt-dlp>=2024.7.1",
 ]
 visual = [
+    "numpy>=1.26,<2.0",
     "Pillow>=10.4,<10.5",
     "matplotlib>=3.8,<3.9",
     "imageio>=2.34,<2.35",

@@ -53,6 +53,7 @@ python -m pip install -e .[ai]            # palette clustering (scikit-learn)
 | ASCII_Clock | Real-time ASCII clock (synced & unsynced variants). | stdlib only | — |
 | CellularTextures | (WIP) Procedural texture generation (C++ prototype). | C++ | — |
 | CompColor | Color space component visualizer & composite manipulator. | numpy, Pillow | — |
+| DoublePendulum | Runge–Kutta chaotic pendulum with CSV/GIF export. | matplotlib | numpy, imageio |
 | EulerianPath | Fleury vs Hierholzer algorithm demos (Java/Python/C++). | stdlib (Py) | — |
 | SpinnyCube | Text-based + optional VPython 3D spinning cube. | stdlib (text mode) | vpython |
 
