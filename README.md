@@ -404,17 +404,27 @@ git clone https://github.com/saintwithataint/Pro-g-rammingChallenges4.git
 cd Pro-g-rammingChallenges4
 python -m venv .venv
 . .venv/Scripts/Activate.ps1
-pip install -r requirements.txt
+python -m pip install -e .[practical]
 ```
 
-If you only want a subset (e.g., just run the imageboard or seam carving), install that folder's own `requirements.txt` instead of the root.
+The project uses [`pyproject.toml`](pyproject.toml) extras as the single source of truth for optional stacks. Mix and match the ones you need, for example:
+
+```bash
+# Base algorithms + AI helpers
+python -m pip install -e .[algorithmic,ai]
+
+# Everything including developer tooling
+python -m pip install -e .[all,developer]
+```
+
+The root [`requirements.txt`](requirements.txt) is now generated directly from the extras for compatibility with tools that still expect a requirements file. Regenerate it with `python tools/sync_requirements.py` if you update `pyproject.toml`.
 
 ### 2. Dependency Strategy
 
-* Root `requirements.txt` = superset, categorized (web, imaging, analysis, visualization).
-* Folder-level `requirements.txt` files (e.g. `Practical/`, `Emulation/`) are leaner.
+* `pyproject.toml` extras drive dependency selection; install only what you need (e.g. `python -m pip install -e .[visual]`).
+* Run `python tools/sync_requirements.py` after editing extras to keep the generated `requirements.txt` in sync.
+* Folder-level `requirements.txt` files (e.g. `Practical/`, `Emulation/`) remain available for ultra-minimal installs.
 * Heavy/optional libs (plotly, vpython, scikit-learn, colour-science) can be skipped unless you need those features.
-* Future improvement: adopt `pyproject.toml` with extras (e.g. `pip install .[imageboard]`).
 
 ### 3. Binary Asset Management (Git LFS)
 
