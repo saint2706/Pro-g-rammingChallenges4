@@ -5,6 +5,7 @@ practical, batteries-included baseline that new learners can extend.
 It supports basic checkpointing, reproducible seeding, and a
 train/eval command-line interface for experimentation.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -17,7 +18,11 @@ import gymnasium as gym
 import numpy as np
 import torch
 from stable_baselines3 import DQN
-from stable_baselines3.common.callbacks import CallbackList, CheckpointCallback, EvalCallback
+from stable_baselines3.common.callbacks import (
+    CallbackList,
+    CheckpointCallback,
+    EvalCallback,
+)
 from stable_baselines3.common.evaluation import evaluate_policy
 from stable_baselines3.common.vec_env import DummyVecEnv
 
@@ -192,7 +197,9 @@ def train(args: argparse.Namespace) -> None:
         n_eval_episodes=args.eval_episodes,
         deterministic=True,
     )
-    print(f"Evaluation after training — mean reward: {mean_reward:.2f} ± {std_reward:.2f}")
+    print(
+        f"Evaluation after training — mean reward: {mean_reward:.2f} ± {std_reward:.2f}"
+    )
 
 
 def evaluate(args: argparse.Namespace) -> None:
