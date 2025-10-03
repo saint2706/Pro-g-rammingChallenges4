@@ -55,6 +55,7 @@ python -m pip install -e .[ai]            # palette clustering (scikit-learn)
 | CompColor | Color space component visualizer & composite manipulator. | numpy, Pillow | — |
 | EulerianPath | Fleury vs Hierholzer algorithm demos (Java/Python/C++). | stdlib (Py) | — |
 | SpinnyCube | Text-based + optional VPython 3D spinning cube. | stdlib (text mode) | vpython |
+| FFTSpectrum | Real-time FFT spectrum analyzer with mic/WAV sources. | numpy, matplotlib, sounddevice | — |
 
 > Some folders may contain experimental or WIP code; stable scripts include `5cs.py`, `comp.py`, `hierholzer.py`, `ClockSynced.py`.
 
@@ -82,6 +83,7 @@ Install only the extras you need:
 | OpenCV acceleration | `visual` | Adds `opencv-python` alongside Pillow/imageio. |
 | Component color visualizer (CompColor) | `visual` | Only Pillow + numpy required. |
 | SpinnyCube VPython 3D version | `visual` | VPython is part of the visual extra. |
+| FFTSpectrum real-time analyzer | `visual` | Adds numpy, matplotlib, sounddevice for live plots. |
 | Pure stdlib demos (Eulerian path, ASCII clock) | *(none)* | Standard library only. |
 
 ---
