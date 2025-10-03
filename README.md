@@ -58,7 +58,7 @@ The repository now ships a `pyproject.toml` so you can install challenge stacks 
 | ----- | ------ | ---------- |
 | `practical` | `Practical/` utilities, desktop apps, and web tools | Flask imageboard, Streamlit dashboards, Seam Carving, Shazam clone |
 | `algorithmic` | `Algorithmic/` problem set helpers | Steganography, stock analysis, crawler tooling |
-| `visual` | Visualization add-ons used across categories | Matplotlib demos, colour-science palettes, VPython spinny cube |
+| `visual` | Visualization add-ons used across categories | Matplotlib demos, colour-science palettes, VPython spinny cube, FFT spectrum analyzer |
 | `audio` | Audio processing stacks | WAV equalizer, Shazam clone, music streaming |
 | `games` | Python games in `Games/` | Sudoku solver, Simon, Oil Panic tribute |
 | `ai` | `Artificial Intelligence/` demos | A* Sudoku, Connect4 AI, neural network |
@@ -207,7 +207,7 @@ The repository includes a GitHub Actions workflow at `.github/workflows/keep-str
 | 92 | Double Pendulum Simulation | Not Yet |
 | 93 | Constructive Solid Geometry | Not Yet |
 | 94 | Ray Tracer | Not Yet |
-| 95 | Real-Time Fast Fourier Transform Spectrum Visualizer | Not Yet |
+| 95 | Real-Time Fast Fourier Transform Spectrum Visualizer | [View Solution](./Emulation/FFTSpectrum/) |
 | 96 | Generate a Complimentary Color from any input color | [View Solution](./Emulation/CompColor/) |
 | 97 | Generate a 5-Color Scheme from the most dominant tones in any image | [View Solution](./Emulation/5%20color%20scheme/) |
 | 98 | General Lambert's-Problem Solver (At least it's not rocket science... Oh wait it actually is) | Not Yet |
