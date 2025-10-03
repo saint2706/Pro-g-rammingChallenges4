@@ -191,7 +191,7 @@ The repository includes a GitHub Actions workflow at `.github/workflows/keep-str
 | # | Challenge | Status |
 | --- | --------- | ------ |
 | 70 | OpenAI Gym Project | Not Yet |
-| 71 | AI for Roguelikes | Not Yet |
+| 71 | AI for Roguelikes | [View Solution](./Artificial%20Intelligence/AI%20Roguelike/) |
 | 72 | Sudoku/n-Puzzle Solver using A* algorithm | [View Solution](./Artificial%20Intelligence/Sudoku/) |
 | 73 | Connect-4 AI Player using Alpha-Beta Pruning | [View Solution](./Artificial%20Intelligence/Connect4/) |
 | 74 | Basic Neural Network - Simulate individual neurons and their connections | [View Solution](./Artificial%20Intelligence/Basic%20Neural%20Network/) |
