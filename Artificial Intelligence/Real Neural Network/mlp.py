@@ -4,6 +4,7 @@ This module exposes the :class:`MLP` class which performs forward and
 backward propagation using matrix operations.  It supports multi-class
 classification with cross-entropy loss and softmax output activation.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass

@@ -1,4 +1,5 @@
 """Train the NumPy MLP on MNIST or a compatible dataset."""
+
 from __future__ import annotations
 
 import argparse
@@ -80,7 +81,9 @@ def main(argv: Sequence[str] | None = None) -> None:
     args = parse_args(argv)
 
     X_train, X_test, y_train, y_test = load_mnist(
-        test_size=0.2, random_state=args.seed, data_home=str(args.data_home) if args.data_home else None
+        test_size=0.2,
+        random_state=args.seed,
+        data_home=str(args.data_home) if args.data_home else None,
     )
 
     rng = np.random.default_rng(args.seed)

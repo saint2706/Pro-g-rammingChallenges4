@@ -1,4 +1,5 @@
 """Evaluate a trained NumPy MLP checkpoint on MNIST."""
+
 from __future__ import annotations
 
 import argparse
@@ -39,7 +40,9 @@ def main(argv: Sequence[str] | None = None) -> None:
     args = parse_args(argv)
 
     X_train, X_test, y_train, y_test = load_mnist(
-        test_size=0.2, random_state=args.seed, data_home=str(args.data_home) if args.data_home else None
+        test_size=0.2,
+        random_state=args.seed,
+        data_home=str(args.data_home) if args.data_home else None,
     )
 
     model = MLP.load(args.model)
