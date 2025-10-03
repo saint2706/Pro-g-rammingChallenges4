@@ -56,6 +56,7 @@ The repository now ships a `pyproject.toml` so you can install challenge stacks 
    ```bash
    python -m pip install -e .[practical]
    python -m pip install -e .[algorithmic]
+   python -m pip install -e .[constructive_solid_geometry]
    ```
    Combine extras (e.g., `.[practical,visual]`) or grab everything with `.[all]`.
 3. **Run scripts/tests** directly from the repo. Editable installs keep your checkout in sync with the environment.
@@ -67,6 +68,7 @@ The repository now ships a `pyproject.toml` so you can install challenge stacks 
 | `visual` | Visualization add-ons used across categories | Matplotlib demos, colour-science palettes, VPython spinny cube, FFT spectrum analyzer |
 | `audio` | Audio processing stacks | WAV equalizer, Shazam clone, music streaming |
 | `games` | Python games in `Games/` | Sudoku solver, Simon, Oil Panic tribute |
+| `constructive_solid_geometry` | `Emulation/ConstructiveSolidGeometry/` mesh utilities | Signed-distance field primitives, marching cubes meshing |
 | `ai` | `Artificial Intelligence/` demos | A* Sudoku, Connect4 AI, neural network |
 | `web` | HTTP and dashboard helpers | Imageboard, IP tracking, web crawlers |
 | `desktop` | GUI/automation conveniences | Window manager, key press bot, Tk front-ends |
