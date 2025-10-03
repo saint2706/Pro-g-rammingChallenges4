@@ -92,8 +92,12 @@ class DoublePendulumSimulator:
 
         return (omega1, domega1, omega2, domega2)
 
-    def _rk4_step(self, state: Sequence[float], dt: float) -> Tuple[float, float, float, float]:
-        def combine(s: Sequence[float], scale: float, deriv: Sequence[float]) -> Tuple[float, float, float, float]:
+    def _rk4_step(
+        self, state: Sequence[float], dt: float
+    ) -> Tuple[float, float, float, float]:
+        def combine(
+            s: Sequence[float], scale: float, deriv: Sequence[float]
+        ) -> Tuple[float, float, float, float]:
             return (
                 s[0] + scale * deriv[0],
                 s[1] + scale * deriv[1],
@@ -139,7 +143,9 @@ class DoublePendulumSimulator:
 
         return SimulationResult(time, theta1, theta2, omega1, omega2)
 
-    def positions(self, theta1: float, theta2: float) -> Tuple[float, float, float, float]:
+    def positions(
+        self, theta1: float, theta2: float
+    ) -> Tuple[float, float, float, float]:
         """Compute cartesian coordinates of the two bobs."""
 
         cfg = self.config
@@ -149,7 +155,9 @@ class DoublePendulumSimulator:
         y2 = y1 - cfg.l2 * cos(theta2)
         return x1, y1, x2, y2
 
-    def trajectory(self, result: SimulationResult) -> Tuple[List[float], List[float], List[float], List[float]]:
+    def trajectory(
+        self, result: SimulationResult
+    ) -> Tuple[List[float], List[float], List[float], List[float]]:
         """Return x/y coordinates for both links across the trace."""
 
         x1: List[float] = []
@@ -248,8 +256,14 @@ def render_matplotlib(
     if show:
         for idx in range(len(result.time)):
             ax.clear()
-            ax.set_xlim(-simulator.config.l1 - simulator.config.l2 - 0.2, simulator.config.l1 + simulator.config.l2 + 0.2)
-            ax.set_ylim(-simulator.config.l1 - simulator.config.l2 - 0.2, simulator.config.l1 + simulator.config.l2 + 0.2)
+            ax.set_xlim(
+                -simulator.config.l1 - simulator.config.l2 - 0.2,
+                simulator.config.l1 + simulator.config.l2 + 0.2,
+            )
+            ax.set_ylim(
+                -simulator.config.l1 - simulator.config.l2 - 0.2,
+                simulator.config.l1 + simulator.config.l2 + 0.2,
+            )
             ax.set_title(f"Double Pendulum t={result.time[idx]:.2f}s")
             ax.grid(True, linestyle="--", alpha=0.3)
 
@@ -261,7 +275,12 @@ def render_matplotlib(
 
             ax.plot([0.0, x1[idx]], [0.0, y1[idx]], color="tab:blue")
             ax.plot([x1[idx], x2[idx]], [y1[idx], y2[idx]], color="tab:orange")
-            ax.scatter([x1[idx], x2[idx]], [y1[idx], y2[idx]], color=["tab:blue", "tab:orange"], s=50)
+            ax.scatter(
+                [x1[idx], x2[idx]],
+                [y1[idx], y2[idx]],
+                color=["tab:blue", "tab:orange"],
+                s=50,
+            )
             ax.plot(history_x, history_y, color="tab:red", linewidth=1.0, alpha=0.7)
             plt.pause(0.001)
 
@@ -272,17 +291,25 @@ def render_matplotlib(
 
     # Static render for headless mode with optional save.
     idx = -1
-    ax.set_xlim(-simulator.config.l1 - simulator.config.l2 - 0.2, simulator.config.l1 + simulator.config.l2 + 0.2)
-    ax.set_ylim(-simulator.config.l1 - simulator.config.l2 - 0.2, simulator.config.l1 + simulator.config.l2 + 0.2)
+    ax.set_xlim(
+        -simulator.config.l1 - simulator.config.l2 - 0.2,
+        simulator.config.l1 + simulator.config.l2 + 0.2,
+    )
+    ax.set_ylim(
+        -simulator.config.l1 - simulator.config.l2 - 0.2,
+        simulator.config.l1 + simulator.config.l2 + 0.2,
+    )
     ax.grid(True, linestyle="--", alpha=0.3)
     ax.set_title("Double Pendulum (final state)")
 
-    history_x.extend(x2[max(0, len(x2) - trail_length):])
-    history_y.extend(y2[max(0, len(y2) - trail_length):])
+    history_x.extend(x2[max(0, len(x2) - trail_length) :])
+    history_y.extend(y2[max(0, len(y2) - trail_length) :])
 
     ax.plot([0.0, x1[idx]], [0.0, y1[idx]], color="tab:blue")
     ax.plot([x1[idx], x2[idx]], [y1[idx], y2[idx]], color="tab:orange")
-    ax.scatter([x1[idx], x2[idx]], [y1[idx], y2[idx]], color=["tab:blue", "tab:orange"], s=50)
+    ax.scatter(
+        [x1[idx], x2[idx]], [y1[idx], y2[idx]], color=["tab:blue", "tab:orange"], s=50
+    )
     ax.plot(history_x, history_y, color="tab:red", linewidth=1.0, alpha=0.7)
 
     if save_path is not None:
@@ -315,8 +342,14 @@ def export_gif(
 
     for idx in range(len(result.time)):
         ax.clear()
-        ax.set_xlim(-simulator.config.l1 - simulator.config.l2 - 0.2, simulator.config.l1 + simulator.config.l2 + 0.2)
-        ax.set_ylim(-simulator.config.l1 - simulator.config.l2 - 0.2, simulator.config.l1 + simulator.config.l2 + 0.2)
+        ax.set_xlim(
+            -simulator.config.l1 - simulator.config.l2 - 0.2,
+            simulator.config.l1 + simulator.config.l2 + 0.2,
+        )
+        ax.set_ylim(
+            -simulator.config.l1 - simulator.config.l2 - 0.2,
+            simulator.config.l1 + simulator.config.l2 + 0.2,
+        )
         ax.set_axis_off()
 
         history_x.append(x2[idx])
@@ -327,7 +360,12 @@ def export_gif(
 
         ax.plot([0.0, x1[idx]], [0.0, y1[idx]], color="tab:blue", linewidth=2)
         ax.plot([x1[idx], x2[idx]], [y1[idx], y2[idx]], color="tab:orange", linewidth=2)
-        ax.scatter([x1[idx], x2[idx]], [y1[idx], y2[idx]], color=["tab:blue", "tab:orange"], s=40)
+        ax.scatter(
+            [x1[idx], x2[idx]],
+            [y1[idx], y2[idx]],
+            color=["tab:blue", "tab:orange"],
+            s=40,
+        )
         ax.plot(history_x, history_y, color="tab:red", linewidth=1.0, alpha=0.7)
 
         fig.canvas.draw()
@@ -346,17 +384,51 @@ def _cli() -> None:
     import argparse
 
     parser = argparse.ArgumentParser(description="Simulate a chaotic double pendulum")
-    parser.add_argument("--theta1", type=float, default=120.0, help="Initial angle of the first link in degrees")
-    parser.add_argument("--theta2", type=float, default=-10.0, help="Initial angle of the second link in degrees")
-    parser.add_argument("--omega1", type=float, default=0.0, help="Initial angular velocity of the first link (rad/s)")
-    parser.add_argument("--omega2", type=float, default=0.0, help="Initial angular velocity of the second link (rad/s)")
-    parser.add_argument("--duration", type=float, default=10.0, help="Simulation duration in seconds")
+    parser.add_argument(
+        "--theta1",
+        type=float,
+        default=120.0,
+        help="Initial angle of the first link in degrees",
+    )
+    parser.add_argument(
+        "--theta2",
+        type=float,
+        default=-10.0,
+        help="Initial angle of the second link in degrees",
+    )
+    parser.add_argument(
+        "--omega1",
+        type=float,
+        default=0.0,
+        help="Initial angular velocity of the first link (rad/s)",
+    )
+    parser.add_argument(
+        "--omega2",
+        type=float,
+        default=0.0,
+        help="Initial angular velocity of the second link (rad/s)",
+    )
+    parser.add_argument(
+        "--duration", type=float, default=10.0, help="Simulation duration in seconds"
+    )
     parser.add_argument("--dt", type=float, default=0.01, help="Integration time step")
-    parser.add_argument("--damping", type=float, default=0.0, help="Damping factor applied to both joints")
+    parser.add_argument(
+        "--damping",
+        type=float,
+        default=0.0,
+        help="Damping factor applied to both joints",
+    )
     parser.add_argument("--csv", type=Path, help="Optional CSV output path")
     parser.add_argument("--gif", type=Path, help="Optional GIF output path")
-    parser.add_argument("--no-show", action="store_true", help="Skip the matplotlib preview window")
-    parser.add_argument("--trail", type=int, default=180, help="Number of points to keep for the path trail")
+    parser.add_argument(
+        "--no-show", action="store_true", help="Skip the matplotlib preview window"
+    )
+    parser.add_argument(
+        "--trail",
+        type=int,
+        default=180,
+        help="Number of points to keep for the path trail",
+    )
 
     args = parser.parse_args()
 

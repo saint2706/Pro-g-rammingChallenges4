@@ -24,7 +24,9 @@ def test_energy_conservation_small_angles() -> None:
     )
 
     max_delta = 0.0
-    for th1, om1, th2, om2 in zip(result.theta1, result.omega1, result.theta2, result.omega2):
+    for th1, om1, th2, om2 in zip(
+        result.theta1, result.omega1, result.theta2, result.omega2
+    ):
         energy = compute_total_energy(cfg, th1, om1, th2, om2)
         max_delta = max(max_delta, abs(energy - initial_energy))
 
