@@ -16,6 +16,7 @@ cd Pro-g-rammingChallenges4/Games
 ```
 
 > Working from the repository root? Swap the final line for `cd Pro-g-rammingChallenges4` and prefix game paths with `Games/` in the commands below.
+> ⚠️ **Large assets ahead:** Before launching any game, follow the [Git LFS setup guide](../docs/git-lfs.md) from the repo root and run `git lfs install` / `git lfs pull` so sprites, audio, and models are available locally.
 
 ### 1.2. Create a virtual environment (recommended)
 

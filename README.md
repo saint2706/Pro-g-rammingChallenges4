@@ -11,6 +11,10 @@ This repository is a collection of solutions to a wide array of programming prob
 
 The solutions are organized by category and difficulty, making it easy to navigate and find what you're looking for. Many of the projects are implemented in multiple languages to showcase different ways of solving the same problem.
 
+## Prerequisites
+
+- **Git LFS** – Install Git Large File Storage before cloning and run the sync commands from the [Git LFS setup guide](docs/git-lfs.md). Many challenges (games, audio tools, pretrained AI models) rely on large assets stored with LFS, so remember to run `git lfs install` and `git lfs pull` before building or testing.
+
 ## Progress
 
 <progress value="100" max="131"></progress>
@@ -30,6 +34,8 @@ _Progress counts are generated from the actual solution folders in the repositor
 ## How to Contribute (A Guide for New Developers)
 
 While this is a personal project, the principles behind it are universal. If you're starting your own journey of programming challenges, here's a guide to help you get the most out of it:
+
+> **Working in this repo?** Make sure [Git LFS is installed](docs/git-lfs.md) and that you've run `git lfs install` / `git lfs pull` so game assets, audio packs, and pretrained models are available before you start hacking.
 
 1. **Understand the Problem:** Before writing a single line of code, do your research. Draw diagrams, write out the logic, and break the problem down into smaller pieces. If a problem seems too easy, think about how you can add more features or complexity.
 2. **Implement a Solution:** Start with a language you're comfortable with to get a working solution first. Don't worry about writing perfect code on the first try. The goal is to get it working, then you can refactor and improve it.

@@ -23,6 +23,8 @@ git clone https://github.com/saintwithataint/Pro-g-rammingChallenges4.git
 cd Pro-g-rammingChallenges4/Practical
 ```
 
+> ⚠️ **Git LFS required:** Before running any tools, visit the [Git LFS setup guide](../docs/git-lfs.md) in the repo root and run `git lfs install` followed by `git lfs pull` so audio samples, pretrained models, and binary assets are present.
+
 ### 1.2. Create a virtual environment (recommended)
 
 ```pwsh
