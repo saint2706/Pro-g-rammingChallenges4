@@ -70,6 +70,8 @@ visual = [
     "colour-science>=0.4,<0.5",
     "vpython>=7.6,<7.7",
     "opencv-python>=4.10,<5.0",
+    "scikit-image>=0.24,<0.25",
+    "trimesh>=4.4,<4.5",
 ]
 audio = [
     "numpy>=1.26,<2.0",
@@ -173,6 +175,8 @@ all = [
     "pytest>=8.3,<8.4",
     "ruff>=0.5,<0.6",
     "mypy>=1.11,<1.12",
+    "scikit-image>=0.24,<0.25",
+    "trimesh>=4.4,<4.5",
 ]
 
 [project.urls]

@@ -13,16 +13,16 @@ The solutions are organized by category and difficulty, making it easy to naviga
 
 ## Progress
 
-<progress value="99" max="131"></progress>
+<progress value="100" max="131"></progress>
 
-**Overall:** 99 / 131 challenges completed (75.6%).
+**Overall:** 100 / 131 challenges completed (76.3%).
 
 | Category | Completed | Total | Progress |
 | --- | --- | --- | --- |
 | Practical | 53 | 53 | 100% |
 | Algorithmic | 27 | 27 | 100% |
 | Artificial Intelligence | 3 | 8 | 37.5% |
-| Emulation/Modeling | 6 | 14 | 42.9% |
+| Emulation/Modeling | 7 | 14 | 50.0% |
 | Games | 10 | 29 | 34.5% |
 
 _Progress counts are generated from the actual solution folders in the repository (see tables below)._ 
@@ -205,7 +205,7 @@ The repository includes a GitHub Actions workflow at `.github/workflows/keep-str
 | --- | --------- | ------ |
 | 91 | Chip - 8 Emulator (Hard Mode: Cached Interpreter. Fuck You: Dynamic Recompiler use dynarec/jit library) | Not Yet |
 | 92 | Double Pendulum Simulation | Not Yet |
-| 93 | Constructive Solid Geometry | Not Yet |
+| 93 | Constructive Solid Geometry | [View Solution](./Emulation/ConstructiveSolidGeometry/) |
 | 94 | Ray Tracer | Not Yet |
 | 95 | Real-Time Fast Fourier Transform Spectrum Visualizer | Not Yet |
 | 96 | Generate a Complimentary Color from any input color | [View Solution](./Emulation/CompColor/) |

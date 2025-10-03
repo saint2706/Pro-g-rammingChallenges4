@@ -55,6 +55,7 @@ python -m pip install -e .[ai]            # palette clustering (scikit-learn)
 | CompColor | Color space component visualizer & composite manipulator. | numpy, Pillow | — |
 | EulerianPath | Fleury vs Hierholzer algorithm demos (Java/Python/C++). | stdlib (Py) | — |
 | SpinnyCube | Text-based + optional VPython 3D spinning cube. | stdlib (text mode) | vpython |
+| ConstructiveSolidGeometry | Signed distance field CSG CLI + mesh exporter. | numpy, scikit-image, trimesh | — |
 
 > Some folders may contain experimental or WIP code; stable scripts include `5cs.py`, `comp.py`, `hierholzer.py`, `ClockSynced.py`.
 
