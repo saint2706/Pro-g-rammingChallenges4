@@ -13,15 +13,15 @@ The solutions are organized by category and difficulty, making it easy to naviga
 
 ## Progress
 
-<progress value="99" max="131"></progress>
+<progress value="100" max="131"></progress>
 
-**Overall:** 99 / 131 challenges completed (75.6%).
+**Overall:** 100 / 131 challenges completed (76.3%).
 
 | Category | Completed | Total | Progress |
 | --- | --- | --- | --- |
 | Practical | 53 | 53 | 100% |
 | Algorithmic | 27 | 27 | 100% |
-| Artificial Intelligence | 3 | 8 | 37.5% |
+| Artificial Intelligence | 4 | 8 | 50.0% |
 | Emulation/Modeling | 6 | 14 | 42.9% |
 | Games | 10 | 29 | 34.5% |
 
@@ -195,7 +195,7 @@ The repository includes a GitHub Actions workflow at `.github/workflows/keep-str
 | 72 | Sudoku/n-Puzzle Solver using A* algorithm | [View Solution](./Artificial%20Intelligence/Sudoku/) |
 | 73 | Connect-4 AI Player using Alpha-Beta Pruning | [View Solution](./Artificial%20Intelligence/Connect4/) |
 | 74 | Basic Neural Network - Simulate individual neurons and their connections | [View Solution](./Artificial%20Intelligence/Basic%20Neural%20Network/) |
-| 75 | Real Neural Network - Implement a basic feed-forward neural network using matrices for entire layers along with matrix operations for computations. | Not Yet |
+| 75 | Real Neural Network - Implement a basic feed-forward neural network using matrices for entire layers along with matrix operations for computations. | [View Solution](./Artificial%20Intelligence/Real%20Neural%20Network/) |
 | 76 | Convolutional Neural Network: Implement a convolutional N.N. for a handwritten digit recognition test on MNIST dataset (Use TensorFlow Theano etc...) | Not Yet |
 | 77 | Convolutional Neural Network: Implement your own convolutional neural network for handwritten digit recognition test on MNIST Dataset (Without TensorFlow Theano etc...) | Not Yet |
 
