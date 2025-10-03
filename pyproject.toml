@@ -94,6 +94,10 @@ games = [
 emulation = [
     "pygame>=2.6,<2.7",
 ]
+constructive_solid_geometry = [
+    "scikit-image>=0.24,<0.25",
+    "trimesh>=4.4,<4.5",
+]
 ai = [
     "numpy>=1.26,<2.0",
     "scipy>=1.11,<1.13",
