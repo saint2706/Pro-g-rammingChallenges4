@@ -22,7 +22,9 @@ def load_optional_dependencies() -> dict[str, list[str]]:
     project = data.get("project", {})
     extras = project.get("optional-dependencies")
     if extras is None:
-        raise SystemExit("[project.optional-dependencies] section is missing in pyproject.toml")
+        raise SystemExit(
+            "[project.optional-dependencies] section is missing in pyproject.toml"
+        )
     return extras
 
 
@@ -42,7 +44,9 @@ def normalize_requirement(requirement: str) -> str:
     name_part = bracket_split[0].strip()
     match = NAME_RE.match(name_part)
     if not match:
-        raise SystemExit(f"Unable to determine requirement name for entry: '{requirement}'")
+        raise SystemExit(
+            f"Unable to determine requirement name for entry: '{requirement}'"
+        )
     return match.group(0).lower()
 
 
@@ -87,9 +91,13 @@ def main(argv: list[str] | None = None) -> int:
     content = render_requirements(requirements)
 
     if args.check:
-        current = REQUIREMENTS.read_text(encoding="utf-8") if REQUIREMENTS.exists() else ""
+        current = (
+            REQUIREMENTS.read_text(encoding="utf-8") if REQUIREMENTS.exists() else ""
+        )
         if current != content:
-            print("requirements.txt is out of sync with pyproject.toml optional dependencies.")
+            print(
+                "requirements.txt is out of sync with pyproject.toml optional dependencies."
+            )
             print("Run `python tools/sync_requirements.py` to regenerate the file.")
             return 1
         print("requirements.txt is up to date.")
