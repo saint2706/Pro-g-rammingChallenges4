@@ -1,0 +1,3 @@
+# Ignore ad-hoc training artifacts produced locally.
+checkpoints/
+models/
