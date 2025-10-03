@@ -1,4 +1,5 @@
 """Simplified LCD panel for the TI-86."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field

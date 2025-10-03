@@ -1,4 +1,5 @@
 """Memory map for the TI-86 emulator."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field

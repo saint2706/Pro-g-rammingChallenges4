@@ -5,6 +5,7 @@ an extensible subset of the Z80 instruction set that is sufficient for the autom
 unit tests in this repository and provides hooks for adding further opcodes as the
 emulator matures.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -296,7 +297,16 @@ class Z80CPU:
         return (high << 8) | low
 
     def _read_reg_by_index(self, index: int) -> int:
-        table = [self.reg.b, self.reg.c, self.reg.d, self.reg.e, self.reg.h, self.reg.l, None, self.reg.a]
+        table = [
+            self.reg.b,
+            self.reg.c,
+            self.reg.d,
+            self.reg.e,
+            self.reg.h,
+            self.reg.l,
+            None,
+            self.reg.a,
+        ]
         if index == 6:  # (HL)
             address = (self.reg.h << 8) | self.reg.l
             return self.memory.read_byte(address)
@@ -611,7 +621,9 @@ class Z80CPU:
             raise NotImplementedError(f"Opcode 0x{opcode:02X} not implemented")
         value = self._fetch_word()
         self._set_reg_pair(pair, value)
-        return ExecutionTrace(self.reg.pc - 3, opcode, f"LD {pair.upper()},nn", cycles=10)
+        return ExecutionTrace(
+            self.reg.pc - 3, opcode, f"LD {pair.upper()},nn", cycles=10
+        )
 
     def _op_ld_rr_indirect_a(self, opcode: int) -> ExecutionTrace:
         addr = self._get_indirect_address(opcode)
@@ -750,7 +762,9 @@ class Z80CPU:
         else:
             a = (a + adjust) & 0xFF
         self.reg.a = a
-        self.reg.f &= ~(FLAG_HALF_CARRY | FLAG_ZERO | FLAG_SIGN | FLAG_PARITY | FLAG_CARRY)
+        self.reg.f &= ~(
+            FLAG_HALF_CARRY | FLAG_ZERO | FLAG_SIGN | FLAG_PARITY | FLAG_CARRY
+        )
         if a == 0:
             self.reg.f |= FLAG_ZERO
         if a & 0x80:
@@ -872,7 +886,9 @@ class Z80CPU:
         else:
             value = self._get_reg_pair_value(pair)
         self._push(value)
-        return ExecutionTrace(self.reg.pc - 1, opcode, f"PUSH {pair.upper()}", cycles=11)
+        return ExecutionTrace(
+            self.reg.pc - 1, opcode, f"PUSH {pair.upper()}", cycles=11
+        )
 
     def _op_pop_rr(self, opcode: int) -> ExecutionTrace:
         pair_map = {0xC1: "bc", 0xD1: "de", 0xE1: "hl", 0xF1: "af"}
@@ -925,7 +941,9 @@ class Z80CPU:
                 flags |= FLAG_SIGN
             self.reg.f = flags
             return ExecutionTrace(self.reg.pc - 2, 0xCB00 | cb_opcode, "BIT", cycles=8)
-        raise NotImplementedError(f"CB-prefixed opcode 0x{cb_opcode:02X} not implemented")
+        raise NotImplementedError(
+            f"CB-prefixed opcode 0x{cb_opcode:02X} not implemented"
+        )
 
     # Utility wrappers -------------------------------------------------
     def load_state(self, snapshot: Dict[str, int]) -> None:

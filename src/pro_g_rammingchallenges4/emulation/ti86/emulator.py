@@ -1,4 +1,5 @@
 """High level TI-86 emulator façade."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
