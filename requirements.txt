@@ -1,9 +1,51 @@
-# Dependency management moved to pyproject.toml.
-# Use extras to install the stacks you need, for example:
-#   python -m pip install -e .[practical]
-#   python -m pip install -e .[algorithmic]
-# See the README "Using pyproject.toml" section for more combinations and details.
+# This file is auto-generated from pyproject.toml optional dependencies.
+# Do not edit by hand; run `python tools/sync_requirements.py`.
 
-# Additional ad-hoc dependencies referenced by individual tools.
-streamlit>=1.37
-streamlit-drawable-canvas>=0.9.3  # Interactive canvas widget for Practical/Paint/streamlit_app.py
+beautifulsoup4>=4.12,<5.0
+boto3>=1.34,<1.35
+colorama>=0.4.6,<0.5
+colour-science>=0.4,<0.5
+cryptography>=42.0,<44.0
+Flask>=3.0,<3.1
+gymnasium>=0.29,<0.30
+imageio>=2.34,<2.35
+librosa>=0.10,<0.11
+markdown>=3.6,<3.7
+matplotlib>=3.8,<3.9
+mido>=1.3,<1.4
+mutagen>=1.47,<1.48
+mypy>=1.11,<1.12
+numpy>=1.26,<2.0
+opencv-python>=4.10,<5.0
+pandas>=2.2,<2.3
+Pillow>=10.4,<10.5
+plotly>=5.22,<5.23
+pyautogui>=0.9,<0.10
+pygame>=2.6,<2.7
+pynput>=1.7,<1.8
+pypdf>=4.3,<4.4
+pyproj>=3.6.1,<3.7
+PySide6>=6.7,<6.8
+pytest>=8.3,<8.4
+python-rtmidi>=1.5,<1.6
+python-xlib>=0.33,<0.34
+PyYAML>=6.0.2,<6.1
+requests>=2.31,<3.0
+ruff>=0.5,<0.6
+scikit-image>=0.24,<0.25
+scikit-learn>=1.5,<1.6
+scipy>=1.11,<1.13
+sounddevice>=0.4,<0.5
+soundfile>=0.12,<0.13
+stable-baselines3>=2.3,<2.4
+streamlit-drawable-canvas>=0.9.3,<0.10
+streamlit==1.50.0
+sympy>=1.12,<1.15
+tcod>=16.2,<17.0
+tkhtmlview>=0.3.1,<0.4
+torch>=2.5,<2.6
+torchvision>=0.18,<0.19
+tqdm>=4.66,<4.67
+trimesh>=4.4,<4.5
+vpython>=7.6,<7.7
+yt-dlp>=2024.7.1
