@@ -106,7 +106,11 @@ The repository includes a GitHub Actions workflow at `.github/workflows/keep-str
 
 1. In GitHub, open **Settings → Secrets and variables → Actions** for this repository.
 2. Add a new repository secret named `STREAMLIT_PING_URL` that contains the fully qualified URL of the Streamlit deployment (e.g., `https://example.streamlit.app/`).
-3. Save the secret; the workflow will automatically read the value when it runs on its hourly schedule.
+3. Save the secret; the workflow will automatically read the value when it runs on its hourly schedule. If the secret is missing (or blank), the job now logs a warning and exits successfully instead of failing, so unattended runs will not flap.
+
+### Override the ping target for debugging
+
+When triggering the workflow manually via **Actions → Keep Streamlit deployment alive → Run workflow**, you can provide the optional `target_url` input to override the secret for a single run. This is useful when testing staging environments or validating that the workflow definition still functions end-to-end without touching the production secret.
 
 ### Manually test the keep-alive workflow
 

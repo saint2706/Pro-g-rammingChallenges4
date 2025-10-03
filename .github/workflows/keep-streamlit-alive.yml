@@ -20,8 +20,8 @@ jobs:
       - name: Validate target URL
         run: |
           if [ -z "${TARGET_URL}" ]; then
-            echo "The target URL is not configured. Provide it as a workflow input or configure the STREAMLIT_PING_URL secret." >&2
-            exit 1
+            echo "::warning::No Streamlit target URL configured; skipping keep-alive ping."
+            exit 0
           fi
 
           echo "::add-mask::${TARGET_URL}"
