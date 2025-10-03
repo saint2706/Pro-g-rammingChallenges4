@@ -22,8 +22,8 @@ The solutions are organized by category and difficulty, making it easy to naviga
 | Practical | 53 | 53 | 100% |
 | Algorithmic | 27 | 27 | 100% |
 | Artificial Intelligence | 3 | 8 | 37.5% |
-| Emulation/Modeling | 7 | 14 | 50% |
-| Games | 10 | 29 | 34.5% |
+| Emulation/Modeling | 6 | 14 | 42.9% |
+| Games | 11 | 29 | 37.9% |
 
 _Progress counts are generated from the actual solution folders in the repository (see tables below)._ 
 
@@ -211,8 +211,8 @@ The repository includes a GitHub Actions workflow at `.github/workflows/keep-str
 | 96 | Generate a Complimentary Color from any input color | [View Solution](./Emulation/CompColor/) |
 | 97 | Generate a 5-Color Scheme from the most dominant tones in any image | [View Solution](./Emulation/5%20color%20scheme/) |
 | 98 | General Lambert's-Problem Solver (At least it's not rocket science... Oh wait it actually is) | Not Yet |
-| 99 | TI-86 Emulator (Bonus: Include the Option to Create Programs) | [View Solution](./Emulation/TI86/) |
-| 100 | N-Body Simulator with particles having a certain mass and radius depending on the mass that merge if they collide (Bonus: Include a GUI where you can place particles) | Not Yet |
+| 99 | TI-86 Emulator (Bonus: Include the Option to Create Programs) | Not Yet |
+| 100 | N-Body Simulator with particles having a certain mass and radius depending on the mass that merge if they collide (Bonus: Include a GUI where you can place particles) | [View Solution](./Emulation/NBodySimulator/) |
 | 101 | Eulerian Path | [View Solution](./Emulation/EulerianPath/) |
 | 102 | Draw a spinning 3D Cube | [View Solution](./Emulation/SpinnyCube/) |
 | 103 | Cellular Textures | [View Solution](./Emulation/CellularTextures/) |
@@ -243,7 +243,7 @@ The repository includes a GitHub Actions workflow at `.github/workflows/keep-str
 | 112 | First-Person Engine in OpenGL (Walking Looking Around Jumping on Obstacles) (BONUS: VR Compatibility) | Not Yet |
 | 113 | Shuffle a Deck of Cards (Include a Visualization) | [View Solution](./Games/Shuffle/) |
 | 114 | Simulate a game of Tag using a multi-agent system | Not Yet |
-| 115 | Wolfenstein Clone (FPS two-dimensional map that appears to be 3-D) (If you need a starting point search for bisquit's video about DOOM-like Engines) | Not Yet |
+| 115 | Wolfenstein Clone (FPS two-dimensional map that appears to be 3-D) (If you need a starting point search for bisquit's video about DOOM-like Engines) | [View Solution](./Games/WolfensteinClone/) |
 | 116 | Scorched Earth Clone | [View Solution](./Games/ScorchedEarth/) |
 | 117 | Minesweeper | [View Solution](./Games/Minesweeper/) |
 | 118 | An Audio/Visual 64KB Demonstration | [View Solution](./Games/64kDemo/) |

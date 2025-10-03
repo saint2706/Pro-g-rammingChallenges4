@@ -45,6 +45,7 @@ python "Breakout/breakout.py"    # pygame Breakout with JSON levels
 python "Simon/simon.py"          # Pygame Simon (loads local assets)
 python "OilPanic/oil_panic.py"   # Dual-screen Game & Watch tribute
 python "Shuffle/cards.py"        # Matplotlib card shuffler
+python "WolfensteinClone/game.py"  # Pygame Wolfenstein raycaster
 ```
 
 Prefer Java or C++? Check the run matrix in [Section 4](#4-run-guides-by-language).
@@ -68,6 +69,7 @@ Authoritative map of every folder under `Games/` and its `/g/` challenge number.
 | 112 | [FirstPersonEngine](FirstPersonEngine/) | Solved | C++ OpenGL playground with GLFW/GLAD, mouse-look movement, configurable controls, and JSON level loading. | C++17, OpenGL, GLFW/GLAD |
 | 113 | [Shuffle](Shuffle/) | Solved | Matplotlib deck visualiser that shuffles/reset decks interactively for randomness demonstrations. | Python, matplotlib |
 | 114 | [MultiAgentTag](MultiAgentTag/) | Solved | Pygame tag simulation with steering behaviours, replay capture, headless batching, and matplotlib analytics. | Python, pygame, matplotlib |
+| 115 | [WolfensteinClone](WolfensteinClone/) | Solved | Pygame raycasting shooter with textured walls, sprites, minimap overlay, and configurable maps/controls. | Python, pygame |
 | 116 | [ScorchedEarth](ScorchedEarth/) | Solved | Artillery clone sporting destructible terrain, wind, configurable weapons, and human/AI pilots. | Python, pygame |
 | 117 | [Minesweeper](Minesweeper/) | Solved | Tkinter Minesweeper with adjustable board/mine counts and dialog-driven win/loss flow. | Python, tkinter |
 | 118 | [64kDemo](64kDemo/) | Solved | Procedural WebGL/Web Audio demo with a Python build script that packs the bundle under the 64 KB target. | JavaScript, WebGL, Web Audio |
