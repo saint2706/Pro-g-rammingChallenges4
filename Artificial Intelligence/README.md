@@ -4,14 +4,17 @@ This folder contains a collection of classic and educational artificial intellig
 
 ## Contents
 
-- **Basic Neural Network (`BNN.py`)**  
+- **Basic Neural Network (`BNN.py`)**
   A simple, from-scratch implementation of a feedforward neural network. Great for learning the fundamentals of neural nets and backpropagation.
 
-- **Connect4 (`c4.py`)**  
+- **Connect4 (`c4.py`)**
   A playable Connect Four game with a basic AI opponent. Demonstrates game logic, state evaluation, and simple AI strategies.
 
-- **Sudoku (`astar.py`)**  
+- **Sudoku (`astar.py`)**
   A modern Sudoku solver using the A* search algorithm, with an option to compare against classic recursive backtracking. Includes a command-line interface and clear code structure for educational purposes.
+
+- **OpenAI Gym (`OpenAI Gym/train.py`)**
+  A Stable-Baselines3 DQN training script for Gymnasium environments with CLI flags for training/evaluation, checkpointing, and seeded reproducibility. Includes a lightweight heuristic controller for CartPole that powers the regression test without storing binary checkpoints.
 
 ## Getting Started
 
