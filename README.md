@@ -203,7 +203,7 @@ The repository includes a GitHub Actions workflow at `.github/workflows/keep-str
 
 | # | Challenge | Status |
 | --- | --------- | ------ |
-| 91 | Chip - 8 Emulator (Hard Mode: Cached Interpreter. Fuck You: Dynamic Recompiler use dynarec/jit library) | Not Yet |
+| 91 | Chip - 8 Emulator (Hard Mode: Cached Interpreter. Fuck You: Dynamic Recompiler use dynarec/jit library) | [View Solution](./Emulation/Chip8/) |
 | 92 | Double Pendulum Simulation | Not Yet |
 | 93 | Constructive Solid Geometry | [View Solution](./Emulation/ConstructiveSolidGeometry/) |
 | 94 | Ray Tracer | Not Yet |

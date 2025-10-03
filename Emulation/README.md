@@ -39,6 +39,7 @@ From the repo root install the extras that match the demos you want to run:
 python -m pip install -e .[visual]
 python -m pip install -e .[algorithmic]   # optional math helpers
 python -m pip install -e .[ai]            # palette clustering (scikit-learn)
+python -m pip install -e .[emulation]    # pygame-backed CHIP-8 renderer/input
 ```
 
 ### 1.4. Or install just what you need (see Section 3)
@@ -53,6 +54,7 @@ python -m pip install -e .[ai]            # palette clustering (scikit-learn)
 | ASCII_Clock | Real-time ASCII clock (synced & unsynced variants). | stdlib only | — |
 | CellularTextures | (WIP) Procedural texture generation (C++ prototype). | C++ | — |
 | CompColor | Color space component visualizer & composite manipulator. | numpy, Pillow | — |
+| Chip8 | CHIP-8 emulator with modular CPU/memory/display/input stacks. | Python, pygame (optional) | pygame |
 | EulerianPath | Fleury vs Hierholzer algorithm demos (Java/Python/C++). | stdlib (Py) | — |
 | NBodySimulator | 2D gravitational sandbox with merging collisions. | pygame | `visual` extra (pygame) |
 | SpinnyCube | Text-based + optional VPython 3D spinning cube. | stdlib (text mode) | vpython |
