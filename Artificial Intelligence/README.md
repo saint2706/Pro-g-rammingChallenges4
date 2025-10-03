@@ -4,8 +4,11 @@ This folder contains a collection of classic and educational artificial intellig
 
 ## Contents
 
-- **Basic Neural Network (`BNN.py`)**  
+- **Basic Neural Network (`BNN.py`)**
   A simple, from-scratch implementation of a feedforward neural network. Great for learning the fundamentals of neural nets and backpropagation.
+
+- **Real Neural Network (`Real Neural Network/`)**
+  A NumPy-only multilayer perceptron with configurable depth, MNIST training script, evaluation CLI, and reusable checkpoint format.
 
 - **Connect4 (`c4.py`)**  
   A playable Connect Four game with a basic AI opponent. Demonstrates game logic, state evaluation, and simple AI strategies.
