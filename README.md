@@ -392,7 +392,26 @@ If you only want a subset (e.g., just run the imageboard or seam carving), insta
 * Heavy/optional libs (plotly, vpython, scikit-learn, colour-science) can be skipped unless you need those features.
 * Future improvement: adopt `pyproject.toml` with extras (e.g. `pip install .[imageboard]`).
 
-### 3. At-a-Glance Tool Categories
+### 3. Binary Asset Management (Git LFS)
+
+Large or frequently updated binaries live in Git LFS so the regular Git history stays lightweight. The following patterns are
+tracked automatically:
+
+* `Games/**/Assets/**/*.{png,wav}` – game textures, sprites, and audio cues.
+* `Emulation/Chip8/roms/*.ch8` – sample ROMs for the CHIP-8 emulator.
+* `Emulation/FFTSpectrum/**/*.wav` – reference audio for FFT spectrum demos.
+* `Practical/Booru Imageboard Downloader/downloads/**/*.png` – example download payloads.
+* `Practical/ImgToASCII/*.png` – high-resolution source images for ASCII rendering tests.
+* `Practical/Imageboard/docs/**/*.png` – documentation screenshots that exceed a few kilobytes.
+* `Artificial Intelligence/CNN_Framework/checkpoints/**/*.{pt,pth}` – neural network checkpoint blobs.
+
+Everything else (including placeholder `.gitkeep` files) should remain in normal Git. If you add a new binary asset outside the
+paths above either relocate it into an existing asset folder or extend `.gitattributes` with a narrowly-scoped pattern before
+committing. After updating the attributes run `git lfs track`/`git lfs untrack` as needed, `git add .gitattributes`, and
+finally `git lfs checkout` to ensure your working tree contains the real binary bits rather than pointer text. `git lfs
+ls-files` and `git lfs status` are good final sanity checks before opening a PR.
+
+### 4. At-a-Glance Tool Categories
 
 | Domain | Example Scripts | Key Deps | Typical Command |
 |--------|-----------------|----------|-----------------|
@@ -407,7 +426,7 @@ If you only want a subset (e.g., just run the imageboard or seam carving), insta
 | Networking Scan | Port Scanner | (stdlib) | `python "Practical/Port Scanner/scanner.py" 192.168.1.10 --top 100` |
 | Markov Text | Markov Chain | (stdlib) | `python "Practical/Markov Chain Sentence Generator/mcsg.py" corpus.txt --sentences 3` |
 
-### 4. Common Options & Patterns
+### 5. Common Options & Patterns
 
 * Most Python scripts expose `--help` for argument details.
 * Image tools usually accept `--out` or `-o` for output file specification.
@@ -415,7 +434,7 @@ If you only want a subset (e.g., just run the imageboard or seam carving), insta
 * Some GUIs are mirrored by a CLI variant (e.g. `resize.py` vs `resize_gui.py`).
 * Optional dependencies are imported inside `try/except` blocks; absence results in reduced functionality, not crashes.
 
-### 5. Recommended Minimal Installs Per Interest
+### 6. Recommended Minimal Installs Per Interest
 
 | Interest | Install Command |
 |----------|-----------------|
@@ -427,7 +446,7 @@ If you only want a subset (e.g., just run the imageboard or seam carving), insta
 | Geo/IP Visualization | `pip install requests pandas plotly tqdm` |
 | 3D Cube (VPython) | `pip install vpython` |
 
-### 6. Quick Smoke Test Script (Optional)
+### 7. Quick Smoke Test Script (Optional)
 
 You can verify key imports with a short one-liner:
 
@@ -458,7 +477,7 @@ reason. The test module treats each entry as a prefix, so adding
 `"Games"` skips the entire games tree, while a specific file path affects
 just that script.
 
-### 7. Troubleshooting Quick Reference
+### 8. Troubleshooting Quick Reference
 
 | Issue | Cause | Fix |
 |-------|-------|-----|
@@ -468,7 +487,7 @@ just that script.
 | GUI window invisible | Running headless | Use CLI version or run locally |
 | `OSError: [Errno ...] image file truncated` | Corrupt input image | Re-download / validate file |
 
-### 8. Running Tests Locally
+### 9. Running Tests Locally
 
 To mirror the automated checks:
 
@@ -495,7 +514,7 @@ To mirror the automated checks:
    export IMAGEBOARD_ADMIN_PASSWORD=letmein
    ```
 
-### 9. Next Steps / Improvements
+### 10. Next Steps / Improvements
 
 * Introduce `pyproject.toml` with extras: `imageboard`, `visual`, `ml`, `geo`.
 * Add `pytest` smoke tests (import + `--help` execution) to CI.
