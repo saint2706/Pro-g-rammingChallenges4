@@ -1,7 +1,7 @@
 
 # Pro-g-ramming Challenges 4
 
-[![Wakatime badge](https://wakatime.com/badge/github/saintwithataint/Pro-g-rammingChallenges4.svg)](https://wakatime.com/badge/github/saintwithataint/Pro-g-rammingChallenges4)
+[![Wakatime badge](https://wakatime.com/badge/github/saint2706/Pro-g-rammingChallenges4.svg)](https://wakatime.com/badge/github/saint2706/Pro-g-rammingChallenges4)
 
 Welcome to the fourth iteration of my programming challenges repository! This project is a personal journey of learning and implementing various programming challenges, spanning different categories and difficulty levels.
 
