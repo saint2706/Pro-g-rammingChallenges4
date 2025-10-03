@@ -196,7 +196,7 @@ The repository includes a GitHub Actions workflow at `.github/workflows/keep-str
 | 73 | Connect-4 AI Player using Alpha-Beta Pruning | [View Solution](./Artificial%20Intelligence/Connect4/) |
 | 74 | Basic Neural Network - Simulate individual neurons and their connections | [View Solution](./Artificial%20Intelligence/Basic%20Neural%20Network/) |
 | 75 | Real Neural Network - Implement a basic feed-forward neural network using matrices for entire layers along with matrix operations for computations. | Not Yet |
-| 76 | Convolutional Neural Network: Implement a convolutional N.N. for a handwritten digit recognition test on MNIST dataset (Use TensorFlow Theano etc...) | Not Yet |
+| 76 | Convolutional Neural Network: Implement a convolutional N.N. for a handwritten digit recognition test on MNIST dataset (Use TensorFlow Theano etc...) | ✅ [CNN Framework – MNIST with PyTorch](Artificial%20Intelligence/CNN_Framework/README.md) |
 | 77 | Convolutional Neural Network: Implement your own convolutional neural network for handwritten digit recognition test on MNIST Dataset (Without TensorFlow Theano etc...) | Not Yet |
 
 ### Emulation/Modeling

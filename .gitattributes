@@ -8,3 +8,7 @@ Games/Tron/screenshot.png filter=lfs diff=lfs merge=lfs -text
 Games/Pipe[[:space:]]Dreams/*.png filter=lfs diff=lfs merge=lfs -text
 
 
+
+
+Artificial[[:space:]]Intelligence/CNN_Framework/checkpoints/.gitkeep filter=lfs diff=lfs merge=lfs -text
+
