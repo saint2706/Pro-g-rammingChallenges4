@@ -13,8 +13,12 @@ This folder contains a collection of classic and educational artificial intellig
 - **Connect4 (`c4.py`)**  
   A playable Connect Four game with a basic AI opponent. Demonstrates game logic, state evaluation, and simple AI strategies.
 
-- **Sudoku (`astar.py`)**  
+- **Sudoku (`astar.py`)**
   A modern Sudoku solver using the A* search algorithm, with an option to compare against classic recursive backtracking. Includes a command-line interface and clear code structure for educational purposes.
+
+- **CNN Framework (`CNN_Framework/`)**
+  A PyTorch-based mini-framework for MNIST digit recognition featuring automated downloads, a training CLI, checkpoint
+  saving, evaluation utilities, and pytest-backed smoke tests.
 
 ## Getting Started
 

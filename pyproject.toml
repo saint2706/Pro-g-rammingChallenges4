@@ -98,6 +98,8 @@ ai = [
     "numpy>=1.26,<2.0",
     "scipy>=1.11,<1.13",
     "scikit-learn>=1.5,<1.6",
+    "torch>=2.3,<3.0",
+    "torchvision>=0.18,<0.19",
 ]
 ai_roguelike = [
     "numpy>=1.26,<2.0",
