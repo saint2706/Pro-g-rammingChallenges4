@@ -5,6 +5,7 @@ pygame front-end so unit tests can exercise the physics without a GUI
 context.  Bodies interact gravitationally, merge elastically when they
 collide, and scale their radius with mass assuming constant density.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -83,7 +84,12 @@ class NBodySimulation:
         velocity: Sequence[float] = (0.0, 0.0),
         color: Tuple[int, int, int] | None = None,
     ) -> Body:
-        body = Body(mass=mass, position=list(position), velocity=list(velocity), color=color or (255, 200, 120))
+        body = Body(
+            mass=mass,
+            position=list(position),
+            velocity=list(velocity),
+            color=color or (255, 200, 120),
+        )
         self.bodies.append(body)
         return body
 
@@ -96,7 +102,12 @@ class NBodySimulation:
         distance = math.sqrt(distance_sq)
         if distance == 0.0:
             return (0.0, 0.0)
-        strength = self.gravitational_constant * subject.mass * attractor.mass / (distance_sq * distance)
+        strength = (
+            self.gravitational_constant
+            * subject.mass
+            * attractor.mass
+            / (distance_sq * distance)
+        )
         return (strength * dx, strength * dy)
 
     def _compute_forces(self) -> List[Vector]:
@@ -173,7 +184,9 @@ class NBodySimulation:
             int((a.color[idx] * a.mass + b.color[idx] * b.mass) / total_mass)
             for idx in range(3)
         )
-        merged = Body(mass=total_mass, position=position, velocity=velocity, color=color)
+        merged = Body(
+            mass=total_mass, position=position, velocity=velocity, color=color
+        )
         merged.trail = (a.trail + b.trail)[-self.max_trail_length :]
         return merged
 

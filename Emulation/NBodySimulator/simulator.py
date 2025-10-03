@@ -13,6 +13,7 @@ Controls
 The physics core lives in :mod:`pro_g_rammingchallenges4.nbody` and is
 covered by automated tests.
 """
+
 from __future__ import annotations
 
 import math
@@ -33,13 +34,28 @@ FONT_PATH = str(Path(pygame.font.get_default_font()))
 
 
 def _draw_body(surface: pygame.Surface, body: Body) -> None:
-    pygame.draw.circle(surface, body.color, (int(body.position[0]), int(body.position[1])), int(body.radius))
-    pygame.draw.circle(surface, (30, 30, 50), (int(body.position[0]), int(body.position[1])), int(body.radius), 1)
+    pygame.draw.circle(
+        surface,
+        body.color,
+        (int(body.position[0]), int(body.position[1])),
+        int(body.radius),
+    )
+    pygame.draw.circle(
+        surface,
+        (30, 30, 50),
+        (int(body.position[0]), int(body.position[1])),
+        int(body.radius),
+        1,
+    )
     if body.trail:
-        pygame.draw.lines(surface, body.color, False, [(int(x), int(y)) for x, y in body.trail], 1)
+        pygame.draw.lines(
+            surface, body.color, False, [(int(x), int(y)) for x, y in body.trail], 1
+        )
 
 
-def _draw_velocity_vector(surface: pygame.Surface, start: Tuple[int, int], current: Tuple[int, int]) -> None:
+def _draw_velocity_vector(
+    surface: pygame.Surface, start: Tuple[int, int], current: Tuple[int, int]
+) -> None:
     dx = current[0] - start[0]
     dy = current[1] - start[1]
     pygame.draw.line(surface, (120, 180, 255), start, current, 2)
@@ -50,7 +66,13 @@ def _draw_velocity_vector(surface: pygame.Surface, start: Tuple[int, int], curre
         pygame.draw.circle(surface, (120, 180, 255), tip, 3)
 
 
-def _draw_overlay(surface: pygame.Surface, font: pygame.font.Font, sim: NBodySimulation, paused: bool, spawn_mass: float) -> None:
+def _draw_overlay(
+    surface: pygame.Surface,
+    font: pygame.font.Font,
+    sim: NBodySimulation,
+    paused: bool,
+    spawn_mass: float,
+) -> None:
     lines = [
         f"Bodies: {len(sim.bodies)} | dt: {sim.timestep:.4f} | Trails: {'on' if sim.trails_enabled else 'off'}",
         f"Paused: {'yes' if paused else 'no'} | Spawn mass: {spawn_mass:.2f}",
@@ -70,7 +92,9 @@ def main() -> None:
     clock = pygame.time.Clock()
     font = pygame.font.Font(FONT_PATH, 18)
 
-    sim = NBodySimulation(gravitational_constant=1000.0, softening=4.0, max_trail_length=600)
+    sim = NBodySimulation(
+        gravitational_constant=1000.0, softening=4.0, max_trail_length=600
+    )
     sim.timestep = 0.02
 
     paused = False
