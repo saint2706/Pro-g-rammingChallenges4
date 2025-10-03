@@ -1,0 +1,64 @@
+[
+  {
+    "name": "LD A,n",
+    "program": [62, 66],
+    "initial": {"pc": 0},
+    "expected": {"a": 66, "pc": 2, "f": 0}
+  },
+  {
+    "name": "ADD A,B",
+    "program": [128],
+    "initial": {"a": 15, "b": 1},
+    "expected": {"a": 16, "f": 16}
+  },
+  {
+    "name": "SUB B",
+    "program": [144],
+    "initial": {"a": 16, "b": 16},
+    "expected": {"a": 0, "f": 66}
+  },
+  {
+    "name": "CP B",
+    "program": [184],
+    "initial": {"a": 32, "b": 16},
+    "expected": {"a": 32, "f": 2}
+  },
+  {
+    "name": "JR loop",
+    "program": [24, 254],
+    "expected": {"pc": 0}
+  },
+  {
+    "name": "JR NZ not taken",
+    "program": [32, 2],
+    "initial": {"f": 64},
+    "expected": {"pc": 2, "f": 64}
+  },
+  {
+    "name": "BIT 7,H",
+    "program": [203, 124],
+    "initial": {"h": 128, "f": 1},
+    "expected": {"f": 145}
+  },
+  {
+    "name": "CALL nn",
+    "program": [205, 52, 18],
+    "initial": {"sp": 65534},
+    "expected": {"pc": 4660, "sp": 65532},
+    "post_memory": {"65532": 3, "65533": 0}
+  },
+  {
+    "name": "RET",
+    "program": [201],
+    "initial": {"sp": 65532},
+    "pre_memory": {"65532": 52, "65533": 18},
+    "expected": {"pc": 4660, "sp": 65534}
+  },
+  {
+    "name": "LD (HL),n",
+    "program": [54, 85],
+    "initial": {"h": 128, "l": 0},
+    "expected": {"pc": 2},
+    "post_memory": {"32768": 85}
+  }
+]
