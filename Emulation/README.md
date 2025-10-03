@@ -54,6 +54,7 @@ python -m pip install -e .[ai]            # palette clustering (scikit-learn)
 | CellularTextures | (WIP) Procedural texture generation (C++ prototype). | C++ | — |
 | CompColor | Color space component visualizer & composite manipulator. | numpy, Pillow | — |
 | EulerianPath | Fleury vs Hierholzer algorithm demos (Java/Python/C++). | stdlib (Py) | — |
+| NBodySimulator | 2D gravitational sandbox with merging collisions. | pygame | `visual` extra (pygame) |
 | SpinnyCube | Text-based + optional VPython 3D spinning cube. | stdlib (text mode) | vpython |
 | FFTSpectrum | Real-time FFT spectrum analyzer with mic/WAV sources. | numpy, matplotlib, sounddevice | — |
 
