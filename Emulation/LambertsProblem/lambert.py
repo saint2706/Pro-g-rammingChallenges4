@@ -152,7 +152,9 @@ def solve_lambert_universal(
     gdot = 1.0 - y / r2_mag
 
     if isclose(g, 0.0, abs_tol=1e-12):
-        raise LambertNoConvergenceError("g function evaluated to zero; degenerate case.")
+        raise LambertNoConvergenceError(
+            "g function evaluated to zero; degenerate case."
+        )
 
     v1 = (r2 - f * r1) / g
     v2 = (gdot * r2 - r1) / g

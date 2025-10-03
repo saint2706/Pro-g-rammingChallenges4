@@ -69,8 +69,12 @@ def build_parser() -> argparse.ArgumentParser:
         "solve",
         help="Solve for the transfer velocities given a time-of-flight.",
     )
-    solve_parser.add_argument("r1", nargs=3, metavar="R1", help="Start position vector components (km).")
-    solve_parser.add_argument("r2", nargs=3, metavar="R2", help="End position vector components (km).")
+    solve_parser.add_argument(
+        "r1", nargs=3, metavar="R1", help="Start position vector components (km)."
+    )
+    solve_parser.add_argument(
+        "r2", nargs=3, metavar="R2", help="End position vector components (km)."
+    )
     solve_parser.add_argument(
         "time_of_flight",
         type=float,
@@ -81,8 +85,12 @@ def build_parser() -> argparse.ArgumentParser:
         "analyze",
         help="Report minimum transfer time without solving for velocities.",
     )
-    info_parser.add_argument("r1", nargs=3, metavar="R1", help="Start position vector components (km).")
-    info_parser.add_argument("r2", nargs=3, metavar="R2", help="End position vector components (km).")
+    info_parser.add_argument(
+        "r1", nargs=3, metavar="R1", help="Start position vector components (km)."
+    )
+    info_parser.add_argument(
+        "r2", nargs=3, metavar="R2", help="End position vector components (km)."
+    )
 
     return parser
 
@@ -194,7 +202,9 @@ def _plot_transfer(
     ax = fig.add_subplot(111, projection="3d")
     ax.plot(sol.y[0], sol.y[1], sol.y[2], label="Transfer arc")
     ax.scatter([r0[0]], [r0[1]], [r0[2]], color="green", label="Departure")
-    ax.scatter([sol.y[0, -1]], [sol.y[1, -1]], [sol.y[2, -1]], color="red", label="Arrival")
+    ax.scatter(
+        [sol.y[0, -1]], [sol.y[1, -1]], [sol.y[2, -1]], color="red", label="Arrival"
+    )
     ax.set_xlabel("x (km)")
     ax.set_ylabel("y (km)")
     ax.set_zlabel("z (km)")

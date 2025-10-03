@@ -30,7 +30,9 @@ def vallado_case() -> dict[str, np.ndarray | float]:
     }
 
 
-def test_universal_variable_matches_vallado(vallado_case: dict[str, np.ndarray | float]) -> None:
+def test_universal_variable_matches_vallado(
+    vallado_case: dict[str, np.ndarray | float],
+) -> None:
     result = solve_lambert_universal(
         vallado_case["r1"],
         vallado_case["r2"],
@@ -38,15 +40,23 @@ def test_universal_variable_matches_vallado(vallado_case: dict[str, np.ndarray |
         vallado_case["mu"],
     )
 
-    np.testing.assert_allclose(result.v1, vallado_case["v1_expected"], rtol=0, atol=5e-4)
-    np.testing.assert_allclose(result.v2, vallado_case["v2_expected"], rtol=0, atol=5e-4)
-    np.testing.assert_allclose(result.time_of_flight(vallado_case["mu"]), vallado_case["dt"], atol=1e-6)
+    np.testing.assert_allclose(
+        result.v1, vallado_case["v1_expected"], rtol=0, atol=5e-4
+    )
+    np.testing.assert_allclose(
+        result.v2, vallado_case["v2_expected"], rtol=0, atol=5e-4
+    )
+    np.testing.assert_allclose(
+        result.time_of_flight(vallado_case["mu"]), vallado_case["dt"], atol=1e-6
+    )
 
 
 def test_minimum_time_of_flight_matches_reference(
-    vallado_case: dict[str, np.ndarray | float]
+    vallado_case: dict[str, np.ndarray | float],
 ) -> None:
-    tof = minimum_time_of_flight(vallado_case["r1"], vallado_case["r2"], vallado_case["mu"])
+    tof = minimum_time_of_flight(
+        vallado_case["r1"], vallado_case["r2"], vallado_case["mu"]
+    )
     assert tof == pytest.approx(vallado_case["tmin_expected"], abs=5e-6)
 
 
