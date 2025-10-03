@@ -1,4 +1,5 @@
 """Simple CPU-based ray tracer with JSON/CLI configurable scenes."""
+
 from __future__ import annotations
 
 import argparse
@@ -53,7 +54,9 @@ class Light:
 class SceneObject:
     material: Material
 
-    def intersect(self, origin: Vector, direction: Vector) -> Optional[Tuple[float, Vector]]:
+    def intersect(
+        self, origin: Vector, direction: Vector
+    ) -> Optional[Tuple[float, Vector]]:
         raise NotImplementedError
 
 
@@ -63,7 +66,9 @@ class Sphere(SceneObject):
     radius: float
     material: Material
 
-    def intersect(self, origin: Vector, direction: Vector) -> Optional[Tuple[float, Vector]]:
+    def intersect(
+        self, origin: Vector, direction: Vector
+    ) -> Optional[Tuple[float, Vector]]:
         oc = origin - self.center
         a = np.dot(direction, direction)
         b = 2.0 * np.dot(oc, direction)
@@ -96,7 +101,9 @@ class Plane(SceneObject):
     def __post_init__(self) -> None:
         self.normal = _normalize(self.normal)
 
-    def intersect(self, origin: Vector, direction: Vector) -> Optional[Tuple[float, Vector]]:
+    def intersect(
+        self, origin: Vector, direction: Vector
+    ) -> Optional[Tuple[float, Vector]]:
         denom = np.dot(self.normal, direction)
         if abs(denom) < _EPSILON:
             return None
@@ -170,7 +177,9 @@ class RayTracer:
             color = (1 - reflection) * color + reflection * reflected
         return color
 
-    def _find_nearest(self, origin: Vector, direction: Vector) -> Optional[Tuple[float, SceneObject, Vector]]:
+    def _find_nearest(
+        self, origin: Vector, direction: Vector
+    ) -> Optional[Tuple[float, SceneObject, Vector]]:
         closest_t = float("inf")
         closest_obj: Optional[SceneObject] = None
         closest_normal: Optional[Vector] = None
@@ -187,7 +196,9 @@ class RayTracer:
             return None
         return closest_t, closest_obj, closest_normal
 
-    def _shade(self, point: Vector, normal: Vector, view_dir: Vector, material: Material) -> Vector:
+    def _shade(
+        self, point: Vector, normal: Vector, view_dir: Vector, material: Material
+    ) -> Vector:
         color = material.ambient * material.color
         for light in self.scene.lights:
             light_dir = _normalize(light.position - point)
@@ -204,7 +215,9 @@ class RayTracer:
             color += light.intensity * (diffuse_color + specular_color)
         return np.clip(color, 0.0, 1.0)
 
-    def _is_shadowed(self, point: Vector, light_dir: Vector, light_distance: float) -> bool:
+    def _is_shadowed(
+        self, point: Vector, light_dir: Vector, light_distance: float
+    ) -> bool:
         origin = point + light_dir * _EPSILON
         for obj in self.scene.objects:
             result = obj.intersect(origin, light_dir)
@@ -366,9 +379,21 @@ def load_scene_file(path: Path | str) -> SceneConfig:
 def _build_scene_from_cli(args: argparse.Namespace) -> SceneConfig:
     fov = float(args.fov) if args.fov is not None else 45.0
     camera = Camera(
-        position=_parse_vector(args.camera_position) if args.camera_position else _to_array((0.0, 1.0, -5.0)),
-        look_at=_parse_vector(args.camera_look_at) if args.camera_look_at else _to_array((0.0, 0.5, 0.0)),
-        up=_parse_vector(args.camera_up) if args.camera_up else _to_array((0.0, 1.0, 0.0)),
+        position=(
+            _parse_vector(args.camera_position)
+            if args.camera_position
+            else _to_array((0.0, 1.0, -5.0))
+        ),
+        look_at=(
+            _parse_vector(args.camera_look_at)
+            if args.camera_look_at
+            else _to_array((0.0, 0.5, 0.0))
+        ),
+        up=(
+            _parse_vector(args.camera_up)
+            if args.camera_up
+            else _to_array((0.0, 1.0, 0.0))
+        ),
         fov=fov,
     )
     objects: List[SceneObject] = []
@@ -388,12 +413,19 @@ def _build_scene_from_cli(args: argparse.Namespace) -> SceneConfig:
                 Sphere(
                     center=_to_array((-1.0, 0.35, 1.0)),
                     radius=0.35,
-                    material=Material(color=_parse_color("#4f83ff"), reflection=0.1, shininess=40.0),
+                    material=Material(
+                        color=_parse_color("#4f83ff"), reflection=0.1, shininess=40.0
+                    ),
                 ),
                 Plane(
                     point=_to_array((0.0, 0.0, 0.0)),
                     normal=_to_array((0.0, 1.0, 0.0)),
-                    material=Material(color=_parse_color((210, 210, 210)), ambient=0.2, diffuse=0.7, specular=0.1),
+                    material=Material(
+                        color=_parse_color((210, 210, 210)),
+                        ambient=0.2,
+                        diffuse=0.7,
+                        specular=0.1,
+                    ),
                 ),
             ]
         )
@@ -402,10 +434,22 @@ def _build_scene_from_cli(args: argparse.Namespace) -> SceneConfig:
         lights.append(_parse_light(text))
     if not lights:
         lights.append(
-            Light(position=_to_array((5.0, 5.0, -10.0)), color=_to_array((1.0, 1.0, 1.0)), intensity=1.2)
+            Light(
+                position=_to_array((5.0, 5.0, -10.0)),
+                color=_to_array((1.0, 1.0, 1.0)),
+                intensity=1.2,
+            )
         )
-        lights.append(Light(position=_to_array((-3.0, 4.0, -2.0)), color=_to_array((1.0, 0.9, 0.8)), intensity=0.6))
-    background = _parse_color(args.background) if args.background else _parse_color((25, 30, 40))
+        lights.append(
+            Light(
+                position=_to_array((-3.0, 4.0, -2.0)),
+                color=_to_array((1.0, 0.9, 0.8)),
+                intensity=0.6,
+            )
+        )
+    background = (
+        _parse_color(args.background) if args.background else _parse_color((25, 30, 40))
+    )
     max_depth = int(args.max_depth)
     return SceneConfig(
         camera=camera,
@@ -417,21 +461,49 @@ def _build_scene_from_cli(args: argparse.Namespace) -> SceneConfig:
 
 
 def build_arg_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="CPU-based ray tracer (spheres + planes).")
+    parser = argparse.ArgumentParser(
+        description="CPU-based ray tracer (spheres + planes)."
+    )
     parser.add_argument("--scene", type=Path, help="Path to JSON scene description.")
-    parser.add_argument("--output", type=Path, default=Path("render.png"), help="Output image path.")
-    parser.add_argument("--width", type=int, default=400, help="Render width in pixels.")
-    parser.add_argument("--height", type=int, default=300, help="Render height in pixels.")
-    parser.add_argument("--max-depth", type=int, default=2, help="Maximum reflection depth.")
-    parser.add_argument("--background", type=str, help="Background color (hex or r,g,b).")
+    parser.add_argument(
+        "--output", type=Path, default=Path("render.png"), help="Output image path."
+    )
+    parser.add_argument(
+        "--width", type=int, default=400, help="Render width in pixels."
+    )
+    parser.add_argument(
+        "--height", type=int, default=300, help="Render height in pixels."
+    )
+    parser.add_argument(
+        "--max-depth", type=int, default=2, help="Maximum reflection depth."
+    )
+    parser.add_argument(
+        "--background", type=str, help="Background color (hex or r,g,b)."
+    )
     parser.add_argument("--fov", type=float, help="Field of view in degrees.")
-    parser.add_argument("--camera-position", type=str, help="Camera position vector (x,y,z).")
-    parser.add_argument("--camera-look-at", type=str, help="Camera look-at vector (x,y,z).")
+    parser.add_argument(
+        "--camera-position", type=str, help="Camera position vector (x,y,z)."
+    )
+    parser.add_argument(
+        "--camera-look-at", type=str, help="Camera look-at vector (x,y,z)."
+    )
     parser.add_argument("--camera-up", type=str, help="Camera up vector (x,y,z).")
-    parser.add_argument("--sphere", action="append", help="Sphere definition center;radius;color;ambient;diffuse;specular;shininess;reflection")
-    parser.add_argument("--plane", action="append", help="Plane definition point;normal;color;ambient;diffuse;specular;shininess;reflection")
-    parser.add_argument("--light", action="append", help="Light definition position;color;intensity")
-    parser.add_argument("--show", action="store_true", help="Open the rendered image after saving.")
+    parser.add_argument(
+        "--sphere",
+        action="append",
+        help="Sphere definition center;radius;color;ambient;diffuse;specular;shininess;reflection",
+    )
+    parser.add_argument(
+        "--plane",
+        action="append",
+        help="Plane definition point;normal;color;ambient;diffuse;specular;shininess;reflection",
+    )
+    parser.add_argument(
+        "--light", action="append", help="Light definition position;color;intensity"
+    )
+    parser.add_argument(
+        "--show", action="store_true", help="Open the rendered image after saving."
+    )
     return parser
 
 
@@ -453,10 +525,23 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
         if args.background:
             scene.background_color = _parse_color(args.background)
         scene.max_depth = int(args.max_depth)
-        if args.camera_position or args.camera_look_at or args.camera_up or args.fov is not None:
+        if (
+            args.camera_position
+            or args.camera_look_at
+            or args.camera_up
+            or args.fov is not None
+        ):
             scene.camera = Camera(
-                position=_parse_vector(args.camera_position) if args.camera_position else scene.camera.position,
-                look_at=_parse_vector(args.camera_look_at) if args.camera_look_at else scene.camera.look_at,
+                position=(
+                    _parse_vector(args.camera_position)
+                    if args.camera_position
+                    else scene.camera.position
+                ),
+                look_at=(
+                    _parse_vector(args.camera_look_at)
+                    if args.camera_look_at
+                    else scene.camera.look_at
+                ),
                 up=_parse_vector(args.camera_up) if args.camera_up else scene.camera.up,
                 fov=float(args.fov) if args.fov is not None else scene.camera.fov,
             )
