@@ -1,4 +1,5 @@
 """Command-line interface for composing simple CSG scenes."""
+
 from __future__ import annotations
 
 import argparse
@@ -72,18 +73,34 @@ def build_scene(operation: str, primitive_a: SDF, primitive_b: SDF) -> SDF:
 
 
 def create_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Compose simple CSG scenes from primitives.")
-    parser.add_argument("operation", choices=["union", "intersection", "difference"], help="Boolean operation")
-    parser.add_argument("primitive_a", help="First primitive specification (e.g. 'sphere:radius=0.6;center=0,0,0')")
+    parser = argparse.ArgumentParser(
+        description="Compose simple CSG scenes from primitives."
+    )
+    parser.add_argument(
+        "operation",
+        choices=["union", "intersection", "difference"],
+        help="Boolean operation",
+    )
+    parser.add_argument(
+        "primitive_a",
+        help="First primitive specification (e.g. 'sphere:radius=0.6;center=0,0,0')",
+    )
     parser.add_argument("primitive_b", help="Second primitive specification")
     parser.add_argument(
         "--bounds",
         default="-1.5,1.5;-1.5,1.5;-1.5,1.5",
         help="Sampling bounds as xmin,xmax;ymin,ymax;zmin,zmax",
     )
-    parser.add_argument("--resolution", type=int, default=96, help="Grid resolution for marching cubes")
-    parser.add_argument("--export", help="Path to export mesh (extension determines format, e.g. .stl or .obj)")
-    parser.add_argument("--plot", action="store_true", help="Render the generated mesh with matplotlib")
+    parser.add_argument(
+        "--resolution", type=int, default=96, help="Grid resolution for marching cubes"
+    )
+    parser.add_argument(
+        "--export",
+        help="Path to export mesh (extension determines format, e.g. .stl or .obj)",
+    )
+    parser.add_argument(
+        "--plot", action="store_true", help="Render the generated mesh with matplotlib"
+    )
     return parser
 
 
@@ -97,7 +114,9 @@ def main(argv: list[str] | None = None) -> None:
     bounds = parse_bounds(args.bounds)
     mesh = mesh_from_sdf(scene, bounds=bounds, resolution=args.resolution)
 
-    print(f"Vertices: {len(mesh.vertices)} | Faces: {len(mesh.faces)} | Volume: {mesh.volume:.4f}")
+    print(
+        f"Vertices: {len(mesh.vertices)} | Faces: {len(mesh.faces)} | Volume: {mesh.volume:.4f}"
+    )
 
     if args.export:
         os.makedirs(os.path.dirname(args.export) or ".", exist_ok=True)

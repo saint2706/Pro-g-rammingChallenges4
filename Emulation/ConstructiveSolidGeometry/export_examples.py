@@ -1,4 +1,5 @@
 """Generate sample CSG meshes and export them to STL/OBJ files."""
+
 from __future__ import annotations
 
 import argparse
@@ -38,9 +39,18 @@ def export_samples(directory: Path, resolution: int = 96) -> None:
 
 
 def main(argv: list[str] | None = None) -> None:
-    parser = argparse.ArgumentParser(description="Export sample CSG meshes to STL/OBJ files")
-    parser.add_argument("output", nargs="?", default="outputs", help="Directory to place exported meshes")
-    parser.add_argument("--resolution", type=int, default=96, help="Grid resolution for marching cubes")
+    parser = argparse.ArgumentParser(
+        description="Export sample CSG meshes to STL/OBJ files"
+    )
+    parser.add_argument(
+        "output",
+        nargs="?",
+        default="outputs",
+        help="Directory to place exported meshes",
+    )
+    parser.add_argument(
+        "--resolution", type=int, default=96, help="Grid resolution for marching cubes"
+    )
     args = parser.parse_args(argv)
 
     export_samples(Path(args.output), resolution=args.resolution)

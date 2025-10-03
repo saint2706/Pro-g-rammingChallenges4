@@ -15,7 +15,9 @@ def _volume(mesh) -> float:
 def test_sphere_volume_matches_analytic_value():
     radius = 0.5
     sdf = sphere(radius=radius)
-    mesh = mesh_from_sdf(sdf, bounds=((-0.6, 0.6), (-0.6, 0.6), (-0.6, 0.6)), resolution=96)
+    mesh = mesh_from_sdf(
+        sdf, bounds=((-0.6, 0.6), (-0.6, 0.6), (-0.6, 0.6)), resolution=96
+    )
     expected = 4.0 / 3.0 * math.pi * radius**3
     assert _volume(mesh) == pytest.approx(expected, rel=0.05)
 

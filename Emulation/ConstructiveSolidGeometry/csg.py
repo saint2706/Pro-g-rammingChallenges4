@@ -4,6 +4,7 @@ This module provides primitive SDF generators, boolean operations, and helpers
 for sampling an SDF into a triangular mesh using marching cubes.  The meshes can
 be exported with :mod:`trimesh` or visualised with matplotlib.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -46,7 +47,9 @@ def _ensure_tuple(value: Iterable[float], length: int) -> Tuple[float, ...]:
     return seq
 
 
-def sphere(*, center: Tuple[float, float, float] = (0.0, 0.0, 0.0), radius: float = 0.5) -> SDF:
+def sphere(
+    *, center: Tuple[float, float, float] = (0.0, 0.0, 0.0), radius: float = 0.5
+) -> SDF:
     cx, cy, cz = _ensure_tuple(center, 3)
     r = float(radius)
 
@@ -69,7 +72,11 @@ def box(
         px = np.abs(x - cx) - hx
         py = np.abs(y - cy) - hy
         pz = np.abs(z - cz) - hz
-        outside = np.sqrt(np.maximum(px, 0.0) ** 2 + np.maximum(py, 0.0) ** 2 + np.maximum(pz, 0.0) ** 2)
+        outside = np.sqrt(
+            np.maximum(px, 0.0) ** 2
+            + np.maximum(py, 0.0) ** 2
+            + np.maximum(pz, 0.0) ** 2
+        )
         inside = np.minimum(np.maximum(np.maximum(px, py), pz), 0.0)
         return outside + inside
 
@@ -107,7 +114,9 @@ def cylinder(
     return SDF(func)
 
 
-def sample_grid(bounds: Bounds, resolution: int) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+def sample_grid(
+    bounds: Bounds, resolution: int
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     if resolution < 16:
         raise ValueError("Resolution should be at least 16 for meaningful sampling")
     (xmin, xmax), (ymin, ymax), (zmin, zmax) = bounds
