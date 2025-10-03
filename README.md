@@ -210,7 +210,7 @@ The repository includes a GitHub Actions workflow at `.github/workflows/keep-str
 | 95 | Real-Time Fast Fourier Transform Spectrum Visualizer | [View Solution](./Emulation/FFTSpectrum/) |
 | 96 | Generate a Complimentary Color from any input color | [View Solution](./Emulation/CompColor/) |
 | 97 | Generate a 5-Color Scheme from the most dominant tones in any image | [View Solution](./Emulation/5%20color%20scheme/) |
-| 98 | General Lambert's-Problem Solver (At least it's not rocket science... Oh wait it actually is) | Not Yet |
+| 98 | General Lambert's-Problem Solver (At least it's not rocket science... Oh wait it actually is) | [View Solution](./Emulation/LambertsProblem/) |
 | 99 | TI-86 Emulator (Bonus: Include the Option to Create Programs) | Not Yet |
 | 100 | N-Body Simulator with particles having a certain mass and radius depending on the mass that merge if they collide (Bonus: Include a GUI where you can place particles) | [View Solution](./Emulation/NBodySimulator/) |
 | 101 | Eulerian Path | [View Solution](./Emulation/EulerianPath/) |
