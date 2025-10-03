@@ -107,130 +107,93 @@ Need another stack? Refer to the [root extras table](../README.md#using-pyprojec
 
 ## 4. Run Guides by Language
 
-Each language links to the dedicated game README for deeper context (rules, controls, screenshots, and assets). Commands assume you are inside `Games/` with the virtual environment activated.
+Commands assume you are inside `Games/` with your virtual environment (if any) activated. Every row links to the detailed game README for controls, assets, and extended notes. Use the automated check column to quickly smoke-test builds that ship pytest coverage.
 
-### 4.1. Python
+| Game | Run Command(s) | Documentation | Automated Checks |
+|------|----------------|---------------|------------------|
+| [64k Demo](64kDemo/README.md) | `python 64kDemo/build.py` → open `64kDemo/dist/index.html` | WebGL/Web Audio bundling guide | – |
+| [Breakout](Breakout/README.md) | `python "Breakout/breakout.py"` | pygame overview + JSON level format | – |
+| [Chess](Chess/README.md) | `python -m Chess.cli` | CLI + pygame UI instructions | – |
+| [Connect Four](Connect4/README.md) | *Python*: `python "Connect4/connect4.py"`<br>*Java*: `javac Connect4/connect4.java && java -cp Connect4 connect4` | Rules, AI notes, language variants | – |
+| [Danmaku Engine](DanmakuEngine/README.md) | `cd "DanmakuEngine" && npm install && npm run dev` | PixiJS tooling + pattern scripting | – |
+| [First Person Engine](FirstPersonEngine/README.md) | `cmake -S FirstPersonEngine -B FirstPersonEngine/build`<br>`cmake --build FirstPersonEngine/build`<br>`./FirstPersonEngine/build/first_person_engine` | Platform setup + controls | – |
+| [Go](Go/README.md) | `python "Go/main.py"` | PySide6 UI guide | – |
+| [Knight's Tour](Knight%20Tour/README.md) | `python "Knight Tour/knight.py"` | CLI usage + solver parameters | – |
+| [Mastermind](Mastermind/README.md) | `python "Mastermind/mastermind_cli.py"`<br>`python "Mastermind/mastermind_gui.py"` | CLI and tkinter UX | – |
+| [Minesweeper](Minesweeper/README.md) | `python "Minesweeper/mine.py"` | tkinter board controls | – |
+| [Missile Command](MissileCommand/README.md) | `python "MissileCommand/missile_command.py"` | pygame controls + wave tuning | – |
+| [Monster Raising](Monster%20Raising/README.md) | `python "Monster Raising/main.py"` | Ranch loop + save data format | – |
+| [Multi-Agent Tag](MultiAgentTag/README.md) | `python "MultiAgentTag/main.py"` | Steering behaviours + replay capture | – |
+| [Oil Panic](OilPanic/README.md) | `python "OilPanic/oil_panic.py"` | Dual-screen layout + scaling | – |
+| [Pac-Man](Pacman/README.md) | `python "Pacman/main.py"` | Maze JSON + ghost AI cycles | – |
+| [Pipe Dreams](Pipe%20Dreams/README.md) | `cd "Pipe Dreams" && npm install && npm run dev` | Vite dev server + editor tooling | – |
+| [RPG Engine](RPGEngine/README.md) | `python "RPGEngine/main.py"` | Data-driven overworld + battle system guide | – |
+| [Roguelike](Roguelike/README.md) | `python -m Games.Roguelike.main` | tcod controls + save files | `pytest tests/test_ai_roguelike_smoke.py` |
+| [Rock Paper Scissors](RPS/README.md) | *Python*: `python "RPS/rpsls.py"`<br>*C++*: `g++ RPS/rps.cpp -o RPS/rps && ./RPS/rps`<br>*Java*: `javac RPS/rps.java && java -cp RPS rps`<br>*Web*: open `RPS/rps.html` | Mode matrix + asset notes | – |
+| [Scorched Earth](ScorchedEarth/README.md) | `python "ScorchedEarth/scorched_earth.py"` | Terrain settings + multiplayer tips | – |
+| [Simon](Simon/README.md) | `python "Simon/simon.py"` | Asset checklist + control scheme | – |
+| [Shuffle](Shuffle/README.md) | `python "Shuffle/cards.py"` | Matplotlib configuration | – |
+| [Snake](Snake/README.md) | *Python*: `python "Snake/snake.py"`<br>*Web*: open `Snake/snake.html` | Controls + speed settings | – |
+| [Sudoku](Sudoku/README.md) | `python "Sudoku/sudoku.py"` | Difficulty presets + solver usage | – |
+| [Tetris](Tetris/README.md) | `python "Tetris/main.py"` | DAS/ARR tuning + hotkeys | – |
+| [Tron](Tron/README.md) | open `Tron/index.html` or serve via `python -m http.server` | Multiplayer + WebRTC notes | – |
+| [Unity Engine](UnityEngine/README.md) | Open in Unity 2022.3+ | ECS scene loader guide | – |
+| [Wolfenstein Clone](WolfensteinClone/README.md) | `python "WolfensteinClone/game.py"` | Raycasting internals + assets | `pytest tests/test_wolfenstein_clone.py` |
+| [Yahtzee](Yahtzee/README.md) | *Python*: `python "Yahtzee/yahtzee.py"`<br>*Java*: `javac Yahtzee/yahtzee.java && java -cp Yahtzee Yahtzee` | Scorecard reference | – |
 
-```bash
-python "Connect4/connect4.py"   # Requires pygame + numpy
-python "Tetris/main.py"         # Pygame Tetris with DAS/ARR controls
-python "Minesweeper/mine.py"    # tkinter GUI (bundled with most Python installs)
-python "Simon/simon.py"         # Loads Assets/Audio and Assets/Images
-python "OilPanic/oil_panic.py"  # Dual-screen Game & Watch tribute
-python "Sudoku/sudoku.py"       # Needs numpy + tkinter
-python "Shuffle/cards.py"       # matplotlib visualiser
-
-python "ScorchedEarth/scorched_earth.py"  # Pygame artillery with destructible terrain
-
-python "Pacman/main.py"        # Pygame Pac-Man with behavioural ghosts
-
-python "Yahtzee/yahtzee.py"     # CLI edition
-python "Snake/snake.py"         # Turtle graphics, ensure tkinter is available
-python "Breakout/breakout.py"   # pygame-powered Breakout with JSON levels
-python "Knight Tour/knight.py"  # CLI solver visualises via stdout
-python "Mastermind/mastermind_cli.py"  # CLI Mastermind with difficulty presets
-python "Mastermind/mastermind_gui.py"  # tkinter GUI with code-maker mode
-python "RPS/rpsls.py"           # CLI (supports Lizard/Spock variant)
-
-python -m Chess.cli              # CLI chess with optional AI
-```
-
-Per-game documentation: [Connect Four](Connect4/README.md), [Minesweeper](Minesweeper/README.md), [Simon](Simon/README.md), [Sudoku](Sudoku/README.md), [Shuffle](Shuffle/README.md), [Yahtzee](Yahtzee/README.md), [Snake](Snake/README.md), [Knight's Tour]("Knight Tour"/README.md), [Rock Paper Scissors](RPS/README.md), [Chess](Chess/README.md).
-
-
-python -m Games.Roguelike.main   # Terminal roguelike (tcod)
-
-python "Monster Raising/main.py"  # pygame ranch sim with JSON saves
-
-```
-
-
-Per-game documentation: [Connect Four](Connect4/README.md), [Minesweeper](Minesweeper/README.md), [Simon](Simon/README.md), [Sudoku](Sudoku/README.md), [Shuffle](Shuffle/README.md), [Yahtzee](Yahtzee/README.md), [Snake](Snake/README.md), [Knight's Tour]("Knight Tour"/README.md), [Rock Paper Scissors](RPS/README.md), [Breakout](Breakout/README.md).
-
-
-Per-game documentation: [Connect Four](Connect4/README.md), [Minesweeper](Minesweeper/README.md), [Simon](Simon/README.md), [Sudoku](Sudoku/README.md), [Shuffle](Shuffle/README.md), [Yahtzee](Yahtzee/README.md), [Snake](Snake/README.md), [Knight's Tour]("Knight Tour"/README.md), [Rock Paper Scissors](RPS/README.md), [Pac-Man](Pacman/README.md).
-
-Per-game documentation: [Connect Four](Connect4/README.md), [Tetris](Tetris/README.md), [Minesweeper](Minesweeper/README.md), [Simon](Simon/README.md), [Sudoku](Sudoku/README.md), [Shuffle](Shuffle/README.md), [Yahtzee](Yahtzee/README.md), [Snake](Snake/README.md), [Knight's Tour]("Knight Tour"/README.md), [Rock Paper Scissors](RPS/README.md).
-
-
-
-
-Assets are co-located inside each project (e.g., `Simon/Assets/Audio`). Keep relative paths intact when running outside the repo root.
-
-### 4.2. Java
-
-```bash
-javac Connect4/connect4.java && java -cp Connect4 connect4
-javac Yahtzee/yahtzee.java && java -cp Yahtzee Yahtzee
-javac RPS/rps.java && java -cp RPS rps
-```
-
-Ensure `javac`/`java` are on your `PATH`. See the linked READMEs for gameplay controls and optional CLI arguments: [Connect Four](Connect4/README.md), [Yahtzee](Yahtzee/README.md), [Rock Paper Scissors](RPS/README.md).
-
-### 4.3. C++
-
-```bash
-g++ RPS/rps.cpp -o RPS/rps
-./RPS/rps
-
-cmake -S FirstPersonEngine -B FirstPersonEngine/build
-cmake --build FirstPersonEngine/build
-./FirstPersonEngine/build/first_person_engine  # Launch (Linux/macOS)
-FirstPersonEngine\build\Debug\first_person_engine.exe  # Windows example
-```
-
-The `FirstPersonEngine` project ships its own [README](FirstPersonEngine/README.md) with platform-specific notes and VR hook instructions.
-
-### 4.4. JavaScript / Web
-
-1. Open the HTML file directly in a browser:
-   - `Snake/snake.html`
-   - `RPS/rps.html`
-
-   - `64kDemo/dist/index.html` (after running `python 64kDemo/build.py`)
-
-
-   - `Tron/index.html`
-
-
-   - `DanmakuEngine/index.html` (or run `npm run dev` inside `DanmakuEngine/` for PixiJS build tooling)
-
-
-2. For asset-backed games, keep the accompanying `.js`, `.css`, and `assets/` folders in the same directory.
-3. Optional: use a static server for clean module loading (`python -m http.server` from within the game folder).
-
-See [Snake](Snake/README.md) and [Rock Paper Scissors](RPS/README.md) for control schemes and asset notes.
-
-2. Launch the Vite dev server for the TypeScript canvas build:
-   ```bash
-   cd "Pipe Dreams"
-   npm install
-   npm run dev
-   ```
-   Use `npm run build` for a static bundle (already included under `Pipe Dreams/dist/`).
-3. For asset-backed games, keep the accompanying `.js`, `.css`, and `assets/` folders in the same directory.
-4. Optional: use a static server for clean module loading (`python -m http.server` from within the game folder).
-
-See [Snake](Snake/README.md), [Rock Paper Scissors](RPS/README.md), and [Pipe Dreams](Pipe%20Dreams/README.md) for control schemes and asset notes.
-
+Need another build? Browse the [Project Index](#2-project-index-solved-builds) for challenge coverage and language stacks.
 
 ---
 
+
 ## 5. Troubleshooting
+
+### 5.1. Installing pygame and core dependencies
+- **`ModuleNotFoundError: pygame` or `numpy`** – activate your virtual environment and reinstall the extras bundle: `python -m pip install -e .[games]`. This covers [Breakout](Breakout/README.md), [Pac-Man](Pacman/README.md), [Tetris](Tetris/README.md), [Wolfenstein Clone](WolfensteinClone/README.md), and every other pygame-powered build.
+- **Tkinter/Turtle errors (`No module named '_tkinter'`)** – install the system Tk package (`brew install python-tk` on macOS or `sudo apt-get install python3-tk` on Debian/Ubuntu). Games such as [Snake](Snake/README.md), [Minesweeper](Minesweeper/README.md), and [Sudoku](Sudoku/README.md) require it.
+- **Audio backends missing** – on Linux, install SDL mixer packages (`sudo apt-get install libsdl2-mixer-2.0-0`) so titles like [Simon](Simon/README.md) and [Monster Raising](Monster%20Raising/README.md) can play bundled sounds.
+
+### 5.2. Asset paths and packaging
+- Keep the repository's relative paths intact. Many builds load sprites and data from `Assets/` subdirectories (e.g., [Simon/Assets](Simon/README.md), [Pac-Man/mazes](Pacman/README.md), [WolfensteinClone/assets](WolfensteinClone/README.md)). Running from a different working directory? Prefix the script path with `Games/` or use `python -m` so the loader resolves correctly.
+- For web games, serve them with `python -m http.server` or the provided dev server to avoid cross-origin errors. This is essential for [Tron](Tron/README.md), [Snake HTML](Snake/README.md), [Pipe Dreams](Pipe%20Dreams/README.md), and [Danmaku Engine](DanmakuEngine/README.md).
+- Packaging for distribution? Copy the entire game folder so JSON levels, audio, and textures travel with the executable.
+
+### 5.3. Window scaling and display issues
+- **Oversized windows on high-DPI displays** – most pygame titles expose a resolution constant in their README (see [Oil Panic](OilPanic/README.md), [Scorched Earth](ScorchedEarth/README.md), and [Missile Command](MissileCommand/README.md)). Reduce the default width/height before launching or toggle fullscreen where documented.
+- **Raycaster viewport cropped** – [Wolfenstein Clone](WolfensteinClone/README.md) scales the surface after rendering. Adjust the `SCREEN_WIDTH`/`SCREEN_HEIGHT` constants or run in windowed mode if your GPU driver forces scaling.
+- **Dual-monitor layouts** – [Oil Panic](OilPanic/README.md) uses a stacked window. If it spawns off-screen, reset the pygame display environment (`SDL_VIDEO_WINDOW_POS=0,0`) before running the script.
+
+#### Quick reference
 
 | Symptom | Fix |
 |---------|-----|
-| `ModuleNotFoundError: pygame` or `numpy` | Install extras with `python -m pip install -e .[games]` (virtual env recommended). |
-| Python GUI fails with `No module named '_tkinter'` | Install a system package that provides Tk (macOS: `brew install python-tk`; Ubuntu: `sudo apt-get install python3-tk`). Turtle and tkinter-based games (Snake, Minesweeper, Sudoku) depend on it. |
-| Pygame window opens without sound | Ensure `pygame.mixer` can access audio devices. On Linux, install SDL dependencies (`sudo apt-get install libsdl2-mixer-2.0-0`). Assets live under `Simon/Assets`. |
-| Java commands fail with `class not found` | Compile within the game folder and include it on the classpath (`-cp`). Follow the exact commands in [Section 4.2](#42-java). |
-| Browser games cannot load assets when served remotely | Serve via a static server that preserves folder structure (`python -m http.server`) to avoid cross-origin or relative path issues. |
+| pygame import errors | Install extras with `python -m pip install -e .[games]` (virtual env recommended). |
+| Tkinter missing | Install a system Tk package so [Snake](Snake/README.md) and [Minesweeper](Minesweeper/README.md) can boot. |
+| No audio in pygame games | Install SDL mixer libs and verify `pygame.mixer.init()` succeeds (see [Simon](Simon/README.md)). |
+| Java commands fail with `class not found` | Compile within the game folder and include it on the classpath (`-cp`). Follow the exact commands in the [Run Guides](#4-run-guides-by-language). |
+| Browser games cannot load assets remotely | Serve via `python -m http.server` or the framework dev server to preserve relative paths. |
 
 If issues persist, open an issue referencing the challenge number and include OS + dependency versions.
 
 ---
 
-## 6. Contribution Guidelines (Games-specific)
+## 6. Learning Resources
+
+Level up with the official guides and community walkthroughs that underpin the projects in this catalog:
+
+- **pygame** – [pygame.org docs](https://www.pygame.org/docs/) and the [Write Games with pygame tutorial series](https://www.pygame.org/wiki/tutorials) cover event loops, sprite groups, and audio mixing used by [Breakout](Breakout/README.md), [Pac-Man](Pacman/README.md), [Simon](Simon/README.md), and [Tetris](Tetris/README.md).
+- **python-tcod (libtcod)** – The [Python tcod roguelike tutorial](https://python-tcod.readthedocs.io/en/latest/tutorials.html) mirrors the architecture in [Roguelike](Roguelike/README.md), from field-of-view to dungeon generation.
+- **PixiJS** – Pixi's [official guide](https://pixijs.com/guides) and [PixiJS GitHub examples](https://github.com/pixijs/examples) map directly to the rendering patterns in [Danmaku Engine](DanmakuEngine/README.md).
+- **Web build tooling** – Vite's [Getting Started](https://vitejs.dev/guide/) and Mozilla's [MDN Canvas tutorials](https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial) support [Pipe Dreams](Pipe%20Dreams/README.md), [Tron](Tron/README.md), and the HTML variant of [Snake](Snake/README.md).
+- **3D/OpenGL foundations** – Work through [LearnOpenGL](https://learnopengl.com/) and CMake's [official docs](https://cmake.org/cmake/help/latest/) before diving into [First Person Engine](FirstPersonEngine/README.md).
+- **Unity ECS patterns** – Unity's [Entities docs](https://docs.unity3d.com/Packages/com.unity.entities@1.0/manual/index.html) complement the architecture in [Unity Engine](UnityEngine/README.md).
+
+Looking for more inspiration? The `/g/` challenge threads linked inside each game README often include the original problem statements and community design discussions.
+
+---
+
+
+## 7. Contribution Guidelines (Games-specific)
 
 1. **Coding style**: Match existing Python conventions (type hints, docstrings, classes for game state) and follow language idioms for Java/C++ (camelCase methods, header comments). Keep logic modules importable so they can be unit-tested.
 2. **Asset handling**: Place media under `<Game>/Assets/` with subfolders (`Audio/`, `Images/`, etc.). Document licensing in the game README and prefer original or CC0/GPL-compatible assets.
