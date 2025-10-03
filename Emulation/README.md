@@ -39,6 +39,7 @@ From the repo root install the extras that match the demos you want to run:
 python -m pip install -e .[visual]
 python -m pip install -e .[algorithmic]   # optional math helpers
 python -m pip install -e .[ai]            # palette clustering (scikit-learn)
+python -m pip install -e .[emulation]    # pygame-backed CHIP-8 renderer/input
 ```
 
 ### 1.4. Or install just what you need (see Section 3)
@@ -53,9 +54,11 @@ python -m pip install -e .[ai]            # palette clustering (scikit-learn)
 | ASCII_Clock | Real-time ASCII clock (synced & unsynced variants). | stdlib only | — |
 | CellularTextures | (WIP) Procedural texture generation (C++ prototype). | C++ | — |
 | CompColor | Color space component visualizer & composite manipulator. | numpy, Pillow | — |
-| DoublePendulum | Runge–Kutta chaotic pendulum with CSV/GIF export. | matplotlib | numpy, imageio |
+| Chip8 | CHIP-8 emulator with modular CPU/memory/display/input stacks. | Python, pygame (optional) | pygame |
 | EulerianPath | Fleury vs Hierholzer algorithm demos (Java/Python/C++). | stdlib (Py) | — |
+| NBodySimulator | 2D gravitational sandbox with merging collisions. | pygame | `visual` extra (pygame) |
 | SpinnyCube | Text-based + optional VPython 3D spinning cube. | stdlib (text mode) | vpython |
+| FFTSpectrum | Real-time FFT spectrum analyzer with mic/WAV sources. | numpy, matplotlib, sounddevice | — |
 
 > Some folders may contain experimental or WIP code; stable scripts include `5cs.py`, `comp.py`, `hierholzer.py`, `ClockSynced.py`.
 
@@ -83,6 +86,7 @@ Install only the extras you need:
 | OpenCV acceleration | `visual` | Adds `opencv-python` alongside Pillow/imageio. |
 | Component color visualizer (CompColor) | `visual` | Only Pillow + numpy required. |
 | SpinnyCube VPython 3D version | `visual` | VPython is part of the visual extra. |
+| FFTSpectrum real-time analyzer | `visual` | Adds numpy, matplotlib, sounddevice for live plots. |
 | Pure stdlib demos (Eulerian path, ASCII clock) | *(none)* | Standard library only. |
 
 ---
