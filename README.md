@@ -197,7 +197,7 @@ The repository includes a GitHub Actions workflow at `.github/workflows/keep-str
 | 74 | Basic Neural Network - Simulate individual neurons and their connections | [View Solution](./Artificial%20Intelligence/Basic%20Neural%20Network/) |
 | 75 | Real Neural Network - Implement a basic feed-forward neural network using matrices for entire layers along with matrix operations for computations. | Not Yet |
 | 76 | Convolutional Neural Network: Implement a convolutional N.N. for a handwritten digit recognition test on MNIST dataset (Use TensorFlow Theano etc...) | Not Yet |
-| 77 | Convolutional Neural Network: Implement your own convolutional neural network for handwritten digit recognition test on MNIST Dataset (Without TensorFlow Theano etc...) | Not Yet |
+| 77 | Convolutional Neural Network: Implement your own convolutional neural network for handwritten digit recognition test on MNIST Dataset (Without TensorFlow Theano etc...) | [View Solution](./Artificial%20Intelligence/CNN_Scratch/) |
 
 ### Emulation/Modeling
 
