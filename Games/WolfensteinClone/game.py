@@ -91,15 +91,21 @@ class WolfensteinGame:
         pygame.display.set_caption("Wolfenstein Clone")
         self.clock = pygame.time.Clock()
 
-        self.map, self.player_pos, self.player_angle, enemy_positions = self._load_map(self.config.map_path)
+        self.map, self.player_pos, self.player_angle, enemy_positions = self._load_map(
+            self.config.map_path
+        )
         self.controls = self.config.controls
         self.move_speed = 3.0
         self.turn_speed = 2.0
         self.sprint_multiplier = 1.8
 
         self.wall_textures = self._load_wall_textures(self.config.wall_textures)
-        self.sprite_texture = self._load_texture(self.config.sprite_texture).convert_alpha()
-        self.sprites = [Sprite(enemy[0], enemy[1], self.sprite_texture) for enemy in enemy_positions]
+        self.sprite_texture = self._load_texture(
+            self.config.sprite_texture
+        ).convert_alpha()
+        self.sprites = [
+            Sprite(enemy[0], enemy[1], self.sprite_texture) for enemy in enemy_positions
+        ]
 
         self.depth_buffer: List[float] = [0.0] * self.screen_width
         self.background = self._create_background()
@@ -142,7 +148,9 @@ class WolfensteinGame:
         surface = pygame.image.load(texture_path.as_posix())
         return surface.convert()
 
-    def _load_wall_textures(self, mapping: Optional[Dict[int, str]]) -> Dict[int, pygame.Surface]:
+    def _load_wall_textures(
+        self, mapping: Optional[Dict[int, str]]
+    ) -> Dict[int, pygame.Surface]:
         mapping = mapping or {1: "wall_stone.png"}
         textures = {}
         for tile_id, filename in mapping.items():
@@ -281,9 +289,13 @@ class WolfensteinGame:
                     hit = True
 
             if side == 0:
-                perp_wall_dist = (map_x - self.player_pos[0] + (1 - step_x) / 2) / (ray_dir_x or 1e-6)
+                perp_wall_dist = (map_x - self.player_pos[0] + (1 - step_x) / 2) / (
+                    ray_dir_x or 1e-6
+                )
             else:
-                perp_wall_dist = (map_y - self.player_pos[1] + (1 - step_y) / 2) / (ray_dir_y or 1e-6)
+                perp_wall_dist = (map_y - self.player_pos[1] + (1 - step_y) / 2) / (
+                    ray_dir_y or 1e-6
+                )
             perp_wall_dist = max(perp_wall_dist, 1e-4)
             self.depth_buffer[column] = perp_wall_dist
 
@@ -330,7 +342,9 @@ class WolfensteinGame:
 
         inv_det = 1.0 / (plane_x * dir_y - dir_x * plane_y + 1e-6)
 
-        for sprite in sorted(self.sprites, key=lambda s: s.distance_to(*self.player_pos), reverse=True):
+        for sprite in sorted(
+            self.sprites, key=lambda s: s.distance_to(*self.player_pos), reverse=True
+        ):
             sprite_x = sprite.x - self.player_pos[0]
             sprite_y = sprite.y - self.player_pos[1]
 
@@ -340,7 +354,9 @@ class WolfensteinGame:
             if transform_y <= 0:
                 continue
 
-            sprite_screen_x = int((self.screen_width / 2) * (1 + transform_x / transform_y))
+            sprite_screen_x = int(
+                (self.screen_width / 2) * (1 + transform_x / transform_y)
+            )
 
             sprite_height = max(1, abs(int(self.screen_height / transform_y)))
             sprite_width = sprite_height
@@ -350,17 +366,27 @@ class WolfensteinGame:
             draw_start_x = -sprite_width // 2 + sprite_screen_x
             draw_end_x = sprite_width // 2 + sprite_screen_x
 
-            scaled_texture = pygame.transform.smoothscale(sprite.texture, (sprite_width, sprite_height))
+            scaled_texture = pygame.transform.smoothscale(
+                sprite.texture, (sprite_width, sprite_height)
+            )
 
             for stripe in range(draw_start_x, draw_end_x):
-                if 0 <= stripe < self.screen_width and transform_y < self.depth_buffer[stripe]:
+                if (
+                    0 <= stripe < self.screen_width
+                    and transform_y < self.depth_buffer[stripe]
+                ):
                     column = stripe - draw_start_x
                     if 0 <= column < scaled_texture.get_width():
-                        column_surface = scaled_texture.subsurface((column, 0, 1, sprite_height))
+                        column_surface = scaled_texture.subsurface(
+                            (column, 0, 1, sprite_height)
+                        )
                         self.screen.blit(column_surface, (stripe, draw_start_y))
 
     def _draw_minimap(self) -> None:
-        map_surface = pygame.Surface((self.map.width * self.minimap_scale, self.map.height * self.minimap_scale), pygame.SRCALPHA)
+        map_surface = pygame.Surface(
+            (self.map.width * self.minimap_scale, self.map.height * self.minimap_scale),
+            pygame.SRCALPHA,
+        )
         wall_color = (120, 120, 120, 220)
         floor_color = (30, 30, 30, 180)
         for y in range(self.map.height):
@@ -387,18 +413,29 @@ class WolfensteinGame:
             sy = int(sprite.y * self.minimap_scale)
             pygame.draw.circle(map_surface, (0, 200, 200), (sx, sy), 3)
 
-        border = pygame.Surface((map_surface.get_width() + 4, map_surface.get_height() + 4), pygame.SRCALPHA)
+        border = pygame.Surface(
+            (map_surface.get_width() + 4, map_surface.get_height() + 4), pygame.SRCALPHA
+        )
         border.fill((0, 0, 0, 150))
         border.blit(map_surface, (2, 2))
         self.screen.blit(border, (10, 10))
 
 
 def build_argument_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Wolfenstein 3D inspired raycasting engine")
-    parser.add_argument("--map", type=str, default=str(MAP_DIR / "default_map.json"), help="Path to a JSON map file")
+    parser = argparse.ArgumentParser(
+        description="Wolfenstein 3D inspired raycasting engine"
+    )
+    parser.add_argument(
+        "--map",
+        type=str,
+        default=str(MAP_DIR / "default_map.json"),
+        help="Path to a JSON map file",
+    )
     parser.add_argument("--width", type=int, default=960, help="Screen width")
     parser.add_argument("--height", type=int, default=600, help="Screen height")
-    parser.add_argument("--fov", type=float, default=math.pi / 3, help="Field of view in radians")
+    parser.add_argument(
+        "--fov", type=float, default=math.pi / 3, help="Field of view in radians"
+    )
     return parser
 
 
