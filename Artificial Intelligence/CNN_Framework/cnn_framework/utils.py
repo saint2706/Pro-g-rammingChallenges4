@@ -69,7 +69,9 @@ def save_checkpoint(model: nn.Module, path: str | Path) -> None:
     torch.save(model.state_dict(), str(path))
 
 
-def load_checkpoint(model: nn.Module, path: str | Path, map_location: str | torch.device | None = None) -> nn.Module:
+def load_checkpoint(
+    model: nn.Module, path: str | Path, map_location: str | torch.device | None = None
+) -> nn.Module:
     """Load weights into ``model`` from ``path`` and return the model."""
 
     state_dict = torch.load(str(path), map_location=map_location)

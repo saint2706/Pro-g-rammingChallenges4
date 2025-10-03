@@ -10,10 +10,14 @@ import pytest
 try:  # pragma: no cover - optional dependency guard
     import torch  # noqa: F401
     import torchvision  # noqa: F401
-except ModuleNotFoundError as exc:  # pragma: no cover - skip when ai extra not installed
+except (
+    ModuleNotFoundError
+) as exc:  # pragma: no cover - skip when ai extra not installed
     pytest.skip(f"PyTorch stack not available: {exc}", allow_module_level=True)
 
-PACKAGE_ROOT = Path(__file__).resolve().parents[1] / "Artificial Intelligence" / "CNN_Framework"
+PACKAGE_ROOT = (
+    Path(__file__).resolve().parents[1] / "Artificial Intelligence" / "CNN_Framework"
+)
 if str(PACKAGE_ROOT) not in sys.path:
     sys.path.insert(0, str(PACKAGE_ROOT))
 

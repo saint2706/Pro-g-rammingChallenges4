@@ -63,7 +63,10 @@ def train_model(config: TrainConfig) -> Dict[str, float]:
 
             running_loss += float(loss.item())
 
-            if config.max_steps_per_epoch is not None and step >= config.max_steps_per_epoch:
+            if (
+                config.max_steps_per_epoch is not None
+                and step >= config.max_steps_per_epoch
+            ):
                 break
 
         metrics = evaluate(model, eval_loader, device=device, loss_fn=loss_fn)
@@ -77,21 +80,42 @@ def train_model(config: TrainConfig) -> Dict[str, float]:
 
 
 def _parse_args(argv: Optional[list[str]] = None) -> TrainConfig:
-    parser = argparse.ArgumentParser(description="Train a convolutional network on MNIST.")
-    parser.add_argument("--data-dir", type=Path, default=Path("./data"), help="Directory for MNIST data")
-    parser.add_argument("--batch-size", type=int, default=64, help="Training batch size")
-    parser.add_argument("--epochs", type=int, default=5, help="Number of training epochs")
-    parser.add_argument("--learning-rate", type=float, default=1e-3, help="Optimizer learning rate")
-    parser.add_argument("--num-workers", type=int, default=0, help="Data loader worker processes")
+    parser = argparse.ArgumentParser(
+        description="Train a convolutional network on MNIST."
+    )
+    parser.add_argument(
+        "--data-dir", type=Path, default=Path("./data"), help="Directory for MNIST data"
+    )
+    parser.add_argument(
+        "--batch-size", type=int, default=64, help="Training batch size"
+    )
+    parser.add_argument(
+        "--epochs", type=int, default=5, help="Number of training epochs"
+    )
+    parser.add_argument(
+        "--learning-rate", type=float, default=1e-3, help="Optimizer learning rate"
+    )
+    parser.add_argument(
+        "--num-workers", type=int, default=0, help="Data loader worker processes"
+    )
     parser.add_argument(
         "--checkpoint-path",
         type=Path,
         default=Path("checkpoints/mnist_cnn.pt"),
         help="Path for saving the trained weights",
     )
-    parser.add_argument("--cpu", action="store_true", help="Force CPU training even if GPU is available")
-    parser.add_argument("--train-limit", type=int, default=None, help="Limit number of training samples")
-    parser.add_argument("--eval-limit", type=int, default=None, help="Limit number of evaluation samples")
+    parser.add_argument(
+        "--cpu", action="store_true", help="Force CPU training even if GPU is available"
+    )
+    parser.add_argument(
+        "--train-limit", type=int, default=None, help="Limit number of training samples"
+    )
+    parser.add_argument(
+        "--eval-limit",
+        type=int,
+        default=None,
+        help="Limit number of evaluation samples",
+    )
 
     args = parser.parse_args(argv)
 

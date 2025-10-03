@@ -40,13 +40,26 @@ def evaluate_model(
 
 
 def _parse_args(argv: Optional[list[str]] = None) -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Evaluate a trained MNIST CNN checkpoint.")
+    parser = argparse.ArgumentParser(
+        description="Evaluate a trained MNIST CNN checkpoint."
+    )
     parser.add_argument("checkpoint", type=Path, help="Path to the saved checkpoint")
-    parser.add_argument("--data-dir", type=Path, default=Path("./data"), help="Directory for MNIST data")
-    parser.add_argument("--batch-size", type=int, default=256, help="Batch size for evaluation")
-    parser.add_argument("--num-workers", type=int, default=0, help="Worker processes for data loading")
+    parser.add_argument(
+        "--data-dir", type=Path, default=Path("./data"), help="Directory for MNIST data"
+    )
+    parser.add_argument(
+        "--batch-size", type=int, default=256, help="Batch size for evaluation"
+    )
+    parser.add_argument(
+        "--num-workers", type=int, default=0, help="Worker processes for data loading"
+    )
     parser.add_argument("--cpu", action="store_true", help="Force CPU evaluation")
-    parser.add_argument("--eval-limit", type=int, default=None, help="Limit number of evaluation samples")
+    parser.add_argument(
+        "--eval-limit",
+        type=int,
+        default=None,
+        help="Limit number of evaluation samples",
+    )
     return parser.parse_args(argv)
 
 

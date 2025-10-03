@@ -9,7 +9,9 @@ from torch.utils.data import DataLoader, Subset
 from torchvision import datasets, transforms
 
 
-def _maybe_limit(dataset: datasets.MNIST, limit: Optional[int]) -> datasets.MNIST | Subset[datasets.MNIST]:
+def _maybe_limit(
+    dataset: datasets.MNIST, limit: Optional[int]
+) -> datasets.MNIST | Subset[datasets.MNIST]:
     """Return a subset of ``dataset`` limited to ``limit`` samples if provided."""
 
     if limit is None:
