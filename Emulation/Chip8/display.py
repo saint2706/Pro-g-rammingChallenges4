@@ -14,7 +14,9 @@ class DisplayBuffer:
     height: int = 32
 
     def __post_init__(self) -> None:
-        self._buffer: List[List[int]] = [[0 for _ in range(self.width)] for _ in range(self.height)]
+        self._buffer: List[List[int]] = [
+            [0 for _ in range(self.width)] for _ in range(self.height)
+        ]
         self._dirty = True
 
     def clear(self) -> None:
@@ -56,11 +58,15 @@ class PygameDisplay(DisplayBuffer):
         try:
             import pygame
         except ImportError as exc:  # pragma: no cover - optional dependency
-            raise RuntimeError("pygame is required for the pygame display backend") from exc
+            raise RuntimeError(
+                "pygame is required for the pygame display backend"
+            ) from exc
         super().__init__()
         self._pygame = pygame
         pygame.init()
-        self._surface = pygame.display.set_mode((self.width * scale, self.height * scale))
+        self._surface = pygame.display.set_mode(
+            (self.width * scale, self.height * scale)
+        )
         pygame.display.set_caption("CHIP-8 Emulator")
         self._clock = pygame.time.Clock()
 

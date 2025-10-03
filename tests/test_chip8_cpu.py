@@ -46,14 +46,22 @@ def run_program(
 def test_load_store_and_memory(cpu: CPU) -> None:
     program = bytes(
         [
-            0x60, 0x0A,  # LD V0, 0x0A
-            0x61, 0x05,  # LD V1, 0x05
-            0x80, 0x14,  # ADD V0, V1 -> V0 = 0x0F
-            0xA3, 0x00,  # LD I, 0x300
-            0xF1, 0x55,  # LD [I], V0..V1
-            0x60, 0x00,  # LD V0, 0
-            0x61, 0x00,  # LD V1, 0
-            0xF1, 0x65,  # LD V0..V1, [I]
+            0x60,
+            0x0A,  # LD V0, 0x0A
+            0x61,
+            0x05,  # LD V1, 0x05
+            0x80,
+            0x14,  # ADD V0, V1 -> V0 = 0x0F
+            0xA3,
+            0x00,  # LD I, 0x300
+            0xF1,
+            0x55,  # LD [I], V0..V1
+            0x60,
+            0x00,  # LD V0, 0
+            0x61,
+            0x00,  # LD V1, 0
+            0xF1,
+            0x65,  # LD V0..V1, [I]
         ]
     )
     run_program(cpu, program)
@@ -67,13 +75,19 @@ def test_sprite_render_and_collision(cpu: CPU) -> None:
     sprite = [0xF0, 0x90, 0x90, 0x90, 0xF0]
     program = bytes(
         [
-            0x60, 0x00,  # LD V0, 0
-            0x61, 0x00,  # LD V1, 0
-            0xA3, 0x00,  # LD I, 0x300
-            0xD0, 0x15,  # DRW V0, V1, 5
-            0xD0, 0x15,  # DRW V0, V1, 5 -> collision on identical draw
+            0x60,
+            0x00,  # LD V0, 0
+            0x61,
+            0x00,  # LD V1, 0
+            0xA3,
+            0x00,  # LD I, 0x300
+            0xD0,
+            0x15,  # DRW V0, V1, 5
+            0xD0,
+            0x15,  # DRW V0, V1, 5 -> collision on identical draw
         ]
     )
+
     def load_sprite(state: CPU) -> None:
         for index, value in enumerate(sprite):
             state.memory.write_byte(0x300 + index, value)
@@ -89,17 +103,28 @@ def test_flow_control_and_random(cpu: CPU) -> None:
     expected_random = mirror_rng.randint(0, 255) & 0x0F
     program = bytes(
         [
-            0x60, 0x05,  # LD V0, 5
-            0x30, 0x05,  # SE V0, 5 -> skip next
-            0x60, 0x00,  # (skipped)
-            0x70, 0x01,  # ADD V0, 1 -> V0 = 6
-            0xC1, 0x0F,  # RND V1, 0x0F -> deterministic via seeded RNG
-            0x22, 0x12,  # CALL 0x212
-            0x12, 0x14,  # JP 0x214 -> terminate
-            0x00, 0xE0,  # padding
-            0x00, 0x00,  # padding
-            0x72, 0x02,  # @0x212: ADD V2, 2
-            0x00, 0xEE,  # RET
+            0x60,
+            0x05,  # LD V0, 5
+            0x30,
+            0x05,  # SE V0, 5 -> skip next
+            0x60,
+            0x00,  # (skipped)
+            0x70,
+            0x01,  # ADD V0, 1 -> V0 = 6
+            0xC1,
+            0x0F,  # RND V1, 0x0F -> deterministic via seeded RNG
+            0x22,
+            0x12,  # CALL 0x212
+            0x12,
+            0x14,  # JP 0x214 -> terminate
+            0x00,
+            0xE0,  # padding
+            0x00,
+            0x00,  # padding
+            0x72,
+            0x02,  # @0x212: ADD V2, 2
+            0x00,
+            0xEE,  # RET
         ]
     )
     run_program(cpu, program, steps=8)
@@ -112,9 +137,12 @@ def test_flow_control_and_random(cpu: CPU) -> None:
 def test_bcd_encoding(cpu: CPU) -> None:
     program = bytes(
         [
-            0x60, 0xFF,  # LD V0, 255
-            0xA3, 0x10,  # LD I, 0x310
-            0xF0, 0x33,  # BCD V0
+            0x60,
+            0xFF,  # LD V0, 255
+            0xA3,
+            0x10,  # LD I, 0x310
+            0xF0,
+            0x33,  # BCD V0
         ]
     )
     run_program(cpu, program)

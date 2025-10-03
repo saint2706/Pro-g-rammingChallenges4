@@ -1,4 +1,5 @@
 """Utilities for downloading and loading the MNIST dataset."""
+
 from __future__ import annotations
 
 import gzip
@@ -45,7 +46,9 @@ def _load_labels(path: Path) -> np.ndarray:
         return labels
 
 
-def load_mnist(data_dir: str | os.PathLike[str], normalize: bool = True) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+def load_mnist(
+    data_dir: str | os.PathLike[str], normalize: bool = True
+) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """Download (if necessary) and load the MNIST dataset."""
     data_path = Path(data_dir)
     data_path.mkdir(parents=True, exist_ok=True)

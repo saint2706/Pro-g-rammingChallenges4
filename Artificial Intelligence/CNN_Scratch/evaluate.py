@@ -1,4 +1,5 @@
 """Evaluate a trained scratch CNN on the MNIST test split."""
+
 from __future__ import annotations
 
 import argparse
@@ -23,10 +24,20 @@ Array = np.ndarray
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Evaluate a saved NumPy CNN on MNIST.")
-    parser.add_argument("--model", type=str, required=True, help="Path to the saved weights (.npz)")
-    parser.add_argument("--data-dir", type=str, default="./data", help="Directory containing the MNIST cache")
     parser.add_argument(
-        "--limit", type=int, default=None, help="Limit the number of test samples for quicker evaluation"
+        "--model", type=str, required=True, help="Path to the saved weights (.npz)"
+    )
+    parser.add_argument(
+        "--data-dir",
+        type=str,
+        default="./data",
+        help="Directory containing the MNIST cache",
+    )
+    parser.add_argument(
+        "--limit",
+        type=int,
+        default=None,
+        help="Limit the number of test samples for quicker evaluation",
     )
     return parser.parse_args()
 

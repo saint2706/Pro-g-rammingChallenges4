@@ -1,4 +1,5 @@
 """Convolutional neural network implemented from scratch with NumPy."""
+
 from __future__ import annotations
 
 import math
@@ -11,13 +12,19 @@ import numpy as np
 Array = np.ndarray
 
 
-def im2col(images: Array, filter_h: int, filter_w: int, stride: int, padding: int) -> Array:
+def im2col(
+    images: Array, filter_h: int, filter_w: int, stride: int, padding: int
+) -> Array:
     """Convert image batches into column matrix for convolution operations."""
     n, c, h, w = images.shape
     out_h = (h + 2 * padding - filter_h) // stride + 1
     out_w = (w + 2 * padding - filter_w) // stride + 1
 
-    padded = np.pad(images, ((0, 0), (0, 0), (padding, padding), (padding, padding)), mode="constant")
+    padded = np.pad(
+        images,
+        ((0, 0), (0, 0), (padding, padding), (padding, padding)),
+        mode="constant",
+    )
 
     cols = np.empty((c * filter_h * filter_w, out_h * out_w * n), dtype=images.dtype)
     col_idx = 0
@@ -28,12 +35,19 @@ def im2col(images: Array, filter_h: int, filter_w: int, stride: int, padding: in
             x_min = x * stride
             x_max = x_min + filter_w
             patch = padded[:, :, y_min:y_max, x_min:x_max]
-            cols[:, col_idx:col_idx + n] = patch.reshape(n, -1).T
+            cols[:, col_idx : col_idx + n] = patch.reshape(n, -1).T
             col_idx += n
     return cols
 
 
-def col2im(cols: Array, input_shape: Tuple[int, int, int, int], filter_h: int, filter_w: int, stride: int, padding: int) -> Array:
+def col2im(
+    cols: Array,
+    input_shape: Tuple[int, int, int, int],
+    filter_h: int,
+    filter_w: int,
+    stride: int,
+    padding: int,
+) -> Array:
     """Inverse of im2col to accumulate gradients back into image space."""
     n, c, h, w = input_shape
     out_h = (h + 2 * padding - filter_h) // stride + 1
@@ -47,7 +61,7 @@ def col2im(cols: Array, input_shape: Tuple[int, int, int, int], filter_h: int, f
         for x in range(out_w):
             x_min = x * stride
             x_max = x_min + filter_w
-            patch = cols[:, col_idx:col_idx + n].T.reshape(n, c, filter_h, filter_w)
+            patch = cols[:, col_idx : col_idx + n].T.reshape(n, c, filter_h, filter_w)
             padded[:, :, y_min:y_max, x_min:x_max] += patch
             col_idx += n
 
@@ -60,19 +74,30 @@ class Layer:
     def forward(self, x: Array) -> Array:  # pragma: no cover - interface
         raise NotImplementedError
 
-    def backward(self, grad: Array, learning_rate: float) -> Array:  # pragma: no cover - interface
+    def backward(
+        self, grad: Array, learning_rate: float
+    ) -> Array:  # pragma: no cover - interface
         raise NotImplementedError
 
 
 class Conv2D(Layer):
-    def __init__(self, in_channels: int, out_channels: int, kernel_size: int, stride: int = 1, padding: int = 0):
+    def __init__(
+        self,
+        in_channels: int,
+        out_channels: int,
+        kernel_size: int,
+        stride: int = 1,
+        padding: int = 0,
+    ):
         self.in_channels = in_channels
         self.out_channels = out_channels
         self.kernel_size = kernel_size
         self.stride = stride
         self.padding = padding
         limit = 1.0 / math.sqrt(in_channels * kernel_size * kernel_size)
-        self.weights = np.random.uniform(-limit, limit, size=(out_channels, in_channels, kernel_size, kernel_size))
+        self.weights = np.random.uniform(
+            -limit, limit, size=(out_channels, in_channels, kernel_size, kernel_size)
+        )
         self.bias = np.zeros(out_channels)
         self._cache: Tuple[Array, Array] | None = None
 
@@ -99,7 +124,14 @@ class Conv2D(Layer):
 
         weight_matrix = self.weights.reshape(self.out_channels, -1)
         d_cols = weight_matrix.T @ grad_reshaped
-        dx = col2im(d_cols, x.shape, self.kernel_size, self.kernel_size, self.stride, self.padding)
+        dx = col2im(
+            d_cols,
+            x.shape,
+            self.kernel_size,
+            self.kernel_size,
+            self.stride,
+            self.padding,
+        )
 
         self.weights -= learning_rate * d_weights / n
         self.bias -= learning_rate * d_bias / n
@@ -115,7 +147,9 @@ class ReLU(Layer):
         self.mask = x > 0
         return x * self.mask
 
-    def backward(self, grad: Array, learning_rate: float) -> Array:  # noqa: ARG002 - interface requires parameter
+    def backward(
+        self, grad: Array, learning_rate: float
+    ) -> Array:  # noqa: ARG002 - interface requires parameter
         assert self.mask is not None
         return grad * self.mask
 
@@ -140,7 +174,12 @@ class MaxPool2D(Layer):
                     for j in range(out_w):
                         i0 = i * self.stride
                         j0 = j * self.stride
-                        window = x[b, ch, i0 : i0 + self.kernel_size, j0 : j0 + self.kernel_size]
+                        window = x[
+                            b,
+                            ch,
+                            i0 : i0 + self.kernel_size,
+                            j0 : j0 + self.kernel_size,
+                        ]
                         max_idx = np.unravel_index(np.argmax(window), window.shape)
                         out[b, ch, i, j] = window[max_idx]
                         mask[b, ch, i0 + max_idx[0], j0 + max_idx[1]] = True
@@ -148,7 +187,9 @@ class MaxPool2D(Layer):
         self._input_shape = x.shape
         return out
 
-    def backward(self, grad: Array, learning_rate: float) -> Array:  # noqa: ARG002 - interface requires parameter
+    def backward(
+        self, grad: Array, learning_rate: float
+    ) -> Array:  # noqa: ARG002 - interface requires parameter
         assert self._mask is not None and self._input_shape is not None
         n, c, h, w = self._input_shape
         out_h = (h - self.kernel_size) // self.stride + 1
@@ -161,8 +202,18 @@ class MaxPool2D(Layer):
                     for j in range(out_w):
                         i0 = i * self.stride
                         j0 = j * self.stride
-                        window_mask = self._mask[b, ch, i0 : i0 + self.kernel_size, j0 : j0 + self.kernel_size]
-                        dx[b, ch, i0 : i0 + self.kernel_size, j0 : j0 + self.kernel_size][window_mask] += grad[b, ch, i, j]
+                        window_mask = self._mask[
+                            b,
+                            ch,
+                            i0 : i0 + self.kernel_size,
+                            j0 : j0 + self.kernel_size,
+                        ]
+                        dx[
+                            b,
+                            ch,
+                            i0 : i0 + self.kernel_size,
+                            j0 : j0 + self.kernel_size,
+                        ][window_mask] += grad[b, ch, i, j]
         return dx
 
 
@@ -174,7 +225,9 @@ class Flatten(Layer):
         self._shape = x.shape
         return x.reshape(x.shape[0], -1)
 
-    def backward(self, grad: Array, learning_rate: float) -> Array:  # noqa: ARG002 - interface requires parameter
+    def backward(
+        self, grad: Array, learning_rate: float
+    ) -> Array:  # noqa: ARG002 - interface requires parameter
         assert self._shape is not None
         return grad.reshape(self._shape)
 
@@ -182,7 +235,9 @@ class Flatten(Layer):
 class Dense(Layer):
     def __init__(self, in_features: int, out_features: int):
         limit = 1.0 / math.sqrt(in_features)
-        self.weights = np.random.uniform(-limit, limit, size=(in_features, out_features))
+        self.weights = np.random.uniform(
+            -limit, limit, size=(in_features, out_features)
+        )
         self.bias = np.zeros(out_features)
         self._input: Array | None = None
 
@@ -248,7 +303,9 @@ class SimpleCNN:
         self.conv1 = Conv2D(c, conv1_channels, kernel_size=3, stride=1, padding=1)
         self.relu1 = ReLU()
         self.pool1 = MaxPool2D(kernel_size=2, stride=2)
-        self.conv2 = Conv2D(conv1_channels, conv2_channels, kernel_size=3, stride=1, padding=1)
+        self.conv2 = Conv2D(
+            conv1_channels, conv2_channels, kernel_size=3, stride=1, padding=1
+        )
         self.relu2 = ReLU()
         self.pool2 = MaxPool2D(kernel_size=2, stride=2)
         self.flatten = Flatten()
@@ -302,7 +359,9 @@ class SimpleCNN:
         preds = self.predict(x)
         return float((preds == y).mean())
 
-    def train_epoch(self, x: Array, y: Array, batch_size: int, learning_rate: float) -> Tuple[float, float]:
+    def train_epoch(
+        self, x: Array, y: Array, batch_size: int, learning_rate: float
+    ) -> Tuple[float, float]:
         indices = np.arange(len(x))
         np.random.shuffle(indices)
         x = x[indices]

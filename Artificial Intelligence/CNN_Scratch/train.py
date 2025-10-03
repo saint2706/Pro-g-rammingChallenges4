@@ -1,4 +1,5 @@
 """Train the scratch CNN on the MNIST dataset."""
+
 from __future__ import annotations
 
 import argparse
@@ -25,10 +26,24 @@ Array = np.ndarray
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Train a NumPy CNN on MNIST.")
-    parser.add_argument("--epochs", type=int, default=5, help="Number of training epochs (default: 5)")
-    parser.add_argument("--batch-size", type=int, default=64, help="Mini-batch size (default: 64)")
-    parser.add_argument("--learning-rate", type=float, default=0.01, help="Learning rate for SGD (default: 0.01)")
-    parser.add_argument("--data-dir", type=str, default="./data", help="Directory to download/cache MNIST")
+    parser.add_argument(
+        "--epochs", type=int, default=5, help="Number of training epochs (default: 5)"
+    )
+    parser.add_argument(
+        "--batch-size", type=int, default=64, help="Mini-batch size (default: 64)"
+    )
+    parser.add_argument(
+        "--learning-rate",
+        type=float,
+        default=0.01,
+        help="Learning rate for SGD (default: 0.01)",
+    )
+    parser.add_argument(
+        "--data-dir",
+        type=str,
+        default="./data",
+        help="Directory to download/cache MNIST",
+    )
     parser.add_argument(
         "--model-out",
         type=str,

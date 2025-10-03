@@ -30,7 +30,9 @@ HOST_KEYMAP = {
 class Keypad:
     """Tracks the 16-key CHIP-8 keypad state."""
 
-    _state: Dict[int, bool] = field(default_factory=lambda: {index: False for index in range(16)})
+    _state: Dict[int, bool] = field(
+        default_factory=lambda: {index: False for index in range(16)}
+    )
     _last_pressed: Optional[int] = None
 
     def press(self, key: int) -> None:
@@ -61,7 +63,9 @@ class PygameInput:
         try:
             import pygame
         except ImportError as exc:  # pragma: no cover - optional dependency
-            raise RuntimeError("pygame is required for the pygame input backend") from exc
+            raise RuntimeError(
+                "pygame is required for the pygame input backend"
+            ) from exc
         self._pygame = pygame
         self.keypad = keypad
         self.quit_requested = False
@@ -77,7 +81,9 @@ class PygameInput:
             elif event.type == self._pygame.KEYUP:
                 self._handle_key(event.key, False)
 
-    def _handle_key(self, keycode: int, pressed: bool) -> None:  # pragma: no cover - requires pygame
+    def _handle_key(
+        self, keycode: int, pressed: bool
+    ) -> None:  # pragma: no cover - requires pygame
         key_name = self._pygame.key.name(keycode)
         mapping = HOST_KEYMAP.get(key_name)
         if mapping is None:

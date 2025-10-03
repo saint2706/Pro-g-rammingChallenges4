@@ -42,12 +42,31 @@ def choose_rom(directory: Path) -> Optional[Path]:
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Minimal CHIP-8 emulator")
-    parser.add_argument("rom", nargs="?", help="ROM path or name inside the roms directory")
-    parser.add_argument("--rom-dir", type=Path, default=ROM_DIRECTORY, help="Directory containing ROM files")
-    parser.add_argument("--backend", choices=["pygame", "curses", "headless"], default="pygame", help="Display backend")
-    parser.add_argument("--scale", type=int, default=12, help="Pixel scale for the pygame backend")
+    parser.add_argument(
+        "rom", nargs="?", help="ROM path or name inside the roms directory"
+    )
+    parser.add_argument(
+        "--rom-dir",
+        type=Path,
+        default=ROM_DIRECTORY,
+        help="Directory containing ROM files",
+    )
+    parser.add_argument(
+        "--backend",
+        choices=["pygame", "curses", "headless"],
+        default="pygame",
+        help="Display backend",
+    )
+    parser.add_argument(
+        "--scale", type=int, default=12, help="Pixel scale for the pygame backend"
+    )
     parser.add_argument("--speed", type=int, default=500, help="CPU cycles per second")
-    parser.add_argument("--headless-frames", type=int, default=0, help="Run a limited number of frames in headless mode")
+    parser.add_argument(
+        "--headless-frames",
+        type=int,
+        default=0,
+        help="Run a limited number of frames in headless mode",
+    )
     return parser
 
 
@@ -64,7 +83,9 @@ def resolve_rom(path_or_name: Optional[str], directory: Path) -> Optional[Path]:
     return None
 
 
-def create_input_and_display(backend: str, scale: int) -> tuple[DisplayBuffer, Optional[object], Keypad]:
+def create_input_and_display(
+    backend: str, scale: int
+) -> tuple[DisplayBuffer, Optional[object], Keypad]:
     keypad = Keypad()
     if backend == "pygame":
         display = create_display("pygame", scale=scale)
@@ -113,11 +134,15 @@ def main(argv: Optional[list[str]] = None) -> int:
                 time.sleep(0.005)
 
             if input_driver is not None:
-                if isinstance(input_driver, PygameInput):  # pragma: no cover - interactive
+                if isinstance(
+                    input_driver, PygameInput
+                ):  # pragma: no cover - interactive
                     input_driver.process_events()
                     if input_driver.quit_requested:
                         break
-                elif isinstance(input_driver, CursesInput):  # pragma: no cover - interactive
+                elif isinstance(
+                    input_driver, CursesInput
+                ):  # pragma: no cover - interactive
                     if input_driver.process_events():
                         break
 
