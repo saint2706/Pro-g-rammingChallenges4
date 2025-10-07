@@ -31,11 +31,11 @@ This command configures the global Git hooks that fetch large files and keeps th
    git clone https://github.com/saintwithataint/Pro-g-rammingChallenges4.git
    cd Pro-g-rammingChallenges4
    ```
-2. Pull all tracked large files:
+1. Pull all tracked large files:
    ```bash
    git lfs pull
    ```
-3. (Optional) Verify that LFS pointers are replaced with real files:
+1. (Optional) Verify that LFS pointers are replaced with real files:
    ```bash
    git lfs ls-files
    ```
@@ -93,6 +93,6 @@ cd Pro-g-rammingChallenges4
 git lfs pull
 ```
 
----
+______________________________________________________________________
 
 Keeping Git LFS healthy ensures sprite sheets, audio packs, and other binary dependencies download with the rest of the source, letting you build and test every project without missing files.

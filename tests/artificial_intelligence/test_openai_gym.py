@@ -2,13 +2,19 @@
 
 from __future__ import annotations
 
+# ruff: noqa: E402
+
 from pathlib import Path
 from statistics import mean
 from typing import Callable, Sequence
 from runpy import run_path
 
-import gymnasium as gym
 import pytest
+
+pytest.importorskip("gymnasium")
+pytest.importorskip("stable_baselines3")
+
+import gymnasium as gym
 from stable_baselines3.common.monitor import Monitor
 
 PROJECT_ROOT = Path("Artificial Intelligence/OpenAI Gym")

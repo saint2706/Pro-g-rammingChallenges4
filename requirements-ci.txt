@@ -1,0 +1,6 @@
+# Lightweight dependencies required for CI linting and tests.
+mdformat>=0.7.17,<0.8
+numpy>=1.26,<2.0
+Pillow>=10.4,<10.5
+pytest>=8.3,<8.4
+ruff>=0.5,<0.6
