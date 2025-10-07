@@ -1,7 +1,6 @@
-
 # Pro-g-ramming Challenges 4
 
-[![wakatime](https://wakatime.com/badge/github/saintwithataint/Pro-g-rammingChallenges4.svg)](https://wakatime.com/badge/github/saintwithataint/Pro-g-rammingChallenges4) 
+[![wakatime](https://wakatime.com/badge/github/saintwithataint/Pro-g-rammingChallenges4.svg)](https://wakatime.com/badge/github/saintwithataint/Pro-g-rammingChallenges4)
 
 Welcome to the fourth iteration of my programming challenges repository! This project is a personal journey of learning and implementing various programming challenges, spanning different categories and difficulty levels.
 
@@ -17,19 +16,19 @@ The solutions are organized by category and difficulty, making it easy to naviga
 
 ## Progress
 
-<progress value="100" max="131"></progress>
+<progress value="131" max="131"></progress>
 
-**Overall:** 100 / 131 challenges completed (76.3%).
+**Overall:** 131 / 131 challenges completed (100%).
 
 | Category | Completed | Total | Progress |
 | --- | --- | --- | --- |
 | Practical | 53 | 53 | 100% |
 | Algorithmic | 27 | 27 | 100% |
-| Artificial Intelligence | 4 | 8 | 50.0% |
-| Emulation/Modeling | 6 | 14 | 42.9% |
-| Games | 11 | 29 | 37.9% |
+| Artificial Intelligence | 8 | 8 | 100% |
+| Emulation/Modeling | 14 | 14 | 100% |
+| Games | 29 | 29 | 100% |
 
-_Progress counts are generated from the actual solution folders in the repository (see tables below)._ 
+_Progress counts are generated from the actual solution folders in the repository (see tables below)._
 
 ## How to Contribute (A Guide for New Developers)
 
@@ -38,10 +37,10 @@ While this is a personal project, the principles behind it are universal. If you
 > **Working in this repo?** Make sure [Git LFS is installed](docs/git-lfs.md) and that you've run `git lfs install` / `git lfs pull` so game assets, audio packs, and pretrained models are available before you start hacking.
 
 1. **Understand the Problem:** Before writing a single line of code, do your research. Draw diagrams, write out the logic, and break the problem down into smaller pieces. If a problem seems too easy, think about how you can add more features or complexity.
-2. **Implement a Solution:** Start with a language you're comfortable with to get a working solution first. Don't worry about writing perfect code on the first try. The goal is to get it working, then you can refactor and improve it.
-3. **Test Your Code:** Think about how your code might fail. Write test cases to cover different scenarios and edge cases. Find bugs, fix them, and document your process.
-4. **Re-implement and Explore:** Once you have a solid solution, try implementing it in a new language. Experiment with different algorithms, data structures, and programming styles. This is a great way to deepen your understanding and expand your skills.
-5. **Never Stop Learning:** Keep challenging yourself. Contribute to open source, start new projects, and keep building your portfolio.
+1. **Implement a Solution:** Start with a language you're comfortable with to get a working solution first. Don't worry about writing perfect code on the first try. The goal is to get it working, then you can refactor and improve it.
+1. **Test Your Code:** Think about how your code might fail. Write test cases to cover different scenarios and edge cases. Find bugs, fix them, and document your process.
+1. **Re-implement and Explore:** Once you have a solid solution, try implementing it in a new language. Experiment with different algorithms, data structures, and programming styles. This is a great way to deepen your understanding and expand your skills.
+1. **Never Stop Learning:** Keep challenging yourself. Contribute to open source, start new projects, and keep building your portfolio.
 
 ## Using pyproject.toml
 
@@ -52,14 +51,14 @@ The repository now ships a `pyproject.toml` so you can install challenge stacks 
    python -m venv .venv
    source .venv/bin/activate  # PowerShell: .venv\Scripts\Activate.ps1
    ```
-2. **Install the extras you need**:
+1. **Install the extras you need**:
    ```bash
    python -m pip install -e .[practical]
    python -m pip install -e .[algorithmic]
    python -m pip install -e .[constructive_solid_geometry]
    ```
    Combine extras (e.g., `.[practical,visual]`) or grab everything with `.[all]`.
-3. **Run scripts/tests** directly from the repo. Editable installs keep your checkout in sync with the environment.
+1. **Run scripts/tests** directly from the repo. Editable installs keep your checkout in sync with the environment.
 
 | Extra | Covers | Highlights |
 | ----- | ------ | ---------- |
@@ -69,7 +68,7 @@ The repository now ships a `pyproject.toml` so you can install challenge stacks 
 | `audio` | Audio processing stacks | WAV equalizer, Shazam clone, music streaming |
 | `games` | Python games in `Games/` | Sudoku solver, Simon, Oil Panic tribute |
 | `constructive_solid_geometry` | `Emulation/ConstructiveSolidGeometry/` mesh utilities | Signed-distance field primitives, marching cubes meshing |
-| `ai` | `Artificial Intelligence/` demos | A* Sudoku, Connect4 AI, neural network |
+| `ai` | `Artificial Intelligence/` demos | A\* Sudoku, Connect4 AI, neural network |
 | `web` | HTTP and dashboard helpers | Imageboard, IP tracking, web crawlers |
 | `desktop` | GUI/automation conveniences | Window manager, key press bot, Tk front-ends |
 | `markdown` | Markdown Editor stack | Live preview, HTML export |
@@ -88,11 +87,11 @@ Consult the consolidated [debugging guide](docs/debugging.md) for a full matrix 
 
 **Quick commands**
 
-- `pytest tests/test_cli_help.py -k "Practical"` &mdash; exercise CLI entry points for Practical utilities headlessly. 【F:tests/test_cli_help.py†L1-L82】
-- `pytest tests/test_raytracer.py` &mdash; render deterministic sample scenes from `Emulation/RayTracer/scenes/minimal.json`. 【F:tests/test_raytracer.py†L11-L26】
-- `pytest tests/test_wolfenstein_clone.py` &mdash; boot the Wolfenstein raycasting engine with SDL's dummy backend. 【F:tests/test_wolfenstein_clone.py†L1-L45】
-- `pytest tests/test_ai_roguelike_smoke.py` &mdash; run the roguelike agent end-to-end using the bundled `tcod` stub. 【F:tests/test_ai_roguelike_smoke.py†L1-L194】
-- `pytest tests/test_cnn_framework.py` &mdash; perform a one-epoch MNIST training/evaluation cycle and verify checkpoints. 【F:tests/test_cnn_framework.py†L1-L49】
+- `pytest tests/test_cli_help.py -k "Practical"` — exercise CLI entry points for Practical utilities headlessly. 【F:tests/test_cli_help.py†L1-L82】
+- `pytest tests/test_raytracer.py` — render deterministic sample scenes from `Emulation/RayTracer/scenes/minimal.json`. 【F:tests/test_raytracer.py†L11-L26】
+- `pytest tests/test_wolfenstein_clone.py` — boot the Wolfenstein raycasting engine with SDL's dummy backend. 【F:tests/test_wolfenstein_clone.py†L1-L45】
+- `pytest tests/test_ai_roguelike_smoke.py` — run the roguelike agent end-to-end using the bundled `tcod` stub. 【F:tests/test_ai_roguelike_smoke.py†L1-L194】
+- `pytest tests/test_cnn_framework.py` — perform a one-epoch MNIST training/evaluation cycle and verify checkpoints. 【F:tests/test_cnn_framework.py†L1-L49】
 
 **Manual spot checks**
 
@@ -107,8 +106,8 @@ The repository includes a GitHub Actions workflow at `.github/workflows/keep-str
 ### Configure the `STREAMLIT_PING_URL` secret
 
 1. In GitHub, open **Settings → Secrets and variables → Actions** for this repository.
-2. Add a new repository secret named `STREAMLIT_PING_URL` that contains the fully qualified URL of the Streamlit deployment (e.g., `https://example.streamlit.app/`).
-3. Save the secret; the workflow will automatically read the value when it runs on its hourly schedule. If the secret is missing (or blank), the job now logs a warning and exits successfully instead of failing, so unattended runs will not flap.
+1. Add a new repository secret named `STREAMLIT_PING_URL` that contains the fully qualified URL of the Streamlit deployment (e.g., `https://example.streamlit.app/`).
+1. Save the secret; the workflow will automatically read the value when it runs on its hourly schedule. If the secret is missing (or blank), the job now logs a warning and exits successfully instead of failing, so unattended runs will not flap.
 
 ### Override the ping target for debugging
 
@@ -117,8 +116,8 @@ When triggering the workflow manually via **Actions → Keep Streamlit deploymen
 ### Manually test the keep-alive workflow
 
 1. Navigate to **Actions → Keep Streamlit deployment alive** in GitHub.
-2. Click **Run workflow** to launch it on demand. You may leave the `target_url` field blank to use the `STREAMLIT_PING_URL` secret, or provide a one-off URL for testing.
-3. Review the workflow run logs to ensure the keep-alive request succeeded.
+1. Click **Run workflow** to launch it on demand. You may leave the `target_url` field blank to use the `STREAMLIT_PING_URL` secret, or provide a one-off URL for testing.
+1. Review the workflow run logs to ensure the keep-alive request succeeded.
 
 ## Challenges
 
@@ -220,14 +219,14 @@ When triggering the workflow manually via **Actions → Keep Streamlit deploymen
 
 | # | Challenge | Status |
 | --- | --------- | ------ |
-| 70 | OpenAI Gym Project | Not Yet |
-| 71 | AI for Roguelikes | [View Solution](./Artificial%20Intelligence/AI%20Roguelike/) |
-| 72 | Sudoku/n-Puzzle Solver using A* algorithm | [View Solution](./Artificial%20Intelligence/Sudoku/) |
-| 73 | Connect-4 AI Player using Alpha-Beta Pruning | [View Solution](./Artificial%20Intelligence/Connect4/) |
-| 74 | Basic Neural Network - Simulate individual neurons and their connections | [View Solution](./Artificial%20Intelligence/Basic%20Neural%20Network/) |
-| 75 | Real Neural Network - Implement a basic feed-forward neural network using matrices for entire layers along with matrix operations for computations. | [View Solution](./Artificial%20Intelligence/Real%20Neural%20Network/) |
-| 76 | Convolutional Neural Network: Implement a convolutional N.N. for a handwritten digit recognition test on MNIST dataset (Use TensorFlow Theano etc...) | Not Yet |
-| 77 | Convolutional Neural Network: Implement your own convolutional neural network for handwritten digit recognition test on MNIST Dataset (Without TensorFlow Theano etc...) | [View Solution](./Artificial%20Intelligence/CNN_Scratch/) |
+| 70 | OpenAI Gym Project | ✅ [View Solution](./Artificial%20Intelligence/OpenAI%20Gym/) |
+| 71 | AI for Roguelikes | ✅ [View Solution](./Artificial%20Intelligence/AI%20Roguelike/) |
+| 72 | Sudoku/n-Puzzle Solver using A\* algorithm | ✅ [View Solution](./Artificial%20Intelligence/Sudoku/) |
+| 73 | Connect-4 AI Player using Alpha-Beta Pruning | ✅ [View Solution](./Artificial%20Intelligence/Connect4/) |
+| 74 | Basic Neural Network - Simulate individual neurons and their connections | ✅ [View Solution](./Artificial%20Intelligence/Basic%20Neural%20Network/) |
+| 75 | Real Neural Network - Implement a basic feed-forward neural network using matrices for entire layers along with matrix operations for computations. | ✅ [View Solution](./Artificial%20Intelligence/Real%20Neural%20Network/) |
+| 76 | Convolutional Neural Network: Implement a convolutional N.N. for a handwritten digit recognition test on MNIST dataset (Use TensorFlow Theano etc...) | ✅ [View Solution](./Artificial%20Intelligence/CNN_Framework/) |
+| 77 | Convolutional Neural Network: Implement your own convolutional neural network for handwritten digit recognition test on MNIST Dataset (Without TensorFlow Theano etc...) | ✅ [View Solution](./Artificial%20Intelligence/CNN_Scratch/) |
 
 #### OpenAI Gym DQN Trainer
 
@@ -261,93 +260,54 @@ PY
 
 | # | Challenge | Status |
 | --- | --------- | ------ |
-| 91 | Chip - 8 Emulator (Hard Mode: Cached Interpreter. Fuck You: Dynamic Recompiler use dynarec/jit library) | [View Solution](./Emulation/Chip8/) |
-| 92 | Double Pendulum Simulation | Not Yet |
-| 93 | Constructive Solid Geometry | [View Solution](./Emulation/ConstructiveSolidGeometry/) |
-| 94 | Ray Tracer | Not Yet |
-| 95 | Real-Time Fast Fourier Transform Spectrum Visualizer | [View Solution](./Emulation/FFTSpectrum/) |
-| 96 | Generate a Complimentary Color from any input color | [View Solution](./Emulation/CompColor/) |
-| 97 | Generate a 5-Color Scheme from the most dominant tones in any image | [View Solution](./Emulation/5%20color%20scheme/) |
-| 98 | General Lambert's-Problem Solver (At least it's not rocket science... Oh wait it actually is) | [View Solution](./Emulation/LambertsProblem/) |
-| 99 | TI-86 Emulator (Bonus: Include the Option to Create Programs) | Not Yet |
-| 100 | N-Body Simulator with particles having a certain mass and radius depending on the mass that merge if they collide (Bonus: Include a GUI where you can place particles) | [View Solution](./Emulation/NBodySimulator/) |
-| 101 | Eulerian Path | [View Solution](./Emulation/EulerianPath/) |
-| 102 | Draw a spinning 3D Cube | [View Solution](./Emulation/SpinnyCube/) |
-| 103 | Cellular Textures | [View Solution](./Emulation/CellularTextures/) |
-| 145 | ASCII Digital Clock | [View Solution](./Emulation/ASCII_Clock/) |
+| 91 | Chip - 8 Emulator (Hard Mode: Cached Interpreter. Fuck You: Dynamic Recompiler use dynarec/jit library) | ✅ [View Solution](./Emulation/Chip8/) |
+| 92 | Double Pendulum Simulation | ✅ [View Solution](./Emulation/DoublePendulum/) |
+| 93 | Constructive Solid Geometry | ✅ [View Solution](./Emulation/ConstructiveSolidGeometry/) |
+| 94 | Ray Tracer | ✅ [View Solution](./Emulation/RayTracer/) |
+| 95 | Real-Time Fast Fourier Transform Spectrum Visualizer | ✅ [View Solution](./Emulation/FFTSpectrum/) |
+| 96 | Generate a Complimentary Color from any input color | ✅ [View Solution](./Emulation/CompColor/) |
+| 97 | Generate a 5-Color Scheme from the most dominant tones in any image | ✅ [View Solution](./Emulation/5%20color%20scheme/) |
+| 98 | General Lambert's-Problem Solver (At least it's not rocket science... Oh wait it actually is) | ✅ [View Solution](./Emulation/LambertsProblem/) |
+| 99 | TI-86 Emulator (Bonus: Include the Option to Create Programs) | ✅ [View Solution](./Emulation/TI86/) |
+| 100 | N-Body Simulator with particles having a certain mass and radius depending on the mass that merge if they collide (Bonus: Include a GUI where you can place particles) | ✅ [View Solution](./Emulation/NBodySimulator/) |
+| 101 | Eulerian Path | ✅ [View Solution](./Emulation/EulerianPath/) |
+| 102 | Draw a spinning 3D Cube | ✅ [View Solution](./Emulation/SpinnyCube/) |
+| 103 | Cellular Textures | ✅ [View Solution](./Emulation/CellularTextures/) |
+| 145 | ASCII Digital Clock | ✅ [View Solution](./Emulation/ASCII_Clock/) |
 
 ### Games
 
 | # | Challenge | Status |
 | --- | --------- | ------ |
-| 104 | Knight's Tour | [View Solution](./Games/Knight%20Tour/) |
-
-| 105 | Monster Raising/Breeding Simulator | [View Solution](./Games/Monster%20Raising/) |
-| 106 | Tetris | Not Yet |
-
-| 105 | Monster Raising/Breeding Simulator | Not Yet |
-| 106 | Tetris | [View Solution](./Games/Tetris/) |
-
-| 107 | Snake | [View Solution](./Games/Snake/) |
-
-| 108 | Pipe Dreams | Not Yet |
-| 109 | Pac Man With Different Behaviors for each ghost | [View Solution](./Games/Pacman/) |
-
-| 108 | Pipe Dreams | [View Solution](./Games/Pipe%20Dreams/) |
-| 109 | Pac Man With Different Behaviors for each ghost | Not Yet |
-
-| 110 | Dragon Quest / Basic RPG Engine | Not Yet |
-| 111 | Rock Paper Scissors | [View Solution](./Games/RPS/) |
-| 112 | First-Person Engine in OpenGL (Walking Looking Around Jumping on Obstacles) (BONUS: VR Compatibility) | Not Yet |
-| 113 | Shuffle a Deck of Cards (Include a Visualization) | [View Solution](./Games/Shuffle/) |
-| 114 | Simulate a game of Tag using a multi-agent system | Not Yet |
-| 115 | Wolfenstein Clone (FPS two-dimensional map that appears to be 3-D) (If you need a starting point search for bisquit's video about DOOM-like Engines) | [View Solution](./Games/WolfensteinClone/) |
-| 116 | Scorched Earth Clone | [View Solution](./Games/ScorchedEarth/) |
-| 117 | Minesweeper | [View Solution](./Games/Minesweeper/) |
-| 118 | An Audio/Visual 64KB Demonstration | [View Solution](./Games/64kDemo/) |
-| 119 | Sudoku | [View Solution](./Games/Sudoku/) |
-| 120 | Danmaku (Bullet Hell) Engine | Not Yet |
-
-| 121 | Roguelike Engine/Dungeon Generator | [View Solution](./Games/Roguelike/) |
-| 122 | Design a Game Engine in Unity | Not Yet |
-
-| 121 | Roguelike Engine/Dungeon Generator | Not Yet |
-| 122 | Design a Game Engine in Unity | [View Solution](./Games/UnityEngine/) |
-
-| 123 | Yahtzee | [View Solution](./Games/Yahtzee/) |
-
-
-| 124 | Oil Panic | [View Solution](./Games/OilPanic/) |
-
-| 124 | Oil Panic | Not Yet |
-
-
-| 125 | Chess | Not Yet |
-| 126 | Go (No AI Necessary) | [View Solution](./Games/Go/) |
-
-| 125 | Chess | [View Solution](./Games/Chess/) |
-| 126 | Go (No AI Necessary) | Not Yet |
-
-| 127 | Connect Four | [View Solution](./Games/Connect4/) |
-| 128 | Mastermind | Not Yet |
-
-| 129 | Missile Command Game | [View Solution](./Games/MissileCommand/) |
-| 130 | Tron | Not Yet |
-
-| 129 | Missile Command Game | Not Yet |
-
-| 130 | Tron | [View Solution](./Games/Tron/) |
-
-
-
-
-
-| 131 | Breakout | Not Yet |
-
-| 130 | Tron | Not Yet |
-| 131 | Breakout | [View Solution](./Games/Breakout/) |
-
-| 132 | Simon | [View Solution](./Games/Simon/) |
+| 104 | Knight's Tour | ✅ [View Solution](./Games/Knight%20Tour/) |
+| 105 | Monster Raising/Breeding Simulator | ✅ [View Solution](./Games/Monster%20Raising/) |
+| 106 | Tetris | ✅ [View Solution](./Games/Tetris/) |
+| 107 | Snake | ✅ [View Solution](./Games/Snake/) |
+| 108 | Pipe Dreams | ✅ [View Solution](./Games/Pipe%20Dreams/) |
+| 109 | Pac Man With Different Behaviors for each ghost | ✅ [View Solution](./Games/Pacman/) |
+| 110 | Dragon Quest / Basic RPG Engine | ✅ [View Solution](./Games/RPGEngine/) |
+| 111 | Rock Paper Scissors | ✅ [View Solution](./Games/RPS/) |
+| 112 | First-Person Engine in OpenGL (Walking Looking Around Jumping on Obstacles) (BONUS: VR Compatibility) | ✅ [View Solution](./Games/FirstPersonEngine/) |
+| 113 | Shuffle a Deck of Cards (Include a Visualization) | ✅ [View Solution](./Games/Shuffle/) |
+| 114 | Simulate a game of Tag using a multi-agent system | ✅ [View Solution](./Games/MultiAgentTag/) |
+| 115 | Wolfenstein Clone (FPS two-dimensional map that appears to be 3-D) (If you need a starting point search for bisquit's video about DOOM-like Engines) | ✅ [View Solution](./Games/WolfensteinClone/) |
+| 116 | Scorched Earth Clone | ✅ [View Solution](./Games/ScorchedEarth/) |
+| 117 | Minesweeper | ✅ [View Solution](./Games/Minesweeper/) |
+| 118 | An Audio/Visual 64KB Demonstration | ✅ [View Solution](./Games/64kDemo/) |
+| 119 | Sudoku | ✅ [View Solution](./Games/Sudoku/) |
+| 120 | Danmaku (Bullet Hell) Engine | ✅ [View Solution](./Games/DanmakuEngine/) |
+| 121 | Roguelike Engine/Dungeon Generator | ✅ [View Solution](./Games/Roguelike/) |
+| 122 | Design a Game Engine in Unity | ✅ [View Solution](./Games/UnityEngine/) |
+| 123 | Yahtzee | ✅ [View Solution](./Games/Yahtzee/) |
+| 124 | Oil Panic | ✅ [View Solution](./Games/OilPanic/) |
+| 125 | Chess | ✅ [View Solution](./Games/Chess/) |
+| 126 | Go (No AI Necessary) | ✅ [View Solution](./Games/Go/) |
+| 127 | Connect Four | ✅ [View Solution](./Games/Connect4/) |
+| 128 | Mastermind | ✅ [View Solution](./Games/Mastermind/) |
+| 129 | Missile Command Game | ✅ [View Solution](./Games/MissileCommand/) |
+| 130 | Tron | ✅ [View Solution](./Games/Tron/) |
+| 131 | Breakout | ✅ [View Solution](./Games/Breakout/) |
+| 132 | Simon | ✅ [View Solution](./Games/Simon/) |
 
 ## Highlights
 
@@ -355,22 +315,22 @@ This repository includes several scripts with graphical user interfaces (GUIs) a
 
 ### GUI Applications
 
-| Tool                              | Command                                                                 |
+| Tool | Command |
 | --------------------------------- | ----------------------------------------------------------------------- |
-| PDF Metadata Tagger               | `python "Practical/PDF Tagger/pdftag_gui.py"`                           |
-| Image to ASCII Art Converter      | `python "Practical/ImgToASCII/convert_gui.py"`                          |
-| Multi-threaded Port Scanner       | `python "Practical/Port Scanner/scanner_gui.py"`                        |
-| Radix Base Converter              | `python "Practical/Radix Base Converter/radix_gui.py"`                  |
-| Markov Chain Sentence Generator   | `python "Practical/Markov Chain Sentence Generator/mcsg_gui.py"`        |
-| Seam Carving Image Resizer        | `python "Practical/Seam Carving/resize_gui.py"`                         |
+| PDF Metadata Tagger | `python "Practical/PDF Tagger/pdftag_gui.py"` |
+| Image to ASCII Art Converter | `python "Practical/ImgToASCII/convert_gui.py"` |
+| Multi-threaded Port Scanner | `python "Practical/Port Scanner/scanner_gui.py"` |
+| Radix Base Converter | `python "Practical/Radix Base Converter/radix_gui.py"` |
+| Markov Chain Sentence Generator | `python "Practical/Markov Chain Sentence Generator/mcsg_gui.py"` |
+| Seam Carving Image Resizer | `python "Practical/Seam Carving/resize_gui.py"` |
 
 ### Algorithm Visualizations
 
-| Visualization                   | Command                                                                 |
+| Visualization | Command |
 | ------------------------------- | ----------------------------------------------------------------------- |
-| Dijkstra's Shortest Path        | `python "Algorithmic/Djikstra/dijkstra_visualizer.py" --start A`        |
-| Towers of Hanoi                 | `python "Algorithmic/Towers of Hanoi/ToH_visualizer.py" 4`              |
-| Character Frequency             | `python "Algorithmic/Character Counter/charcount_visualizer.py" -t "hello world"` |
+| Dijkstra's Shortest Path | `python "Algorithmic/Djikstra/dijkstra_visualizer.py" --start A` |
+| Towers of Hanoi | `python "Algorithmic/Towers of Hanoi/ToH_visualizer.py" 4` |
+| Character Frequency | `python "Algorithmic/Character Counter/charcount_visualizer.py" -t "hello world"` |
 
 ## Further Learning
 
@@ -378,24 +338,24 @@ For those hungry for more, here are some excellent resources to continue your jo
 
 ### Recommended Reading
 
-* Knuth: *The Art of Computer Programming*
-* Skiena: *The Algorithm Design Manual*
-* Cormen et al: *Introduction to Algorithms*
-* Russel: *Artificial Intelligence: A Modern Approach*
-* Abelson: *Structure and Interpretation of Computer Programs*
+- Knuth: *The Art of Computer Programming*
+- Skiena: *The Algorithm Design Manual*
+- Cormen et al: *Introduction to Algorithms*
+- Russel: *Artificial Intelligence: A Modern Approach*
+- Abelson: *Structure and Interpretation of Computer Programs*
 
 ### More Challenges
 
-* [HackerRank](https://www.hackerrank.com)
-* [CodeChef](https://www.codechef.com)
-* [CodeFights](https://www.codefights.com)
-* [Project Euler](https://www.projecteuler.net)
-* [Rosetta Code](https://www.rosettacode.org)
-* [CodeAbbey](https://www.codeabbey.com)
-* [CodingBat](https://www.codingbat.com)
-* [Programming Praxis](https://www.programmingpraxis.com)
+- [HackerRank](https://www.hackerrank.com)
+- [CodeChef](https://www.codechef.com)
+- [CodeFights](https://www.codefights.com)
+- [Project Euler](https://www.projecteuler.net)
+- [Rosetta Code](https://www.rosettacode.org)
+- [CodeAbbey](https://www.codeabbey.com)
+- [CodingBat](https://www.codingbat.com)
+- [Programming Praxis](https://www.programmingpraxis.com)
 
----
+______________________________________________________________________
 
 ## Repository Usage Guide
 
@@ -427,29 +387,28 @@ The root [`requirements.txt`](requirements.txt) is now generated directly from t
 
 ### 2. Dependency Strategy
 
-* `pyproject.toml` extras drive dependency selection; install only what you need (e.g. `python -m pip install -e .[visual]`).
-* Run `python tools/sync_requirements.py` after editing extras to keep the generated `requirements.txt` in sync.
-* Folder-level `requirements.txt` files (e.g. `Practical/`, `Emulation/`) remain available for ultra-minimal installs.
-* Heavy/optional libs (plotly, vpython, scikit-learn, colour-science) can be skipped unless you need those features.
+- `pyproject.toml` extras drive dependency selection; install only what you need (e.g. `python -m pip install -e .[visual]`).
+- Run `python tools/sync_requirements.py` after editing extras to keep the generated `requirements.txt` in sync.
+- Folder-level `requirements.txt` files (e.g. `Practical/`, `Emulation/`) remain available for ultra-minimal installs.
+- Heavy/optional libs (plotly, vpython, scikit-learn, colour-science) can be skipped unless you need those features.
 
 ### 3. Binary Asset Management (Git LFS)
 
 Large or frequently updated binaries live in Git LFS so the regular Git history stays lightweight. The following patterns are
 tracked automatically:
 
-* `Games/**/Assets/**/*.{png,wav}` – game textures, sprites, and audio cues.
-* `Emulation/Chip8/roms/*.ch8` – sample ROMs for the CHIP-8 emulator.
-* `Emulation/FFTSpectrum/**/*.wav` – reference audio for FFT spectrum demos.
-* `Practical/Booru Imageboard Downloader/downloads/**/*.png` – example download payloads.
-* `Practical/ImgToASCII/*.png` – high-resolution source images for ASCII rendering tests.
-* `Practical/Imageboard/docs/**/*.png` – documentation screenshots that exceed a few kilobytes.
-* `Artificial Intelligence/CNN_Framework/checkpoints/**/*.{pt,pth}` – neural network checkpoint blobs.
+- `Games/**/Assets/**/*.{png,wav}` – game textures, sprites, and audio cues.
+- `Emulation/Chip8/roms/*.ch8` – sample ROMs for the CHIP-8 emulator.
+- `Emulation/FFTSpectrum/**/*.wav` – reference audio for FFT spectrum demos.
+- `Practical/Booru Imageboard Downloader/downloads/**/*.png` – example download payloads.
+- `Practical/ImgToASCII/*.png` – high-resolution source images for ASCII rendering tests.
+- `Practical/Imageboard/docs/**/*.png` – documentation screenshots that exceed a few kilobytes.
+- `Artificial Intelligence/CNN_Framework/checkpoints/**/*.{pt,pth}` – neural network checkpoint blobs.
 
 Everything else (including placeholder `.gitkeep` files) should remain in normal Git. If you add a new binary asset outside the
 paths above either relocate it into an existing asset folder or extend `.gitattributes` with a narrowly-scoped pattern before
 committing. After updating the attributes run `git lfs track`/`git lfs untrack` as needed, `git add .gitattributes`, and
-finally `git lfs checkout` to ensure your working tree contains the real binary bits rather than pointer text. `git lfs
-ls-files` and `git lfs status` are good final sanity checks before opening a PR.
+finally `git lfs checkout` to ensure your working tree contains the real binary bits rather than pointer text. `git lfs ls-files` and `git lfs status` are good final sanity checks before opening a PR.
 
 ### 4. At-a-Glance Tool Categories
 
@@ -468,11 +427,11 @@ ls-files` and `git lfs status` are good final sanity checks before opening a PR.
 
 ### 5. Common Options & Patterns
 
-* Most Python scripts expose `--help` for argument details.
-* Image tools usually accept `--out` or `-o` for output file specification.
-* Long-running tasks often support interruption with Ctrl+C (graceful cleanup implemented where applicable).
-* Some GUIs are mirrored by a CLI variant (e.g. `resize.py` vs `resize_gui.py`).
-* Optional dependencies are imported inside `try/except` blocks; absence results in reduced functionality, not crashes.
+- Most Python scripts expose `--help` for argument details.
+- Image tools usually accept `--out` or `-o` for output file specification.
+- Long-running tasks often support interruption with Ctrl+C (graceful cleanup implemented where applicable).
+- Some GUIs are mirrored by a CLI variant (e.g. `resize.py` vs `resize_gui.py`).
+- Optional dependencies are imported inside `try/except` blocks; absence results in reduced functionality, not crashes.
 
 ### 6. Recommended Minimal Installs Per Interest
 
@@ -538,7 +497,7 @@ To mirror the automated checks:
    python -m pip install -e .[developer,practical]
    ```
 
-2. From the repository root, run the full test suite:
+1. From the repository root, run the full test suite:
 
    ```bash
    pytest
@@ -546,7 +505,7 @@ To mirror the automated checks:
 
    The included `pytest.ini` sets `PYTHONPATH=.` so tests in `Practical/Imageboard/tests` and `Algorithmic/MBR` resolve local modules without extra flags.
 
-3. If you need to replicate the imageboard tests manually, export the environment variables they expect before invoking the app or running individual tests:
+1. If you need to replicate the imageboard tests manually, export the environment variables they expect before invoking the app or running individual tests:
 
    ```bash
    export IMAGEBOARD_DATA_DIR=$(mktemp -d)
@@ -556,12 +515,12 @@ To mirror the automated checks:
 
 ### 10. Next Steps / Improvements
 
-* Introduce `pyproject.toml` with extras: `imageboard`, `visual`, `ml`, `geo`.
-* Add `pytest` smoke tests (import + `--help` execution) to CI.
-* Provide a unified launcher (`python tools.py list` / `run <tool>`).
-* Add Dockerfile for the imageboard deployment scenario.
-* Generate HTML index page summarizing runnable tools.
+- Introduce `pyproject.toml` with extras: `imageboard`, `visual`, `ml`, `geo`.
+- Add `pytest` smoke tests (import + `--help` execution) to CI.
+- Provide a unified launcher (`python tools.py list` / `run <tool>`).
+- Add Dockerfile for the imageboard deployment scenario.
+- Generate HTML index page summarizing runnable tools.
 
----
+______________________________________________________________________
 
 If you’d like help implementing any of these improvements next, open an issue or continue the session here.

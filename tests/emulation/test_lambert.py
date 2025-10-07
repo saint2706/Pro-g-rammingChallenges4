@@ -2,8 +2,13 @@
 
 from __future__ import annotations
 
-import numpy as np
+# ruff: noqa: E402
+
 import pytest
+
+pytest.importorskip("scipy")
+
+import numpy as np
 
 from Emulation.LambertsProblem import minimum_time_of_flight, solve_lambert_universal
 
