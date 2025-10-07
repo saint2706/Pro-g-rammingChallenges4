@@ -4,6 +4,10 @@ import math
 
 import pytest
 
+# ruff: noqa: E402
+
+pytest.importorskip("skimage")
+
 from Emulation.ConstructiveSolidGeometry import box, mesh_from_sdf, sphere
 
 

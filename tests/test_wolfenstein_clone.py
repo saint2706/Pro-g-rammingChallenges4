@@ -2,13 +2,26 @@
 
 from __future__ import annotations
 
+# ruff: noqa: E402
+
 import json
 import os
 from pathlib import Path
 
-import pygame
+import pytest
+
+pygame = pytest.importorskip("pygame")
 
 from Games.WolfensteinClone.game import GameConfig, MAP_DIR, WolfensteinGame
+
+ASSET_DIR = Path("Games/WolfensteinClone/assets")
+REQUIRED_TEXTURE = ASSET_DIR / "wall_stone.png"
+
+if not REQUIRED_TEXTURE.exists():
+    pytest.skip(
+        "Wolfenstein textures are missing (requires Git LFS assets).",
+        allow_module_level=True,
+    )
 
 
 def _ensure_dummy_video() -> None:
