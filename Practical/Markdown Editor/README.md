@@ -97,3 +97,10 @@ Practical/Markdown Editor/
 - If preview rendering looks raw, install `tkhtmlview` to enable full HTML styling.
 
 Enjoy writing!
+
+## Additional Solutions
+
+Looking for alternative stacks? Explore the implementations under `solutions/`:
+
+- `solutions/python_flask` – Flask-powered web editor with live preview.
+- `solutions/node_cli` – Node.js CLI that converts Markdown to HTML from the terminal.

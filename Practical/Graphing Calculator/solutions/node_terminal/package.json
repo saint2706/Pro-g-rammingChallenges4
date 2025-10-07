@@ -1,0 +1,16 @@
+{
+  "name": "graphing-calculator-terminal",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "ASCII graph renderer for mathematical expressions",
+  "bin": {
+    "graph-term": "index.js"
+  },
+  "scripts": {
+    "start": "node index.js \"sin(x)\""
+  },
+  "dependencies": {
+    "commander": "^11.1.0",
+    "mathjs": "^12.2.1"
+  }
+}
