@@ -1,0 +1,13 @@
+{
+  "name": "chatbot-cli",
+  "version": "1.0.0",
+  "description": "Rule based chatbot implemented with Node.js",
+  "type": "module",
+  "bin": {
+    "chatbot-node": "index.js"
+  },
+  "scripts": {
+    "start": "node index.js"
+  },
+  "license": "MIT"
+}
