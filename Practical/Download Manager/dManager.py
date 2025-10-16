@@ -28,6 +28,7 @@ from __future__ import annotations
 
 import argparse
 import concurrent.futures as futures
+import contextlib
 import hashlib
 import json
 import math
@@ -89,6 +90,96 @@ RANGE_HEADER = "Accept-Ranges"
 CONTENT_LENGTH = "Content-Length"
 DEFAULT_UA = "ProChallengesDownloader/1.0"
 LOCK = threading.Lock()  # for shared progress/state edits if needed
+
+
+def _resume_metadata_path(target: Path) -> Path:
+    return target.with_name(target.name + ".resume.json")
+
+
+class ResumeState:
+    """Track per-part completion for multi-threaded resume support."""
+
+    def __init__(self, target: Path, size: int, parts: Dict[str, bool]):
+        self.target = target
+        self.size = size
+        self.meta_path = _resume_metadata_path(target)
+        self._parts = parts
+        self._lock = threading.Lock()
+
+    @staticmethod
+    def _key(part: Tuple[int, int]) -> str:
+        return f"{part[0]}-{part[1]}"
+
+    @staticmethod
+    def _parse_key(key: str) -> Tuple[int, int]:
+        start, end = key.split("-", 1)
+        return int(start), int(end)
+
+    @classmethod
+    def initialize(
+        cls, target: Path, size: int, parts: List[Tuple[int, int]]
+    ) -> "ResumeState":
+        existing: Dict[str, bool] = {}
+        meta_path = _resume_metadata_path(target)
+        if meta_path.exists():
+            try:
+                with open(meta_path, "r", encoding="utf-8") as fh:
+                    data = json.load(fh)
+                if data.get("size") == size:
+                    existing = {k: bool(v) for k, v in data.get("parts", {}).items()}
+            except (OSError, ValueError, TypeError):
+                existing = {}
+
+        for part in parts:
+            existing.setdefault(cls._key(part), False)
+
+        state = cls(target, size, existing)
+        state._flush()
+        return state
+
+    def is_complete(self, part: Tuple[int, int]) -> bool:
+        return self._parts.get(self._key(part), False)
+
+    def mark_complete(self, part: Tuple[int, int]) -> None:
+        key = self._key(part)
+        with self._lock:
+            self._parts[key] = True
+            self._flush()
+
+    def completed_bytes(self) -> int:
+        total = 0
+        for key, done in self._parts.items():
+            if not done:
+                continue
+            start, end = self._parse_key(key)
+            total += end - start + 1
+        return total
+
+    def sync_with_file(self) -> None:
+        existing_size = self.target.stat().st_size if self.target.exists() else 0
+        changed = False
+        for key, done in list(self._parts.items()):
+            if not done:
+                continue
+            _, end = self._parse_key(key)
+            if end >= existing_size:
+                self._parts[key] = False
+                changed = True
+        if changed:
+            self._flush()
+
+    def cleanup(self) -> None:
+        with contextlib.suppress(OSError):
+            _resume_metadata_path(self.target).unlink()
+
+    def _flush(self) -> None:
+        payload = {"size": self.size, "parts": self._parts}
+        try:
+            self.meta_path.parent.mkdir(parents=True, exist_ok=True)
+            with open(self.meta_path, "w", encoding="utf-8") as fh:
+                json.dump(payload, fh, sort_keys=True)
+        except OSError:
+            pass
 
 # --------------------------- Utility Functions --------------------------- #
 
@@ -175,6 +266,7 @@ def download_part(
     retries: int,
     timeout: float,
     file_path: Path,
+    resume_state: Optional[ResumeState] = None,
 ) -> int:
     start, end = part
     headers = {"Range": f"bytes={start}-{end}", "User-Agent": cfg.user_agent}
@@ -199,6 +291,8 @@ def download_part(
                         f.write(chunk)
                         downloaded += len(chunk)
                         pbar.update(len(chunk))
+                if resume_state:
+                    resume_state.mark_complete(part)
                 return downloaded
         except requests.RequestException as e:
             attempt += 1
@@ -294,6 +388,9 @@ def download(cfg: Config) -> Result:
         elif size and existing == size:
             print("File already fully downloaded. Skipping.")
             elapsed = time.time() - t0
+            if cfg.resume:
+                with contextlib.suppress(OSError):
+                    _resume_metadata_path(cfg.output).unlink()
             checksum = compute_sha256(cfg.output) if cfg.expected_sha256 else None
             checksum_match = (
                 (checksum == cfg.expected_sha256) if cfg.expected_sha256 else None
@@ -312,11 +409,29 @@ def download(cfg: Config) -> Result:
             )
 
     downloaded = 0
+    resume_state: Optional[ResumeState] = None
 
     if not range_ok or cfg.threads == 1 or size is None:
+        if cfg.resume:
+            with contextlib.suppress(OSError):
+                _resume_metadata_path(cfg.output).unlink()
         downloaded = single_thread_download(session, cfg, size, cfg.output)
     else:
         parts = plan_parts(size, cfg.threads)
+        resume_state = (
+            ResumeState.initialize(cfg.output, size, parts) if cfg.resume else None
+        )
+        if resume_state:
+            resume_state.sync_with_file()
+        initial_bytes = resume_state.completed_bytes() if resume_state else 0
+        if size:
+            initial_bytes = min(initial_bytes, size)
+        if initial_bytes:
+            resumed = True
+        downloaded = initial_bytes
+        parts_to_download = [
+            part for part in parts if not resume_state or not resume_state.is_complete(part)
+        ]
         # Prepare file
         mode = "r+b" if cfg.output.exists() else "wb"
         with open(cfg.output, mode) as f:
@@ -326,24 +441,28 @@ def download(cfg: Config) -> Result:
             unit="B",
             unit_scale=True,
             desc=cfg.output.name,
-            initial=cfg.output.stat().st_size if resumed else 0,
+            initial=initial_bytes,
         ) as pbar:
-            with futures.ThreadPoolExecutor(max_workers=cfg.threads) as pool:
-                future_list = [
-                    pool.submit(
-                        download_part,
-                        session,
-                        cfg,
-                        part,
-                        pbar,
-                        cfg.retries,
-                        cfg.timeout,
-                        cfg.output,
-                    )
-                    for part in parts
-                ]
-                for fut in futures.as_completed(future_list):
-                    downloaded += fut.result()
+            if parts_to_download:
+                with futures.ThreadPoolExecutor(max_workers=cfg.threads) as pool:
+                    future_list = [
+                        pool.submit(
+                            download_part,
+                            session,
+                            cfg,
+                            part,
+                            pbar,
+                            cfg.retries,
+                            cfg.timeout,
+                            cfg.output,
+                            resume_state,
+                        )
+                        for part in parts_to_download
+                    ]
+                    for fut in futures.as_completed(future_list):
+                        downloaded += fut.result()
+            else:
+                pbar.update(0)
 
     elapsed = time.time() - t0
     final_size = cfg.output.stat().st_size if cfg.output.exists() else 0
@@ -360,6 +479,9 @@ def download(cfg: Config) -> Result:
         error = f"Size mismatch: expected {size}, got {final_size}"
     if checksum_match is False:
         error = (error + "; " if error else "") + "Checksum mismatch"
+
+    if not error and size and final_size == size and resume_state:
+        resume_state.cleanup()
 
     return Result(
         url=cfg.url,
