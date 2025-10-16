@@ -8,7 +8,7 @@ import math
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
-from typing import Dict, List, Optional, Sequence, Set, Tuple
+from typing import Dict, Iterable, List, Optional, Sequence, Set, Tuple
 
 import pygame
 
@@ -112,6 +112,52 @@ class LevelData:
                 elif cell == TileType.POWER.value:
                     powers.add((x, y))
         return pellets, powers
+
+
+class PathCache:
+    """Caches BFS distance fields for faster ghost path queries."""
+
+    def __init__(self, level: LevelData):
+        self.level = level
+        self._cache: Dict[Tuple[Tuple[int, int], bool], Dict[Tuple[int, int], int]] = {}
+
+    def _neighbors(
+        self, tile: Tuple[int, int], *, through_door: bool
+    ) -> Iterable[Tuple[int, int]]:
+        for direction in DIRECTIONS:
+            next_tile = tile[0] + int(direction.x), tile[1] + int(direction.y)
+            if self.level.walkable(next_tile, through_door=through_door):
+                yield next_tile
+
+    def _distances_from(
+        self, start: Tuple[int, int], *, through_door: bool
+    ) -> Dict[Tuple[int, int], int]:
+        key = (start, through_door)
+        if key in self._cache:
+            return self._cache[key]
+        queue: List[Tuple[int, int]] = [start]
+        distances: Dict[Tuple[int, int], int] = {start: 0}
+        for tile in queue:
+            base_distance = distances[tile]
+            for neighbour in self._neighbors(tile, through_door=through_door):
+                if neighbour not in distances:
+                    distances[neighbour] = base_distance + 1
+                    queue.append(neighbour)
+        self._cache[key] = distances
+        return distances
+
+    def distance(
+        self,
+        start: Tuple[int, int],
+        goal: Tuple[int, int],
+        *,
+        through_door: bool,
+    ) -> float:
+        distances = self._distances_from(start, through_door=through_door)
+        return distances.get(goal, math.inf)
+
+    def clear(self) -> None:
+        self._cache.clear()
 
 
 class AnimatedSprite:
@@ -281,6 +327,7 @@ class Ghost(Entity):
         pacman: Pacman,
         blinky: "Ghost",
         speed: float,
+        navigator: PathCache,
     ):
         if self.state == GhostState.FRIGHTENED:
             self.frightened_timer -= dt
@@ -290,19 +337,31 @@ class Ghost(Entity):
             if Vec2(self.position).distance_to(self.home) < 0.1:
                 self.state = GhostState.CHASE
         target = self.target_tile(pacman, blinky, level)
-        direction = self.choose_direction(target, level)
+        direction = self.choose_direction(target, level, navigator)
         self.direction = direction
         velocity = Vec2(direction) * (speed * dt / level.tile_size)
         self.position += velocity
         self.wrap(level)
 
-    def choose_direction(self, target: Vec2, level: LevelData) -> Direction:
+    def choose_direction(
+        self, target: Vec2, level: LevelData, navigator: PathCache
+    ) -> Direction:
         options = self.available_directions(level)
         best = options[0]
         best_distance = math.inf
+        start_tile = (int(round(self.position.x)), int(round(self.position.y)))
+        target_tile = (int(round(target.x)), int(round(target.y)))
+        can_pass_door = self.state in (
+            GhostState.EATEN,
+            GhostState.CHASE,
+            GhostState.SCATTER,
+        )
         for direction in options:
             next_pos = self.position + direction
-            distance = (target - next_pos).length_squared()
+            next_tile = (int(round(next_pos.x)), int(round(next_pos.y)))
+            distance = navigator.distance(
+                next_tile, target_tile, through_door=can_pass_door
+            )
             if distance < best_distance:
                 best_distance = distance
                 best = direction
@@ -449,6 +508,7 @@ class Game:
     def load_level(self):
         path = self.level_paths[self.level_index % len(self.level_paths)]
         self.level = LevelData.from_file(path)
+        self.navigator = PathCache(self.level)
         pellets, powers = self.level.pellets()
         self.pellets = pellets
         self.power_pellets = powers
@@ -490,6 +550,7 @@ class Game:
     def restart_positions(self):
         self.pacman.position = Vec2(self.level.pacman_start)
         self.pacman.direction = LEFT
+        self.navigator.clear()
         for name, start in self.level.ghost_starts.items():
             ghost = self.ghosts[name]
             ghost.position = Vec2(start)
@@ -515,7 +576,7 @@ class Game:
             )
             if ghost.state == GhostState.EATEN:
                 speed = self.ghost_speed * 1.5
-            ghost.update(dt, self.level, self.pacman, blinky, speed)
+            ghost.update(dt, self.level, self.pacman, blinky, speed, self.navigator)
         self.check_pellet_collision()
         self.check_ghost_collision()
         if not self.pellets and not self.power_pellets:
