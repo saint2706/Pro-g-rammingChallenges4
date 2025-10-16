@@ -114,6 +114,32 @@ class Plane(SceneObject):
 
 
 @dataclass(slots=True)
+class BoundingBox:
+    minimum: Vector
+    maximum: Vector
+
+    def intersects(
+        self, origin: Vector, direction: Vector, max_distance: float = float("inf")
+    ) -> bool:
+        inv_dir = np.where(np.abs(direction) > _EPSILON, 1.0 / direction, np.inf)
+        t1 = (self.minimum - origin) * inv_dir
+        t2 = (self.maximum - origin) * inv_dir
+        lower = np.maximum.reduce(np.minimum(t1, t2))
+        upper = np.minimum.reduce(np.maximum(t1, t2))
+        if np.isnan(lower) or np.isnan(upper):
+            return False
+        if upper < 0.0 or lower > upper:
+            return False
+        return lower <= max_distance
+
+
+@dataclass(slots=True)
+class _AcceleratedObject:
+    obj: SceneObject
+    bbox: Optional[BoundingBox]
+
+
+@dataclass(slots=True)
 class Camera:
     position: Vector
     look_at: Vector
@@ -137,6 +163,7 @@ class RayTracer:
         self.width = width
         self.height = height
         self.scene = scene
+        self._accelerated_objects = self._build_accelerated_objects()
         self._setup_camera()
 
     def _setup_camera(self) -> None:
@@ -183,14 +210,17 @@ class RayTracer:
         closest_t = float("inf")
         closest_obj: Optional[SceneObject] = None
         closest_normal: Optional[Vector] = None
-        for obj in self.scene.objects:
-            result = obj.intersect(origin, direction)
+        for entry in self._accelerated_objects:
+            bbox = entry.bbox
+            if bbox is not None and not bbox.intersects(origin, direction, closest_t):
+                continue
+            result = entry.obj.intersect(origin, direction)
             if result is None:
                 continue
             t, normal = result
             if _EPSILON < t < closest_t:
                 closest_t = t
-                closest_obj = obj
+                closest_obj = entry.obj
                 closest_normal = normal
         if closest_obj is None or closest_normal is None:
             return None
@@ -219,14 +249,29 @@ class RayTracer:
         self, point: Vector, light_dir: Vector, light_distance: float
     ) -> bool:
         origin = point + light_dir * _EPSILON
-        for obj in self.scene.objects:
-            result = obj.intersect(origin, light_dir)
+        for entry in self._accelerated_objects:
+            bbox = entry.bbox
+            if bbox is not None and not bbox.intersects(origin, light_dir, light_distance):
+                continue
+            result = entry.obj.intersect(origin, light_dir)
             if result is None:
                 continue
             t, _ = result
             if _EPSILON < t < light_distance:
                 return True
         return False
+
+    def _build_accelerated_objects(self) -> List[_AcceleratedObject]:
+        return [_AcceleratedObject(obj, self._bounding_box(obj)) for obj in self.scene.objects]
+
+    @staticmethod
+    def _bounding_box(obj: SceneObject) -> Optional[BoundingBox]:
+        if isinstance(obj, Sphere):
+            radius_vec = np.full(3, obj.radius, dtype=np.float64)
+            return BoundingBox(obj.center - radius_vec, obj.center + radius_vec)
+        if isinstance(obj, Plane):
+            return None
+        return None
 
 
 def _parse_color(value: Sequence[float] | str) -> Vector:

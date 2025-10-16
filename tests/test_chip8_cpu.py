@@ -56,6 +56,8 @@ def test_load_store_and_memory(cpu: CPU) -> None:
             0x00,  # LD I, 0x300
             0xF1,
             0x55,  # LD [I], V0..V1
+            0xA3,
+            0x00,  # LD I, 0x300 (reset after FX55 increment)
             0x60,
             0x00,  # LD V0, 0
             0x61,
@@ -149,3 +151,41 @@ def test_bcd_encoding(cpu: CPU) -> None:
     assert cpu.memory.read_byte(0x310) == 2
     assert cpu.memory.read_byte(0x311) == 5
     assert cpu.memory.read_byte(0x312) == 5
+
+
+def test_fx55_fx65_increment_index(cpu: CPU) -> None:
+    program = bytes(
+        [
+            0x60,
+            0x01,  # LD V0, 1
+            0x61,
+            0x02,  # LD V1, 2
+            0xA3,
+            0x00,  # LD I, 0x300
+            0xF1,
+            0x55,  # LD [I], V0..V1 (increments I)
+            0xA3,
+            0x00,  # LD I, 0x300
+            0x60,
+            0x00,  # LD V0, 0
+            0x61,
+            0x00,  # LD V1, 0
+            0xF1,
+            0x65,  # LD V0..V1, [I] (increments I)
+        ]
+    )
+
+    cpu.memory.clear()
+    cpu.memory.load_rom(program)
+    cpu.reset()
+
+    for _ in range(4):
+        cpu.step()
+    assert cpu.I == 0x302
+
+    while cpu.pc < cpu.memory.start_address + len(program):
+        cpu.step()
+
+    assert cpu.I == 0x302
+    assert cpu.V[0] == 0x01
+    assert cpu.V[1] == 0x02

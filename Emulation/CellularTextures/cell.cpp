@@ -33,31 +33,37 @@
 
 #define _CRT_SECURE_NO_WARNINGS
 
-#include <assert.h>
-#include <malloc.h> // alloca (legacy usage)
-#include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <algorithm>
+#include <array>
+#include <cassert>
+#include <chrono>
+#include <cmath>
+#include <cstdio>
+#include <cstdlib>
+#include <limits>
+#include <memory>
+#include <random>
+#include <vector>
 
 #include <emmintrin.h> // SSE2 intrinsics
 
-template <typename T>
-static inline T min(T a, T b) { return a < b ? a : b; }
+using std::max;
+using std::min;
 
-template <typename T>
-static inline T max(T a, T b) { return a > b ? a : b; }
+static std::mt19937 gRng(std::random_device{}());
+static std::uniform_real_distribution<float> gUniform01(0.0f, 1.0f);
 
 // Clamp helper; restricts x to [lowerBound, upperBound].
 static inline float clamp(float x, float lowerBound, float upperBound)
 {
-  return min(max(x, lowerBound), upperBound);
+  return std::min(std::max(x, lowerBound), upperBound);
 }
 
 static inline float saturate(float x) { return clamp(x, 0.0f, 1.0f); }
 
 static inline float square(float x) { return x * x; }
 
-static inline float frac(float x) { return x - floor(x); }
+static inline float frac(float x) { return x - std::floor(x); }
 
 template <typename T>
 static void swap(T &a, T &b)
@@ -72,17 +78,18 @@ typedef float Intens;
 // Lightweight grayscale image container (row-major, float intensities)
 class Image
 {
-  Intens *Pixels;
+  std::vector<Intens> Pixels;
 
 public:
   int SizeX, SizeY;
 
-  Image(int sx, int sy) : SizeX(sx), SizeY(sy), Pixels(new Intens[sx * sy]) {}
+  Image(int sx, int sy) : Pixels(static_cast<size_t>(sx) * sy), SizeX(sx), SizeY(sy) {}
 
-  ~Image() { delete[] Pixels; }
-
-  Intens *Row(int y) { return Pixels + y * SizeX; }
-  const Intens *Row(int y) const { return Pixels + y * SizeX; }
+  Intens *Row(int y) { return Pixels.data() + static_cast<size_t>(y) * SizeX; }
+  const Intens *Row(int y) const
+  {
+    return Pixels.data() + static_cast<size_t>(y) * SizeX;
+  }
 };
 
 // Minimal uncompressed top-left origin grayscale TGA writer (8 bpp)
@@ -106,24 +113,22 @@ static bool saveImageTGA(const char *filename, const Image &img)
   header[0x0e] = img.SizeY & 0xff;
   header[0x0f] = (img.SizeY >> 8) & 0xff;
 
-  FILE *f = fopen(filename, "wb");
-  if (!f)
+  std::unique_ptr<FILE, decltype(&std::fclose)> file(std::fopen(filename, "wb"), &std::fclose);
+  if (!file)
     return false;
 
-  bool ok = true;
-  ok &= fwrite(header, sizeof(header), 1, f) == 1;
+  bool ok = std::fwrite(header, sizeof(header), 1, file.get()) == 1;
 
-  unsigned char *lineBuf = (unsigned char *)alloca(img.SizeX);
+  std::vector<unsigned char> lineBuf(static_cast<size_t>(img.SizeX));
   for (int y = 0; y < img.SizeY; y++)
   {
     const Intens *src = img.Row(y);
     for (int x = 0; x < img.SizeX; x++)
       lineBuf[x] = (unsigned char)(saturate(src[x]) * 255.0f);
 
-    ok &= fwrite(lineBuf, img.SizeX, 1, f) == 1;
+    ok &= std::fwrite(lineBuf.data(), static_cast<size_t>(img.SizeX), 1, file.get()) == 1;
   }
 
-  fclose(f);
   return ok;
 }
 
@@ -138,7 +143,7 @@ struct Point
 // Distance on a wrapped unit interval (toroidal axis)
 static inline float wrapDist(float a, float b)
 {
-  float d = fabs(b - a);
+  float d = std::fabs(b - a);
   return min(d, 1.0f - d);
 }
 
@@ -154,7 +159,7 @@ static inline float wrapDistSq(const Point &a, const Point &b)
 
 static inline float wrapDist(const Point &a, const Point &b)
 {
-  return sqrtf(wrapDistSq(a, b));
+  return std::sqrt(wrapDistSq(a, b));
 }
 
 // Poisson-ish rejection sampling enforcing a minimum separation (minDist)
@@ -173,8 +178,8 @@ static int genRandomPoints(Point pts[], int count, float minDist)
       if (++attempt > maxTries)
         return i;
 
-      pts[i].x = float(rand()) / RAND_MAX;
-      pts[i].y = float(rand()) / RAND_MAX;
+      pts[i].x = gUniform01(gRng);
+      pts[i].y = gUniform01(gRng);
 
       for (j = 0; j < i; j++)
         if (wrapDistSq(pts[i], pts[j]) < minDistSq)
@@ -207,13 +212,14 @@ struct KeyedPoint
   float temp;
 };
 
-static KeyedPoint *makeKeyed(const Point pts[], int count)
+static std::vector<KeyedPoint> makeKeyed(const Point pts[], int count)
 {
-  KeyedPoint *out = new KeyedPoint[count];
+  std::vector<KeyedPoint> out(static_cast<size_t>(count));
   for (int i = 0; i < count; i++)
   {
-    out[i].pt = pts[i];
-    out[i].key = out[i].temp = 0.0f;
+    out[static_cast<size_t>(i)].pt = pts[i];
+    out[static_cast<size_t>(i)].key = 0.0f;
+    out[static_cast<size_t>(i)].temp = 0.0f;
   }
 
   return out;
@@ -257,7 +263,7 @@ static void cellularTexBruteForce(Image &out, const Point pts[], int count)
         }
       }
 
-      dest[x] = cellIntensity(sqrtf(best), sqrtf(best2));
+      dest[x] = cellIntensity(std::sqrt(best), std::sqrt(best2));
     }
   }
 }
@@ -265,7 +271,8 @@ static void cellularTexBruteForce(Image &out, const Point pts[], int count)
 // Sort-by-Y pruning: maintain a sorted list of squared y-distances to early-exit.
 static void cellularTexSortY(Image &out, const Point ptIn[], int count)
 {
-  KeyedPoint *pts = makeKeyed(ptIn, count);
+  auto ptsBuf = makeKeyed(ptIn, count);
+  KeyedPoint *pts = ptsBuf.data();
 
   for (int y = 0; y < out.SizeY; y++)
   {
@@ -293,11 +300,10 @@ static void cellularTexSortY(Image &out, const Point ptIn[], int count)
         }
       }
 
-      dest[x] = cellIntensity(sqrtf(best), sqrtf(best2));
+      dest[x] = cellIntensity(std::sqrt(best), std::sqrt(best2));
     }
   }
 
-  delete[] pts;
 }
 
 // SSE2 variant of Y-sorted approach; processes 4 pixels (x positions) in parallel.
@@ -306,7 +312,8 @@ static void cellularTexSortY_SSE(Image &out, const Point ptIn[], int count)
   assert(out.SizeX % 4 == 0);
   float stepX = 1.0f / out.SizeX;
 
-  KeyedPoint *pts = makeKeyed(ptIn, count);
+  auto ptsBuf = makeKeyed(ptIn, count);
+  KeyedPoint *pts = ptsBuf.data();
 
   for (int y = 0; y < out.SizeY; y++)
   {
@@ -366,7 +373,6 @@ static void cellularTexSortY_SSE(Image &out, const Point ptIn[], int count)
     }
   }
 
-  delete[] pts;
 }
 
 // Tile-based pruning: subdivide into fixed blocks, compute conservative bounds,
@@ -421,7 +427,7 @@ static void cellularTexTilesRect(Image &out, int x0, int y0, int x1, int y1,
             }
           }
 
-          dest[x] = cellIntensity(sqrtf(best), sqrtf(best2));
+          dest[x] = cellIntensity(std::sqrt(best), std::sqrt(best2));
         }
       }
     }
@@ -430,9 +436,8 @@ static void cellularTexTilesRect(Image &out, int x0, int y0, int x1, int y1,
 
 static void cellularTexTiles(Image &out, const Point ptIn[], int count)
 {
-  KeyedPoint *pts = makeKeyed(ptIn, count);
-  cellularTexTilesRect(out, 0, 0, out.SizeX, out.SizeY, pts, count);
-  delete[] pts;
+  auto ptsBuf = makeKeyed(ptIn, count);
+  cellularTexTilesRect(out, 0, 0, out.SizeX, out.SizeY, ptsBuf.data(), count);
 }
 
 // SSE2-accelerated version of tile pruning combining x & y wrap distance math.
@@ -539,9 +544,8 @@ static void cellularTexTilesRect_SSE(Image &out, int x0, int y0, int x1, int y1,
 
 static void cellularTexTiles_SSE(Image &out, const Point ptIn[], int count)
 {
-  KeyedPoint *pts = makeKeyed(ptIn, count);
-  cellularTexTilesRect_SSE(out, 0, 0, out.SizeX, out.SizeY, pts, count);
-  delete[] pts;
+  auto ptsBuf = makeKeyed(ptIn, count);
+  cellularTexTilesRect_SSE(out, 0, 0, out.SizeX, out.SizeY, ptsBuf.data(), count);
 }
 
 struct TreeNode
@@ -553,12 +557,11 @@ struct TreeNode
 
 class Tree
 {
-  Point *points;
-  TreeNode *nodes;
+  std::vector<Point> points;
+  std::vector<TreeNode> nodes;
 
 public:
   Tree(const Point pts[], int nPoints);
-  ~Tree();
 
   void findNearestTwo(const Point &pt, float &best, float &best2);
 
@@ -574,21 +577,18 @@ Tree::Tree(const Point pts[], int nPoints)
 {
   assert(nPoints >= 2);
 
-  points = new Point[nPoints];
-  for (int i = 0; i < nPoints; i++)
-    points[i] = pts[i];
-
-  nodes = new TreeNode[nPoints - 1];
+  points.assign(pts, pts + nPoints);
+  nodes.resize(static_cast<size_t>(nPoints - 1));
 
   for (int i = 1; i < nPoints; i++)
   {
-    TreeNode *newNode = nodes + (i - 1);
+    TreeNode *newNode = nodes.data() + (i - 1);
     newNode->point2 = i;
     newNode->kid[0] = newNode->kid[1] = 0;
 
     if (i > 1)
     {
-      TreeNode *cur = nodes;
+      TreeNode *cur = nodes.data();
       float p1DistSq = wrapDistSq(points[i], points[0]);
 
       for (;;)
@@ -613,13 +613,7 @@ Tree::Tree(const Point pts[], int nPoints)
     }
   }
 
-  calcBoundsR(nodes, 0);
-}
-
-Tree::~Tree()
-{
-  delete[] points;
-  delete[] nodes;
+  calcBoundsR(nodes.data(), 0);
 }
 
 void Tree::calcBoundsR(TreeNode *root, int point1)
@@ -638,7 +632,7 @@ void Tree::calcBoundsR(TreeNode *root, int point1)
   if (root->kid[1])
     calcBoundsR2(root, pt1, root->kid[1]);
 
-  root->radius = sqrtf(root->radius);
+  root->radius = std::sqrt(root->radius);
 }
 
 void Tree::findNearestTwo(const Point &pt, float &best, float &best2)
@@ -756,54 +750,38 @@ static void cellularTexSpatialSubdR(Image &out, int x0, int y0, int x1, int y1,
       cellularTexSpatialSubdR(out, sx0, sy0, sx0 + hx, sy0 + hy, subRad, pts,
                               outCount);
     else
-      cellularTexTilesRect_SSE(out, sx0, sy0, sx0 + hx, sy0 + hy, pts, count);
+      cellularTexTilesRect_SSE(out, sx0, sy0, sx0 + hx, sy0 + hy, pts, outCount);
   }
 }
 
 static void cellularTexSpatialSubd(Image &out, const Point ptIn[], int count)
 {
-  KeyedPoint *pts = makeKeyed(ptIn, count);
-  cellularTexSpatialSubdR(out, 0, 0, out.SizeX, out.SizeY, 0.5f, pts, count);
-  delete[] pts;
+  auto ptsBuf = makeKeyed(ptIn, count);
+  cellularTexSpatialSubdR(out, 0, 0, out.SizeX, out.SizeY, 0.5f, ptsBuf.data(),
+                          count);
 }
 
 typedef void (*CellularFunc)(Image &out, const Point pts[], int count);
 
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-
-static LARGE_INTEGER timeFreq;
-
-// Windows high-resolution timer initialization (legacy timing path)
-static void initTimeUS()
-{
-  QueryPerformanceFrequency(&timeFreq);
-  timeFreq.QuadPart /= 1000000;
-}
-
-static int getTimeUS()
-{
-  LARGE_INTEGER now;
-  QueryPerformanceCounter(&now);
-  return (int)(now.QuadPart / timeFreq.QuadPart);
-}
-
 static void measure(CellularFunc func, const char *name, Image &out,
                     const Point pts[], int count)
 {
+  using namespace std::chrono;
+
   printf("%20s: ", name);
   fflush(stdout);
 
-  int minTime = 0x7fffffff;
+  long long minTime = std::numeric_limits<long long>::max();
 
   for (int i = 0; i < 3; i++)
   {
-    int timeStart = getTimeUS();
+    const auto timeStart = steady_clock::now();
     func(out, pts, count);
-    minTime = min(minTime, getTimeUS() - timeStart);
+    const auto elapsed = duration_cast<microseconds>(steady_clock::now() - timeStart);
+    minTime = std::min<long long>(minTime, elapsed.count());
   }
 
-  printf("%9d microseconds\n", minTime);
+  printf("%9lld microseconds\n", minTime);
 }
 
 int main()
@@ -812,14 +790,13 @@ int main()
   static const int maxPts = 2048;
   static const int numPts[] = {64, 128, 256, 512, 1024};
 
-  initTimeUS();
-
   Image img(1024, 1024);
-  Point pts[maxPts];
+  std::vector<Point> pts(maxPts);
+  gRng.seed(1337u);
 
   for (int j = 0; j < sizeof(numPts) / sizeof(*numPts); j++)
   {
-    int count = genRandomPoints(pts, numPts[j], 0.01f);
+    int count = genRandomPoints(pts.data(), numPts[j], 0.01f);
     printf("%d points.\n", count);
 
     static const struct MeasureTarget
@@ -844,7 +821,7 @@ int main()
     };
 
     for (int i = 0; i < sizeof(targets) / sizeof(*targets); i++)
-      measure(targets[i].Target, targets[i].Name, img, pts, count);
+      measure(targets[i].Target, targets[i].Name, img, pts.data(), count);
 
     printf("\n");
   }
