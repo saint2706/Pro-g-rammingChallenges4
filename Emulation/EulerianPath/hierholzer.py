@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from collections import defaultdict, deque
-from typing import List, Dict, Optional, Tuple, Iterable
+from collections import Counter, defaultdict
+from typing import Dict, Iterable, List, Optional, Set, Tuple
 import argparse
 
 AdjList = Dict[int, List[int]]
@@ -9,38 +9,42 @@ AdjList = Dict[int, List[int]]
 # ------------------------- Eulerian Helpers ------------------------- #
 
 
+def _vertex_universe(adj_list: AdjList) -> Set[int]:
+    vertices: Set[int] = set(adj_list)
+    for neighbours in adj_list.values():
+        vertices.update(neighbours)
+    return vertices
+
+
 def degree_parity(adj_list: AdjList) -> Dict[int, int]:
     return {v: (len(adj_list[v]) % 2) for v in adj_list}
 
 
-def is_connected_ignoring_isolated(adj_list: AdjList, num_vertices: int) -> bool:
+def is_connected_ignoring_isolated(adj_list: AdjList) -> bool:
     """Check connectivity ignoring isolated vertices (those with degree 0)."""
-    # find a start vertex with edges
-    start = next(
-        (v for v in range(num_vertices) if v in adj_list and adj_list[v]), None
-    )
-    if start is None:
-        return True  # no edges
-    visited = [False] * num_vertices
+    vertices = _vertex_universe(adj_list)
+    non_isolated = [v for v in vertices if len(adj_list.get(v, [])) > 0]
+    if not non_isolated:
+        return True  # graph without edges is trivially connected
+
+    start = non_isolated[0]
+    visited = {start}
     stack = [start]
-    visited[start] = True
     while stack:
         u = stack.pop()
         for w in adj_list.get(u, []):
-            if not visited[w]:
-                visited[w] = True
+            if w not in visited:
+                visited.add(w)
                 stack.append(w)
-    for v in range(num_vertices):
-        if v in adj_list and adj_list[v] and not visited[v]:
-            return False
-    return True
+    return all((len(adj_list.get(v, [])) == 0) or (v in visited) for v in vertices)
 
 
-def classify_eulerian(adj_list: AdjList, num_vertices: int) -> str:
+def classify_eulerian(adj_list: AdjList) -> str:
     """Return classification: 'none', 'trail', or 'circuit'."""
-    if not is_connected_ignoring_isolated(adj_list, num_vertices):
+    if not is_connected_ignoring_isolated(adj_list):
         return "none"
-    odd_vertices = [v for v in adj_list if len(adj_list[v]) % 2 == 1]
+    vertices = _vertex_universe(adj_list)
+    odd_vertices = [v for v in vertices if len(adj_list.get(v, [])) % 2 == 1]
     if len(odd_vertices) == 0:
         return "circuit"
     if len(odd_vertices) == 2:
@@ -63,40 +67,55 @@ def hierholzer(adj_list: AdjList, start: Optional[int] = None) -> List[int]:
     Returns:
         List of vertices representing Eulerian traversal (length edges+1) or empty if none.
     """
-    # Determine vertex universe
     if not adj_list:
         return []
-    # Build a working copy (multigraph-friendly by removing per-incidence)
-    work: AdjList = {u: list(neigh) for u, neigh in adj_list.items()}
-    edge_count = sum(len(vs) for vs in work.values()) // 2
-    if edge_count == 0:
+
+    vertices = _vertex_universe(adj_list)
+    if not vertices:
         return []
 
-    classification = classify_eulerian(work, max(work) + 1)
+    classification = classify_eulerian(adj_list)
     if classification == "none":
+        return []
+
+    work: Dict[int, Counter[int]] = {u: Counter(neigh) for u, neigh in adj_list.items()}
+    for v in vertices:
+        work.setdefault(v, Counter())
+
+    edge_count = sum(sum(counter.values()) for counter in work.values()) // 2
+    if edge_count == 0:
         return []
 
     if start is None:
         if classification == "trail":
-            # pick one odd vertex
-            for v, vs in work.items():
-                if len(vs) % 2 == 1:
+            for v in sorted(vertices):
+                if len(adj_list.get(v, [])) % 2 == 1:
                     start = v
                     break
         else:
-            start = next(iter(work))
-    assert start is not None
+            start = min(vertices)
+    if start is None or start not in vertices:
+        return []
 
     path: List[int] = []
     stack: List[int] = [start]
 
     while stack:
         v = stack[-1]
-        if work.get(v):
-            u = work[v].pop()
-            # remove reverse edge
-            if u in work and v in work[u]:
-                work[u].remove(v)
+        counter = work[v]
+        if counter:
+            u = next(iter(counter))
+            counter[u] -= 1
+            if counter[u] == 0:
+                del counter[u]
+
+            rev = work[u]
+            if rev.get(v, 0) <= 0:
+                return []
+            rev[v] -= 1
+            if rev[v] == 0:
+                del rev[v]
+
             stack.append(u)
         else:
             path.append(stack.pop())
@@ -158,9 +177,8 @@ def main(argv: Optional[List[str]] = None) -> int:
     if not edges:
         print("No edges.")
         return 0
-    max_v = max(max(u, v) for u, v in edges)
     adj = build_adj(edges)
-    classification = classify_eulerian(adj, max_v + 1)
+    classification = classify_eulerian(adj)
     if classification == "none":
         print("Graph is not Eulerian (no trail/circuit).")
         return 0

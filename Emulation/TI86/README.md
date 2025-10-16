@@ -23,6 +23,17 @@ for _ in range(10):
     print(trace)
 ```
 
+### Command-line runner
+
+For quick smoke tests, the repository now ships a minimal CLI wrapper around the
+emulator core. It can execute a ROM for a bounded number of instructions or
+validate the opcode truth table used by the unit tests:
+
+```bash
+python Emulation/TI86/emulator.py --verify-truth
+python Emulation/TI86/emulator.py --rom path/to/ti86.rom --trace --max-instructions 50
+```
+
 ### Debugging helpers
 
 ```python

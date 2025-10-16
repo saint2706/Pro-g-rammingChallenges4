@@ -186,9 +186,11 @@ class CPU:
         elif nn == 0x55:
             for index in range(x + 1):
                 self.memory.write_byte(self.I + index, self.V[index])
+            self.I = (self.I + x + 1) & 0xFFFF
         elif nn == 0x65:
             for index in range(x + 1):
                 self.V[index] = self.memory.read_byte(self.I + index)
+            self.I = (self.I + x + 1) & 0xFFFF
         else:
             raise NotImplementedError(f"Unknown FX opcode: 0xF{ x:X}{nn:02X}")
 
