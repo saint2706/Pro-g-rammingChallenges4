@@ -44,9 +44,11 @@ import sys
 import time
 from dataclasses import dataclass
 from pathlib import Path
+from textwrap import dedent
 from typing import Dict, Iterable, List, Optional, Tuple
 
 import numpy as np
+from numpy.lib.stride_tricks import sliding_window_view
 
 try:  # Optional acceleration
     from scipy.signal import convolve2d  # type: ignore
@@ -61,356 +63,39 @@ import pygame
 # -----------------------------
 # Pattern Library
 # -----------------------------
+
+def _parse_pattern(art: str) -> np.ndarray:
+    lines = [line for line in dedent(art).splitlines() if line.strip()]
+    grid = []
+    for line in lines:
+        row = [1 if ch in {"#", "O", "o", "X"} else 0 for ch in line.strip()]
+        grid.append(row)
+    return np.array(grid, dtype=int)
+
+
 PATTERNS: Dict[str, np.ndarray] = {
-    "glider": np.array([[0, 1, 0], [0, 0, 1], [1, 1, 1]], dtype=int),
-    "gosper_glider_gun": np.array(
-        [
-            [
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                1,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-            ],
-            [
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                1,
-                0,
-                1,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-            ],
-            [
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                1,
-                1,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                1,
-                1,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                1,
-                1,
-            ],
-            [
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                1,
-                0,
-                0,
-                0,
-                1,
-                0,
-                0,
-                0,
-                0,
-                1,
-                1,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                1,
-                1,
-            ],
-            [
-                1,
-                1,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                1,
-                0,
-                0,
-                0,
-                0,
-                0,
-                1,
-                0,
-                0,
-                0,
-                1,
-                1,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-            ],
-            [
-                1,
-                1,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                1,
-                0,
-                0,
-                0,
-                1,
-                0,
-                1,
-                1,
-                0,
-                0,
-                0,
-                0,
-                1,
-                0,
-                1,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-            ],
-            [
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                1,
-                0,
-                0,
-                0,
-                0,
-                0,
-                1,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                1,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-            ],
-            [
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                1,
-                0,
-                0,
-                0,
-                1,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-            ],
-            [
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                1,
-                1,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-            ],
-        ],
-        dtype=int,
+    "glider": _parse_pattern(
+        """
+        .#.
+        ..#
+        ###
+        """
+    ),
+    "gosper_glider_gun": _parse_pattern(
+        """
+        ........................#...........
+        ......................#.#...........
+        ............##......##............##
+        ...........#...#....##............##
+        ##........#.....#...##..............
+        ##........#...#.##....#.#...........
+        ..........#.....#.......#...........
+        ...........#...#....................
+        ............##......................
+        """
     ),
 }
+
 
 
 # -----------------------------
@@ -476,7 +161,7 @@ class GameConfig:
 class NeighborCalculator:
     """Strategy object for neighbor count supporting wrap or bounded edges.
 
-    Uses SciPy convolution if available, else a NumPy roll-based implementation.
+    Uses SciPy convolution if available, else a NumPy sliding-window implementation.
     """
 
     _KERNEL = np.array([[1, 1, 1], [1, 0, 1], [1, 1, 1]], dtype=int)
@@ -489,33 +174,10 @@ class NeighborCalculator:
         if _SCIPY_AVAILABLE:
             boundary = "wrap" if self.wrap else "fill"
             return convolve2d(grid, self._KERNEL, mode="same", boundary=boundary)  # type: ignore[arg-type]
-        # NumPy fallback using roll-shifts (wrap) or padded slicing (no-wrap)
-        if self.wrap:
-            g = grid
-            return (
-                np.roll(g, 1, 0)
-                + np.roll(g, -1, 0)
-                + np.roll(g, 1, 1)
-                + np.roll(g, -1, 1)
-                + np.roll(np.roll(g, 1, 0), 1, 1)
-                + np.roll(np.roll(g, 1, 0), -1, 1)
-                + np.roll(np.roll(g, -1, 0), 1, 1)
-                + np.roll(np.roll(g, -1, 0), -1, 1)
-            )
-        # no-wrap: pad and convolve manually via slicing
-        padded = np.pad(grid, 1, mode="constant")
-        # Sum 8 neighbors explicitly (small constant factor fine)
-        S = (
-            padded[:-2, :-2]
-            + padded[:-2, 1:-1]
-            + padded[:-2, 2:]
-            + padded[1:-1, :-2]
-            + padded[1:-1, 2:]
-            + padded[2:, :-2]
-            + padded[2:, 1:-1]
-            + padded[2:, 2:]
-        )
-        return S
+        pad_mode = "wrap" if self.wrap else "constant"
+        padded = np.pad(grid, 1, mode=pad_mode)
+        windows = sliding_window_view(padded, (3, 3))
+        return np.tensordot(windows, self._KERNEL, axes=((2, 3), (0, 1)))
 
 
 class GameOfLife:

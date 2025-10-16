@@ -56,6 +56,53 @@ def setup_logging(level: str = "INFO") -> None:
     )
 
 
+def _text_to_base(
+    text: str,
+    encoding: str,
+    separator: str,
+    fmt: str,
+) -> str:
+    if not isinstance(text, str):
+        raise TypeError("Input text must be a string")
+    if not text:
+        return ""
+    try:
+        byte_data = text.encode(encoding)
+    except LookupError as e:
+        raise ValueError(f"Unsupported encoding: {encoding}") from e
+    except UnicodeEncodeError as e:
+        logging.error(f"Cannot encode text with {encoding}: {e}")
+        raise
+    return separator.join(format(byte, fmt) for byte in byte_data)
+
+
+def _decode_from_base(
+    data_string: str,
+    encoding: str,
+    separator: str,
+    width: int,
+    base: int,
+) -> str:
+    if not data_string.strip():
+        return ""
+    if separator:
+        tokens = [token for token in data_string.split(separator) if token]
+    else:
+        if len(data_string) % width != 0:
+            raise ValueError("Input length must be a multiple of chunk width when no separator is used")
+        tokens = [data_string[i : i + width] for i in range(0, len(data_string), width)]
+    try:
+        byte_data = bytes(int(token, base) for token in tokens)
+    except ValueError as e:
+        raise ValueError(f"Invalid base-{base} string: {e}") from e
+    try:
+        return byte_data.decode(encoding)
+    except UnicodeDecodeError as e:
+        raise ValueError(
+            f"Invalid base-{base} string or cannot decode with {encoding}: {e}"
+        ) from e
+
+
 def text_to_hex(text: str, encoding: str = "utf-8", separator: str = " ") -> str:
     """
     Converts a string to its hexadecimal representation using specified encoding.
@@ -83,23 +130,7 @@ def text_to_hex(text: str, encoding: str = "utf-8", separator: str = " ") -> str
         >>> text_to_hex("Hello", encoding="ascii")
         '48 65 6c 6c 6f'
     """
-    if not isinstance(text, str):
-        raise TypeError("Input text must be a string")
-
-    if not text:
-        return ""
-
-    try:
-        # Convert text to bytes using specified encoding
-        byte_data = text.encode(encoding)
-        # Convert each byte to 2-digit hexadecimal
-        hex_values = [f"{byte:02x}" for byte in byte_data]
-        return separator.join(hex_values)
-    except LookupError as e:
-        raise ValueError(f"Unsupported encoding: {encoding}") from e
-    except UnicodeEncodeError as e:
-        logging.error(f"Cannot encode text with {encoding}: {e}")
-        raise
+    return _text_to_base(text, encoding, separator, "02x")
 
 
 def text_to_bin(text: str, encoding: str = "utf-8", separator: str = " ") -> str:
@@ -129,23 +160,7 @@ def text_to_bin(text: str, encoding: str = "utf-8", separator: str = " ") -> str
         >>> text_to_bin("Hi", encoding="ascii")
         '01001000 01101001'
     """
-    if not isinstance(text, str):
-        raise TypeError("Input text must be a string")
-
-    if not text:
-        return ""
-
-    try:
-        # Convert text to bytes using specified encoding
-        byte_data = text.encode(encoding)
-        # Convert each byte to 8-bit binary
-        binary_values = [f"{byte:08b}" for byte in byte_data]
-        return separator.join(binary_values)
-    except LookupError as e:
-        raise ValueError(f"Unsupported encoding: {encoding}") from e
-    except UnicodeEncodeError as e:
-        logging.error(f"Cannot encode text with {encoding}: {e}")
-        raise
+    return _text_to_base(text, encoding, separator, "08b")
 
 
 def hex_to_text(hex_string: str, encoding: str = "utf-8", separator: str = " ") -> str:
@@ -167,22 +182,10 @@ def hex_to_text(hex_string: str, encoding: str = "utf-8", separator: str = " ") 
         >>> hex_to_text("48 65 6c 6c 6f")
         'Hello'
     """
-    if not hex_string.strip():
-        return ""
-
     try:
-        # Split hex string and convert to bytes
-        hex_values = (
-            hex_string.split(separator)
-            if separator
-            else [hex_string[i : i + 2] for i in range(0, len(hex_string), 2)]
-        )
-        byte_data = bytes(int(hex_val, 16) for hex_val in hex_values if hex_val)
-        return byte_data.decode(encoding)
-    except (ValueError, UnicodeDecodeError) as e:
-        raise ValueError(
-            f"Invalid hex string or cannot decode with {encoding}: {e}"
-        ) from e
+        return _decode_from_base(hex_string, encoding, separator, 2, 16)
+    except ValueError as e:
+        raise ValueError(str(e)) from e
 
 
 def bin_to_text(
@@ -206,22 +209,10 @@ def bin_to_text(
         >>> bin_to_text("01001000 01101001")
         'Hi'
     """
-    if not binary_string.strip():
-        return ""
-
     try:
-        # Split binary string and convert to bytes
-        binary_values = (
-            binary_string.split(separator)
-            if separator
-            else [binary_string[i : i + 8] for i in range(0, len(binary_string), 8)]
-        )
-        byte_data = bytes(int(bin_val, 2) for bin_val in binary_values if bin_val)
-        return byte_data.decode(encoding)
-    except (ValueError, UnicodeDecodeError) as e:
-        raise ValueError(
-            f"Invalid binary string or cannot decode with {encoding}: {e}"
-        ) from e
+        return _decode_from_base(binary_string, encoding, separator, 8, 2)
+    except ValueError as e:
+        raise ValueError(str(e)) from e
 
 
 def validate_encoding(encoding: str) -> bool:

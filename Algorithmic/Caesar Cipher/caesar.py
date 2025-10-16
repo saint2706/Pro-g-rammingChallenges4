@@ -83,6 +83,10 @@ ENGLISH_FREQUENCY = {
 }
 
 
+PRINTABLE_CHARS: str = string.printable[:95]
+PRINTABLE_INDEX: Dict[str, int] = {char: idx for idx, char in enumerate(PRINTABLE_CHARS)}
+
+
 def setup_logging(level: str = "INFO") -> None:
     """
     Configure logging for the application.
@@ -182,12 +186,11 @@ def caesar_cipher(
 
     elif alphabet_type == AlphabetType.PRINTABLE:
         # Use all printable ASCII characters (32-126)
-        printable_chars = string.printable[:95]  # Exclude whitespace variations
         for char in text:
-            if char in printable_chars:
-                char_index = printable_chars.index(char)
-                new_index = (char_index + shift) % len(printable_chars)
-                result.append(printable_chars[new_index])
+            if char in PRINTABLE_INDEX:
+                char_index = PRINTABLE_INDEX[char]
+                new_index = (char_index + shift) % len(PRINTABLE_CHARS)
+                result.append(PRINTABLE_CHARS[new_index])
             else:
                 # Non-printable characters pass through unchanged
                 result.append(char)

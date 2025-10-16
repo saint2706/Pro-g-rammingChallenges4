@@ -109,7 +109,7 @@ class AlgorithmStep:
     current_node: Optional[NodeId]
     distances: Distances
     previous_nodes: PreviousNodes
-    priority_queue: List[NodeId]
+    priority_queue: PriorityQueue
     visited_nodes: Set[NodeId]
     message: str
     timestamp: float = field(default_factory=time.time)
@@ -405,7 +405,7 @@ def dijkstra_stepper(
         current_node=None,
         distances=distances.copy(),
         previous_nodes=previous_nodes.copy(),
-        priority_queue=[item[1] for item in priority_queue],
+        priority_queue=list(priority_queue),
         visited_nodes=visited_nodes.copy(),
         message=f"Initialized algorithm with start node '{start_node}'. All distances set to infinity except start node (distance 0).",
         processing_time=time.time() - start_time,
@@ -432,7 +432,7 @@ def dijkstra_stepper(
             distances=distances.copy(),
             previous_nodes=previous_nodes.copy(),
             priority_queue=[
-                item[1] for item in priority_queue if item[1] not in visited_nodes
+                item for item in priority_queue if item[1] not in visited_nodes
             ],
             visited_nodes=visited_nodes.copy(),
             message=f"Processing node '{current_node}' with current shortest distance {current_distance}. "
@@ -471,7 +471,7 @@ def dijkstra_stepper(
                 distances=distances.copy(),
                 previous_nodes=previous_nodes.copy(),
                 priority_queue=[
-                    item[1] for item in priority_queue if item[1] not in visited_nodes
+                    item for item in priority_queue if item[1] not in visited_nodes
                 ],
                 visited_nodes=visited_nodes.copy(),
                 message=f"Updated distances via '{current_node}': {', '.join(update_messages)}",

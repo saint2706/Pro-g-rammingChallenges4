@@ -39,21 +39,24 @@ This report reviews the implementations in the `Algorithmic/` directory and asse
 - **Efficiency:** Quadratic convergence and dynamic precision tuning keep the iteration count small even for large digit counts.【F:Algorithmic/1000 Digits of Pi/pi.py†L62-L114】  
 - **Readability:** Extensive docstrings, structured CLI parsing, and logging make the module approachable despite its size.【F:Algorithmic/1000 Digits of Pi/pi.py†L24-L209】  
 - **Best Practices:** Uses type hints, exception handling, and separates CLI concerns from computation.【F:Algorithmic/1000 Digits of Pi/pi.py†L24-L320】  
-- **Opportunities:** Final formatting slices the decimal string without rounding; quantizing to the requested precision would avoid truncation bias.【F:Algorithmic/1000 Digits of Pi/pi.py†L138-L141】  
+- **Opportunities:** Final formatting slices the decimal string without rounding; quantizing to the requested precision would avoid truncation bias.【F:Algorithmic/1000 Digits of Pi/pi.py†L138-L141】
+- **Follow-up:** Final output now rounds via `Decimal.quantize`, ensuring the requested precision is honored without truncation bias.【F:Algorithmic/1000 Digits of Pi/pi.py†L137-L140】
 
 ### Caesar Cipher
 - **Correctness:** Supports encrypt/decrypt/crack modes across multiple alphabets with validation and frequency scoring.【F:Algorithmic/Caesar Cipher/caesar.py†L63-L287】  
 - **Efficiency:** Letter and alphanumeric modes are efficient, but printable mode recomputes `index` via linear search for every character; precomputing a lookup dict would reduce O(n) per-character costs.【F:Algorithmic/Caesar Cipher/caesar.py†L175-L206】【F:Algorithmic/Caesar Cipher/caesar.py†L187-L192】  
 - **Readability:** Enum-based modes, constants, and dataclasses keep the code organized.【F:Algorithmic/Caesar Cipher/caesar.py†L33-L121】  
 - **Best Practices:** Rich CLI with argparse and logging setup aligns with Python idioms.【F:Algorithmic/Caesar Cipher/caesar.py†L108-L285】  
-- **Opportunities:** Consider caching printable character positions to avoid repeated `.index` scans in large texts.【F:Algorithmic/Caesar Cipher/caesar.py†L188-L191】  
+- **Opportunities:** Consider caching printable character positions to avoid repeated `.index` scans in large texts.【F:Algorithmic/Caesar Cipher/caesar.py†L188-L191】
+- **Follow-up:** Added a precomputed printable-character index so shifts no longer perform per-character linear searches.【F:Algorithmic/Caesar Cipher/caesar.py†L44-L48】【F:Algorithmic/Caesar Cipher/caesar.py†L181-L193】
 
 ### Character Counter
 - **Correctness:** Provides Unicode-aware counting, categorization, and entropy/diversity metrics via cohesive helpers.【F:Algorithmic/Character Counter/charcount.py†L24-L360】  
 - **Efficiency:** Uses `Counter` and simple loops; however, entropy/diversity calculations always operate on the original text even when case-insensitive mode lowers data elsewhere, yielding inconsistent statistics.【F:Algorithmic/Character Counter/charcount.py†L208-L240】【F:Algorithmic/Character Counter/charcount.py†L278-L324】  
 - **Readability:** Dataclasses and enums clarify the data model, and docstrings explain outputs.【F:Algorithmic/Character Counter/charcount.py†L32-L120】  
 - **Best Practices:** Logging helper and JSON serialization follow idiomatic patterns.【F:Algorithmic/Character Counter/charcount.py†L58-L73】【F:Algorithmic/Character Counter/charcount.py†L278-L324】  
-- **Opportunities:** Use the case-normalized text when computing entropy/diversity to keep statistics aligned with the configured mode.【F:Algorithmic/Character Counter/charcount.py†L304-L324】  
+- **Opportunities:** Use the case-normalized text when computing entropy/diversity to keep statistics aligned with the configured mode.【F:Algorithmic/Character Counter/charcount.py†L304-L324】
+- **Follow-up:** Entropy and diversity calculations now operate on the normalized text when case-insensitive analysis is requested, aligning reported metrics with character counts.【F:Algorithmic/Character Counter/charcount.py†L233-L251】
 
 ### Digits of Pi
 - **Correctness:** Implements the Chudnovsky series with configurable precision and verification helpers.【F:Algorithmic/Digits of Pi/DigitPi.py†L42-L320】  
@@ -67,7 +70,8 @@ This report reviews the implementations in the `Algorithmic/` directory and asse
 - **Efficiency:** Uses priority queue and early exit options; copying structures in the stepper for every yield may be heavy on dense graphs.【F:Algorithmic/Djikstra/dijkstra.py†L387-L428】  
 - **Readability:** Dataclasses capture configuration and algorithm steps for visualization.【F:Algorithmic/Djikstra/dijkstra.py†L57-L135】【F:Algorithmic/Djikstra/dijkstra.py†L348-L428】  
 - **Best Practices:** Validates inputs and separates traversal logic, though the exposed step state drops priority weights by only returning node IDs.【F:Algorithmic/Djikstra/dijkstra.py†L108-L135】【F:Algorithmic/Djikstra/dijkstra.py†L402-L409】  
-- **Opportunities:** Preserve both cost and node in exported step data to aid visualizers instead of stripping weights, and consider lazy copies to cut stepper overhead on large graphs.【F:Algorithmic/Djikstra/dijkstra.py†L402-L409】  
+- **Opportunities:** Preserve both cost and node in exported step data to aid visualizers instead of stripping weights, and consider lazy copies to cut stepper overhead on large graphs.【F:Algorithmic/Djikstra/dijkstra.py†L402-L409】
+- **Follow-up:** Step snapshots now retain `(weight, node)` tuples so visualizers can reflect queue priorities without recomputing them.【F:Algorithmic/Djikstra/dijkstra.py†L406-L435】
 
 ### FizzBuzz
 - **Correctness:** Dataclass-backed rules generate classic and custom sequences with CLI validation.【F:Algorithmic/FizzBuzz/fizzbuzz.py†L24-L249】  
@@ -81,7 +85,8 @@ This report reviews the implementations in the `Algorithmic/` directory and asse
 - **Efficiency:** Offers convolution-based updates when SciPy is present, but the NumPy fallback recalculates multiple `np.roll` shifts per generation; caching kernels or using vectorized convolution would reduce overhead.【F:Algorithmic/Game of life/conway.py†L49-L57】【F:Algorithmic/Game of life/conway.py†L496-L503】  
 - **Readability:** Extensive documentation, structured dataclasses, and clear event handling aid maintenance despite file size.【F:Algorithmic/Game of life/conway.py†L40-L520】  
 - **Best Practices:** Handles optional dependencies gracefully and exposes headless modes.【F:Algorithmic/Game of life/conway.py†L49-L57】【F:Algorithmic/Game of life/conway.py†L280-L520】  
-- **Opportunities:** Large embedded pattern arrays could be externalized or compressed to simplify diffs and potentially speed loading.【F:Algorithmic/Game of life/conway.py†L64-L275】  
+- **Opportunities:** Large embedded pattern arrays could be externalized or compressed to simplify diffs and potentially speed loading.【F:Algorithmic/Game of life/conway.py†L64-L275】
+- **Follow-up:** Pattern definitions are now parsed from compact ASCII templates and the NumPy fallback leverages sliding-window convolution to avoid repeated roll operations.【F:Algorithmic/Game of life/conway.py†L63-L101】【F:Algorithmic/Game of life/conway.py†L199-L205】
 
 ### Highest prime factor
 - **Correctness:** Wheel-optimized trial division correctly finds maximal prime factors with CLI batching and JSON output.【F:Algorithmic/Highest prime factor/HighPF.py†L24-L147】  
@@ -115,15 +120,17 @@ This report reviews the implementations in the `Algorithmic/` directory and asse
 - **Correctness:** Handles audio loading (file or synthetic) and produces STFT/Mel spectrograms with configurable display.【F:Algorithmic/Music Visualizer/mv.py†L18-L176】  
 - **Efficiency:** Relies on librosa’s optimized routines, but importing Matplotlib at module load even when `--no-plot`/`--json` is used forces GUI dependencies unnecessarily.【F:Algorithmic/Music Visualizer/mv.py†L36-L62】  
 - **Readability:** Dataclass config, clear helper separation, and docstrings aid comprehension.【F:Algorithmic/Music Visualizer/mv.py†L62-L176】  
-- **Best Practices:** Gracefully degrades when optional libraries are missing.【F:Algorithmic/Music Visualizer/mv.py†L36-L121】  
-- **Opportunities:** Lazy-import Matplotlib only when plotting is requested to support JSON-only invocations in minimal environments.【F:Algorithmic/Music Visualizer/mv.py†L36-L121】  
+- **Best Practices:** Gracefully degrades when optional libraries are missing.【F:Algorithmic/Music Visualizer/mv.py†L36-L121】
+- **Opportunities:** Lazy-import Matplotlib only when plotting is requested to support JSON-only invocations in minimal environments.【F:Algorithmic/Music Visualizer/mv.py†L36-L121】
+- **Follow-up:** Matplotlib is now imported lazily within the plotting routine so JSON-only or no-plot runs avoid GUI dependencies.【F:Algorithmic/Music Visualizer/mv.py†L24-L45】【F:Algorithmic/Music Visualizer/mv.py†L158-L189】
 
 ### PassGen
 - **Correctness:** Uses `secrets` to produce high-entropy passwords with category guarantees and JSON reporting.【F:Algorithmic/PassGen/passgen.py†L16-L148】  
 - **Efficiency:** Workload is minimal; the approach scales linearly with password length.【F:Algorithmic/PassGen/passgen.py†L85-L126】  
 - **Readability:** Dataclass specification and helper breakdown make it easy to extend.【F:Algorithmic/PassGen/passgen.py†L34-L148】  
 - **Best Practices:** Enforces minimum length and uses cryptographic RNG correctly.【F:Algorithmic/PassGen/passgen.py†L52-L126】  
-- **Opportunities:** The `min_categories` policy is currently advisory (`pass`); consider warning users when the policy is not met or enforcing it explicitly.【F:Algorithmic/PassGen/passgen.py†L52-L72】  
+- **Opportunities:** The `min_categories` policy is currently advisory (`pass`); consider warning users when the policy is not met or enforcing it explicitly.【F:Algorithmic/PassGen/passgen.py†L52-L72】
+- **Follow-up:** Validation now enforces the configured minimum category threshold and provides actionable guidance when the requirement is unmet.【F:Algorithmic/PassGen/passgen.py†L45-L67】
 
 ### ROT 13
 - **Correctness:** Precomputed translation table ensures ROT13 transforms are correct and involutive.【F:Algorithmic/ROT 13/rot13.py†L20-L56】  
@@ -206,14 +213,16 @@ This report reviews the implementations in the `Algorithmic/` directory and asse
 - **Efficiency:** Uses a deque for queueing, but fetching with `stream=True` and then reading `resp.content` loads full bodies while keeping the stream flag; dropping `stream=True` or using incremental reads would simplify resource handling.【F:Algorithmic/Web Page Crawler/wpc.py†L92-L131】  
 - **Readability:** Dataclass config, modular crawler class, and helper methods maintain structure.【F:Algorithmic/Web Page Crawler/wpc.py†L24-L200】  
 - **Best Practices:** Enforces polite crawling options and error categorization.【F:Algorithmic/Web Page Crawler/wpc.py†L68-L200】  
-- **Opportunities:** Implement per-domain politeness (delay per host) and persist visited URLs to disk for long runs.【F:Algorithmic/Web Page Crawler/wpc.py†L68-L200】  
+- **Opportunities:** Implement per-domain politeness (delay per host) and persist visited URLs to disk for long runs.【F:Algorithmic/Web Page Crawler/wpc.py†L68-L200】
+- **Follow-up:** The crawler now enforces global and per-host pacing, streams responses in bounded chunks, and can persist/resume crawl state from JSON snapshots.【F:Algorithmic/Web Page Crawler/wpc.py†L45-L248】
 
 ### basic text encoding
 - **Correctness:** Converts text to hex/bin with configurable encodings and reverse helpers.【F:Algorithmic/basic text encoding/txtToHexAndBin.py†L16-L160】  
 - **Efficiency:** Byte-level loops are fine for modest text sizes.【F:Algorithmic/basic text encoding/txtToHexAndBin.py†L52-L120】  
 - **Readability:** Enums and helper functions make usage discoverable.【F:Algorithmic/basic text encoding/txtToHexAndBin.py†L20-L160】  
 - **Best Practices:** Argparse and logging usage align with conventions.【F:Algorithmic/basic text encoding/txtToHexAndBin.py†L24-L200】  
-- **Opportunities:** Avoid code duplication between hex and binary functions by factoring out shared encoding logic; unit tests would help lock behavior because none exist yet.【F:Algorithmic/basic text encoding/txtToHexAndBin.py†L52-L140】【f8b067†L1-L6】  
+- **Opportunities:** Avoid code duplication between hex and binary functions by factoring out shared encoding logic; unit tests would help lock behavior because none exist yet.【F:Algorithmic/basic text encoding/txtToHexAndBin.py†L52-L140】【f8b067†L1-L6】
+- **Follow-up:** Shared helpers now power both encoders/decoders, and fresh pytest coverage exercises round-trips, invalid inputs, and separator edge cases.【F:Algorithmic/basic text encoding/txtToHexAndBin.py†L44-L107】【F:tests/algorithmic/test_basic_text_encoding.py†L1-L64】
 
 ### ytmp3
 - **Correctness:** Wraps yt-dlp/youtube-dl selection with FFmpeg post-processing for audio extraction, handling batches and errors.【F:Algorithmic/ytmp3/cringe.py†L16-L172】  
@@ -224,11 +233,11 @@ This report reviews the implementations in the `Algorithmic/` directory and asse
 
 ## Prioritized Improvement Targets
 
-1. **Web Page Crawler:** Address streaming/content handling and extend politeness controls to keep long crawls reliable and courteous.【F:Algorithmic/Web Page Crawler/wpc.py†L92-L200】
-2. **Game of life:** Optimize the NumPy fallback (e.g., reuse convolution kernels) and reduce massive embedded pattern literals for maintainability.【F:Algorithmic/Game of life/conway.py†L49-L275】【F:Algorithmic/Game of life/conway.py†L496-L503】
-3. **1000 Digits of Pi:** Switch from truncation to quantized rounding for final output to avoid losing the last digit’s accuracy.【F:Algorithmic/1000 Digits of Pi/pi.py†L138-L141】
-4. **Character Counter:** Align entropy/diversity metrics with case-insensitive counts to keep analytics consistent.【F:Algorithmic/Character Counter/charcount.py†L304-L324】
-5. **basic text encoding:** Factor shared conversion logic and add automated tests to prevent regressions, since the directory currently lacks them.【F:Algorithmic/basic text encoding/txtToHexAndBin.py†L52-L140】【f8b067†L1-L6】
-6. **Music Visualizer:** Defer heavy plotting imports until needed so JSON-only workflows function in minimal environments.【F:Algorithmic/Music Visualizer/mv.py†L36-L121】
-7. **Djikstra:** Preserve queue weights when yielding algorithm steps to improve downstream visualization accuracy.【F:Algorithmic/Djikstra/dijkstra.py†L402-L409】
+1. **Web Page Crawler:** (Resolved) Streaming fetches, polite pacing, and JSON state persistence keep long crawls reliable.【F:Algorithmic/Web Page Crawler/wpc.py†L45-L248】
+2. **Game of life:** (Resolved) Sliding-window neighbor counting and ASCII-derived patterns trim overhead and huge literals.【F:Algorithmic/Game of life/conway.py†L63-L205】
+3. **1000 Digits of Pi:** (Resolved) Final output now rounds via `Decimal.quantize` instead of truncating digits.【F:Algorithmic/1000 Digits of Pi/pi.py†L137-L140】
+4. **Character Counter:** (Resolved) Entropy and diversity metrics now honor case-insensitive normalization to keep analytics consistent.【F:Algorithmic/Character Counter/charcount.py†L304-L324】
+5. **basic text encoding:** (Resolved) Shared helpers replace duplicated logic and new tests lock conversions and validation edge cases.【F:Algorithmic/basic text encoding/txtToHexAndBin.py†L44-L107】【F:tests/algorithmic/test_basic_text_encoding.py†L1-L64】
+6. **Music Visualizer:** (Resolved) Plotting imports are now deferred so JSON-only workflows function in minimal environments.【F:Algorithmic/Music Visualizer/mv.py†L24-L45】【F:Algorithmic/Music Visualizer/mv.py†L158-L189】
+7. **Djikstra:** (Resolved) Step snapshots now retain `(weight, node)` tuples for downstream visual accuracy.【F:Algorithmic/Djikstra/dijkstra.py†L406-L435】
 

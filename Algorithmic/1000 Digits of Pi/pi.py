@@ -135,10 +135,10 @@ def calculate_pi_gauss_legendre(num_digits: int, *, show_progress: bool = False)
     # Final calculation of Pi using the converged values
     pi_calculated = (a + b) ** 2 / (4 * t)
 
-    # Format result: convert to string and truncate to exact requested length
-    # The result includes "3." plus num_digits decimal places
-    pi_string = str(pi_calculated)
-    return pi_string[: num_digits + 2]
+    # Format result with proper rounding instead of truncation.
+    quantizer = decimal.Decimal(1).scaleb(-num_digits)
+    rounded = pi_calculated.quantize(quantizer, rounding=decimal.ROUND_HALF_UP)
+    return format(rounded, f".{num_digits}f")
 
 
 def setup_logging(verbose: bool = False) -> None:

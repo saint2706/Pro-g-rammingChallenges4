@@ -27,6 +27,7 @@ import sys
 import time
 from collections import deque
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Deque, Dict, Iterable, List, Optional, Set, Tuple
 from urllib.parse import urljoin, urlparse
 from urllib.robotparser import RobotFileParser
@@ -47,11 +48,13 @@ class CrawlerConfig:
     max_pages: int = 500
     same_domain: bool = True
     rate_limit: float = 0.0  # seconds between requests (simple global spacing)
+    per_host_delay: float = 0.0  # politeness spacing per host
     timeout: float = 6.0
     user_agent: str = DEFAULT_UA
     robots: bool = False
     json_out: bool = False
     edges_path: Optional[str] = None
+    state_path: Optional[Path] = None
 
     def normalize(self) -> None:
         if not urlparse(self.start_url).scheme:
@@ -62,6 +65,10 @@ class CrawlerConfig:
             raise ValueError("max_pages must be >= 1")
         if self.rate_limit < 0:
             raise ValueError("rate_limit must be >= 0")
+        if self.per_host_delay < 0:
+            raise ValueError("per_host_delay must be >= 0")
+        if self.state_path is not None:
+            self.state_path = self.state_path.expanduser().resolve()
 
 
 # ------------------------------ Core Crawler ------------------------------ #
@@ -76,8 +83,11 @@ class WebCrawler:
         self.edges: List[Tuple[str, str]] = []
         self.errors: Dict[str, str] = {}
         self.robot_parser: Optional[RobotFileParser] = None
+        self._last_global_request = 0.0
+        self._last_host_request: Dict[str, float] = {}
         if cfg.robots:
             self._init_robots()
+        self._load_state()
 
     # ---- Robots ---- #
     def _init_robots(self) -> None:
@@ -100,15 +110,26 @@ class WebCrawler:
     def fetch(self, url: str) -> Optional[BeautifulSoup]:
         headers = {"User-Agent": self.cfg.user_agent}
         try:
-            resp = requests.get(
+            limit_bytes = 2 * 1024 * 1024
+            chunks: List[bytes] = []
+            downloaded = 0
+            with requests.get(
                 url, timeout=self.cfg.timeout, headers=headers, stream=True
-            )
-            resp.raise_for_status()
-            ctype = resp.headers.get("Content-Type", "")
-            if "text/html" not in ctype.lower():
+            ) as resp:
+                resp.raise_for_status()
+                ctype = resp.headers.get("Content-Type", "")
+                if "text/html" not in ctype.lower():
+                    return None
+                for chunk in resp.iter_content(chunk_size=16384):
+                    if not chunk:
+                        continue
+                    chunks.append(chunk)
+                    downloaded += len(chunk)
+                    if downloaded >= limit_bytes:
+                        break
+            if not chunks:
                 return None
-            # Limit body size (simple guard) to 2MB
-            content = resp.content[: 2 * 1024 * 1024]
+            content = b"".join(chunks)
             return BeautifulSoup(content, "html.parser")
         except requests.exceptions.RequestException as e:
             self.errors[url] = type(e).__name__
@@ -146,21 +167,15 @@ class WebCrawler:
     # ---- Crawl Loop ---- #
     def crawl(self) -> None:
         pages_fetched = 0
-        last_request_time = 0.0
         while self.queue and pages_fetched < self.cfg.max_pages:
             url, depth = self.queue.popleft()
             if url in self.visited or depth > self.cfg.max_depth:
                 continue
             self.visited.add(url)
             print(f"[{depth}] {url}")
-            # Rate limiting - simple global sleep to respect spacing
-            if self.cfg.rate_limit > 0:
-                elapsed = time.time() - last_request_time
-                to_wait = self.cfg.rate_limit - elapsed
-                if to_wait > 0:
-                    time.sleep(to_wait)
+            self._wait_for_politeness(url)
             soup = self.fetch(url)
-            last_request_time = time.time()
+            self._record_request(url)
             if soup is None:
                 continue
             for link in self.extract_links(soup, url):
@@ -169,6 +184,65 @@ class WebCrawler:
                     self.queue.append((link, depth + 1))
             pages_fetched += 1
             self.handle_page(url, soup)
+            self._persist_state()
+
+    def _wait_for_politeness(self, url: str) -> None:
+        sleep_for = 0.0
+        now = time.time()
+        if self.cfg.rate_limit > 0:
+            sleep_for = max(sleep_for, self.cfg.rate_limit - (now - self._last_global_request))
+        if self.cfg.per_host_delay > 0:
+            host = urlparse(url).netloc
+            host_wait = self.cfg.per_host_delay - (now - self._last_host_request.get(host, 0.0))
+            sleep_for = max(sleep_for, host_wait)
+        if sleep_for > 0:
+            time.sleep(max(0.0, sleep_for))
+
+    def _record_request(self, url: str) -> None:
+        now = time.time()
+        self._last_global_request = now
+        if self.cfg.per_host_delay > 0:
+            host = urlparse(url).netloc
+            self._last_host_request[host] = now
+
+    def _persist_state(self) -> None:
+        if not self.cfg.state_path:
+            return
+        state = {
+            "visited": sorted(self.visited),
+            "queue": list(self.queue),
+        }
+        try:
+            self.cfg.state_path.parent.mkdir(parents=True, exist_ok=True)
+            self.cfg.state_path.write_text(json.dumps(state, indent=2), encoding="utf-8")
+        except OSError as exc:
+            self.errors.setdefault("__state__", str(exc))
+
+    def _load_state(self) -> None:
+        if not self.cfg.state_path or not self.cfg.state_path.exists():
+            return
+        try:
+            data = json.loads(self.cfg.state_path.read_text(encoding="utf-8"))
+            visited = data.get("visited", [])
+            queue = data.get("queue", [])
+            if isinstance(visited, list):
+                self.visited.update(v for v in visited if isinstance(v, str))
+            restored_queue: List[Tuple[str, int]] = []
+            if isinstance(queue, list):
+                for item in queue:
+                    if (
+                        isinstance(item, (list, tuple))
+                        and len(item) == 2
+                        and isinstance(item[0], str)
+                    ):
+                        try:
+                            restored_queue.append((item[0], int(item[1])))
+                        except (TypeError, ValueError):
+                            continue
+            if restored_queue:
+                self.queue = deque(restored_queue)
+        except (OSError, json.JSONDecodeError, ValueError) as exc:
+            self.errors.setdefault("__state__", f"load_failed:{exc}")
 
     # Extension point
     def handle_page(
@@ -186,7 +260,9 @@ class WebCrawler:
             "edges_count": len(self.edges),
             "same_domain": self.cfg.same_domain,
             "rate_limit": self.cfg.rate_limit,
+            "per_host_delay": self.cfg.per_host_delay,
             "robots": self.cfg.robots,
+            "state_path": str(self.cfg.state_path) if self.cfg.state_path else None,
             "errors": self.errors,
         }
 
@@ -212,6 +288,12 @@ def build_parser() -> argparse.ArgumentParser:
         default=0.0,
         help="Seconds between requests (simple rate limit)",
     )
+    p.add_argument(
+        "--host-delay",
+        type=float,
+        default=0.0,
+        help="Minimum seconds between requests to the same host",
+    )
     p.add_argument("--timeout", type=float, default=6.0, help="Request timeout seconds")
     p.add_argument(
         "--ua",
@@ -227,6 +309,11 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument(
         "--edges", metavar="PATH", help="Write discovered edges (src\tdst) to file"
     )
+    p.add_argument(
+        "--state",
+        type=Path,
+        help="Persist crawl state (visited + queue) to this JSON file",
+    )
     return p
 
 
@@ -239,11 +326,13 @@ def main(argv: Optional[List[str]] = None) -> int:
         max_pages=args.max_pages,
         same_domain=not args.no_same_domain,
         rate_limit=args.rate,
+        per_host_delay=args.host_delay,
         timeout=args.timeout,
         user_agent=args.ua,
         robots=args.robots,
         json_out=args.json,
         edges_path=args.edges,
+        state_path=args.state,
     )
     try:
         cfg.normalize()
