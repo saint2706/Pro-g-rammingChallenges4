@@ -8,12 +8,14 @@ Features:
 - Modular, well-commented code for learning
 """
 
-import numpy as np
-import random
-import pygame
-import sys
 import math
-from typing import Tuple, List, Optional
+import random
+import sys
+from typing import List, Optional, Tuple
+
+import numpy as np
+
+sys.modules.setdefault("c4", sys.modules[__name__])
 
 # --- Constants ---
 BLUE = (20, 50, 200)
@@ -43,6 +45,15 @@ class Board:
         """Place a piece in the board at (row, col)."""
         self.board[row][col] = piece
 
+    def apply_move(self, col: int, piece: int) -> Optional[int]:
+        """Apply a move in ``col`` for ``piece`` returning the played row or ``None``."""
+
+        row = self.get_next_open_row(col)
+        if row is None:
+            return None
+        self.board[row][col] = piece
+        return row
+
     def is_valid_location(self, col: int) -> bool:
         """Check if a move can be made in the given column."""
         return self.board[ROW_COUNT - 1][col] == 0
@@ -53,6 +64,14 @@ class Board:
             if self.board[r][col] == 0:
                 return r
         return None
+
+    def undo_move(self, col: int) -> None:
+        """Undo the most recent move in ``col`` if present."""
+
+        for r in range(ROW_COUNT - 1, -1, -1):
+            if self.board[r][col] != 0:
+                self.board[r][col] = 0
+                break
 
     def winning_move(self, piece: int) -> bool:
         """Check if the given piece has a winning position."""
@@ -181,12 +200,11 @@ class AIPlayer:
         if maximizing_player:
             value = -math.inf
             for col in valid_locations:
-                temp_board = Board()
-                temp_board.board = board_obj.board.copy()
-                row = temp_board.get_next_open_row(col)
-                if row is not None:
-                    temp_board.drop_piece(row, col, self.ai_piece)
-                new_score = self.minimax(temp_board, depth - 1, alpha, beta, False)[1]
+                row = board_obj.apply_move(col, self.ai_piece)
+                if row is None:
+                    continue
+                new_score = self.minimax(board_obj, depth - 1, alpha, beta, False)[1]
+                board_obj.undo_move(col)
                 if new_score > value:
                     value = new_score
                     best_col = col
@@ -197,12 +215,11 @@ class AIPlayer:
         else:
             value = math.inf
             for col in valid_locations:
-                temp_board = Board()
-                temp_board.board = board_obj.board.copy()
-                row = temp_board.get_next_open_row(col)
-                if row is not None:
-                    temp_board.drop_piece(row, col, self.player_piece)
-                new_score = self.minimax(temp_board, depth - 1, alpha, beta, True)[1]
+                row = board_obj.apply_move(col, self.player_piece)
+                if row is None:
+                    continue
+                new_score = self.minimax(board_obj, depth - 1, alpha, beta, True)[1]
+                board_obj.undo_move(col)
                 if new_score < value:
                     value = new_score
                     best_col = col
@@ -220,151 +237,7 @@ class AIPlayer:
         return col
 
 
-class Connect4Game:
-    """
-    Manages the main game loop, graphics, and player interactions.
-    Handles drawing, input, and switching turns.
-    """
-
-    def __init__(self, screen_size: int = 100):
-        pygame.init()
-        self.square_size = screen_size
-        self.width = COLUMN_COUNT * self.square_size
-        self.height = (ROW_COUNT + 1) * self.square_size
-        self.radius = int(self.square_size / 2 - 5)
-
-        self.screen = pygame.display.set_mode((self.width, self.height))
-        pygame.display.set_caption("Connect 4 - AI Challenge")
-        self.font = pygame.font.SysFont("monospace", 75)
-
-        self.board = Board()
-        self.ai_player = AIPlayer(AI_PIECE, PLAYER_PIECE)
-        self.game_over = False
-        self.turn = random.randint(PLAYER_PIECE, AI_PIECE) - 1  # PLAYER=0, AI=1
-
-    def draw_board(self) -> None:
-        """Draw the Connect 4 board and pieces."""
-        for c in range(COLUMN_COUNT):
-            for r in range(ROW_COUNT):
-                pygame.draw.rect(
-                    self.screen,
-                    BLUE,
-                    (
-                        c * self.square_size,
-                        r * self.square_size + self.square_size,
-                        self.square_size,
-                        self.square_size,
-                    ),
-                )
-                pygame.draw.circle(
-                    self.screen,
-                    BLACK,
-                    (
-                        int(c * self.square_size + self.square_size / 2),
-                        int(
-                            r * self.square_size
-                            + self.square_size
-                            + self.square_size / 2
-                        ),
-                    ),
-                    self.radius,
-                )
-
-        for c in range(COLUMN_COUNT):
-            for r in range(ROW_COUNT):
-                if self.board.board[r][c] == PLAYER_PIECE:
-                    pygame.draw.circle(
-                        self.screen,
-                        RED,
-                        (
-                            int(c * self.square_size + self.square_size / 2),
-                            self.height
-                            - int(r * self.square_size + self.square_size / 2),
-                        ),
-                        self.radius,
-                    )
-                elif self.board.board[r][c] == AI_PIECE:
-                    pygame.draw.circle(
-                        self.screen,
-                        YELLOW,
-                        (
-                            int(c * self.square_size + self.square_size / 2),
-                            self.height
-                            - int(r * self.square_size + self.square_size / 2),
-                        ),
-                        self.radius,
-                    )
-        pygame.display.update()
-
-    def handle_player_move(self, posx: int) -> None:
-        """Handle a player's move based on mouse x position."""
-        col = posx // self.square_size
-        if self.board.is_valid_location(col):
-            row = self.board.get_next_open_row(col)
-            if row is not None:
-                self.board.drop_piece(row, col, PLAYER_PIECE)
-                if self.board.winning_move(PLAYER_PIECE):
-                    self.end_game("You win!!")
-                self.switch_turn()
-
-    def handle_ai_move(self) -> None:
-        """Handle the AI's move using minimax."""
-        col = self.ai_player.get_best_move(self.board)
-        if col is not None and self.board.is_valid_location(col):
-            row = self.board.get_next_open_row(col)
-            if row is not None:
-                self.board.drop_piece(row, col, AI_PIECE)
-                if self.board.winning_move(AI_PIECE):
-                    self.end_game("AI wins!!")
-                self.switch_turn()
-
-    def switch_turn(self) -> None:
-        """Switch to the other player's turn."""
-        self.turn = (self.turn + 1) % 2
-
-    def end_game(self, message: str) -> None:
-        """Display the end game message and set game_over flag."""
-        color = RED if "You" in message else YELLOW
-        label = self.font.render(message, True, color)
-        self.screen.blit(label, (40, 10))
-        self.game_over = True
-
-    def run(self) -> None:
-        """Main game loop: handles events, drawing, and turn logic."""
-        while not self.game_over:
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    sys.exit()
-
-                if event.type == pygame.MOUSEMOTION:
-                    pygame.draw.rect(
-                        self.screen, BLACK, (0, 0, self.width, self.square_size)
-                    )
-                    if self.turn == 0:  # Player's turn
-                        pygame.draw.circle(
-                            self.screen,
-                            RED,
-                            (event.pos[0], int(self.square_size / 2)),
-                            self.radius,
-                        )
-
-                if event.type == pygame.MOUSEBUTTONDOWN and self.turn == 0:
-                    self.handle_player_move(event.pos[0])
-
-            # AI move outside event loop for responsiveness
-            if self.turn == 1 and not self.game_over:
-                self.handle_ai_move()
-
-            self.draw_board()
-
-            if self.board.is_terminal_node() and not self.game_over:
-                self.end_game("It's a Tie!")
-
-            if self.game_over:
-                pygame.time.wait(3000)
-
-
 if __name__ == "__main__":
-    # Entry point: launch the game
-    game = Connect4Game()
-    game.run()
+    from ui import main as run_game
+
+    run_game()

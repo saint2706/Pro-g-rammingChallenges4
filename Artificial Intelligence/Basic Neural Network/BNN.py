@@ -1,40 +1,43 @@
 """
-Basic Neural Network (Single-Layer Perceptron)
-------------------------------------------------
+Basic Neural Network (Minimal Multi-Layer Perceptron)
+-----------------------------------------------------
 Educational, beginner-friendly neural network from scratch using NumPy.
 Features:
-- Single neuron, single layer (no hidden layers)
-- Sigmoid activation
+- Single hidden layer with configurable width and activation
+- Sigmoid output suitable for binary classification demos
 - Configurable epochs, learning rate, and random seed
-- CLI interface for reproducibility
+- Optional progress callback instead of tight-loop ``print`` statements
 - Plots training error progression
 
 Usage:
     python BNN.py --epochs 10000 --lr 0.1 --seed 42
 """
 
-import numpy as np
-import matplotlib.pyplot as plt
-from typing import List, Optional
-from dataclasses import dataclass
 import argparse
+import logging
+from dataclasses import dataclass
+from typing import Callable, List, Optional
+
+import matplotlib.pyplot as plt
+import numpy as np
 
 
-def sigmoid(x: np.ndarray, derivative: bool = False) -> np.ndarray:
-    """
-    Sigmoid activation function and its derivative.
+def sigmoid(x: np.ndarray) -> np.ndarray:
+    """Sigmoid activation function."""
 
-    Args:
-        x: The input numpy array.
-        derivative: If True, computes the derivative of the sigmoid function.
-
-    Returns:
-        The result of the sigmoid function or its derivative.
-    """
-    if derivative:
-        # Assumes the input 'x' is already the output of a sigmoid function.
-        return x * (1 - x)
     return 1 / (1 + np.exp(-x))
+
+
+def tanh(x: np.ndarray) -> np.ndarray:
+    """Hyperbolic tangent activation."""
+
+    return np.tanh(x)
+
+
+def tanh_derivative(output: np.ndarray) -> np.ndarray:
+    """Derivative of ``tanh`` with ``output`` already activated."""
+
+    return 1 - output**2
 
 
 @dataclass
@@ -45,59 +48,109 @@ class NNConfig:
 
 
 class NeuralNetwork:
-    """
-    Single-layer neural network (perceptron) with sigmoid activation.
-    """
+    """Two-layer perceptron capable of solving XOR-style datasets."""
 
     def __init__(
         self,
         training_inputs: np.ndarray,
         training_outputs: np.ndarray,
         config: NNConfig,
+        hidden_units: int = 4,
+        activation: Callable[[np.ndarray], np.ndarray] = tanh,
+        activation_deriv: Callable[[np.ndarray], np.ndarray] = tanh_derivative,
     ):
         self.training_inputs = training_inputs
         self.training_outputs = training_outputs
         self.config = config
+        self.hidden_units = hidden_units
+        self.activation = activation
+        self.activation_deriv = activation_deriv
         if config.seed is not None:
             np.random.seed(config.seed)
-        num_inputs = training_inputs.shape[1]
-        # Small random weights, mean 0
-        self.weights = 2 * np.random.random((num_inputs, 1)) - 1
-        self.output = None
+
+        input_dim = training_inputs.shape[1]
+        output_dim = training_outputs.shape[1]
+
+        limit_hidden = 1.0 / np.sqrt(input_dim)
+        self.w_ih = np.random.uniform(
+            -limit_hidden, limit_hidden, size=(input_dim, hidden_units)
+        )
+        self.b_h = np.zeros((1, hidden_units))
+
+        limit_out = 1.0 / np.sqrt(hidden_units)
+        self.w_ho = np.random.uniform(
+            -limit_out, limit_out, size=(hidden_units, output_dim)
+        )
+        self.b_o = np.zeros((1, output_dim))
+
+        self.hidden_output: Optional[np.ndarray] = None
+        self.output: Optional[np.ndarray] = None
 
     def forward(self) -> np.ndarray:
-        """Compute output for current weights."""
-        self.output = sigmoid(np.dot(self.training_inputs, self.weights))
+        """Compute the forward pass and cache intermediate activations."""
+
+        hidden_linear = np.dot(self.training_inputs, self.w_ih) + self.b_h
+        self.hidden_output = self.activation(hidden_linear)
+        output_linear = np.dot(self.hidden_output, self.w_ho) + self.b_o
+        self.output = sigmoid(output_linear)
         return self.output
 
     def backward(self) -> float:
-        """Update weights using mean absolute error and return error."""
-        if self.output is None:
-            raise ValueError("Must call forward() before backward().")
-        error = self.training_outputs - self.output
-        delta = error * sigmoid(self.output, derivative=True)
-        # Weight update with learning rate
-        self.weights += self.config.learning_rate * np.dot(
-            self.training_inputs.T, delta
-        )
-        return float(np.mean(np.abs(error)))
+        """Update weights using binary cross-entropy and return loss."""
 
-    def train(self) -> List[float]:
-        """Train the network and return error history."""
-        print(f"Training for {self.config.epochs} epochs...")
-        error_history = []
-        for i in range(self.config.epochs):
+        if self.output is None or self.hidden_output is None:
+            raise ValueError("Must call forward() before backward().")
+
+        preds = np.clip(self.output, 1e-8, 1 - 1e-8)
+        error = preds - self.training_outputs
+        loss = float(
+            -np.mean(
+                self.training_outputs * np.log(preds)
+                + (1 - self.training_outputs) * np.log(1 - preds)
+            )
+        )
+
+        grad_output = error / self.training_outputs.shape[0]
+
+        grad_w_ho = np.dot(self.hidden_output.T, grad_output)
+        grad_b_o = np.sum(grad_output, axis=0, keepdims=True)
+
+        hidden_grad = np.dot(grad_output, self.w_ho.T) * self.activation_deriv(
+            self.hidden_output
+        )
+
+        grad_w_ih = np.dot(self.training_inputs.T, hidden_grad)
+        grad_b_h = np.sum(hidden_grad, axis=0, keepdims=True)
+
+        lr = self.config.learning_rate
+        self.w_ho -= lr * grad_w_ho
+        self.b_o -= lr * grad_b_o
+        self.w_ih -= lr * grad_w_ih
+        self.b_h -= lr * grad_b_h
+
+        return loss
+
+    def train(
+        self, progress_callback: Optional[Callable[[int, float], None]] = None
+    ) -> List[float]:
+        """Train the network and return loss history."""
+
+        logging.info("Training for %d epochs", self.config.epochs)
+        loss_history: List[float] = []
+        for epoch in range(1, self.config.epochs + 1):
             self.forward()
-            error = self.backward()
-            error_history.append(error)
-            if (i % 1000) == 0:
-                print(f"  Epoch {i}, Error: {error:.4f}")
-        print("Training complete.")
-        return error_history
+            loss = self.backward()
+            loss_history.append(loss)
+            if progress_callback is not None:
+                progress_callback(epoch, loss)
+        logging.info("Training complete.")
+        return loss_history
 
     def predict(self, inputs: np.ndarray) -> np.ndarray:
         """Predict output for new inputs."""
-        return sigmoid(np.dot(inputs, self.weights))
+
+        hidden = self.activation(np.dot(inputs, self.w_ih) + self.b_h)
+        return sigmoid(np.dot(hidden, self.w_ho) + self.b_o)
 
 
 def main():
@@ -105,7 +158,7 @@ def main():
     Set up, train, and visualize a basic neural network.
     """
     parser = argparse.ArgumentParser(
-        description="Basic Neural Network (Single-Layer Perceptron)"
+        description="Basic Neural Network (Minimal Multi-Layer Perceptron)"
     )
     parser.add_argument(
         "--epochs",
@@ -122,7 +175,22 @@ def main():
         default=None,
         help="Random seed for reproducibility (default: None)",
     )
+    parser.add_argument(
+        "--hidden-units",
+        type=int,
+        default=4,
+        help="Width of the hidden layer (default: 4)",
+    )
+    parser.add_argument(
+        "--log-interval",
+        type=int,
+        default=1000,
+        help="How often (in epochs) to log progress (default: 1000)",
+    )
+
     args = parser.parse_args()
+
+    logging.basicConfig(level=logging.INFO, format="[%(levelname)s] %(message)s")
 
     config = NNConfig(epochs=args.epochs, learning_rate=args.lr, seed=args.seed)
 
@@ -130,8 +198,18 @@ def main():
     training_inputs = np.array([[0, 0, 1], [1, 1, 1], [1, 0, 1], [0, 1, 1]])
     training_outputs = np.array([[0], [1], [1], [0]])
 
-    nn = NeuralNetwork(training_inputs, training_outputs, config)
-    error_history = nn.train()
+    nn = NeuralNetwork(
+        training_inputs,
+        training_outputs,
+        config,
+        hidden_units=args.hidden_units,
+    )
+
+    def progress(epoch: int, loss: float) -> None:
+        if epoch == 1 or epoch % max(args.log_interval, 1) == 0 or epoch == config.epochs:
+            logging.info("Epoch %d, loss %.4f", epoch, loss)
+
+    error_history = nn.train(progress_callback=progress)
 
     # Predict on new data
     print("\n--- Predictions ---")

@@ -10,6 +10,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Sequence, Tuple
 
+import math
 import numpy as np
 
 
@@ -49,6 +50,7 @@ class TrainingHistory:
     accuracy: List[float]
     val_loss: List[float]
     val_accuracy: List[float]
+    grad_norm: List[float]
 
 
 class MLP:
@@ -229,25 +231,39 @@ class MLP:
         if X.shape[0] != y.shape[0]:
             raise ValueError("X and y must contain the same number of samples")
         n_samples = X.shape[0]
-        history = TrainingHistory([], [], [], [])
+        history = TrainingHistory([], [], [], [], [])
+
+        X_source = X
+        y_source = y
 
         for epoch in range(epochs):
-            indices = np.arange(n_samples)
+            grad_norm_sum = 0.0
+            batches = 0
             if shuffle:
-                self.rng.shuffle(indices)
-                X, y = X[indices], y[indices]
+                indices = self.rng.permutation(n_samples)
+            else:
+                indices = np.arange(n_samples)
 
             for start in range(0, n_samples, batch_size):
                 end = start + batch_size
-                batch_X = X[start:end]
-                batch_y = y[start:end]
+                batch_idx = indices[start:end]
+                batch_X = X_source[batch_idx]
+                batch_y = y_source[batch_idx]
                 probs, activations = self.forward(batch_X)
                 grads_w, grads_b = self._backward(batch_X, batch_y, activations)
                 self._update_params(grads_w, grads_b)
+                grad_norm = float(
+                    math.sqrt(
+                        sum(np.sum(gw**2) for gw in grads_w)
+                        + sum(np.sum(gb**2) for gb in grads_b)
+                    )
+                )
+                grad_norm_sum += grad_norm
+                batches += 1
 
-            train_probs, _ = self.forward(X)
-            train_loss = self._loss(train_probs, y)
-            train_acc = float(np.mean(np.argmax(train_probs, axis=1) == y))
+            train_probs, _ = self.forward(X_source)
+            train_loss = self._loss(train_probs, y_source)
+            train_acc = float(np.mean(np.argmax(train_probs, axis=1) == y_source))
 
             if validation_data is not None:
                 val_X, val_y = validation_data
@@ -262,18 +278,20 @@ class MLP:
             history.accuracy.append(train_acc)
             history.val_loss.append(val_loss)
             history.val_accuracy.append(val_acc)
+            history.grad_norm.append(grad_norm_sum / max(batches, 1))
 
             if verbose:
                 if validation_data is not None:
                     print(
                         f"Epoch {epoch + 1}/{epochs}: "
                         f"loss={train_loss:.4f}, acc={train_acc:.3f}, "
-                        f"val_loss={val_loss:.4f}, val_acc={val_acc:.3f}"
+                        f"val_loss={val_loss:.4f}, val_acc={val_acc:.3f}, "
+                        f"grad_norm={history.grad_norm[-1]:.3f}"
                     )
                 else:
                     print(
                         f"Epoch {epoch + 1}/{epochs}: loss={train_loss:.4f}, "
-                        f"acc={train_acc:.3f}"
+                        f"acc={train_acc:.3f}, grad_norm={history.grad_norm[-1]:.3f}"
                     )
 
         return history

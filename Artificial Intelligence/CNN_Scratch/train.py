@@ -107,11 +107,19 @@ def main() -> None:
     Path(os.path.dirname(args.model_out) or ".").mkdir(parents=True, exist_ok=True)
     model.save(args.model_out)
 
-    val_acc = history.accuracies[-1] if x_val is not None else history.accuracies[-1]
+    has_validation = x_val is not None and y_val is not None
+    if has_validation:
+        val_message = f"Validation accuracy: {history.accuracies[-1]:.4f}"
+    else:
+        val_message = (
+            "Validation accuracy: N/A (no validation split). "
+            f"Training accuracy: {history.accuracies[-1]:.4f}"
+        )
+
     test_acc = model.accuracy(x_test, y_test)
 
     print(f"Final training loss: {history.losses[-1]:.4f}")
-    print(f"Validation accuracy: {val_acc:.4f}")
+    print(val_message)
     print(f"Test accuracy: {test_acc:.4f}")
 
 

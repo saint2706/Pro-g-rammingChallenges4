@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Tuple
 
 import numpy as np
@@ -9,11 +10,14 @@ from sklearn.datasets import fetch_openml
 from sklearn.model_selection import train_test_split
 
 
+DEFAULT_DATA_HOME = Path.home() / ".cache" / "pro_g_ai"
+
+
 def load_mnist(
     *,
     test_size: float = 0.2,
     random_state: int = 42,
-    data_home: str | None = None,
+    data_home: str | Path | None = None,
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """Return train/test splits for the MNIST dataset.
 
@@ -27,11 +31,15 @@ def load_mnist(
         Optional directory where the dataset is cached.
     """
 
+    cache_dir = Path(data_home).expanduser() if data_home is not None else DEFAULT_DATA_HOME
+    cache_dir.mkdir(parents=True, exist_ok=True)
+
     mnist = fetch_openml(
         "mnist_784",
         version=1,
         as_frame=False,
-        data_home=data_home,
+        data_home=str(cache_dir),
+        cache=True,
     )
     X = mnist.data.astype(np.float32) / 255.0
     y = mnist.target.astype(np.int64)
