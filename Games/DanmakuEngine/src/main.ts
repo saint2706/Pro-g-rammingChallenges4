@@ -75,8 +75,17 @@ function initializeStage(
     stageRunner.update(delta);
     powerUps.update(delta, player);
 
-    for (const bullet of bullets.activeBullets) {
-      if (hitTest(player.position, config.player.hitbox, bullet.position, bullet.definition.hitbox)) {
+    const detectionRadius =
+      Math.max(config.player.hitbox.radius, config.player.grazeBox.radius) + 48;
+    bullets.forEachNearby(player.position, detectionRadius, (bullet) => {
+      if (
+        hitTest(
+          player.position,
+          config.player.hitbox,
+          bullet.position,
+          bullet.definition.hitbox
+        )
+      ) {
         const gameOver = player.takeHit();
         if (gameOver) {
           app.ticker.stop();
@@ -85,7 +94,7 @@ function initializeStage(
         player.addGraze(bullet.definition.grazeScore ?? 1);
         player.addScore(50);
       }
-    }
+    });
   });
 }
 

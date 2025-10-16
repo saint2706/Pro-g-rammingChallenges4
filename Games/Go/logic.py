@@ -106,14 +106,47 @@ class GoGame:
     def legal_moves(self, color: Optional[Color] = None) -> List[Point]:
         color = color or self.to_move
         moves: List[Point] = []
+        opponent = other(color)
+        history = set(self._position_history)
+        group_cache: Dict[Point, Tuple[Set[Point], int]] = {}
+
+        def cached_group(point: Point) -> Tuple[Set[Point], int]:
+            if point in group_cache:
+                return group_cache[point]
+            group, liberties = self._collect_group(self.board, point)
+            for member in group:
+                group_cache[member] = (group, liberties)
+            return group, liberties
+
         for r in range(self.size):
             for c in range(self.size):
                 if self.board[r][c] is not None:
                     continue
-                try:
-                    self._simulate_move(r, c, color)
-                except IllegalMove:
+
+                has_adjacent_liberty = False
+                friendly_safe = False
+                capture_available = False
+
+                for nr, nc in self._neighbors(r, c):
+                    neighbour_color = self.board[nr][nc]
+                    if neighbour_color is None:
+                        has_adjacent_liberty = True
+                        continue
+                    group, liberties = cached_group((nr, nc))
+                    if neighbour_color == opponent:
+                        if liberties == 1:
+                            capture_available = True
+                    else:
+                        if liberties > 1:
+                            friendly_safe = True
+
+                if not (has_adjacent_liberty or capture_available or friendly_safe):
                     continue
+
+                new_board, _ = self._simulate_move(r, c, color)
+                if self._board_key(new_board) in history:
+                    continue
+
                 moves.append((r, c))
         return moves
 

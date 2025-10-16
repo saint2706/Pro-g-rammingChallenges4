@@ -33,6 +33,7 @@ class GameState:
     monsters: List[Monster] = field(default_factory=list)
     eggs: List[Egg] = field(default_factory=list)
     event_log: Deque[str] = field(default_factory=lambda: deque(maxlen=120))
+    rng: random.Random = field(default_factory=random.Random)
 
     def log_event(self, message: str) -> None:
         self.event_log.append(message)
@@ -81,7 +82,7 @@ class GameState:
             raise RuntimeError("Both parents must be adults.")
         if parent_a is parent_b:
             raise RuntimeError("Select two different monsters for breeding.")
-        potential = 0.95 + random.random() * 0.2
+        potential = 0.95 + self.rng.random() * 0.2
         dominant_species = (
             parent_a.species if parent_a.level >= parent_b.level else parent_b.species
         )
@@ -91,7 +92,7 @@ class GameState:
         )
         egg = Egg(
             species=dominant_species.name,
-            days_until_hatch=random.randint(2, 4),
+            days_until_hatch=self.rng.randint(2, 4),
             potential=potential,
             nickname_hint=nickname_hint,
             parent_names=[parent_a.name, parent_b.name],
@@ -139,14 +140,22 @@ class GameState:
             )
 
     def _maybe_random_event(self) -> None:
-        roll = random.random()
+        roll = self.rng.random()
         if roll < 0.12:
             self.gold += 10
             self.log_event("Visitors tipped 10 gold after a stable tour.")
         elif roll > 0.9 and self.gold > 30:
-            loss = random.randint(5, 15)
+            loss = self.rng.randint(5, 15)
             self.gold -= loss
             self.log_event(f"Equipment repairs cost {loss} gold.")
+
+    def seed_rng(self, seed: Optional[int]) -> None:
+        """Seed the internal RNG for deterministic simulations."""
+
+        if seed is None:
+            self.rng = random.Random()
+        else:
+            self.rng = random.Random(seed)
 
     # ------------------------------------------------------------------
     # Persistence

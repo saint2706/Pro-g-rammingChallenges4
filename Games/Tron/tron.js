@@ -1,3 +1,5 @@
+import { NetworkManager } from './networking.js';
+
 const canvas = document.getElementById('arena');
 const ctx = canvas.getContext('2d');
 const scoreboardEl = document.getElementById('scoreboard');
@@ -119,6 +121,54 @@ const BOOST_TYPES = ['speed', 'shield'];
 
 const MAX_GAMEPADS = 4;
 
+class TrailSpatialIndex {
+  constructor(bucketSize = 8) {
+    this.bucketSize = bucketSize;
+    this.values = new Map();
+    this.buckets = new Map();
+  }
+
+  clear() {
+    this.values.clear();
+    this.buckets.clear();
+  }
+
+  set(x, y, value) {
+    const coordKey = `${x},${y}`;
+    const bucketKey = this.bucketKey(x, y);
+    let bucket = this.buckets.get(bucketKey);
+    if (!bucket) {
+      bucket = new Map();
+      this.buckets.set(bucketKey, bucket);
+    }
+    bucket.set(coordKey, value);
+    this.values.set(coordKey, value);
+  }
+
+  delete(x, y) {
+    const coordKey = `${x},${y}`;
+    const bucketKey = this.bucketKey(x, y);
+    const bucket = this.buckets.get(bucketKey);
+    if (bucket) {
+      bucket.delete(coordKey);
+      if (bucket.size === 0) {
+        this.buckets.delete(bucketKey);
+      }
+    }
+    this.values.delete(coordKey);
+  }
+
+  get(x, y) {
+    return this.values.get(`${x},${y}`) ?? null;
+  }
+
+  bucketKey(x, y) {
+    const bx = Math.floor(x / this.bucketSize);
+    const by = Math.floor(y / this.bucketSize);
+    return `${bx},${by}`;
+  }
+}
+
 class LightCycle {
   constructor(descriptor) {
     Object.assign(this, descriptor);
@@ -144,181 +194,6 @@ class LightCycle {
   }
 }
 
-class NetworkManager {
-  constructor(updateCallback, inputCallback, statusCallback) {
-    this.peer = null;
-    this.channel = null;
-    this.role = 'standalone';
-    this.updateCallback = updateCallback;
-    this.inputCallback = inputCallback;
-    this.statusCallback = statusCallback;
-    this.isReady = false;
-    this.pendingPlayerId = null;
-  }
-
-  setRole(role) {
-    this.role = role;
-    if (role === 'standalone') {
-      this.teardown();
-    }
-  }
-
-  teardown() {
-    if (this.channel) {
-      this.channel.close();
-    }
-    if (this.peer) {
-      this.peer.close();
-    }
-    this.peer = null;
-    this.channel = null;
-    this.isReady = false;
-  }
-
-  async createOffer(playerId) {
-    this.pendingPlayerId = playerId;
-    this.peer = new RTCPeerConnection({
-      iceServers: [{ urls: ['stun:stun.l.google.com:19302'] }]
-    });
-    this.channel = this.peer.createDataChannel('tron');
-    this.attachChannel();
-    const offer = await this.peer.createOffer();
-    await this.peer.setLocalDescription(offer);
-    await this.waitForIceGathering();
-    return btoa(JSON.stringify(this.peer.localDescription));
-  }
-
-  async acceptAnswer(answerText) {
-    if (!this.peer) {
-      throw new Error('Create an offer first.');
-    }
-    const answer = JSON.parse(atob(answerText));
-    await this.peer.setRemoteDescription(answer);
-    this.statusCallback('Remote pilot connected.');
-  }
-
-  async submitOffer(offerText, playerId) {
-    this.pendingPlayerId = playerId;
-    this.peer = new RTCPeerConnection({
-      iceServers: [{ urls: ['stun:stun.l.google.com:19302'] }]
-    });
-    this.peer.ondatachannel = (event) => {
-      this.channel = event.channel;
-      this.attachChannel();
-    };
-    await this.peer.setRemoteDescription(JSON.parse(atob(offerText)));
-    const answer = await this.peer.createAnswer();
-    await this.peer.setLocalDescription(answer);
-    await this.waitForIceGathering();
-    return btoa(JSON.stringify(this.peer.localDescription));
-  }
-
-  attachChannel() {
-    this.channel.binaryType = 'arraybuffer';
-    this.channel.onopen = () => {
-      this.isReady = true;
-      this.statusCallback('Data channel ready.');
-      if (this.role === 'client') {
-        this.channel.send(
-          JSON.stringify({
-            type: 'identify',
-            playerId: this.pendingPlayerId
-          })
-        );
-      } else if (this.role === 'host' && this.pendingPlayerId) {
-        this.requestInputControl(this.pendingPlayerId);
-      }
-    };
-    this.channel.onmessage = (event) => {
-      try {
-        const data = JSON.parse(event.data);
-        if (data.type === 'state') {
-          this.updateCallback(data.payload);
-        } else if (data.type === 'requestInput') {
-          this.pendingPlayerId = data.playerId;
-        } else if (data.type === 'identify') {
-          this.pendingPlayerId = data.playerId;
-        } else if (data.type === 'input') {
-          this.inputCallback(data);
-        } else if (data.type === 'status') {
-          this.statusCallback(data.message);
-        }
-      } catch (err) {
-        console.error('Network message parse error', err);
-      }
-    };
-    this.channel.onclose = () => {
-      this.statusCallback('Network channel closed.');
-      this.isReady = false;
-    };
-  }
-
-  sendState(state) {
-    if (this.isReady && this.channel && this.channel.readyState === 'open') {
-      this.channel.send(
-        JSON.stringify({
-          type: 'state',
-          payload: state
-        })
-      );
-    }
-  }
-
-  sendStatus(message) {
-    if (this.isReady && this.channel && this.channel.readyState === 'open') {
-      this.channel.send(
-        JSON.stringify({
-          type: 'status',
-          message
-        })
-      );
-    }
-  }
-
-  requestInputControl(playerId) {
-    if (this.isReady && this.channel && this.channel.readyState === 'open') {
-      this.channel.send(
-        JSON.stringify({
-          type: 'requestInput',
-          playerId
-        })
-      );
-    }
-  }
-
-  forwardInput(playerId, direction) {
-    if (this.isReady && this.channel && this.channel.readyState === 'open') {
-      this.channel.send(
-        JSON.stringify({
-          type: 'input',
-          playerId,
-          direction
-        })
-      );
-    }
-  }
-
-  waitForIceGathering() {
-    if (!this.peer) return Promise.resolve();
-    if (this.peer.iceGatheringState === 'complete') {
-      return Promise.resolve();
-    }
-    return new Promise((resolve) => {
-      const checkState = () => {
-        if (!this.peer) {
-          resolve();
-          return;
-        }
-        if (this.peer.iceGatheringState === 'complete') {
-          this.peer.removeEventListener('icegatheringstatechange', checkState);
-          resolve();
-        }
-      };
-      this.peer.addEventListener('icegatheringstatechange', checkState);
-    });
-  }
-}
-
 class TronGame {
   constructor() {
     this.players = PLAYER_PRESETS.map((preset) => new LightCycle(preset));
@@ -326,6 +201,8 @@ class TronGame {
     this.gridHeight = SIZE_PRESETS.md.height;
     this.cellSize = 20;
     this.grid = [];
+    this.trailIndex = new TrailSpatialIndex(8);
+    this.freeCells = new Set();
     this.variant = 'classic';
     this.speed = SPEED_PRESETS.normal;
     this.roundTimer = null;
@@ -548,6 +425,13 @@ class TronGame {
     this.grid = Array.from({ length: this.gridHeight }, () => Array(this.gridWidth).fill(null));
     this.obstacles.clear?.();
     this.obstacles = new Set();
+    this.trailIndex.clear();
+    this.freeCells = new Set();
+    for (let y = 0; y < this.gridHeight; y += 1) {
+      for (let x = 0; x < this.gridWidth; x += 1) {
+        this.freeCells.add(`${x},${y}`);
+      }
+    }
 
     if (this.variant === 'ring') {
       const innerMargin = 4;
@@ -597,6 +481,8 @@ class TronGame {
       const [x, y] = key.split(',').map(Number);
       if (this.grid[y] && this.grid[y][x] !== undefined) {
         this.grid[y][x] = 'wall';
+        this.trailIndex.set(x, y, 'wall');
+        this.freeCells.delete(`${x},${y}`);
       }
     });
   }
@@ -609,6 +495,8 @@ class TronGame {
       const direction = this.initialDirectionForSpawn(spawn);
       player.resetForRound(spawn, direction);
       this.grid[spawn.y][spawn.x] = player.id;
+      this.trailIndex.set(spawn.x, spawn.y, player.id);
+      this.freeCells.delete(`${spawn.x},${spawn.y}`);
     });
   }
 
@@ -796,7 +684,7 @@ class TronGame {
 
   evaluateMove(player, next) {
     if (!this.inBounds(next.x, next.y)) return { valid: false, score: -Infinity };
-    const cell = this.grid[next.y][next.x];
+    const cell = this.trailIndex.get(next.x, next.y);
     if (cell && cell !== player.id && player.shieldTicks <= 0) {
       return { valid: false, score: -Infinity };
     }
@@ -830,7 +718,7 @@ class TronGame {
       const key = `${x},${y}`;
       if (visited.has(key)) continue;
       if (!this.inBounds(x, y)) continue;
-      const cell = this.grid[y][x];
+      const cell = this.trailIndex.get(x, y);
       if (cell) continue;
       visited.add(key);
       size += 1;
@@ -839,7 +727,7 @@ class TronGame {
         const ny = y + dy;
         const nKey = `${nx},${ny}`;
         if (!visited.has(nKey) && this.inBounds(nx, ny)) {
-          const value = this.grid[ny][nx];
+          const value = this.trailIndex.get(nx, ny);
           if (!value) queue.push({ x: nx, y: ny });
         }
       });
@@ -895,7 +783,7 @@ class TronGame {
         crashes.add(player);
         return;
       }
-      const cell = this.grid[target.y][target.x];
+      const cell = this.trailIndex.get(target.x, target.y);
       const boost = this.boosts.find((b) => b.x === target.x && b.y === target.y);
       if (cell && cell !== player.id) {
         if (player.shieldTicks > 0) {
@@ -933,6 +821,7 @@ class TronGame {
         return;
       }
       this.grid[player.position.y][player.position.x] = player.id;
+      this.trailIndex.set(player.position.x, player.position.y, player.id);
       player.position = target;
       player.trail.push({ ...target });
       if (player.trail.length > 512) {
@@ -949,6 +838,8 @@ class TronGame {
         this.boosts = this.boosts.filter((b) => b !== boost);
       }
       this.grid[target.y][target.x] = player.id;
+      this.trailIndex.set(target.x, target.y, player.id);
+      this.freeCells.delete(`${target.x},${target.y}`);
     });
 
     this.players.forEach((player) => {
@@ -966,6 +857,8 @@ class TronGame {
             player.position = extraTarget;
             player.trail.push({ ...extraTarget });
             this.grid[extraTarget.y][extraTarget.x] = player.id;
+            this.trailIndex.set(extraTarget.x, extraTarget.y, player.id);
+            this.freeCells.delete(`${extraTarget.x},${extraTarget.y}`);
           } else {
             player.speedTicks = 0;
             crashes.add(player);
@@ -1001,24 +894,32 @@ class TronGame {
   }
 
   spawnBoost() {
-    const freeCells = [];
-    for (let y = 0; y < this.gridHeight; y++) {
-      for (let x = 0; x < this.gridWidth; x++) {
-        if (!this.grid[y][x]) {
-          freeCells.push({ x, y });
-        }
-      }
+    if (!this.freeCells.size) return;
+    const entries = Array.from(this.freeCells);
+    if (!entries.length) return;
+    const pick = entries[Math.floor(Math.random() * entries.length)];
+    if (!pick) return;
+    const [x, y] = pick.split(',').map(Number);
+    if (this.trailIndex.get(x, y)) {
+      this.freeCells.delete(pick);
+      return;
     }
-    if (!freeCells.length) return;
-    const { x, y } = freeCells[Math.floor(Math.random() * freeCells.length)];
     const type = BOOST_TYPES[Math.floor(Math.random() * BOOST_TYPES.length)];
     this.boosts.push({ x, y, type, ttl: 80 });
+    this.freeCells.delete(pick);
   }
 
   decayBoosts() {
-    this.boosts = this.boosts
-      .map((boost) => ({ ...boost, ttl: boost.ttl - 1 }))
-      .filter((boost) => boost.ttl > 0);
+    const survivors = [];
+    this.boosts.forEach((boost) => {
+      const updated = { ...boost, ttl: boost.ttl - 1 };
+      if (updated.ttl > 0) {
+        survivors.push(updated);
+      } else if (!this.trailIndex.get(updated.x, updated.y)) {
+        this.freeCells.add(`${updated.x},${updated.y}`);
+      }
+    });
+    this.boosts = survivors;
   }
 
   serializeState() {
