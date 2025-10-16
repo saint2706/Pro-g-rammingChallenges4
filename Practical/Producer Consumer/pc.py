@@ -19,7 +19,7 @@ import argparse
 import queue
 import threading
 import time
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any, Optional
 
 # Sentinel used to signal consumers to exit. A unique object so it won't
@@ -43,6 +43,15 @@ class Config:
 class Stats:
     produced: int = 0
     consumed: int = 0
+    _lock: threading.Lock = field(default_factory=threading.Lock, init=False, repr=False)
+
+    def increment_produced(self) -> None:
+        with self._lock:
+            self.produced += 1
+
+    def increment_consumed(self) -> None:
+        with self._lock:
+            self.consumed += 1
 
 
 class Logger:
@@ -118,7 +127,7 @@ def producer_task(
         value = (idx, i)  # tuple: (producer id, sequence)
         # blocks if queue full
         q.put(value)
-        stats.produced += 1
+        stats.increment_produced()
         log.log(f"P{idx} produced seq={i} size={q.qsize()}")
         if cfg.prod_delay > 0:
             time.sleep(cfg.prod_delay)
@@ -133,7 +142,7 @@ def consumer_task(
             q.task_done()
             log.log(f"C{idx} received sentinel -> exit")
             break
-        stats.consumed += 1
+        stats.increment_consumed()
         prod_id, seq = item  # unpack tuple produced
         log.log(f"C{idx} consumed P{prod_id} seq={seq} size={q.qsize()}")
         if cfg.cons_delay > 0:

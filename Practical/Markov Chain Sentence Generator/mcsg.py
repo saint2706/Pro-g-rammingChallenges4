@@ -67,20 +67,26 @@ class MarkovGenerator:
     TOKEN_SPLIT_RE = re.compile(r"\s+")
     STRIP_PUNCT_RE = re.compile(r"^[\W_]+|[\W_]+$")  # leading / trailing punctuation
 
-    def _tokenize(self, text: str) -> List[str]:
-        # Basic whitespace split, then strip punctuation at boundaries, keep internal apostrophes
+    SENTENCE_END_RE = re.compile(r"[.!?][\]\)\"']*$")
+
+    def _tokenize_with_boundaries(self, text: str) -> Tuple[List[str], List[bool]]:
+        """Tokenize the text while preserving sentence boundary hints."""
+
         raw = [t for t in self.TOKEN_SPLIT_RE.split(text) if t]
         tokens: List[str] = []
+        boundaries: List[bool] = []
         for tok in raw:
             stripped = self.STRIP_PUNCT_RE.sub("", tok)
             if not stripped:
                 continue
-            tokens.append(stripped.lower() if self.lower else stripped)
-        return tokens
+            cleaned = stripped.lower() if self.lower else stripped
+            tokens.append(cleaned)
+            boundaries.append(bool(self.SENTENCE_END_RE.search(tok)))
+        return tokens, boundaries
 
     def train(self, text: str) -> None:
         """Build the Markov model from a given source text."""
-        tokens = self._tokenize(text)
+        tokens, boundaries = self._tokenize_with_boundaries(text)
         self._token_count = len(tokens)
         if len(tokens) <= self.state_size:
             print(
@@ -90,11 +96,12 @@ class MarkovGenerator:
             return
         state: Deque[str] = deque(tokens[: self.state_size], maxlen=self.state_size)
         self._start_states.append(tuple(state))
-        for next_word in tokens[self.state_size :]:
-            self.model[tuple(state)].append(next_word)
-            if state[0].endswith("."):
-                self._start_states.append(tuple(state))
+        for idx, next_word in enumerate(tokens[self.state_size :], start=self.state_size):
+            current_state = tuple(state)
+            self.model[current_state].append(next_word)
             state.append(next_word)
+            if boundaries[idx - 1]:
+                self._start_states.append(tuple(state))
 
     # ---------------- Generation ---------------- #
     def generate(self, length: int, start_key: Optional[str] = None) -> str:

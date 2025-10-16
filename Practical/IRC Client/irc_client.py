@@ -60,6 +60,10 @@ class IRCClient:
         self.primary_target: Optional[str] = (
             config.channels[0] if config.channels else None
         )
+        self._stdin_reader: Optional[asyncio.StreamReader] = None
+        self._stdin_transport: Optional[asyncio.transports.Transport] = None
+        self._stdin_protocol: Optional[asyncio.StreamReaderProtocol] = None
+        self._stdin_fallback = False
 
     async def run(self) -> None:
         """Entry point for running the client with reconnection logic."""
@@ -104,6 +108,8 @@ class IRCClient:
             except asyncio.CancelledError:
                 break
             delay = min(delay * 2, 60.0)
+
+        await self._close_stdin_reader()
 
     async def _connect(self) -> None:
         """Establish the connection and perform initial handshake."""
@@ -173,12 +179,67 @@ class IRCClient:
                 payload = line.partition(":")[2] or line.split(" ", 1)[-1]
                 await self._send_raw(f"PONG :{payload}")
 
+    async def _ensure_stdin_reader(self) -> Optional[asyncio.StreamReader]:
+        if self._stdin_fallback:
+            return None
+        if self._stdin_reader is not None:
+            return self._stdin_reader
+
+        loop = asyncio.get_running_loop()
+        reader = asyncio.StreamReader()
+        protocol = asyncio.StreamReaderProtocol(reader)
+        try:
+            transport, _ = await loop.connect_read_pipe(lambda: protocol, sys.stdin)
+        except (NotImplementedError, RuntimeError, ValueError):
+            self._stdin_fallback = True
+            self._stdin_reader = None
+            self._stdin_protocol = None
+            self._stdin_transport = None
+            return None
+
+        self._stdin_reader = reader
+        self._stdin_protocol = protocol
+        self._stdin_transport = transport
+        return reader
+
+    async def _close_stdin_reader(self) -> None:
+        transport = self._stdin_transport
+        self._stdin_transport = None
+        self._stdin_reader = None
+        self._stdin_protocol = None
+        if transport is not None:
+            transport.close()
+
     async def _read_user_input(self) -> None:
         """Read commands and messages from stdin asynchronously."""
 
+        reader = await self._ensure_stdin_reader()
+        if reader is None:
+            await self._fallback_input_loop()
+            return
+
         while not self.stop_requested.is_set():
             try:
-                line = await asyncio.to_thread(sys.stdin.readline)
+                raw = await reader.readline()
+            except asyncio.CancelledError:
+                break
+            except Exception as exc:  # noqa: BLE001
+                raise ConnectionError(f"stdin error: {exc!s}") from exc
+
+            if raw == b"":
+                await self.quit("EOF on stdin")
+                return
+
+            line = raw.decode(errors="ignore").rstrip("\r\n")
+            await self._process_user_line(line)
+
+    async def _fallback_input_loop(self) -> None:
+        loop = asyncio.get_running_loop()
+        while not self.stop_requested.is_set():
+            try:
+                line = await loop.run_in_executor(None, sys.stdin.readline)
+            except asyncio.CancelledError:
+                break
             except Exception as exc:  # noqa: BLE001
                 raise ConnectionError(f"stdin error: {exc!s}") from exc
 
@@ -186,17 +247,19 @@ class IRCClient:
                 await self.quit("EOF on stdin")
                 return
 
-            line = line.rstrip("\n")
-            if not line:
-                continue
+            await self._process_user_line(line.rstrip("\r\n"))
 
-            if line.startswith("/"):
-                await self._handle_command(line[1:])
-            else:
-                if not self.primary_target:
-                    self._print_status("No default channel set. Use /join or /msg.")
-                    continue
-                await self.send_message(self.primary_target, line)
+    async def _process_user_line(self, line: str) -> None:
+        if not line:
+            return
+
+        if line.startswith("/"):
+            await self._handle_command(line[1:])
+        else:
+            if not self.primary_target:
+                self._print_status("No default channel set. Use /join or /msg.")
+                return
+            await self.send_message(self.primary_target, line)
 
     async def _handle_command(self, command_line: str) -> None:
         """Parse and execute a slash command from the user."""
