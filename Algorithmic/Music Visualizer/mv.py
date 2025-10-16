@@ -33,6 +33,7 @@ Examples
 from __future__ import annotations
 
 import argparse
+import importlib
 import json
 import math
 import os
@@ -41,6 +42,20 @@ from dataclasses import dataclass
 from typing import Iterable, Optional
 
 import numpy as np
+
+
+def _load_pyplot(headless: bool):
+    """Import matplotlib.pyplot on demand, honoring headless mode."""
+    try:
+        import matplotlib
+
+        if headless and "matplotlib.pyplot" not in sys.modules:
+            matplotlib.use("Agg")  # pragma: no cover - backend selection is env-specific
+        return importlib.import_module("matplotlib.pyplot")
+    except Exception as exc:  # pragma: no cover - propagated to user
+        raise RuntimeError(
+            "matplotlib is required for plotting. Install it or use --no-plot/--json."
+        ) from exc
 
 # Optional dependency handling: we do not import librosa at module import time
 # for faster CLI help and to allow JSON-only operations that may not require it.
@@ -60,12 +75,6 @@ except Exception:  # broad: user environment variations
             )
 
     librosa = _LibrosaStub()  # type: ignore
-
-try:  # pragma: no cover - headless path tested indirectly
-    import matplotlib.pyplot as plt
-except Exception as e:  # pragma: no cover
-    print("Error: matplotlib is required for plotting.", file=sys.stderr)
-    raise
 
 
 # ---------------------------- Data Model ---------------------------- #
@@ -170,11 +179,7 @@ def plot_data(
 ) -> None:
     if cfg.no_plot:
         return
-    # If headless, use non-interactive backend
-    if cfg.headless:
-        import matplotlib
-
-        matplotlib.use("Agg")  # pragma: no cover (environment dependent)
+    plt = _load_pyplot(cfg.headless)
 
     fig, ax = plt.subplots(figsize=(12, 6))
     if cfg.mel:

@@ -301,14 +301,15 @@ def analyze_text_statistics(
     if not isinstance(text, str):
         raise TypeError("Input text must be a string")
 
-    # Get character counts
+    # Get character counts and normalized text
     char_counts = get_char_counts(text, case_sensitive)
+    processed_text = text if case_sensitive else text.lower()
 
     # Calculate statistics
-    total_chars = len(text)
+    total_chars = len(processed_text)
     unique_chars = len(char_counts)
-    entropy = calculate_entropy(text)
-    diversity = calculate_diversity_index(text)
+    entropy = calculate_entropy(processed_text)
+    diversity = calculate_diversity_index(processed_text)
     categories = analyze_character_categories(text)
     most_common = char_counts.most_common(top_n)
 

@@ -56,8 +56,11 @@ class PasswordSpec:
         if categories == 0:
             raise ValueError("At least one character category must be enabled")
         if categories < self.min_categories:
-            # Soft policy for encouraging stronger diversity; not strictly required.
-            pass
+            raise ValueError(
+                "Selected character categories do not meet the minimum diversity "
+                f"requirement of {self.min_categories}. Enable more categories or "
+                "lower the --min-categories threshold."
+            )
         if self.count <= 0:
             raise ValueError("Count must be >= 1")
 
