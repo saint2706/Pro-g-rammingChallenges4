@@ -12,7 +12,7 @@ import argparse
 import random
 from datetime import datetime
 from pathlib import Path
-from typing import Callable
+from typing import Callable, Dict
 
 import gymnasium as gym
 import numpy as np
@@ -25,6 +25,26 @@ from stable_baselines3.common.callbacks import (
 )
 from stable_baselines3.common.evaluation import evaluate_policy
 from stable_baselines3.common.vec_env import DummyVecEnv
+
+
+PRESETS: Dict[str, Dict[str, object]] = {
+    "cartpole": {
+        "env_id": "CartPole-v1",
+        "total_timesteps": 100_000,
+        "learning_rate": 5e-4,
+        "buffer_size": 50_000,
+        "batch_size": 64,
+        "gamma": 0.99,
+    },
+    "lunarlander": {
+        "env_id": "LunarLander-v2",
+        "total_timesteps": 300_000,
+        "learning_rate": 3e-4,
+        "buffer_size": 200_000,
+        "batch_size": 128,
+        "gamma": 0.995,
+    },
+}
 
 
 def make_env(env_id: str, seed: int) -> Callable[[], gym.Env]:
@@ -135,6 +155,11 @@ def build_parser() -> argparse.ArgumentParser:
         default=0.2,
         help="Fraction of training steps used for exploration annealing.",
     )
+    parser.add_argument(
+        "--preset",
+        choices=tuple(PRESETS.keys()),
+        help="Optional configuration preset to apply before running.",
+    )
     return parser
 
 
@@ -223,6 +248,10 @@ def main() -> None:
     parser = build_parser()
     args = parser.parse_args()
 
+    if getattr(args, "preset", None):
+        for key, value in PRESETS[args.preset].items():
+            setattr(args, key, value)
+
     if args.mode == "train":
         train(args)
     else:
@@ -231,3 +260,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+

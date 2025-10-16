@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from typing import List, Sequence, Tuple
 
 import numpy as np
+from numpy.lib.stride_tricks import sliding_window_view
 
 
 Array = np.ndarray
@@ -158,62 +159,30 @@ class MaxPool2D(Layer):
     def __init__(self, kernel_size: int, stride: int):
         self.kernel_size = kernel_size
         self.stride = stride
-        self._mask: Array | None = None
+        self._mask_windows: Array | None = None
         self._input_shape: Tuple[int, int, int, int] | None = None
 
     def forward(self, x: Array) -> Array:
-        n, c, h, w = x.shape
-        out_h = (h - self.kernel_size) // self.stride + 1
-        out_w = (w - self.kernel_size) // self.stride + 1
-
-        out = np.empty((n, c, out_h, out_w), dtype=x.dtype)
-        mask = np.zeros_like(x, dtype=bool)
-        for b in range(n):
-            for ch in range(c):
-                for i in range(out_h):
-                    for j in range(out_w):
-                        i0 = i * self.stride
-                        j0 = j * self.stride
-                        window = x[
-                            b,
-                            ch,
-                            i0 : i0 + self.kernel_size,
-                            j0 : j0 + self.kernel_size,
-                        ]
-                        max_idx = np.unravel_index(np.argmax(window), window.shape)
-                        out[b, ch, i, j] = window[max_idx]
-                        mask[b, ch, i0 + max_idx[0], j0 + max_idx[1]] = True
-        self._mask = mask
         self._input_shape = x.shape
-        return out
+        windows = sliding_window_view(
+            x, (self.kernel_size, self.kernel_size), axis=(2, 3)
+        )
+        windows = windows[:, :, :: self.stride, :: self.stride, :, :]
+        pooled = windows.max(axis=(-1, -2))
+        self._mask_windows = windows == pooled[..., None, None]
+        return pooled
 
     def backward(
         self, grad: Array, learning_rate: float
     ) -> Array:  # noqa: ARG002 - interface requires parameter
-        assert self._mask is not None and self._input_shape is not None
+        assert self._mask_windows is not None and self._input_shape is not None
         n, c, h, w = self._input_shape
-        out_h = (h - self.kernel_size) // self.stride + 1
-        out_w = (w - self.kernel_size) // self.stride + 1
-
         dx = np.zeros((n, c, h, w), dtype=grad.dtype)
-        for b in range(n):
-            for ch in range(c):
-                for i in range(out_h):
-                    for j in range(out_w):
-                        i0 = i * self.stride
-                        j0 = j * self.stride
-                        window_mask = self._mask[
-                            b,
-                            ch,
-                            i0 : i0 + self.kernel_size,
-                            j0 : j0 + self.kernel_size,
-                        ]
-                        dx[
-                            b,
-                            ch,
-                            i0 : i0 + self.kernel_size,
-                            j0 : j0 + self.kernel_size,
-                        ][window_mask] += grad[b, ch, i, j]
+
+        grad_expanded = grad[..., None, None] * self._mask_windows
+        for i in range(self.kernel_size):
+            for j in range(self.kernel_size):
+                dx[:, :, i :: self.stride, j :: self.stride] += grad_expanded[..., i, j]
         return dx
 
 

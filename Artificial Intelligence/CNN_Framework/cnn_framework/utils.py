@@ -3,11 +3,12 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Dict
+from typing import Dict, Optional
 
 import torch
 from torch import nn
 from torch.utils.data import DataLoader
+from torch.optim import Optimizer
 
 
 def get_device(prefer_gpu: bool = True) -> torch.device:
@@ -62,20 +63,39 @@ def evaluate(
     }
 
 
-def save_checkpoint(model: nn.Module, path: str | Path) -> None:
-    """Save ``model`` weights to ``path``."""
+def save_checkpoint(
+    model: nn.Module,
+    path: str | Path,
+    *,
+    optimizer: Optional[Optimizer] = None,
+    metadata: Optional[Dict[str, object]] = None,
+) -> None:
+    """Save ``model`` weights (and optional optimizer state) to ``path``."""
 
     Path(path).parent.mkdir(parents=True, exist_ok=True)
-    torch.save(model.state_dict(), str(path))
+    checkpoint: Dict[str, object] = {"model_state": model.state_dict()}
+    if optimizer is not None:
+        checkpoint["optimizer_state"] = optimizer.state_dict()
+    if metadata is not None:
+        checkpoint["metadata"] = metadata
+    torch.save(checkpoint, str(path))
 
 
 def load_checkpoint(
-    model: nn.Module, path: str | Path, map_location: str | torch.device | None = None
+    model: nn.Module,
+    path: str | Path,
+    map_location: str | torch.device | None = None,
+    optimizer: Optional[Optimizer] = None,
 ) -> nn.Module:
-    """Load weights into ``model`` from ``path`` and return the model."""
+    """Load weights (and optional optimizer state) from ``path`` into ``model``."""
 
-    state_dict = torch.load(str(path), map_location=map_location)
-    model.load_state_dict(state_dict)
+    checkpoint = torch.load(str(path), map_location=map_location)
+    if "model_state" in checkpoint:
+        model.load_state_dict(checkpoint["model_state"])
+        if optimizer is not None and "optimizer_state" in checkpoint:
+            optimizer.load_state_dict(checkpoint["optimizer_state"])
+    else:
+        model.load_state_dict(checkpoint)
     return model
 
 

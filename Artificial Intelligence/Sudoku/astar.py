@@ -2,7 +2,7 @@
 import argparse
 import numpy as np
 import heapq
-from typing import List, Tuple, Optional, Set
+from typing import List, Optional, Tuple
 
 
 class Sudoku:
@@ -18,15 +18,24 @@ class Sudoku:
         Returns True if solved, False otherwise. Modifies the board in-place.
         """
 
-        def heuristic(board: np.ndarray) -> int:
-            return np.count_nonzero(board == 0)
+        def heuristic(board: np.ndarray) -> tuple[int, int]:
+            empties = np.argwhere(board == 0)
+            if empties.size == 0:
+                return (0, 0)
+            candidate_score = sum(
+                self._candidate_count(board, r, c) for r, c in map(tuple, empties)
+            )
+            return (int(empties.shape[0]), int(candidate_score))
 
-        start = (heuristic(self.board), 0, self.board.copy())
-        heap: list[tuple[int, int, np.ndarray]] = [start]
+        g = 0
+        h_empty, h_candidates = heuristic(self.board)
+        start = (g + h_empty, h_empty, h_candidates, g, 0, self.board.copy())
+        heap: list[tuple[int, int, int, int, int, np.ndarray]] = [start]
         visited: set[bytes] = set()
+        counter = 1
 
         while heap:
-            f, g, board = heapq.heappop(heap)
+            _, _, _, g, _, board = heapq.heappop(heap)
             board_bytes = board.tobytes()
             if board_bytes in visited:
                 continue
@@ -35,14 +44,31 @@ class Sudoku:
             if empty.size == 0:
                 self.board = board
                 return True
-            r, c = empty[0]
-            for num in range(1, 10):
-                temp_sudoku = Sudoku(board.tolist())
-                if temp_sudoku.is_valid_move(num, (r, c)):
-                    new_board = board.copy()
-                    new_board[r, c] = num
-                    h = heuristic(new_board)
-                    heapq.heappush(heap, (g + 1 + h, g + 1, new_board))
+            candidates_info = [
+                (self._candidate_count(board, r, c), r, c)
+                for r, c in map(tuple, empty)
+            ]
+            candidates_info.sort()
+            count, r, c = candidates_info[0]
+            if count == 0:
+                continue
+
+            for num in self._candidates(board, r, c):
+                new_board = board.copy()
+                new_board[r, c] = num
+                h_empty, h_candidates = heuristic(new_board)
+                heapq.heappush(
+                    heap,
+                    (
+                        (g + 1) + h_empty,
+                        h_empty,
+                        h_candidates,
+                        g + 1,
+                        counter,
+                        new_board,
+                    ),
+                )
+                counter += 1
         return False
 
     def solve(self) -> bool:
@@ -71,16 +97,25 @@ class Sudoku:
 
         return False
 
+    @staticmethod
+    def _candidates(board: np.ndarray, row: int, col: int) -> List[int]:
+        if board[row, col] != 0:
+            return []
+        row_vals = board[row, :]
+        col_vals = board[:, col]
+        box_r = (row // 3) * 3
+        box_c = (col // 3) * 3
+        box_vals = board[box_r : box_r + 3, box_c : box_c + 3].ravel()
+        used = set(np.concatenate((row_vals, col_vals, box_vals)))
+        used.discard(0)
+        return [num for num in range(1, 10) if num not in used]
+
+    @classmethod
+    def _candidate_count(cls, board: np.ndarray, row: int, col: int) -> int:
+        return len(cls._candidates(board, row, col))
+
     def is_valid_move(self, num: int, pos: Tuple[int, int]) -> bool:
-        row, col = pos
-        if num in self.board[row, :]:
-            return False
-        if num in self.board[:, col]:
-            return False
-        box_x, box_y = col // 3, row // 3
-        if num in self.board[box_y * 3 : box_y * 3 + 3, box_x * 3 : box_x * 3 + 3]:
-            return False
-        return True
+        return num in self._candidates(self.board, *pos)
 
     def find_empty_cell(self) -> Optional[Tuple[int, int]]:
         """

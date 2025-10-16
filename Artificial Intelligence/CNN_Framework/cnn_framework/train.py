@@ -47,6 +47,20 @@ def train_model(config: TrainConfig) -> Dict[str, float]:
     optimizer = torch.optim.Adam(model.parameters(), lr=config.learning_rate)
     loss_fn: nn.Module = nn.CrossEntropyLoss()
 
+    initial_metrics = evaluate(model, eval_loader, device=device, loss_fn=loss_fn)
+    if config.epochs <= 0:
+        print(
+            "No training epochs requested; returning initial evaluation without updating weights."
+        )
+        save_checkpoint(
+            model,
+            config.checkpoint_path,
+            optimizer=optimizer,
+            metadata={"epoch": 0, "metrics": initial_metrics},
+        )
+        return initial_metrics
+
+    metrics: Dict[str, float] = initial_metrics
     for epoch in range(1, config.epochs + 1):
         model.train()
         running_loss = 0.0
@@ -75,7 +89,12 @@ def train_model(config: TrainConfig) -> Dict[str, float]:
             f"eval_loss={metrics['loss']:.4f} eval_acc={metrics['accuracy']:.4f}"
         )
 
-    save_checkpoint(model, config.checkpoint_path)
+    save_checkpoint(
+        model,
+        config.checkpoint_path,
+        optimizer=optimizer,
+        metadata={"epoch": config.epochs, "metrics": metrics},
+    )
     return metrics
 
 
