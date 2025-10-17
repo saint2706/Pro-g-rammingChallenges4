@@ -99,26 +99,6 @@ Consult the consolidated [debugging guide](docs/debugging.md) for a full matrix 
 - Ray tracer scenes live under `Emulation/RayTracer/scenes/`; `minimal.json` mirrors the asset used in the hash regression test. 【F:tests/test_raytracer.py†L16-L23】
 - CNN framework runs emit checkpoints under `Artificial Intelligence/CNN_Framework/checkpoints/` (configurable via `TrainConfig.checkpoint_path`). 【F:tests/test_cnn_framework.py†L24-L49】
 
-## Streamlit deployment keep-alive workflow
-
-The repository includes a GitHub Actions workflow at `.github/workflows/keep-streamlit-alive.yml` that pings the deployed Streamlit app on a schedule. The job runs hourly to keep the hosted instance warm and also supports manual runs so maintainers can verify that the endpoint is still responding.
-
-### Configure the `STREAMLIT_PING_URL` secret
-
-1. In GitHub, open **Settings → Secrets and variables → Actions** for this repository.
-1. Add a new repository secret named `STREAMLIT_PING_URL` that contains the fully qualified URL of the Streamlit deployment (e.g., `https://example.streamlit.app/`).
-1. Save the secret; the workflow will automatically read the value when it runs on its hourly schedule. If the secret is missing (or blank), the job now logs a warning and exits successfully instead of failing, so unattended runs will not flap.
-
-### Override the ping target for debugging
-
-When triggering the workflow manually via **Actions → Keep Streamlit deployment alive → Run workflow**, you can provide the optional `target_url` input to override the secret for a single run. This is useful when testing staging environments or validating that the workflow definition still functions end-to-end without touching the production secret.
-
-### Manually test the keep-alive workflow
-
-1. Navigate to **Actions → Keep Streamlit deployment alive** in GitHub.
-1. Click **Run workflow** to launch it on demand. You may leave the `target_url` field blank to use the `STREAMLIT_PING_URL` secret, or provide a one-off URL for testing.
-1. Review the workflow run logs to ensure the keep-alive request succeeded.
-
 ## Challenges
 
 ### Practical
