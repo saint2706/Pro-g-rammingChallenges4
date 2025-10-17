@@ -84,6 +84,7 @@ class AutosaveTextEditor:
         self.encoding = self.config.encoding
         self.backup_dir = self.config.backup_dir
         self.max_backups = max(0, self.config.max_backups)
+        self._status_after_id: Optional[str] = None
 
         # Event bindings
         self.text_area.bind("<<Modified>>", self._on_modified)
@@ -335,8 +336,17 @@ class AutosaveTextEditor:
 
     def _set_status(self, msg: str) -> None:
         self.status_bar.config(text=msg)
+        if self._status_after_id is not None:
+            with contextlib.suppress(tk.TclError):
+                self.master.after_cancel(self._status_after_id)
+            self._status_after_id = None
+
+        def clear() -> None:
+            self.status_bar.config(text="")
+            self._status_after_id = None
+
         # Clear after 5 seconds
-        self.master.after(5000, lambda: self.status_bar.config(text=""))
+        self._status_after_id = self.master.after(5000, clear)
 
     def _on_close(self) -> None:
         if not self._maybe_discard_changes():
