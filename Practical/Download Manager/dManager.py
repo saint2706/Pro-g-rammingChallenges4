@@ -325,15 +325,17 @@ def single_thread_download(
             verify=cfg.verify_tls,
         ) as r:
             r.raise_for_status()
-            total = (
-                size
-                if size is not None
-                else (
-                    existing + int(r.headers.get(CONTENT_LENGTH, 0))
-                    if not existing
-                    else None
-                )
-            )
+            content_length = r.headers.get(CONTENT_LENGTH)
+            total: Optional[int] = None
+            if size is not None and size >= 0:
+                total = size
+            elif content_length:
+                try:
+                    length = int(content_length)
+                except (TypeError, ValueError):
+                    total = None
+                else:
+                    total = existing + length if existing else length
             with (
                 open(file_path, mode) as f,
                 tqdm(
@@ -361,10 +363,10 @@ def single_thread_download(
 
 def download(cfg: Config) -> Result:
     t0 = time.time()
-    size, range_ok, headers = probe(
+    probed_size, range_ok, headers = probe(
         cfg.url, cfg.timeout, cfg.verify_tls, cfg.user_agent
     )
-    if size is None:
+    if probed_size is None and not headers:
         return Result(
             cfg.url,
             str(cfg.output),
@@ -377,9 +379,12 @@ def download(cfg: Config) -> Result:
             None,
             "Probe failed",
         )
+    size = probed_size
+    reported_size = size if size is not None else -1
 
     resumed = False
     session = requests.Session()
+    threads_used = 1
 
     if cfg.resume and cfg.output.exists():
         existing = cfg.output.stat().st_size
@@ -407,6 +412,8 @@ def download(cfg: Config) -> Result:
                 checksum_match,
                 None,
             )
+        elif existing:
+            resumed = True
 
     downloaded = 0
     resume_state: Optional[ResumeState] = None
@@ -463,6 +470,7 @@ def download(cfg: Config) -> Result:
                         downloaded += fut.result()
             else:
                 pbar.update(0)
+        threads_used = cfg.threads
 
     elapsed = time.time() - t0
     final_size = cfg.output.stat().st_size if cfg.output.exists() else 0
@@ -486,9 +494,9 @@ def download(cfg: Config) -> Result:
     return Result(
         url=cfg.url,
         output=str(cfg.output),
-        size=size if size is not None else -1,
+        size=reported_size,
         downloaded=final_size,
-        threads=cfg.threads if range_ok else 1,
+        threads=threads_used,
         elapsed=elapsed,
         resumed=resumed,
         checksum=checksum,
