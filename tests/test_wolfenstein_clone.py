@@ -12,9 +12,9 @@ import pytest
 
 pygame = pytest.importorskip("pygame")
 
-from Games.WolfensteinClone.game import GameConfig, MAP_DIR, WolfensteinGame
+from challenges.Games.WolfensteinClone.game import GameConfig, MAP_DIR, WolfensteinGame
 
-ASSET_DIR = Path("Games/WolfensteinClone/assets")
+ASSET_DIR = Path("challenges/Games/WolfensteinClone/assets")
 REQUIRED_TEXTURE = ASSET_DIR / "wall_stone.png"
 
 if not REQUIRED_TEXTURE.exists():

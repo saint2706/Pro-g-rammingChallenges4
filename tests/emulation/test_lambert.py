@@ -10,7 +10,7 @@ pytest.importorskip("scipy")
 
 import numpy as np
 
-from Emulation.LambertsProblem import minimum_time_of_flight, solve_lambert_universal
+from challenges.Emulation.LambertsProblem import minimum_time_of_flight, solve_lambert_universal
 
 
 @pytest.fixture()

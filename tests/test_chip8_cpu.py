@@ -7,10 +7,10 @@ from typing import Callable
 
 import pytest
 
-from Emulation.Chip8.cpu import CPU
-from Emulation.Chip8.display import DisplayBuffer
-from Emulation.Chip8.input import Keypad
-from Emulation.Chip8.memory import Memory
+from challenges.Emulation.Chip8.cpu import CPU
+from challenges.Emulation.Chip8.display import DisplayBuffer
+from challenges.Emulation.Chip8.input import Keypad
+from challenges.Emulation.Chip8.memory import Memory
 
 RNG_SEED = 1234
 

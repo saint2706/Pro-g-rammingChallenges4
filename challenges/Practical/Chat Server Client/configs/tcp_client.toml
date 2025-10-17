@@ -1,0 +1,5 @@
+host = "127.0.0.1"
+port = 8765
+room = "lobby"
+log_path = "challenges/Practical/Chat Server Client/logs/tcp-client.log"
+reconnect_delay = 3.0

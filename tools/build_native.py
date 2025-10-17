@@ -11,7 +11,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable, List, Sequence
 
-BASE_DEFAULT = Path("Practical/Producer Consumer")
+BASE_DEFAULT = Path("challenges/Practical/Producer Consumer")
 
 
 @dataclass(frozen=True)

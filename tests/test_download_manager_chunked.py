@@ -6,7 +6,13 @@ from pathlib import Path
 import pytest
 
 
-MODULE_PATH = Path(__file__).resolve().parents[1] / "Practical" / "Download Manager" / "dManager.py"
+MODULE_PATH = (
+    Path(__file__).resolve().parents[1]
+    / "challenges"
+    / "Practical"
+    / "Download Manager"
+    / "dManager.py"
+)
 
 
 @pytest.fixture(scope="module")

@@ -1,6 +1,0 @@
-# The AI demos pull dependencies from pyproject extras.
-# Common installs:
-#   python -m pip install -e .[ai]
-# The ai extra bundles torch/torchvision for the CNN framework.
-#   python -m pip install -e .[algorithmic]  # numerical tooling & plotting
-# See Artificial Intelligence/README.md for setup notes.

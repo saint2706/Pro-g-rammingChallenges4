@@ -15,6 +15,7 @@ def _load_simple_cnn():
         return sys.modules[module_name].SimpleCNN
     module_path = (
         Path(__file__).resolve().parents[2]
+        / "challenges"
         / "Artificial Intelligence"
         / "CNN_Scratch"
         / "cnn.py"

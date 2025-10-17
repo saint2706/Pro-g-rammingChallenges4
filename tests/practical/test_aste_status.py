@@ -8,7 +8,11 @@ from typing import Callable
 
 def load_aste_module():
     module_path = (
-        Path(__file__).resolve().parents[2] / "Practical" / "AutoSave Text Editor" / "aste.py"
+        Path(__file__).resolve().parents[2]
+        / "challenges"
+        / "Practical"
+        / "AutoSave Text Editor"
+        / "aste.py"
     )
     spec = importlib.util.spec_from_file_location("aste_module", module_path)
     module = importlib.util.module_from_spec(spec)

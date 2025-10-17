@@ -93,7 +93,7 @@ desktop.ini
 # Crash / profiling dumps
 *.core
 core.*
-!Practical/Chan Aggregator/chan_aggregator/core.py
+!challenges/Practical/Chan Aggregator/chan_aggregator/core.py
 *.pid
 *.prof
 *.perf
@@ -159,7 +159,7 @@ scratch/
 # (frame_*.png now generalized above)
 
 # Allow test fixtures & sample media if committed intentionally (e.g., 'fur elise.mp3')
-!Algorithmic/Music Visualizer/fur elise.mp3
+!challenges/Algorithmic/Music Visualizer/fur elise.mp3
 
 # Binary & diff artifacts
 *.bin
@@ -187,7 +187,7 @@ programming challenges.png
 !.gitignore
 !README.md
 !LICENSE
-!Practical/Imageboard/data/.gitignore
+!challenges/Practical/Imageboard/data/.gitignore
 
 ################################################################################
 # OPTIONAL (uncomment if you start adding these and don't want them tracked):

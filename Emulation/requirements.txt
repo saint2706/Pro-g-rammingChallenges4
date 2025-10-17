@@ -1,5 +1,0 @@
-# The Emulation suite now relies on the repository's pyproject extras.
-# Install what you need with:
-#   python -m pip install -e .[visual]
-#   python -m pip install -e .[algorithmic]
-# Optional 3D/ML helpers live in extras such as [visual] and [ai]; see Emulation/README.md for guidance.

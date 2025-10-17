@@ -1,0 +1,5 @@
+host = "127.0.0.1"
+port = 8765
+log_path = "challenges/Practical/Chat Server Client/logs/tcp-chat.log"
+history_size = 100
+max_connections = 128
