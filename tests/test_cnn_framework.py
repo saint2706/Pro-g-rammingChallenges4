@@ -18,7 +18,10 @@ except (
     pytest.skip(f"PyTorch stack not available: {exc}", allow_module_level=True)
 
 PACKAGE_ROOT = (
-    Path(__file__).resolve().parents[1] / "Artificial Intelligence" / "CNN_Framework"
+    Path(__file__).resolve().parents[1]
+    / "challenges"
+    / "Artificial Intelligence"
+    / "CNN_Framework"
 )
 if str(PACKAGE_ROOT) not in sys.path:
     sys.path.insert(0, str(PACKAGE_ROOT))

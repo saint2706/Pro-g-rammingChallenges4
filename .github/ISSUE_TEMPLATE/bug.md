@@ -26,7 +26,7 @@ labels: bug
 
 - [ ] Reviewed the relevant playbook in [docs/debugging.md](../../docs/debugging.md) and followed the manual smoke checks.
 - [ ] Ran targeted pytest commands for this category (see the guide for recommended invocations) and attached failing output.
-- [ ] Captured logs/artifacts (e.g. `Artificial Intelligence/CNN_Framework/checkpoints/`, emulator traces, or scene renders) that demonstrate the issue.
+- [ ] Captured logs/artifacts (e.g. `challenges/Artificial Intelligence/CNN_Framework/checkpoints/`, emulator traces, or scene renders) that demonstrate the issue.
 
 ## Additional context
 

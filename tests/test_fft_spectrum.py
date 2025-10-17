@@ -4,11 +4,11 @@ import wave
 import numpy as np
 import pytest
 
-from Emulation.FFTSpectrum.fft_spectrum import SpectrumConfig, chunk_to_fft
+from challenges.Emulation.FFTSpectrum.fft_spectrum import SpectrumConfig, chunk_to_fft
 
 
 def load_samples(window_size: int) -> np.ndarray:
-    wav_path = Path("Emulation/FFTSpectrum/test_tone.wav")
+    wav_path = Path("challenges/Emulation/FFTSpectrum/test_tone.wav")
     if not wav_path.exists() or wav_path.stat().st_size < 256:
         pytest.skip("FFT sample tone is unavailable; fetch Git LFS assets before running.")
     with wave.open(str(wav_path), "rb") as wav_file:

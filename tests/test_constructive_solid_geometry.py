@@ -8,7 +8,7 @@ import pytest
 
 pytest.importorskip("skimage")
 
-from Emulation.ConstructiveSolidGeometry import box, mesh_from_sdf, sphere
+from challenges.Emulation.ConstructiveSolidGeometry import box, mesh_from_sdf, sphere
 
 
 def _volume(mesh) -> float:

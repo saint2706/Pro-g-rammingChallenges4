@@ -1,0 +1,8 @@
+# Python game dependencies are exposed via the repo's optional extras.
+# Install the full toolkit with:
+#   python -m pip install -e .[games]
+# Optional helpers:
+#   python -m pip install -e .[visual]   # matplotlib visualisations
+#   python -m pip install -e .[audio]    # shared sound backends
+# Consult challenges/Games/README.md for per-title suggestions.
+# Roguelike depends on python-tcod (install manually: `python -m pip install tcod`).

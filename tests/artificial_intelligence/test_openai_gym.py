@@ -17,7 +17,7 @@ pytest.importorskip("stable_baselines3")
 import gymnasium as gym
 from stable_baselines3.common.monitor import Monitor
 
-PROJECT_ROOT = Path("Artificial Intelligence/OpenAI Gym")
+PROJECT_ROOT = Path("challenges/Artificial Intelligence/OpenAI Gym")
 POLICY_PATH = PROJECT_ROOT / "policies.py"
 
 

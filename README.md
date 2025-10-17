@@ -10,6 +10,23 @@ This repository is a collection of solutions to a wide array of programming prob
 
 The solutions are organized by category and difficulty, making it easy to navigate and find what you're looking for. Many of the projects are implemented in multiple languages to showcase different ways of solving the same problem.
 
+## Repository Structure
+
+All challenge implementations now live under a consolidated `challenges/` directory so tooling, tests, and packaging metadata can stay focused at the repository root.
+
+```
+.
+├── challenges/            # Category folders (Practical, Algorithmic, Games, Artificial Intelligence, Emulation)
+├── docs/                  # Guides, debugging tips, Git LFS instructions
+├── src/                   # Python support library powering shared tooling/tests
+├── tests/                 # Automated regression and smoke tests
+├── tools/                 # Helper scripts (native build harnesses, release automation)
+├── pyproject.toml         # Packaging metadata with optional dependency extras per category
+└── requirements*.txt      # Consolidated dependency snapshots
+```
+
+Category READMEs and progress tables now reference paths such as `challenges/Practical/Image Converter/` to emphasize the new layout. See [docs/repo-organization.md](docs/repo-organization.md) for the full decision log.
+
 ## Prerequisites
 
 - **Git LFS** – Install Git Large File Storage before cloning and run the sync commands from the [Git LFS setup guide](docs/git-lfs.md). Many challenges (games, audio tools, pretrained AI models) rely on large assets stored with LFS, so remember to run `git lfs install` and `git lfs pull` before building or testing.
@@ -62,13 +79,13 @@ The repository now ships a `pyproject.toml` so you can install challenge stacks 
 
 | Extra | Covers | Highlights |
 | ----- | ------ | ---------- |
-| `practical` | `Practical/` utilities, desktop apps, and web tools | Flask imageboard, Streamlit dashboards, Seam Carving, Shazam clone |
-| `algorithmic` | `Algorithmic/` problem set helpers | Steganography, stock analysis, crawler tooling |
+| `practical` | `challenges/Practical/` utilities, desktop apps, and web tools | Flask imageboard, Streamlit dashboards, Seam Carving, Shazam clone |
+| `algorithmic` | `challenges/Algorithmic/` problem set helpers | Steganography, stock analysis, crawler tooling |
 | `visual` | Visualization add-ons used across categories | Matplotlib demos, colour-science palettes, VPython spinny cube, FFT spectrum analyzer |
 | `audio` | Audio processing stacks | WAV equalizer, Shazam clone, music streaming |
-| `games` | Python games in `Games/` | Sudoku solver, Simon, Oil Panic tribute |
-| `constructive_solid_geometry` | `Emulation/ConstructiveSolidGeometry/` mesh utilities | Signed-distance field primitives, marching cubes meshing |
-| `ai` | `Artificial Intelligence/` demos | A\* Sudoku, Connect4 AI, neural network |
+| `games` | Python games in `challenges/Games/` | Sudoku solver, Simon, Oil Panic tribute |
+| `constructive_solid_geometry` | `challenges/Emulation/ConstructiveSolidGeometry/` mesh utilities | Signed-distance field primitives, marching cubes meshing |
+| `ai` | `challenges/Artificial Intelligence/` demos | A\* Sudoku, Connect4 AI, neural network |
 | `web` | HTTP and dashboard helpers | Imageboard, IP tracking, web crawlers |
 | `desktop` | GUI/automation conveniences | Window manager, key press bot, Tk front-ends |
 | `markdown` | Markdown Editor stack | Live preview, HTML export |
@@ -88,16 +105,16 @@ Consult the consolidated [debugging guide](docs/debugging.md) for a full matrix 
 **Quick commands**
 
 - `pytest tests/test_cli_help.py -k "Practical"` — exercise CLI entry points for Practical utilities headlessly. 【F:tests/test_cli_help.py†L1-L82】
-- `pytest tests/test_raytracer.py` — render deterministic sample scenes from `Emulation/RayTracer/scenes/minimal.json`. 【F:tests/test_raytracer.py†L11-L26】
+- `pytest tests/test_raytracer.py` — render deterministic sample scenes from `challenges/Emulation/RayTracer/scenes/minimal.json`. 【F:tests/test_raytracer.py†L11-L26】
 - `pytest tests/test_wolfenstein_clone.py` — boot the Wolfenstein raycasting engine with SDL's dummy backend. 【F:tests/test_wolfenstein_clone.py†L1-L45】
 - `pytest tests/test_ai_roguelike_smoke.py` — run the roguelike agent end-to-end using the bundled `tcod` stub. 【F:tests/test_ai_roguelike_smoke.py†L1-L194】
 - `pytest tests/test_cnn_framework.py` — perform a one-epoch MNIST training/evaluation cycle and verify checkpoints. 【F:tests/test_cnn_framework.py†L1-L49】
 
 **Manual spot checks**
 
-- Launch headless-friendly games with `python Games/WolfensteinClone/game.py --help` before interactive debugging to confirm argument parsing. 【F:Games/WolfensteinClone/game.py†L440-L520】
-- Ray tracer scenes live under `Emulation/RayTracer/scenes/`; `minimal.json` mirrors the asset used in the hash regression test. 【F:tests/test_raytracer.py†L16-L23】
-- CNN framework runs emit checkpoints under `Artificial Intelligence/CNN_Framework/checkpoints/` (configurable via `TrainConfig.checkpoint_path`). 【F:tests/test_cnn_framework.py†L24-L49】
+- Launch headless-friendly games with `python challenges/Games/WolfensteinClone/game.py --help` before interactive debugging to confirm argument parsing. 【F:challenges/Games/WolfensteinClone/game.py†L440-L520】
+- Ray tracer scenes live under `challenges/Emulation/RayTracer/scenes/`; `minimal.json` mirrors the asset used in the hash regression test. 【F:tests/test_raytracer.py†L16-L23】
+- CNN framework runs emit checkpoints under `challenges/Artificial Intelligence/CNN_Framework/checkpoints/` (configurable via `TrainConfig.checkpoint_path`). 【F:tests/test_cnn_framework.py†L24-L49】
 
 ## Challenges
 
@@ -105,95 +122,95 @@ Consult the consolidated [debugging guide](docs/debugging.md) for a full matrix 
 
 | # | Challenge | Status |
 | --- | --------- | ------ |
-| 1 | Download Manager | [View Solution](./Practical/Download%20Manager/) |
-| 2 | Make an elastic producer/consumer task queue. | [View Solution](./Practical/Producer%20Consumer/) |
-| 3 | IRC Client | [View Solution](./Practical/IRC%20Client/) |
-| 4 | Markov Chain Sentence Generator (Include Shitposting Capabilities) | [View Solution](./Practical/Markov%20Chain%20Sentence%20Generator/) |
-| 5 | English Sentence Parser that Points to the Context of a Sentence | [View Solution](./Practical/Context%20Pointer/) |
-| 6 | MIDI Player + Editor | [View Solution](./Practical/MIDI%20Player%20Editor/) |
-| 7 | Stock Market Simulator Using Yahoo Spreadsheet Data | [View Solution](./Practical/Stock%20Market%20Simulator/) |
-| 8 | Parametric/Graphic Equalizer for .wav files (Make it real-time) | [View Solution](./Practical/WAV%20Equalizer/) |
-| 9 | Graphing Calculator (BONUS: Graph the Function's Derivatives) | [View Solution](./Practical/Graphing%20Calculator/) |
-| 10 | To-Do List Application (Web app or CLI) | [View Solution](./Practical/ToDoList-CLI/) |
-| 11 | Verlet Integration (Verlet Cloth) | [View Solution](./Practical/Verlet%20Cloth/) |
-| 12 | TCP/UDP Chat Server + Client | [View Solution](./Practical/Chat%20Server%20Client/) |
-| 13 | Music Streaming | [View Solution](./Practical/Music%20Streaming/) |
-| 14 | Shazam | [View Solution](./Practical/Shazam%20Clone/) |
-| 15 | Chatbot (with conversation retention) | [View Solution](./Practical/Chatbot/) |
-| 16 | Curses Text Editor (with Emacs /Vim Keybindings) | [View Solution](./Practical/Curses%20Text%20Editor/) |
-| 17 | Paint Clone | [View Solution](./Practical/Paint/) |
-| 18 | Image to ASCII Art | [View Solution](./Practical/ImgToASCII/) |
-| 19 | Booru (Image Board) Image Downloader | [View Solution](./Practical/Booru%20Imageboard%20Downloader/) |
-| 20 | Image Converter | [View Solution](./Practical/Image%20Converter/) |
-| 21 | ID3 Reader | [View Solution](./Practical/ID3%20Reader/) |
-| 22 | Sound Synthesis (Sine square sawtooth etc...) ("Fuck You" mode: Realtime MIDI Playback with Custom instruments) | [View Solution](./Practical/Sound%20Synthesis/) |
-| 23 | C++ IDE Plugin for Sublime/Atom (Auto-Complete Go-To Symbol Declaration and Definition using Clang's AST) | [View Solution](./Practical/C++%20IDE%20Plugin/) |
-| 24 | Simple Version Control supporting checkout commit (with commit message) unlocking and per-file configuration of number of revisions kept | [View Solution](./Practical/Simple%20VCS/) |
-| 25 | Imageboard (Imagine vichan) | [View Solution](./Practical/Imageboard/) |
-| 26 | Password Manager | [View Solution](./Practical/Password%20Manager/) |
-| 27 | Create a Torrent Client (CLI or GUI) | [View Solution](./Practical/Torrent%20Client/) |
-| 28 | Booru Client | [View Solution](./Practical/Booru%20Client/) |
-| 29 | Key Press Bot | [View Solution](./Practical/Key%20Press%20Bot/) |
-| 30 | IP/URL Obsucrification (<http://www.pc-help.org/obscure.htm>) | [View Solution](./Practical/IP%20URL%20Obscurifier/) |
-| 31 | Radix Base Converter (Given a radix base convert it to decimal) | [View Solution](./Practical/Radix%20Base%20Converter/) |
-| 32 | Chan aggregator (Let's user view various boards from different 'chans') (Bonus: Add 4ChanX and Archiving Functionality) | [View Solution](./Practical/Chan%20Aggregator/) |
-| 33 | Encrypt a File and Upload it online | [View Solution](./Practical/Encrypted%20Upload/) |
-| 34 | Make a Text Editor that autosaves and includes the date in the filename | [View Solution](./Practical/AutoSave%20Text%20Editor/) |
-| 35 | Create an HSV Color Representation | [View Solution](./Practical/HSV%20color%20wheel/) |
-| 36 | Window Manager | [View Solution](./Practical/Window%20Manager/) |
-| 37 | Basic Relational Database Software (SQL Support Handle Relationships Focus on Efficiency) | [View Solution](./Practical/Relational%20DB/) |
-| 38 | Pixel Editor | [View Solution](./Practical/Pixel%20Editor/) |
-| 39 | Trivial File Transfer Protocol (TFTP): Allow a client to put a file onto a remote host | [View Solution](./Practical/TFTP%20Tool/) |
-| 40 | Markdown (HTML/XML) Editor | [View Solution](./Practical/Markdown%20Editor/) |
-| 41 | IP Tracking Visualization | [View Solution](./Practical/IP%20Tracking%20visualization/) |
-| 42 | Port Scanner | [View Solution](./Practical/Port%20Scanner/) |
-| 43 | Old School Demo Effect (Plasma Tunnel Scrollers Zoomers etc...) | [View Solution](./Practical/Old%20School%20cringe/) |
-| 135 | Bellman-Ford Simulation with at least Five Vertices | [View Solution](./Practical/Bellman%20Ford%20Simulation/) |
-| 136 | Matrix Arithmetic | [View Solution](./Practical/Matrix%20Arithmetic/) |
-| 137 | File Compression Utility (Make it GUI) | [View Solution](./Practical/File%20Compression%20Utility/) |
-| 138 | PDF Tagger | [View Solution](./Practical/PDF%20Tagger/) |
-| 139 | Nonogram Generator and Solver | [View Solution](./Practical/Nonogram%20Solver/) |
-| 140 | Calculate Dot and Cross Product of Two Vectors | [View Solution](./Practical/Vector%20Product/) |
-| 141 | Bismuth Fractal | [View Solution](./Practical/Bismuth%20Fractal/) |
-| 142 | Seam Carving | [View Solution](./Practical/Seam%20Carving/) |
-| 143 | Bayesian Filter | [View Solution](./Practical/Bayesian%20Filter/) |
-| 144 | WMS viewer that isn't web based | [View Solution](./Practical/WMS%20Viewer/) |
+| 1 | Download Manager | [View Solution](./challenges/Practical/Download%20Manager/) |
+| 2 | Make an elastic producer/consumer task queue. | [View Solution](./challenges/Practical/Producer%20Consumer/) |
+| 3 | IRC Client | [View Solution](./challenges/Practical/IRC%20Client/) |
+| 4 | Markov Chain Sentence Generator (Include Shitposting Capabilities) | [View Solution](./challenges/Practical/Markov%20Chain%20Sentence%20Generator/) |
+| 5 | English Sentence Parser that Points to the Context of a Sentence | [View Solution](./challenges/Practical/Context%20Pointer/) |
+| 6 | MIDI Player + Editor | [View Solution](./challenges/Practical/MIDI%20Player%20Editor/) |
+| 7 | Stock Market Simulator Using Yahoo Spreadsheet Data | [View Solution](./challenges/Practical/Stock%20Market%20Simulator/) |
+| 8 | Parametric/Graphic Equalizer for .wav files (Make it real-time) | [View Solution](./challenges/Practical/WAV%20Equalizer/) |
+| 9 | Graphing Calculator (BONUS: Graph the Function's Derivatives) | [View Solution](./challenges/Practical/Graphing%20Calculator/) |
+| 10 | To-Do List Application (Web app or CLI) | [View Solution](./challenges/Practical/ToDoList-CLI/) |
+| 11 | Verlet Integration (Verlet Cloth) | [View Solution](./challenges/Practical/Verlet%20Cloth/) |
+| 12 | TCP/UDP Chat Server + Client | [View Solution](./challenges/Practical/Chat%20Server%20Client/) |
+| 13 | Music Streaming | [View Solution](./challenges/Practical/Music%20Streaming/) |
+| 14 | Shazam | [View Solution](./challenges/Practical/Shazam%20Clone/) |
+| 15 | Chatbot (with conversation retention) | [View Solution](./challenges/Practical/Chatbot/) |
+| 16 | Curses Text Editor (with Emacs /Vim Keybindings) | [View Solution](./challenges/Practical/Curses%20Text%20Editor/) |
+| 17 | Paint Clone | [View Solution](./challenges/Practical/Paint/) |
+| 18 | Image to ASCII Art | [View Solution](./challenges/Practical/ImgToASCII/) |
+| 19 | Booru (Image Board) Image Downloader | [View Solution](./challenges/Practical/Booru%20Imageboard%20Downloader/) |
+| 20 | Image Converter | [View Solution](./challenges/Practical/Image%20Converter/) |
+| 21 | ID3 Reader | [View Solution](./challenges/Practical/ID3%20Reader/) |
+| 22 | Sound Synthesis (Sine square sawtooth etc...) ("Fuck You" mode: Realtime MIDI Playback with Custom instruments) | [View Solution](./challenges/Practical/Sound%20Synthesis/) |
+| 23 | C++ IDE Plugin for Sublime/Atom (Auto-Complete Go-To Symbol Declaration and Definition using Clang's AST) | [View Solution](./challenges/Practical/C++%20IDE%20Plugin/) |
+| 24 | Simple Version Control supporting checkout commit (with commit message) unlocking and per-file configuration of number of revisions kept | [View Solution](./challenges/Practical/Simple%20VCS/) |
+| 25 | Imageboard (Imagine vichan) | [View Solution](./challenges/Practical/Imageboard/) |
+| 26 | Password Manager | [View Solution](./challenges/Practical/Password%20Manager/) |
+| 27 | Create a Torrent Client (CLI or GUI) | [View Solution](./challenges/Practical/Torrent%20Client/) |
+| 28 | Booru Client | [View Solution](./challenges/Practical/Booru%20Client/) |
+| 29 | Key Press Bot | [View Solution](./challenges/Practical/Key%20Press%20Bot/) |
+| 30 | IP/URL Obsucrification (<http://www.pc-help.org/obscure.htm>) | [View Solution](./challenges/Practical/IP%20URL%20Obscurifier/) |
+| 31 | Radix Base Converter (Given a radix base convert it to decimal) | [View Solution](./challenges/Practical/Radix%20Base%20Converter/) |
+| 32 | Chan aggregator (Let's user view various boards from different 'chans') (Bonus: Add 4ChanX and Archiving Functionality) | [View Solution](./challenges/Practical/Chan%20Aggregator/) |
+| 33 | Encrypt a File and Upload it online | [View Solution](./challenges/Practical/Encrypted%20Upload/) |
+| 34 | Make a Text Editor that autosaves and includes the date in the filename | [View Solution](./challenges/Practical/AutoSave%20Text%20Editor/) |
+| 35 | Create an HSV Color Representation | [View Solution](./challenges/Practical/HSV%20color%20wheel/) |
+| 36 | Window Manager | [View Solution](./challenges/Practical/Window%20Manager/) |
+| 37 | Basic Relational Database Software (SQL Support Handle Relationships Focus on Efficiency) | [View Solution](./challenges/Practical/Relational%20DB/) |
+| 38 | Pixel Editor | [View Solution](./challenges/Practical/Pixel%20Editor/) |
+| 39 | Trivial File Transfer Protocol (TFTP): Allow a client to put a file onto a remote host | [View Solution](./challenges/Practical/TFTP%20Tool/) |
+| 40 | Markdown (HTML/XML) Editor | [View Solution](./challenges/Practical/Markdown%20Editor/) |
+| 41 | IP Tracking Visualization | [View Solution](./challenges/Practical/IP%20Tracking%20visualization/) |
+| 42 | Port Scanner | [View Solution](./challenges/Practical/Port%20Scanner/) |
+| 43 | Old School Demo Effect (Plasma Tunnel Scrollers Zoomers etc...) | [View Solution](./challenges/Practical/Old%20School%20cringe/) |
+| 135 | Bellman-Ford Simulation with at least Five Vertices | [View Solution](./challenges/Practical/Bellman%20Ford%20Simulation/) |
+| 136 | Matrix Arithmetic | [View Solution](./challenges/Practical/Matrix%20Arithmetic/) |
+| 137 | File Compression Utility (Make it GUI) | [View Solution](./challenges/Practical/File%20Compression%20Utility/) |
+| 138 | PDF Tagger | [View Solution](./challenges/Practical/PDF%20Tagger/) |
+| 139 | Nonogram Generator and Solver | [View Solution](./challenges/Practical/Nonogram%20Solver/) |
+| 140 | Calculate Dot and Cross Product of Two Vectors | [View Solution](./challenges/Practical/Vector%20Product/) |
+| 141 | Bismuth Fractal | [View Solution](./challenges/Practical/Bismuth%20Fractal/) |
+| 142 | Seam Carving | [View Solution](./challenges/Practical/Seam%20Carving/) |
+| 143 | Bayesian Filter | [View Solution](./challenges/Practical/Bayesian%20Filter/) |
+| 144 | WMS viewer that isn't web based | [View Solution](./challenges/Practical/WMS%20Viewer/) |
 
 > The IRC client depends only on Python 3.10+ standard-library modules (`asyncio`, `ssl`, `argparse`, `logging`).
 
-> **Security notice:** The encrypted upload utility in this repository is educational. Review the [project documentation](./Practical/Encrypted%20Upload/README.md) before using it with sensitive information and ensure keys, manifests, and remote endpoints are secured.
+> **Security notice:** The encrypted upload utility in this repository is educational. Review the [project documentation](./challenges/Practical/Encrypted%20Upload/README.md) before using it with sensitive information and ensure keys, manifests, and remote endpoints are secured.
 
 ### Algorithmic
 
 | # | Challenge | Status |
 | --- | --------- | ------ |
-| 44 | Fizzbuzz (BONUS: In Assembly) | [View Solution](./Algorithmic/FizzBuzz/) |
-| 45 | RPN Calculator | [View Solution](./Algorithmic/RPN%20Calculator/) |
-| 46 | Counts occurrences of characters in a Given String (include support for unicode characters) | [View Solution](./Algorithmic/Character%20Counter/) |
-| 47 | Towers of Hanoi | [View Solution](./Algorithmic/Towers%20of%20Hanoi/) |
-| 48 | Music Visualizer | [View Solution](./Algorithmic/Music%20Visualizer/) |
-| 49 | Unicode Converter (Support for UTF-8 16LE 32LE and 32BE) | [View Solution](./Algorithmic/basic%20text%20encoding/) |
-| 50 | Calculate the first (n) digits of pi | [View Solution](./Algorithmic/Digits%20of%20Pi/) |
-| 51 | Least Squares Fitting Algorithm | [View Solution](./Algorithmic/Least%20Squares%20Fitting/) |
-| 52 | Given an Array of Stocks's values over time find the period of time where the stocks could have made the most money | [View Solution](./Algorithmic/Stock%20Prices/) |
-| 53 | Highest Prime Factor Calculator | [View Solution](./Algorithmic/Highest%20prime%20factor/) |
-| 54 | Hide and Extract Data in images (Basic Steganography) (Bonus: Include .gif support) | [View Solution](./Algorithmic/Steganography/) |
-| 55 | Web Page Crawler | [View Solution](./Algorithmic/Web%20Page%20Crawler/) |
-| 56 | Password Generator (Let User Choose Options) | [View Solution](./Algorithmic/PassGen/) |
-| 57 | Vigenère cipher encryption/decryption | [View Solution](./Algorithmic/Vigniere%20Cipher/) |
-| 58 | Game Of Life | [View Solution](./Algorithmic/Game%20of%20life/) |
-| 59 | Caesar Cipher Cracker | [View Solution](./Algorithmic/Caesar%20Cipher/) |
-| 60 | Dijkstra's Algorithm | [View Solution](./Algorithmic/Djikstra/) |
-| 61 | ROT 13 | [View Solution](./Algorithmic/ROT%2013/) |
-| 62 | Program that displays MBR Contents | [View Solution](./Algorithmic/MBR/) |
-| 63 | Random Name Picker | [View Solution](./Algorithmic/Random%20Name%20Picker/) |
-| 64 | Encrypt/Decrypt Text: Implement at least one from <http://rumkin.com/tools/cipher/collection> | [View Solution](./Algorithmic/Rumkin%20Ciphers/) |
-| 65 | Youtube To MP3 | [View Solution](./Algorithmic/ytmp3/) |
-| 66 | Text to Hexadecimal/Binary | [View Solution](./Algorithmic/basic%20text%20encoding/) |
-| 67 | Calculate the first 1 000 digits of pi iteratively | [View Solution](./Algorithmic/1000%20Digits%20of%20Pi/) |
-| 68 | Sierpinski Triangle | [View Solution](./Algorithmic/Sierpinski/) |
-| 69 | Mandelbrot Set | [View Solution](./Algorithmic/Mandelbrot%20Set/) |
-| 134 | Ulam Spiral | [View Solution](./Algorithmic/Ulam%20Spiral/) |
+| 44 | Fizzbuzz (BONUS: In Assembly) | [View Solution](./challenges/Algorithmic/FizzBuzz/) |
+| 45 | RPN Calculator | [View Solution](./challenges/Algorithmic/RPN%20Calculator/) |
+| 46 | Counts occurrences of characters in a Given String (include support for unicode characters) | [View Solution](./challenges/Algorithmic/Character%20Counter/) |
+| 47 | Towers of Hanoi | [View Solution](./challenges/Algorithmic/Towers%20of%20Hanoi/) |
+| 48 | Music Visualizer | [View Solution](./challenges/Algorithmic/Music%20Visualizer/) |
+| 49 | Unicode Converter (Support for UTF-8 16LE 32LE and 32BE) | [View Solution](./challenges/Algorithmic/basic%20text%20encoding/) |
+| 50 | Calculate the first (n) digits of pi | [View Solution](./challenges/Algorithmic/Digits%20of%20Pi/) |
+| 51 | Least Squares Fitting Algorithm | [View Solution](./challenges/Algorithmic/Least%20Squares%20Fitting/) |
+| 52 | Given an Array of Stocks's values over time find the period of time where the stocks could have made the most money | [View Solution](./challenges/Algorithmic/Stock%20Prices/) |
+| 53 | Highest Prime Factor Calculator | [View Solution](./challenges/Algorithmic/Highest%20prime%20factor/) |
+| 54 | Hide and Extract Data in images (Basic Steganography) (Bonus: Include .gif support) | [View Solution](./challenges/Algorithmic/Steganography/) |
+| 55 | Web Page Crawler | [View Solution](./challenges/Algorithmic/Web%20Page%20Crawler/) |
+| 56 | Password Generator (Let User Choose Options) | [View Solution](./challenges/Algorithmic/PassGen/) |
+| 57 | Vigenère cipher encryption/decryption | [View Solution](./challenges/Algorithmic/Vigniere%20Cipher/) |
+| 58 | Game Of Life | [View Solution](./challenges/Algorithmic/Game%20of%20life/) |
+| 59 | Caesar Cipher Cracker | [View Solution](./challenges/Algorithmic/Caesar%20Cipher/) |
+| 60 | Dijkstra's Algorithm | [View Solution](./challenges/Algorithmic/Djikstra/) |
+| 61 | ROT 13 | [View Solution](./challenges/Algorithmic/ROT%2013/) |
+| 62 | Program that displays MBR Contents | [View Solution](./challenges/Algorithmic/MBR/) |
+| 63 | Random Name Picker | [View Solution](./challenges/Algorithmic/Random%20Name%20Picker/) |
+| 64 | Encrypt/Decrypt Text: Implement at least one from <http://rumkin.com/tools/cipher/collection> | [View Solution](./challenges/Algorithmic/Rumkin%20Ciphers/) |
+| 65 | Youtube To MP3 | [View Solution](./challenges/Algorithmic/ytmp3/) |
+| 66 | Text to Hexadecimal/Binary | [View Solution](./challenges/Algorithmic/basic%20text%20encoding/) |
+| 67 | Calculate the first 1 000 digits of pi iteratively | [View Solution](./challenges/Algorithmic/1000%20Digits%20of%20Pi/) |
+| 68 | Sierpinski Triangle | [View Solution](./challenges/Algorithmic/Sierpinski/) |
+| 69 | Mandelbrot Set | [View Solution](./challenges/Algorithmic/Mandelbrot%20Set/) |
+| 134 | Ulam Spiral | [View Solution](./challenges/Algorithmic/Ulam%20Spiral/) |
 
 ### Artificial Intelligence
 
@@ -210,7 +227,7 @@ Consult the consolidated [debugging guide](docs/debugging.md) for a full matrix 
 
 #### OpenAI Gym DQN Trainer
 
-Reinforcement learning experiments now live in [`Artificial Intelligence/OpenAI Gym/`](./Artificial%20Intelligence/OpenAI%20Gym/).
+Reinforcement learning experiments now live in [`challenges/Artificial Intelligence/OpenAI Gym/`](./Artificial%20Intelligence/OpenAI%20Gym/).
 The folder ships a reproducible CartPole DQN baseline built on Stable-Baselines3 with command-line
 flags for training and evaluation, checkpointing, deterministic seeding, and a binary-free heuristic for quick checks.
 
@@ -221,73 +238,73 @@ source .venv/bin/activate  # Windows: .venv\Scripts\Activate.ps1
 python -m pip install -e .[ai]
 
 # Train for 80k timesteps and save checkpoints/models under the project folder
-python "Artificial Intelligence/OpenAI Gym/train.py" --mode train \
+python "challenges/Artificial Intelligence/OpenAI Gym/train.py" --mode train \
     --total-timesteps 80000 \
-    --checkpoint-dir "Artificial Intelligence/OpenAI Gym/checkpoints" \
-    --model-path "Artificial Intelligence/OpenAI Gym/models/dqn_cartpole"
+    --checkpoint-dir "challenges/Artificial Intelligence/OpenAI Gym/checkpoints" \
+    --model-path "challenges/Artificial Intelligence/OpenAI Gym/models/dqn_cartpole"
 
 # Quickly sanity-check the heuristic CartPole controller used in tests
 python - <<'PY'
 from runpy import run_path
 
-module_globals = run_path('Artificial Intelligence/OpenAI Gym/policies.py')
+module_globals = run_path('challenges/Artificial Intelligence/OpenAI Gym/policies.py')
 policy = module_globals['cartpole_balance_policy']()
 print('Policy action for zero-state:', policy([0, 0, 0.05, 0]))
 PY
 ```
 
-### Emulation/Modeling
+### Emulation/Modeling (`challenges/Emulation/`)
 
 | # | Challenge | Status |
 | --- | --------- | ------ |
-| 91 | Chip - 8 Emulator (Hard Mode: Cached Interpreter. Fuck You: Dynamic Recompiler use dynarec/jit library) | ✅ [View Solution](./Emulation/Chip8/) |
-| 92 | Double Pendulum Simulation | ✅ [View Solution](./Emulation/DoublePendulum/) |
-| 93 | Constructive Solid Geometry | ✅ [View Solution](./Emulation/ConstructiveSolidGeometry/) |
-| 94 | Ray Tracer | ✅ [View Solution](./Emulation/RayTracer/) |
-| 95 | Real-Time Fast Fourier Transform Spectrum Visualizer | ✅ [View Solution](./Emulation/FFTSpectrum/) |
-| 96 | Generate a Complimentary Color from any input color | ✅ [View Solution](./Emulation/CompColor/) |
-| 97 | Generate a 5-Color Scheme from the most dominant tones in any image | ✅ [View Solution](./Emulation/5%20color%20scheme/) |
-| 98 | General Lambert's-Problem Solver (At least it's not rocket science... Oh wait it actually is) | ✅ [View Solution](./Emulation/LambertsProblem/) |
-| 99 | TI-86 Emulator (Bonus: Include the Option to Create Programs) | ✅ [View Solution](./Emulation/TI86/) |
-| 100 | N-Body Simulator with particles having a certain mass and radius depending on the mass that merge if they collide (Bonus: Include a GUI where you can place particles) | ✅ [View Solution](./Emulation/NBodySimulator/) |
-| 101 | Eulerian Path | ✅ [View Solution](./Emulation/EulerianPath/) |
-| 102 | Draw a spinning 3D Cube | ✅ [View Solution](./Emulation/SpinnyCube/) |
-| 103 | Cellular Textures | ✅ [View Solution](./Emulation/CellularTextures/) |
-| 145 | ASCII Digital Clock | ✅ [View Solution](./Emulation/ASCII_Clock/) |
+| 91 | Chip - 8 Emulator (Hard Mode: Cached Interpreter. Fuck You: Dynamic Recompiler use dynarec/jit library) | ✅ [View Solution](./challenges/Emulation/Chip8/) |
+| 92 | Double Pendulum Simulation | ✅ [View Solution](./challenges/Emulation/DoublePendulum/) |
+| 93 | Constructive Solid Geometry | ✅ [View Solution](./challenges/Emulation/ConstructiveSolidGeometry/) |
+| 94 | Ray Tracer | ✅ [View Solution](./challenges/Emulation/RayTracer/) |
+| 95 | Real-Time Fast Fourier Transform Spectrum Visualizer | ✅ [View Solution](./challenges/Emulation/FFTSpectrum/) |
+| 96 | Generate a Complimentary Color from any input color | ✅ [View Solution](./challenges/Emulation/CompColor/) |
+| 97 | Generate a 5-Color Scheme from the most dominant tones in any image | ✅ [View Solution](./challenges/Emulation/5%20color%20scheme/) |
+| 98 | General Lambert's-Problem Solver (At least it's not rocket science... Oh wait it actually is) | ✅ [View Solution](./challenges/Emulation/LambertsProblem/) |
+| 99 | TI-86 Emulator (Bonus: Include the Option to Create Programs) | ✅ [View Solution](./challenges/Emulation/TI86/) |
+| 100 | N-Body Simulator with particles having a certain mass and radius depending on the mass that merge if they collide (Bonus: Include a GUI where you can place particles) | ✅ [View Solution](./challenges/Emulation/NBodySimulator/) |
+| 101 | Eulerian Path | ✅ [View Solution](./challenges/Emulation/EulerianPath/) |
+| 102 | Draw a spinning 3D Cube | ✅ [View Solution](./challenges/Emulation/SpinnyCube/) |
+| 103 | Cellular Textures | ✅ [View Solution](./challenges/Emulation/CellularTextures/) |
+| 145 | ASCII Digital Clock | ✅ [View Solution](./challenges/Emulation/ASCII_Clock/) |
 
 ### Games
 
 | # | Challenge | Status |
 | --- | --------- | ------ |
-| 104 | Knight's Tour | ✅ [View Solution](./Games/Knight%20Tour/) |
-| 105 | Monster Raising/Breeding Simulator | ✅ [View Solution](./Games/Monster%20Raising/) |
-| 106 | Tetris | ✅ [View Solution](./Games/Tetris/) |
-| 107 | Snake | ✅ [View Solution](./Games/Snake/) |
-| 108 | Pipe Dreams | ✅ [View Solution](./Games/Pipe%20Dreams/) |
-| 109 | Pac Man With Different Behaviors for each ghost | ✅ [View Solution](./Games/Pacman/) |
-| 110 | Dragon Quest / Basic RPG Engine | ✅ [View Solution](./Games/RPGEngine/) |
-| 111 | Rock Paper Scissors | ✅ [View Solution](./Games/RPS/) |
-| 112 | First-Person Engine in OpenGL (Walking Looking Around Jumping on Obstacles) (BONUS: VR Compatibility) | ✅ [View Solution](./Games/FirstPersonEngine/) |
-| 113 | Shuffle a Deck of Cards (Include a Visualization) | ✅ [View Solution](./Games/Shuffle/) |
-| 114 | Simulate a game of Tag using a multi-agent system | ✅ [View Solution](./Games/MultiAgentTag/) |
-| 115 | Wolfenstein Clone (FPS two-dimensional map that appears to be 3-D) (If you need a starting point search for bisquit's video about DOOM-like Engines) | ✅ [View Solution](./Games/WolfensteinClone/) |
-| 116 | Scorched Earth Clone | ✅ [View Solution](./Games/ScorchedEarth/) |
-| 117 | Minesweeper | ✅ [View Solution](./Games/Minesweeper/) |
-| 118 | An Audio/Visual 64KB Demonstration | ✅ [View Solution](./Games/64kDemo/) |
-| 119 | Sudoku | ✅ [View Solution](./Games/Sudoku/) |
-| 120 | Danmaku (Bullet Hell) Engine | ✅ [View Solution](./Games/DanmakuEngine/) |
-| 121 | Roguelike Engine/Dungeon Generator | ✅ [View Solution](./Games/Roguelike/) |
-| 122 | Design a Game Engine in Unity | ✅ [View Solution](./Games/UnityEngine/) |
-| 123 | Yahtzee | ✅ [View Solution](./Games/Yahtzee/) |
-| 124 | Oil Panic | ✅ [View Solution](./Games/OilPanic/) |
-| 125 | Chess | ✅ [View Solution](./Games/Chess/) |
-| 126 | Go (No AI Necessary) | ✅ [View Solution](./Games/Go/) |
-| 127 | Connect Four | ✅ [View Solution](./Games/Connect4/) |
-| 128 | Mastermind | ✅ [View Solution](./Games/Mastermind/) |
-| 129 | Missile Command Game | ✅ [View Solution](./Games/MissileCommand/) |
-| 130 | Tron | ✅ [View Solution](./Games/Tron/) |
-| 131 | Breakout | ✅ [View Solution](./Games/Breakout/) |
-| 132 | Simon | ✅ [View Solution](./Games/Simon/) |
+| 104 | Knight's Tour | ✅ [View Solution](./challenges/Games/Knight%20Tour/) |
+| 105 | Monster Raising/Breeding Simulator | ✅ [View Solution](./challenges/Games/Monster%20Raising/) |
+| 106 | Tetris | ✅ [View Solution](./challenges/Games/Tetris/) |
+| 107 | Snake | ✅ [View Solution](./challenges/Games/Snake/) |
+| 108 | Pipe Dreams | ✅ [View Solution](./challenges/Games/Pipe%20Dreams/) |
+| 109 | Pac Man With Different Behaviors for each ghost | ✅ [View Solution](./challenges/Games/Pacman/) |
+| 110 | Dragon Quest / Basic RPG Engine | ✅ [View Solution](./challenges/Games/RPGEngine/) |
+| 111 | Rock Paper Scissors | ✅ [View Solution](./challenges/Games/RPS/) |
+| 112 | First-Person Engine in OpenGL (Walking Looking Around Jumping on Obstacles) (BONUS: VR Compatibility) | ✅ [View Solution](./challenges/Games/FirstPersonEngine/) |
+| 113 | Shuffle a Deck of Cards (Include a Visualization) | ✅ [View Solution](./challenges/Games/Shuffle/) |
+| 114 | Simulate a game of Tag using a multi-agent system | ✅ [View Solution](./challenges/Games/MultiAgentTag/) |
+| 115 | Wolfenstein Clone (FPS two-dimensional map that appears to be 3-D) (If you need a starting point search for bisquit's video about DOOM-like Engines) | ✅ [View Solution](./challenges/Games/WolfensteinClone/) |
+| 116 | Scorched Earth Clone | ✅ [View Solution](./challenges/Games/ScorchedEarth/) |
+| 117 | Minesweeper | ✅ [View Solution](./challenges/Games/Minesweeper/) |
+| 118 | An Audio/Visual 64KB Demonstration | ✅ [View Solution](./challenges/Games/64kDemo/) |
+| 119 | Sudoku | ✅ [View Solution](./challenges/Games/Sudoku/) |
+| 120 | Danmaku (Bullet Hell) Engine | ✅ [View Solution](./challenges/Games/DanmakuEngine/) |
+| 121 | Roguelike Engine/Dungeon Generator | ✅ [View Solution](./challenges/Games/Roguelike/) |
+| 122 | Design a Game Engine in Unity | ✅ [View Solution](./challenges/Games/UnityEngine/) |
+| 123 | Yahtzee | ✅ [View Solution](./challenges/Games/Yahtzee/) |
+| 124 | Oil Panic | ✅ [View Solution](./challenges/Games/OilPanic/) |
+| 125 | Chess | ✅ [View Solution](./challenges/Games/Chess/) |
+| 126 | Go (No AI Necessary) | ✅ [View Solution](./challenges/Games/Go/) |
+| 127 | Connect Four | ✅ [View Solution](./challenges/Games/Connect4/) |
+| 128 | Mastermind | ✅ [View Solution](./challenges/Games/Mastermind/) |
+| 129 | Missile Command Game | ✅ [View Solution](./challenges/Games/MissileCommand/) |
+| 130 | Tron | ✅ [View Solution](./challenges/Games/Tron/) |
+| 131 | Breakout | ✅ [View Solution](./challenges/Games/Breakout/) |
+| 132 | Simon | ✅ [View Solution](./challenges/Games/Simon/) |
 
 ## Highlights
 
@@ -297,20 +314,20 @@ This repository includes several scripts with graphical user interfaces (GUIs) a
 
 | Tool | Command |
 | --------------------------------- | ----------------------------------------------------------------------- |
-| PDF Metadata Tagger | `python "Practical/PDF Tagger/pdftag_gui.py"` |
-| Image to ASCII Art Converter | `python "Practical/ImgToASCII/convert_gui.py"` |
-| Multi-threaded Port Scanner | `python "Practical/Port Scanner/scanner_gui.py"` |
-| Radix Base Converter | `python "Practical/Radix Base Converter/radix_gui.py"` |
-| Markov Chain Sentence Generator | `python "Practical/Markov Chain Sentence Generator/mcsg_gui.py"` |
-| Seam Carving Image Resizer | `python "Practical/Seam Carving/resize_gui.py"` |
+| PDF Metadata Tagger | `python "challenges/Practical/PDF Tagger/pdftag_gui.py"` |
+| Image to ASCII Art Converter | `python "challenges/Practical/ImgToASCII/convert_gui.py"` |
+| Multi-threaded Port Scanner | `python "challenges/Practical/Port Scanner/scanner_gui.py"` |
+| Radix Base Converter | `python "challenges/Practical/Radix Base Converter/radix_gui.py"` |
+| Markov Chain Sentence Generator | `python "challenges/Practical/Markov Chain Sentence Generator/mcsg_gui.py"` |
+| Seam Carving Image Resizer | `python "challenges/Practical/Seam Carving/resize_gui.py"` |
 
 ### Algorithm Visualizations
 
 | Visualization | Command |
 | ------------------------------- | ----------------------------------------------------------------------- |
-| Dijkstra's Shortest Path | `python "Algorithmic/Djikstra/dijkstra_visualizer.py" --start A` |
-| Towers of Hanoi | `python "Algorithmic/Towers of Hanoi/ToH_visualizer.py" 4` |
-| Character Frequency | `python "Algorithmic/Character Counter/charcount_visualizer.py" -t "hello world"` |
+| Dijkstra's Shortest Path | `python "challenges/Algorithmic/Djikstra/dijkstra_visualizer.py" --start A` |
+| Towers of Hanoi | `python "challenges/Algorithmic/Towers of Hanoi/ToH_visualizer.py" 4` |
+| Character Frequency | `python "challenges/Algorithmic/Character Counter/charcount_visualizer.py" -t "hello world"` |
 
 ## Further Learning
 
@@ -369,7 +386,7 @@ The root [`requirements.txt`](requirements.txt) is now generated directly from t
 
 - `pyproject.toml` extras drive dependency selection; install only what you need (e.g. `python -m pip install -e .[visual]`).
 - Run `python tools/sync_requirements.py` after editing extras to keep the generated `requirements.txt` in sync.
-- Folder-level `requirements.txt` files (e.g. `Practical/`, `Emulation/`) remain available for ultra-minimal installs.
+- Folder-level `requirements.txt` files (e.g. `challenges/Practical/`, `challenges/Emulation/`) remain available for ultra-minimal installs.
 - Heavy/optional libs (plotly, vpython, scikit-learn, colour-science) can be skipped unless you need those features.
 
 ### 3. Binary Asset Management (Git LFS)
@@ -377,13 +394,13 @@ The root [`requirements.txt`](requirements.txt) is now generated directly from t
 Large or frequently updated binaries live in Git LFS so the regular Git history stays lightweight. The following patterns are
 tracked automatically:
 
-- `Games/**/Assets/**/*.{png,wav}` – game textures, sprites, and audio cues.
-- `Emulation/Chip8/roms/*.ch8` – sample ROMs for the CHIP-8 emulator.
-- `Emulation/FFTSpectrum/**/*.wav` – reference audio for FFT spectrum demos.
-- `Practical/Booru Imageboard Downloader/downloads/**/*.png` – example download payloads.
-- `Practical/ImgToASCII/*.png` – high-resolution source images for ASCII rendering tests.
-- `Practical/Imageboard/docs/**/*.png` – documentation screenshots that exceed a few kilobytes.
-- `Artificial Intelligence/CNN_Framework/checkpoints/**/*.{pt,pth}` – neural network checkpoint blobs.
+- `challenges/Games/**/Assets/**/*.{png,wav}` – game textures, sprites, and audio cues.
+- `challenges/Emulation/Chip8/roms/*.ch8` – sample ROMs for the CHIP-8 emulator.
+- `challenges/Emulation/FFTSpectrum/**/*.wav` – reference audio for FFT spectrum demos.
+- `challenges/Practical/Booru Imageboard Downloader/downloads/**/*.png` – example download payloads.
+- `challenges/Practical/ImgToASCII/*.png` – high-resolution source images for ASCII rendering tests.
+- `challenges/Practical/Imageboard/docs/**/*.png` – documentation screenshots that exceed a few kilobytes.
+- `challenges/Artificial Intelligence/CNN_Framework/checkpoints/**/*.{pt,pth}` – neural network checkpoint blobs.
 
 Everything else (including placeholder `.gitkeep` files) should remain in normal Git. If you add a new binary asset outside the
 paths above either relocate it into an existing asset folder or extend `.gitattributes` with a narrowly-scoped pattern before
@@ -394,16 +411,16 @@ finally `git lfs checkout` to ensure your working tree contains the real binary 
 
 | Domain | Example Scripts | Key Deps | Typical Command |
 |--------|-----------------|----------|-----------------|
-| Web App | Imageboard | Flask, Pillow | `python "Practical/Imageboard/imageboard.py" --help` |
-| Image Processing | Seam Carving | opencv-python, numpy | `python "Practical/Seam Carving/resize.py" in.jpg --width -100 -o out.jpg` |
-| Visualization | 5 Color Scheme | numpy, matplotlib, scikit-learn | `python "Emulation/5 color scheme/5cs.py" img.jpg --k 5 --show` |
-| Data / Geo | IP Tracking Visualization | requests, pandas, plotly | `python "Practical/IP Tracking visualization/trackip.py" ips.txt --html map.html` |
-| CLI Utility | Radix Converter | (stdlib) | `python "Practical/Radix Base Converter/radix.py" 1a --from 16 --to 2` |
-| Text / ASCII | ASCII Clock | (stdlib) | `python "Emulation/ASCII_Clock/ClockSynced.py" --refresh 0.2` |
-| Math / Vectors | Vector Product | matplotlib | `python "Practical/Vector Product/vector.py" cross 1,0,0 0,1,0` |
-| PDF Metadata | PDF Tagger | pypdf | `python "Practical/PDF Tagger/pdftag.py" doc.pdf --add key=value` |
-| Networking Scan | Port Scanner | (stdlib) | `python "Practical/Port Scanner/scanner.py" 192.168.1.10 --top 100` |
-| Markov Text | Markov Chain | (stdlib) | `python "Practical/Markov Chain Sentence Generator/mcsg.py" corpus.txt --sentences 3` |
+| Web App | Imageboard | Flask, Pillow | `python "challenges/Practical/Imageboard/imageboard.py" --help` |
+| Image Processing | Seam Carving | opencv-python, numpy | `python "challenges/Practical/Seam Carving/resize.py" in.jpg --width -100 -o out.jpg` |
+| Visualization | 5 Color Scheme | numpy, matplotlib, scikit-learn | `python "challenges/Emulation/5 color scheme/5cs.py" img.jpg --k 5 --show` |
+| Data / Geo | IP Tracking Visualization | requests, pandas, plotly | `python "challenges/Practical/IP Tracking visualization/trackip.py" ips.txt --html map.html` |
+| CLI Utility | Radix Converter | (stdlib) | `python "challenges/Practical/Radix Base Converter/radix.py" 1a --from 16 --to 2` |
+| Text / ASCII | ASCII Clock | (stdlib) | `python "challenges/Emulation/ASCII_Clock/ClockSynced.py" --refresh 0.2` |
+| Math / Vectors | Vector Product | matplotlib | `python "challenges/Practical/Vector Product/vector.py" cross 1,0,0 0,1,0` |
+| PDF Metadata | PDF Tagger | pypdf | `python "challenges/Practical/PDF Tagger/pdftag.py" doc.pdf --add key=value` |
+| Networking Scan | Port Scanner | (stdlib) | `python "challenges/Practical/Port Scanner/scanner.py" 192.168.1.10 --top 100` |
+| Markov Text | Markov Chain | (stdlib) | `python "challenges/Practical/Markov Chain Sentence Generator/mcsg.py" corpus.txt --sentences 3` |
 
 ### 5. Common Options & Patterns
 
@@ -483,7 +500,7 @@ To mirror the automated checks:
    pytest
    ```
 
-   The included `pytest.ini` sets `PYTHONPATH=.` so tests in `Practical/Imageboard/tests` and `Algorithmic/MBR` resolve local modules without extra flags.
+   The included `pytest.ini` sets `PYTHONPATH=.` so tests in `challenges/Practical/Imageboard/tests` and `challenges/Algorithmic/MBR` resolve local modules without extra flags.
 
 1. If you need to replicate the imageboard tests manually, export the environment variables they expect before invoking the app or running individual tests:
 

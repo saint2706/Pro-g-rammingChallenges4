@@ -1,0 +1,6 @@
+# Dependencies for algorithmic challenges are published via optional extras in pyproject.toml.
+# Typical installs:
+#   python -m pip install -e .[algorithmic]
+#   python -m pip install -e .[visual]     # plotting/imagery helpers
+#   python -m pip install -e .[media]      # YouTube downloader support
+# See challenges/Algorithmic/README.md for context and the root README for a full table of extras.

@@ -9,6 +9,7 @@ import numpy as np
 def load_mlp_module():
     module_path = (
         Path(__file__).resolve().parents[2]
+        / "challenges"
         / "Artificial Intelligence"
         / "Real Neural Network"
         / "mlp.py"

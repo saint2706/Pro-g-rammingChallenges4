@@ -13,7 +13,7 @@ sys.path.insert(0, str(ROOT / "src"))
 
 from pro_g_rammingchallenges4.emulation.ti86 import Debugger, Memory, TI86, Z80CPU
 
-DATA_PATH = ROOT / "Emulation" / "TI86" / "opcode_truth.json"
+DATA_PATH = ROOT / "challenges" / "Emulation" / "TI86" / "opcode_truth.json"
 
 
 def load_opcode_cases():

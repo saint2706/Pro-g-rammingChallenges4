@@ -1,6 +1,6 @@
 from collections import Counter
 
-from Emulation.EulerianPath.hierholzer import (
+from challenges.Emulation.EulerianPath.hierholzer import (
     build_adj,
     classify_eulerian,
     hierholzer,

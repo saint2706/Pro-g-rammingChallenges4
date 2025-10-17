@@ -1,4 +1,4 @@
-"""Regression tests for the Emulation/RayTracer module."""
+"""Regression tests for the challenges/Emulation/RayTracer module."""
 
 from __future__ import annotations
 
@@ -8,14 +8,14 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from Emulation.RayTracer import RayTracer, load_scene_file
+from challenges.Emulation.RayTracer import RayTracer, load_scene_file
 
 
 @pytest.mark.parametrize("resolution", [(120, 90), (160, 120)])
 def test_minimal_scene_hash(resolution: tuple[int, int]) -> None:
     """Render the minimal sample scene and compare the output hash."""
     width, height = resolution
-    scene_path = Path("Emulation/RayTracer/scenes/minimal.json")
+    scene_path = Path("challenges/Emulation/RayTracer/scenes/minimal.json")
     scene = load_scene_file(scene_path)
     tracer = RayTracer(width=width, height=height, scene=scene)
     image = tracer.render()
