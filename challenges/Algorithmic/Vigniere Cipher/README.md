@@ -17,6 +17,13 @@ Encrypt or decrypt alphabetic text using the classical Vigenère cipher, where e
   echo "Hello World" | python vig.py encrypt key --upper
   ```
 
+### Visual exploration
+- Render key-specific substitution tables and bar charts with the shared helper:
+  ```bash
+  python ../Caesar\ Cipher/cipher_visualizer.py --cipher vigenere --key LEMON --text "Attack at dawn" --output-json vigenere.json --output-html vigenere.html
+  ```
+- The JSON payload lists mappings for each key position, enabling automated inspections without loading Plotly.
+
 ## Debugging Tips
 - Sanitized keys must contain alphabetic characters only; keys like `abc123` will be reduced to `abc`.
 - ROT13 is the special case `key = N`; test with `--text "hello" --key N` to verify round-trip consistency.
