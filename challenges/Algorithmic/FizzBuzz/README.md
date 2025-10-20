@@ -8,6 +8,10 @@ Print the integers from 1 through *n*, substituting `Fizz` for multiples of 3, `
   ```bash
   python fizzbuzz.py --limit 20
   ```
+- Visualise rule coverage with Matplotlib:
+  ```bash
+  python fizzbuzz_visualizer.py --limit 30 --rule 3:Fizz --rule 5:Buzz --output fizzbuzz.png
+  ```
 - Compile and run the C version:
   ```bash
   gcc fizzbuzz.c -o fizzbuzz && ./fizzbuzz 20
@@ -22,6 +26,11 @@ Print the integers from 1 through *n*, substituting `Fizz` for multiples of 3, `
 - Switch to JSON formatting to inspect sequences programmatically:
   ```bash
   python fizzbuzz.py --limit 15 --format json
+  ```
+- Generate metadata plus a PNG artefact for a custom rule-set:
+  ```bash
+  python fizzbuzz_visualizer.py --limit 42 --rule 3:Fizz --rule 5:Buzz --rule 7:Pop \
+    --no-numbers --output fizzbuzz.png --metadata fizzbuzz.json
   ```
 - When modifying the logic, re-run `pytest` to confirm that edge cases (such as custom divisors via `--rule`) still pass.
 
