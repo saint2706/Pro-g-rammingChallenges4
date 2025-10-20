@@ -18,6 +18,13 @@ Encrypt, decrypt, and analyze substitution ciphers where each alphabetic charact
   python caesar.py --interactive
   ```
 
+### Visual exploration
+- Generate substitution maps, frequency charts, and optional Plotly outputs with the shared visualizer:
+  ```bash
+  python cipher_visualizer.py --cipher caesar --shift 5 --text "Meet me at the park" --output-json caesar.json --output-html caesar.html
+  ```
+- Add `--show` for an interactive window, or `--no-plot --pretty` to print just the JSON data when running headless (e.g., in CI).
+
 ## Debugging Tips
 - Known plaintext pairs are great smoke tests. For example, encrypting `abc` with shift `1` should produce `bcd`.
 - Run the script with `--verbose` (logging set to `INFO`) to see alphabet normalization and scoring decisions.

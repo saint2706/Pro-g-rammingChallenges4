@@ -17,6 +17,13 @@ Experiment with classical substitution ciphers popularized on rumkin.com, includ
   python affine.py --mode brute-force --text "ZOLSS"
   ```
 
+### Visual exploration
+- Inspect affine or Atbash mappings alongside frequency analysis:
+  ```bash
+  python ../Caesar\ Cipher/cipher_visualizer.py --cipher affine --mode decrypt --text "ZOLSS" --a 5 --b 8 --bruteforce --max-bruteforce 5 --output-json affine.json
+  ```
+- Swap `--cipher atbash` for the symmetric mapping, or add `--output-html affine.html` to review the generated Plotly heatmap offline.
+
 ## Debugging Tips
 - Affine cipher requires `a` to be coprime with 26; values such as 2 or 13 should trigger validation errors.
 - Run the tests to validate functionality:

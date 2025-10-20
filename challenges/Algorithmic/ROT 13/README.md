@@ -17,6 +17,13 @@ Apply the ROT13 substitution cipher—a Caesar cipher rotating letters by 13 pos
   echo "uryyb" | python rot13.py --stdin
   ```
 
+### Visual exploration
+- Compare ROT13's involutive mapping to other substitutions with the shared helper:
+  ```bash
+  python ../Caesar\ Cipher/cipher_visualizer.py --cipher rot13 --text "uryyb" --output-json rot13.json --pretty
+  ```
+- Add `--show` to launch the Plotly heatmap or `--output-svg rot13.svg` for static documentation assets.
+
 ## Debugging Tips
 - ROT13 is involutory; running the script twice on the same text should return the original string.
 - Execute the unit tests:
