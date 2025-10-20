@@ -30,7 +30,7 @@ class CanvasSettings:
 
 
 def rgba_from_hex(hex_color: str, alpha: float) -> str:
-    """Convert ``#RRGGBB`` colors to Streamlit-friendly ``rgba()`` strings."""
+    """Convert ``#RRGGBB`` colors to CSS-friendly ``rgba()`` strings."""
 
     hex_color = hex_color.lstrip("#")
     if len(hex_color) != 6:

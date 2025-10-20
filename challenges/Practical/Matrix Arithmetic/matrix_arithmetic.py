@@ -269,7 +269,7 @@ def compute_operation(
     *,
     explain: bool = False,
 ) -> OperationResult:
-    """Dispatch helper shared by the CLI and Streamlit front-ends."""
+    """Dispatch helper shared by the CLI and GUI front-ends."""
 
     operation = operation.lower()
     if operation == "add":

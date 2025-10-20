@@ -79,7 +79,7 @@ The repository now ships a `pyproject.toml` so you can install challenge stacks 
 
 | Extra | Covers | Highlights |
 | ----- | ------ | ---------- |
-| `practical` | `challenges/Practical/` utilities, desktop apps, and web tools | Flask imageboard, Streamlit dashboards, Seam Carving, Shazam clone |
+| `practical` | `challenges/Practical/` utilities, desktop apps, and web tools | Flask imageboard, Tk dashboards, Seam Carving, Shazam clone |
 | `algorithmic` | `challenges/Algorithmic/` problem set helpers | Steganography, stock analysis, crawler tooling |
 | `visual` | Visualization add-ons used across categories | Matplotlib demos, colour-science palettes, VPython spinny cube, FFT spectrum analyzer |
 | `audio` | Audio processing stacks | WAV equalizer, Shazam clone, music streaming |
