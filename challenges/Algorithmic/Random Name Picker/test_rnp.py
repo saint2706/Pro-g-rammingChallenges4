@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
+import json
 import os
 import tempfile
 import unittest
 
 import rnp
+import rnp_visualizer as viz
 
 
 class TestRandomNamePicker(unittest.TestCase):
@@ -61,6 +63,34 @@ class TestRandomNamePicker(unittest.TestCase):
         path = self.make_temp_file("")
         with self.assertRaises(ValueError):
             rnp.parse_names_file(path)
+
+    def test_visualizer_probability_summary(self):
+        path = self.make_temp_file("Alice,2\nBob,1\nCharlie,1\n")
+        cfg = viz.SimulationConfig(
+            path=path,
+            count=2,
+            trials=10,
+            with_replacement=True,
+            seed=7,
+            json_output=True,
+            json_indent=2,
+            no_show=True,
+            save=None,
+        )
+        result = viz.run_simulation(cfg)
+
+        self.assertEqual(result.names, ["Alice", "Bob", "Charlie"])
+        self.assertAlmostEqual(result.normalized_weights[0], 0.5)
+        self.assertAlmostEqual(result.normalized_weights[1], 0.25)
+        self.assertAlmostEqual(result.normalized_weights[2], 0.25)
+        self.assertEqual(result.sample_counts, {"Alice": 13, "Bob": 5, "Charlie": 2})
+        self.assertAlmostEqual(result.sample_probabilities[0], 0.65)
+        self.assertAlmostEqual(result.sample_probabilities[1], 0.25)
+        self.assertAlmostEqual(result.sample_probabilities[2], 0.1)
+
+        payload = json.loads(result.to_json(indent=2))
+        self.assertEqual(payload["sample_counts"], result.sample_counts)
+        self.assertEqual(payload["sample_probabilities"], result.sample_probabilities)
 
 
 if __name__ == "__main__":  # pragma: no cover

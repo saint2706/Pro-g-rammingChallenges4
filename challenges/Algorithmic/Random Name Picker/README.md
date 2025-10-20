@@ -16,6 +16,13 @@ Select one or more names uniformly or with optional weights from a list, support
   ```bash
   python rnp.py --count 4 --seed 42 --json
   ```
+- Compare theoretical weights against simulated draws and render charts:
+  ```bash
+  python rnp_visualizer.py --count 2 --trials 200 --seed 7 --json --no-show --save wheel.png
+  ```
+  The visualizer reports normalized probabilities, runs deterministic Monte Carlo
+  draws when seeded, and can save matplotlib pie/bar charts for quick sanity
+  checks.
 
 ## Debugging Tips
 - If no `names.txt` exists, the script can create one automatically—verify contents before running weighted draws.
