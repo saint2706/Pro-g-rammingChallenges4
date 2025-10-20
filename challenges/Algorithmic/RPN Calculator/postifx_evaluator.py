@@ -49,11 +49,17 @@ def _format_stack(stack: List[Number]) -> str:
     return "[" + ", ".join(f"{x:g}" for x in stack) + "]"
 
 
-def evaluate_rpn(expression: str, *, config: Optional[EvalConfig] = None) -> Number:
+def evaluate_rpn(
+    expression: str,
+    *,
+    config: Optional[EvalConfig] = None,
+    trace_hook: Optional[Callable[[str, List[Number]], None]] = None,
+) -> Number:
     """Evaluate RPN expression and return numeric result.
 
     expression: tokens separated by whitespace.
     config: optional EvalConfig controlling interpretation.
+    trace_hook: optional callable receiving ``(token, stack)`` after each step.
     Raises RPNError on malformed expressions.
     """
     if config is None:
@@ -139,6 +145,8 @@ def evaluate_rpn(expression: str, *, config: Optional[EvalConfig] = None) -> Num
                 raise RPNError(f"Unknown token '{token}'")
         else:
             stack.append(val)
+        if trace_hook is not None:
+            trace_hook(token, list(stack))
         if trace_enabled:
             print(f"token={token:>6} stack={_format_stack(stack)}")
 

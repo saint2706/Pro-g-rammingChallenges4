@@ -16,13 +16,22 @@ Evaluate arithmetic expressions written in Reverse Polish Notation (postfix nota
   ```bash
   python postifx_evaluator.py --repl
   ```
+- Visualise the stack evolution while evaluating:
+  ```bash
+  python rpn_visualizer.py --expr "3 4 + 2 *" --mode both
+  ```
+  Use `--export snapshots.json` to persist the trace, and `--load snapshots.json`
+  to replay an existing capture. Pass `--no-animate` for non-clearing output or
+  `--mode table`/`--mode bars` to focus on a single view.
 
 ## Debugging Tips
 - Stack traces help: pass `--trace` to inspect how the operand stack evolves after each token.
+- For richer exploration, `rpn_visualizer.py` can animate the stack with ASCII
+  bar charts or tables and export the token-by-token state sequence as JSON.
 - Known values: `5 !` should return `120`, while `pi 2 / sin` should equal 1.0.
 - Automated tests cover parsing and error conditions:
   ```bash
-  pytest test_rpn.py
+  pytest tests/algorithmic/test_rpn_visualizer.py
   ```
 
 ## Implementation Notes
