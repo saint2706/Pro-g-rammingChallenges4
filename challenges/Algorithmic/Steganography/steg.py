@@ -33,7 +33,10 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable, Optional, Sequence
 
-from PIL import Image
+try:
+    from PIL import Image
+except ImportError:  # pragma: no cover - exercised when Pillow unavailable.
+    Image = None  # type: ignore[assignment]
 
 EOM_MARKER = "||EOM||"
 ESCAPE_SEQ = "\\E"  # escape introducer for marker occurrences
@@ -87,7 +90,13 @@ def image_capacity_chars(
     )  # bytes -> characters (1 byte per char assumption after UTF-8 encoding; conservative)
 
 
+def _ensure_pillow() -> None:
+    if Image is None:  # pragma: no cover - triggered only when Pillow missing.
+        raise RuntimeError("Pillow is required for image operations. Install it via 'pip install pillow'.")
+
+
 def open_image(path: str) -> Image.Image:
+    _ensure_pillow()
     try:
         return Image.open(path).convert("RGB")
     except FileNotFoundError:
@@ -149,6 +158,7 @@ def extract_message_from_image(img: Image.Image) -> str:
 
 
 def create_dummy_image(path: str, size: tuple[int, int] = (100, 100)) -> None:
+    _ensure_pillow()
     img = Image.new("RGB", size, color="white")
     img.save(path)
 

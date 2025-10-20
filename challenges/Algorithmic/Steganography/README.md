@@ -17,6 +17,30 @@ Hide and retrieve UTF-8 text inside the least significant bits of RGB images. Th
   python steg.py extract secret.png
   ```
 
+## Visualising Stego Differences
+Use `steg_visualizer.py` to inspect how embedding altered the cover image:
+
+- Export JSON metrics describing pixel and bit-plane changes:
+  ```bash
+  python steg_visualizer.py cover.png secret.png --json diff.json
+  ```
+- Generate overlay and heatmap assets (runs without requiring a display):
+  ```bash
+  python steg_visualizer.py cover.png secret.png \
+    --export-overlay overlay.png \
+    --save-heatmap heatmap.png \
+    --save-histogram histogram.png
+  ```
+- Show the heatmap and histogram interactively (falls back gracefully if
+  Matplotlib cannot initialise a GUI backend):
+  ```bash
+  python steg_visualizer.py cover.png secret.png --show
+  ```
+
+The JSON output includes counts of modified pixels, per-channel bit-plane
+statistics, and the cover image's embedding capacity (via
+`image_capacity_chars`).
+
 ## Debugging Tips
 - Capacity is roughly `(width * height * 3) // 8` characters; ensure the payload fits before calling `hide`.
 - Run automated tests:
