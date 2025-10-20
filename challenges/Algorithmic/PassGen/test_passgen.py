@@ -1,11 +1,15 @@
-"""Tests for passgen.py password generator."""
+"""Tests for passgen.py password generator and analytics visualiser."""
 
 from __future__ import annotations
 
+import json
+import random
 import re
 import unittest
+from unittest import mock
 
 import passgen
+import passgen_visualizer
 
 
 class TestPasswordGenerator(unittest.TestCase):
@@ -46,6 +50,66 @@ class TestPasswordGenerator(unittest.TestCase):
         )
         with self.assertRaises(ValueError):
             spec.validate()
+
+
+class TestVisualizerSummary(unittest.TestCase):
+    def test_summary_json_deterministic(self):
+        spec = passgen.PasswordSpec(
+            length=8, letters=True, digits=True, symbols=False, count=2
+        )
+
+        rng = random.Random(123)
+
+        def deterministic_choice(seq):
+            return seq[rng.randrange(len(seq))]
+
+        class DeterministicSystemRandom:
+            def shuffle(self, seq):
+                rng.shuffle(seq)
+
+        with mock.patch.object(
+            passgen.secrets, "choice", side_effect=deterministic_choice
+        ), mock.patch.object(
+            passgen.secrets, "SystemRandom", return_value=DeterministicSystemRandom()
+        ):
+            summary = passgen_visualizer.summarize_generation(spec, batches=2)
+
+        expected_frequencies = {
+            "1": 2,
+            "2": 1,
+            "4": 1,
+            "5": 1,
+            "7": 2,
+            "A": 1,
+            "H": 1,
+            "J": 1,
+            "Q": 1,
+            "S": 1,
+            "X": 2,
+            "c": 2,
+            "d": 1,
+            "f": 2,
+            "g": 2,
+            "j": 1,
+            "k": 2,
+            "p": 1,
+            "q": 1,
+            "r": 1,
+            "t": 1,
+            "u": 1,
+            "v": 3,
+        }
+
+        self.assertEqual(summary["character_frequencies"], expected_frequencies)
+        self.assertEqual(
+            summary["category_frequencies"], {"letters": 25, "digits": 7, "symbols": 0}
+        )
+        self.assertAlmostEqual(summary["estimated_entropy_bits"], 47.6336)
+        self.assertAlmostEqual(summary["baseline_entropy_bits"], 52.4367)
+
+        payload = json.loads(passgen_visualizer.summary_to_json(summary, indent=0))
+        self.assertEqual(payload["character_frequencies"], expected_frequencies)
+        self.assertAlmostEqual(payload["estimated_entropy_bits"], 47.6336)
 
 
 if __name__ == "__main__":  # pragma: no cover

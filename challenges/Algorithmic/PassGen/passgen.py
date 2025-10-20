@@ -89,14 +89,24 @@ def estimate_entropy_bits(pool_size: int, length: int) -> float:
 
 
 def generate_one(spec: PasswordSpec, pool: str) -> str:
-    # Guarantee at least one from each selected category
+    # Guarantee at least one from each selected category while respecting filters
+    letters_pool = [ch for ch in string.ascii_letters if ch in pool]
+    digits_pool = [ch for ch in string.digits if ch in pool]
+    symbols_pool = [ch for ch in string.punctuation if ch in pool]
+
     required = []
     if spec.letters:
-        required.append(secrets.choice(string.ascii_letters))
+        if not letters_pool:
+            raise ValueError("Letter pool is empty after applying filters")
+        required.append(secrets.choice(letters_pool))
     if spec.digits:
-        required.append(secrets.choice(string.digits))
+        if not digits_pool:
+            raise ValueError("Digit pool is empty after applying filters")
+        required.append(secrets.choice(digits_pool))
     if spec.symbols:
-        required.append(secrets.choice(string.punctuation))
+        if not symbols_pool:
+            raise ValueError("Symbol pool is empty after applying filters")
+        required.append(secrets.choice(symbols_pool))
 
     remaining = spec.length - len(required)
     if remaining < 0:

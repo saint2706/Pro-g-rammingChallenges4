@@ -17,6 +17,17 @@ Produce cryptographically strong passwords from configurable character pools, en
   python passgen.py --length 20 --letters --digits --symbols --json
   ```
 
+### Visual analytics
+
+- Inspect character frequencies and entropy trends across batches while keeping the same CLI flags:
+  ```bash
+  python passgen_visualizer.py --length 16 --letters --digits --count 5 --batches 10
+  ```
+- Skip plotting and export just the summary JSON for pipelines or CI checks:
+  ```bash
+  python passgen_visualizer.py --length 20 --letters --digits --symbols --json --no-plot
+  ```
+
 ## Debugging Tips
 - Entropy values are printed alongside passwords; a 16-character letters+digits password should report roughly 95 bits.
 - Run the regression tests:
