@@ -17,6 +17,34 @@ Perform a breadth-first crawl starting from a seed URL, collecting hyperlinks up
   python wpc.py https://example.com --depth 2 --edges links.txt
   ```
 
+## Visualization
+- Generate an interactive crawl map (requires `networkx` + `plotly`):
+  ```bash
+  python - <<'PY'
+  from importlib import util
+  from pathlib import Path
+
+  base = Path(__file__).resolve().parents[2]
+  viz_path = base / "challenges" / "Algorithmic" / "Web Page Crawler" / "crawler_visualizer.py"
+  spec = util.spec_from_file_location("crawler_visualizer", viz_path)
+  viz = util.module_from_spec(spec)
+  assert spec and spec.loader
+  spec.loader.exec_module(viz)
+
+  graph, metadata = viz.build_graph_from_source({
+      "start_url": "https://example.com",
+      "edges": [
+          ["https://example.com", "https://example.com/about"],
+          ["https://example.com", "https://example.com/blog"],
+      ],
+  })
+  figure = viz.build_plotly_figure(graph, metadata)
+  output = viz.export_html(figure, Path("crawl_graph.html"))
+  print(f"Saved visualization to {output}")
+  PY
+  ```
+- Pass a running `WebCrawler` instance directly to `build_graph_from_source` to analyze live crawl results without saving a JSON file first.
+
 ## Debugging Tips
 - Use `--log DEBUG` to trace enqueue/dequeue activity and HTTP status handling when diagnosing crawl gaps.
 - Enable `--robots` to check compliance; the script logs disallowed paths so you can differentiate between 403s and policy skips.

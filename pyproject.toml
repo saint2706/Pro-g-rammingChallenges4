@@ -58,6 +58,7 @@ algorithmic = [
     "Pillow>=10.4,<10.5",
     "requests>=2.31,<3.0",
     "beautifulsoup4>=4.12,<5.0",
+    "networkx>=3.3,<3.4",
     "yt-dlp>=2024.7.1",
 ]
 visual = [
@@ -126,6 +127,7 @@ documents = [
 markdown = [
     "markdown>=3.6,<3.7",
     "tkhtmlview>=0.3.1,<0.4",
+    "networkx>=3.3,<3.4",
 ]
 desktop = [
     "python-xlib>=0.33,<0.34",
