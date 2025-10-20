@@ -39,7 +39,7 @@ import time
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
-from typing import Optional, Union
+from typing import Iterator, Optional, Union
 
 
 class OutputFormat(Enum):
@@ -84,6 +84,16 @@ class PiConfiguration:
 
 # Configure logging
 logger = logging.getLogger(__name__)
+
+
+@dataclass
+class ChudnovskyConvergenceStep:
+    """Structured representation of a Chudnovsky iteration."""
+
+    iteration: int
+    approximation: decimal.Decimal
+    series_sum: decimal.Decimal
+    elapsed: float
 
 
 def setup_logging(level: str = "INFO") -> None:
@@ -163,12 +173,11 @@ def compute_pi(
     if config is None:
         config = PiConfiguration(iterations=iterations)
 
-    # Calculate required precision and set decimal context
+    # Calculate required precision and configure logging context
     estimated_digits = estimate_precision(iterations)
     working_precision = (
         estimated_digits + 100
     )  # Extra buffer for intermediate calculations
-    set_decimal_precision(working_precision)
 
     logger.info(
         f"Computing Pi with {iterations} iterations (estimated {estimated_digits} digits)"
@@ -179,62 +188,28 @@ def compute_pi(
         print(f"Starting Pi computation with {iterations} iterations...")
         start_time = time.time()
 
-    # Chudnovsky algorithm constants
-    # C = 426880 * sqrt(10005) - the constant multiplier
-    constant_multiplier = decimal.Decimal(426880) * decimal.Decimal(10005).sqrt()
+    progress_interval = max(1, iterations // 10)
+    pi_result: Optional[decimal.Decimal] = None
 
-    # Series computation variables
-    # These implement the Chudnovsky series expansion
-    factorial_ratio = decimal.Decimal(1)  # (6k)! / ((3k)! * (k!)^3)
-    linear_term = decimal.Decimal(13591409)  # 13591409 + 545140134*k
-    exponential_term = decimal.Decimal(1)  # 640320^(-3k)
-    series_sum = linear_term  # Initial sum value
+    for step in generate_chudnovsky_convergence(
+        iterations, working_precision=working_precision
+    ):
+        pi_result = step.approximation
 
-    # Algorithm constants for efficient computation
-    factorial_multiplier = decimal.Decimal(
-        545140134
-    )  # Added to linear term each iteration
-    exponential_divisor = decimal.Decimal(262537412640768000)  # 640320^3
+        if config.show_progress:
+            completed = step.iteration + 1
+            if completed == iterations or completed % progress_interval == 0:
+                progress = (completed / iterations) * 100
+                elapsed = step.elapsed
+                if completed > 0 and elapsed > 0:
+                    estimated_total = elapsed / (completed / iterations)
+                    remaining = max(0.0, estimated_total - elapsed)
+                    print(f"Progress: {progress:.1f}% (ETA: {remaining:.1f}s)")
+                else:
+                    print(f"Progress: {progress:.1f}%")
 
-    # Main algorithm loop - compute series terms
-    for k in range(1, iterations):
-        if config.show_progress and k % max(1, iterations // 10) == 0:
-            progress = (k / iterations) * 100
-            if start_time is not None:
-                elapsed = time.time() - start_time
-                estimated_total = elapsed / (k / iterations) if k > 0 else 0
-                remaining = estimated_total - elapsed
-                print(f"Progress: {progress:.1f}% (ETA: {remaining:.1f}s)")
-            else:
-                print(f"Progress: {progress:.1f}%")
-
-        # Update factorial ratio: (6k)! / ((3k)! * (k!)^3)
-        # This is computed iteratively to avoid calculating large factorials
-        factorial_ratio *= (
-            (6 * k - 5)
-            * (6 * k - 4)
-            * (6 * k - 3)
-            * (6 * k - 2)
-            * (6 * k - 1)
-            * (6 * k)
-        )
-        factorial_ratio /= (3 * k - 2) * (3 * k - 1) * (3 * k) * (k**3)
-
-        # Update linear term: 13591409 + 545140134*k
-        linear_term += factorial_multiplier
-
-        # Update exponential term: 640320^(-3k)
-        exponential_term /= exponential_divisor
-
-        # Add current term to series sum with alternating sign
-        current_term = factorial_ratio * linear_term * exponential_term
-        if k % 2 == 0:
-            series_sum += current_term
-        else:
-            series_sum -= current_term
-
-    # Calculate Pi: π = C / S where S is the series sum
-    pi_result = constant_multiplier / series_sum
+    if pi_result is None:
+        raise RuntimeError("Chudnovsky computation did not produce any iterations")
 
     if config.show_progress and start_time is not None:
         elapsed = time.time() - start_time
@@ -254,6 +229,74 @@ def compute_pi(
 
     logger.info(f"Pi computed to {final_precision} decimal places")
     return final_pi
+
+
+def generate_chudnovsky_convergence(
+    iterations: int, *, working_precision: Optional[int] = None
+) -> Iterator[ChudnovskyConvergenceStep]:
+    """Yield successive approximations from the Chudnovsky series."""
+
+    if iterations <= 0:
+        raise ValueError("Number of iterations must be a positive integer")
+
+    estimated_digits = estimate_precision(iterations)
+    precision = working_precision or estimated_digits + 100
+
+    previous_precision = decimal.getcontext().prec
+    set_decimal_precision(precision)
+
+    # Chudnovsky algorithm constants
+    constant_multiplier = decimal.Decimal(426880) * decimal.Decimal(10005).sqrt()
+
+    factorial_ratio = decimal.Decimal(1)
+    linear_term = decimal.Decimal(13591409)
+    exponential_term = decimal.Decimal(1)
+    series_sum = linear_term
+
+    factorial_multiplier = decimal.Decimal(545140134)
+    exponential_divisor = decimal.Decimal(262537412640768000)
+
+    start = time.perf_counter()
+
+    try:
+        # Initial approximation (iteration 0)
+        pi_estimate = constant_multiplier / series_sum
+        yield ChudnovskyConvergenceStep(
+            iteration=0,
+            approximation=pi_estimate,
+            series_sum=series_sum,
+            elapsed=0.0,
+        )
+
+        for k in range(1, iterations):
+            factorial_ratio *= (
+                (6 * k - 5)
+                * (6 * k - 4)
+                * (6 * k - 3)
+                * (6 * k - 2)
+                * (6 * k - 1)
+                * (6 * k)
+            )
+            factorial_ratio /= (3 * k - 2) * (3 * k - 1) * (3 * k) * (k**3)
+
+            linear_term += factorial_multiplier
+            exponential_term /= exponential_divisor
+
+            current_term = factorial_ratio * linear_term * exponential_term
+            if k % 2 == 0:
+                series_sum += current_term
+            else:
+                series_sum -= current_term
+
+            pi_estimate = constant_multiplier / series_sum
+            yield ChudnovskyConvergenceStep(
+                iteration=k,
+                approximation=pi_estimate,
+                series_sum=series_sum,
+                elapsed=time.perf_counter() - start,
+            )
+    finally:
+        decimal.getcontext().prec = previous_precision
 
 
 def verify_pi_accuracy(

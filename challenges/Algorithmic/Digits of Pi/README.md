@@ -17,6 +17,23 @@ Generate high-precision approximations of \(\pi\) via the Chudnovsky series, a r
   python DigitPi.py --precision 1000 --verify-file pi_test.txt
   ```
 
+## Visualizing Convergence
+- Animate the iteration-by-iteration error curve with Plotly:
+  ```bash
+  python pi_visualizer.py --algorithm chudnovsky --iterations 8 --headless --html-output chudnovsky.html
+  ```
+- Export structured convergence data for tests or further processing:
+  ```bash
+  python pi_visualizer.py --algorithm chudnovsky --iterations 8 --headless --json-summary chudnovsky.json
+  ```
+- The visualizer reuses `generate_chudnovsky_convergence` so you can also access the structured steps directly:
+  ```python
+  >>> from DigitPi import generate_chudnovsky_convergence
+  >>> steps = list(generate_chudnovsky_convergence(5))
+  >>> steps[0].approximation
+  Decimal('3.141592653589793238462643383')
+  ```
+
 ## Debugging Tips
 - For regression checks, compute 100 digits and compare the prefix to the known constant `3.1415926535...`.
 - Use the `--progress` flag to see iteration-by-iteration convergence and detect stalls caused by insufficient `decimal` context precision.
