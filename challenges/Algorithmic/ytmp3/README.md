@@ -17,6 +17,15 @@ Download audio tracks from YouTube (or other yt-dlp supported sites), convert th
   python cringe.py -F mp3 -q 192 -o downloads/ -i urls.txt --json
   ```
 
+### Visualising Batch Runs
+
+- Turn a JSON summary (from `--json`) into charts and an HTML report:
+  ```bash
+  python download_visualizer.py downloads/summary.json --output-dir reports/
+  ```
+  This generates PNG charts, an embeddable HTML page, and a metrics JSON file
+  you can diff or assert against in tests.
+
 ## Debugging Tips
 - Ensure `yt-dlp` (preferred) or `youtube_dl` plus `ffmpeg` are installed and available on `PATH`.
 - Use `--quiet` to suppress progress when embedding in other scripts; drop the flag while debugging to see backend logging.
