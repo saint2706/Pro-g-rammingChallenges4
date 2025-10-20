@@ -16,6 +16,12 @@ Inspect the 512-byte Master Boot Record sector of legacy-partitioned disks, deco
   ```bash
   python mbr.py --create-dummy demo_mbr.bin --json
   ```
+- Render a bar-style visualisation (HTML) for quick inspection:
+  ```bash
+  python -m challenges.Algorithmic.MBR.mbr_visualizer demo_mbr.bin --html layout.html
+  ```
+  The helper also accepts ``--png`` for static images and ``--metadata`` to dump
+  the normalised segment description used by the unit tests.
 
 ## Debugging Tips
 - The MBR signature bytes (`0x55AA`) at offsets 510–511 must be present; the parser will raise an error otherwise.
