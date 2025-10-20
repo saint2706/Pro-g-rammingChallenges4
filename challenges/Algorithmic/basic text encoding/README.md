@@ -17,6 +17,20 @@ Convert text between human-readable strings and binary/hexadecimal byte represen
   python txtToHexAndBin.py --interactive
   ```
 
+### Visualising encodings
+- Produce JSON describing byte/bit structure (written to stdout with `--json -`):
+  ```bash
+  python encoding_visualizer.py --text "Hello" --json - --pretty
+  ```
+- Read text from a file, render plots comparing UTF-16 output with ASCII, and save
+  the figure:
+  ```bash
+  python encoding_visualizer.py --file message.txt --encoding utf-16 --save-plot report.png
+  ```
+- The JSON includes `byte_values`, `bit_matrix`, round-trip verification flags,
+  and ASCII comparison metadata that can be consumed by unit tests or other
+  tooling.
+
 ## Debugging Tips
 - Verify reversible conversions by piping the output back into the script's reverse mode (if available) or using Python's built-in `bytes.fromhex` to confirm byte values.
 - Enable verbose logging to inspect encoding steps:
