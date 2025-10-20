@@ -7,6 +7,7 @@ import unittest
 from typing import List
 
 import fizzbuzz as fb
+import fizzbuzz_visualizer as viz
 
 
 class TestFizzBuzzCore(unittest.TestCase):
@@ -62,6 +63,43 @@ class TestFizzBuzzCore(unittest.TestCase):
     def test_invalid_rule(self):
         with self.assertRaises(ValueError):
             fb.FizzBuzzRule(0, "Bad")
+
+
+class TestFizzBuzzVisualizer(unittest.TestCase):
+    def test_metadata_matches_stream(self):
+        entries = viz.generate_rule_metadata(6)
+        emitted_outputs = [entry.output for entry in entries if entry.emitted]
+        self.assertEqual(emitted_outputs, list(fb.fizzbuzz_stream(6)))
+
+        third = entries[2]
+        self.assertEqual(third.value, 3)
+        self.assertEqual(third.applied_rules, ("Fizz",))
+        self.assertTrue(third.emitted)
+
+        fifth = entries[4]
+        self.assertEqual(fifth.value, 5)
+        self.assertEqual(fifth.applied_rules, ("Buzz",))
+
+    def test_metadata_with_number_suppression(self):
+        rules = (
+            fb.FizzBuzzRule(2, "Foo"),
+            fb.FizzBuzzRule(3, "Bar"),
+        )
+
+        entries = viz.generate_rule_metadata(6, rules=rules, include_numbers=False)
+        emitted_values = [entry.value for entry in entries if entry.emitted]
+        self.assertEqual(emitted_values, [2, 3, 4, 6])
+        emitted_outputs = [entry.output for entry in entries if entry.emitted]
+        self.assertEqual(emitted_outputs, list(fb.fizzbuzz_stream(6, rules, include_numbers=False)))
+
+        combined = entries[5]
+        self.assertEqual(combined.value, 6)
+        self.assertEqual(combined.applied_rules, ("Foo", "Bar"))
+        self.assertTrue(combined.emitted)
+
+    def test_metadata_rejects_invalid_limit(self):
+        with self.assertRaises(ValueError):
+            viz.generate_rule_metadata(0)
 
 
 if __name__ == "__main__":  # pragma: no cover
