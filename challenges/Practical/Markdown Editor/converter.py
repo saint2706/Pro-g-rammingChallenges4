@@ -229,10 +229,9 @@ DEFAULT_TEMPLATE_DIR = BASE_DIR / "templates"
 def load_template_manager(template_dir: Optional[Path] = None) -> TemplateManager:
     """Instantiate a :class:`TemplateManager` for ``template_dir``.
 
-    The desktop and Streamlit applications both rely on this helper to lazily
-    construct a manager without importing any Tkinter modules. When
-    ``template_dir`` is ``None`` the default template folder bundled with the
-    project is used.
+    The desktop applications rely on this helper to lazily construct a manager
+    without importing any Tkinter modules. When ``template_dir`` is ``None`` the
+    default template folder bundled with the project is used.
     """
 
     directory = template_dir or DEFAULT_TEMPLATE_DIR
