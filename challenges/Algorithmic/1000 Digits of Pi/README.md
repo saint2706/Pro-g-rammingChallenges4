@@ -14,6 +14,17 @@ Compute \(\pi\) to thousands of decimal places using the Gauss–Legendre iterat
   ```
   The script prints \(\pi\) with the requested number of digits and reports the elapsed time.
 
+## Visualizing Convergence
+- Plot the Gauss–Legendre convergence curve and export it as HTML:
+  ```bash
+  python ../Digits\ of\ Pi/pi_visualizer.py --algorithm gauss-legendre --digits 200 --headless --html-output gauss.html
+  ```
+- Capture the numerical summary for automated checks:
+  ```bash
+  python ../Digits\ of\ Pi/pi_visualizer.py --algorithm gauss-legendre --digits 200 --headless --json-summary gauss.json
+  ```
+- Programmatic access is available through `generate_gauss_legendre_convergence`, which yields dataclass records for each iteration.
+
 ## Debugging Tips
 - Small precisions (e.g. `python pi.py 10`) should yield `3.1415926536`. Larger requests should begin with the same prefix, making it easy to sanity-check rounding.
 - Enable progress logging to monitor convergence:

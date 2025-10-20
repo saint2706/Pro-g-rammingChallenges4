@@ -22,7 +22,19 @@ import decimal
 import logging
 import sys
 import time
-from typing import Optional
+from dataclasses import dataclass
+from typing import Iterator, Optional
+
+
+@dataclass
+class GaussLegendreConvergenceStep:
+    """Represents a single Gauss-Legendre iteration."""
+
+    iteration: int
+    approximation: decimal.Decimal
+    a_value: decimal.Decimal
+    b_value: decimal.Decimal
+    elapsed: float
 
 
 def calculate_pi_gauss_legendre(num_digits: int, *, show_progress: bool = False) -> str:
@@ -72,68 +84,29 @@ def calculate_pi_gauss_legendre(num_digits: int, *, show_progress: bool = False)
     if num_digits <= 0:
         raise ValueError(f"num_digits must be positive, got {num_digits}")
 
-    # Configure decimal precision with buffer for intermediate calculations
-    # We need extra precision to avoid rounding errors during computation
     safety_margin = max(10, num_digits // 100)  # Adaptive safety margin
-    decimal.getcontext().prec = num_digits + safety_margin
 
     if show_progress:
         logging.info(f"Starting Gauss-Legendre calculation for {num_digits} digits")
-        logging.info(f"Using precision: {decimal.getcontext().prec}")
 
-    # Initialize algorithm variables with high-precision Decimal arithmetic
-    # These correspond to the mathematical definitions in the algorithm
-    a = decimal.Decimal(1)  # Arithmetic mean
-    b = decimal.Decimal(1) / decimal.Decimal(2).sqrt()  # Geometric mean
-    t = decimal.Decimal(1) / decimal.Decimal(4)  # Sum term
-    p = decimal.Decimal(1)  # Power of 2
+    final_step: Optional[GaussLegendreConvergenceStep] = None
+    for step in generate_gauss_legendre_convergence(
+        num_digits, safety_margin=safety_margin
+    ):
+        final_step = step
 
-    iteration_count = 0
-    previous_a = a
-
-    # Main iteration loop - continues until convergence
-    while True:
-        iteration_count += 1
-
-        # Store current 'a' for convergence check
-        a_current = a
-
-        # Core Gauss-Legendre iteration steps
-        a_next = (a + b) / 2  # Update arithmetic mean
-        b_next = (a * b).sqrt()  # Update geometric mean
-        t_next = t - p * (a - a_next) ** 2  # Update sum term
-
-        # Update all variables for next iteration
-        a, b, t = a_next, b_next, t_next
-        p *= 2  # Double the power for next iteration
-
-        if show_progress and iteration_count <= 20:  # Limit progress output
-            # Calculate approximate number of correct digits (rough estimate)
-            convergence_rate = abs(a - previous_a)
+        if show_progress and step.iteration <= 20:
+            convergence_rate = abs(step.a_value - step.b_value)
             if convergence_rate > 0:
                 estimated_digits = -convergence_rate.log10()
                 logging.info(
-                    f"Iteration {iteration_count}: ~{int(estimated_digits)} correct digits"
+                    f"Iteration {step.iteration}: ~{int(estimated_digits)} correct digits"
                 )
 
-        # Convergence test: algorithm stops when successive 'a' values are identical
-        # at the current precision level
-        if a == previous_a:
-            if show_progress:
-                logging.info(f"Converged after {iteration_count} iterations")
-            break
+    if final_step is None:
+        raise RuntimeError("Gauss-Legendre computation did not produce any iterations")
 
-        previous_a = a_current
-
-        # Safety check to prevent infinite loops (should never happen in practice)
-        if iteration_count > 50:
-            logging.warning(
-                f"Algorithm did not converge after {iteration_count} iterations"
-            )
-            break
-
-    # Final calculation of Pi using the converged values
-    pi_calculated = (a + b) ** 2 / (4 * t)
+    pi_calculated = final_step.approximation
 
     # Format result with proper rounding instead of truncation.
     quantizer = decimal.Decimal(1).scaleb(-num_digits)
@@ -154,6 +127,77 @@ def setup_logging(verbose: bool = False) -> None:
         format="%(asctime)s - %(levelname)s - %(message)s",
         datefmt="%H:%M:%S",
     )
+
+
+def generate_gauss_legendre_convergence(
+    num_digits: int, *, safety_margin: Optional[int] = None
+) -> Iterator[GaussLegendreConvergenceStep]:
+    """Yield intermediate approximations from the Gauss-Legendre algorithm."""
+
+    if not isinstance(num_digits, int):
+        raise ValueError(
+            f"num_digits must be an integer, got {type(num_digits).__name__}"
+        )
+    if num_digits <= 0:
+        raise ValueError(f"num_digits must be positive, got {num_digits}")
+
+    margin = safety_margin if safety_margin is not None else max(10, num_digits // 100)
+
+    previous_precision = decimal.getcontext().prec
+    decimal.getcontext().prec = num_digits + margin
+
+    a = decimal.Decimal(1)
+    b = decimal.Decimal(1) / decimal.Decimal(2).sqrt()
+    t = decimal.Decimal(1) / decimal.Decimal(4)
+    p = decimal.Decimal(1)
+
+    iteration_count = 0
+    previous_a = a
+
+    start = time.perf_counter()
+
+    try:
+        pi_estimate = (a + b) ** 2 / (4 * t)
+        yield GaussLegendreConvergenceStep(
+            iteration=iteration_count,
+            approximation=pi_estimate,
+            a_value=a,
+            b_value=b,
+            elapsed=0.0,
+        )
+
+        while True:
+            iteration_count += 1
+            a_current = a
+
+            a_next = (a + b) / 2
+            b_next = (a * b).sqrt()
+            t_next = t - p * (a - a_next) ** 2
+
+            a, b, t = a_next, b_next, t_next
+            p *= 2
+
+            pi_estimate = (a + b) ** 2 / (4 * t)
+            yield GaussLegendreConvergenceStep(
+                iteration=iteration_count,
+                approximation=pi_estimate,
+                a_value=a,
+                b_value=b,
+                elapsed=time.perf_counter() - start,
+            )
+
+            if a == previous_a:
+                break
+
+            previous_a = a_current
+
+            if iteration_count > 50:
+                logging.warning(
+                    f"Algorithm did not converge after {iteration_count} iterations"
+                )
+                break
+    finally:
+        decimal.getcontext().prec = previous_precision
 
 
 def parse_arguments() -> argparse.Namespace:
