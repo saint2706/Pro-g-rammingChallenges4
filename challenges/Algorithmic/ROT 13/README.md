@@ -4,6 +4,7 @@
 Apply the ROT13 substitution cipher—a Caesar cipher rotating letters by 13 positions—to encode or decode text from various input sources.
 
 ## Usage
+### Python
 - Transform inline text:
   ```bash
   python rot13.py --text "Hello World!"
@@ -15,6 +16,28 @@ Apply the ROT13 substitution cipher—a Caesar cipher rotating letters by 13 pos
 - Use stdin/stdout for pipelines:
   ```bash
   echo "uryyb" | python rot13.py --stdin
+  ```
+- Emit a JSON report:
+  ```bash
+  python rot13.py --text "Hello" --json
+  ```
+
+### Haskell
+- Transform inline text with the matching CLI:
+  ```bash
+  runghc Rot13.hs --text "Hello World!"
+  ```
+- Process a file and save the output:
+  ```bash
+  runghc Rot13.hs --file message.txt --save encoded.txt
+  ```
+- Use stdin/stdout for pipelines:
+  ```bash
+  echo "uryyb" | runghc Rot13.hs --stdin
+  ```
+- Emit the structured JSON summary:
+  ```bash
+  runghc Rot13.hs --text "Hello" --json
   ```
 
 ### Visual exploration
