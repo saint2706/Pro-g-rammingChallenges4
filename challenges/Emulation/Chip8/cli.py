@@ -114,8 +114,8 @@ def main(argv: Optional[list[str]] = None) -> int:
 
     try:
         memory.load_rom_file(str(rom_path))
-    except OSError as exc:
-        print(f"Failed to load ROM: {exc}", file=sys.stderr)
+    except (OSError, ValueError) as exc:
+        print(f"Failed to load ROM '{rom_path}': {exc}", file=sys.stderr)
         return 1
 
     cpu.reset()
