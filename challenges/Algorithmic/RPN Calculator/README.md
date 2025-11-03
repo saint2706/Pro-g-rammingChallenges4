@@ -24,6 +24,26 @@ Evaluate arithmetic expressions written in Reverse Polish Notation (postfix nota
   to replay an existing capture. Pass `--no-animate` for non-clearing output or
   `--mode table`/`--mode bars` to focus on a single view.
 
+### Haskell CLI
+- Run the Haskell evaluator directly with `runghc`:
+  ```bash
+  runghc "challenges/Algorithmic/RPN Calculator/RPN.hs" --expr "5 1 2 + 4 * + 3 -"
+  ```
+- Enable degree-mode trigonometry and trace output:
+  ```bash
+  runghc "challenges/Algorithmic/RPN Calculator/RPN.hs" --expr "90 sin" --deg --trace
+  ```
+- Use the JSON mode to feed snapshots to visualisation tooling:
+  ```bash
+  runghc "challenges/Algorithmic/RPN Calculator/RPN.hs" --expr "2 3 ^ 4 *" --trace --json > snapshots.json
+  ```
+  The emitted `trace` array mirrors the Python evaluator and can be loaded by
+  `rpn_visualizer.py --load snapshots.json` for side-by-side exploration.
+- Drop into the Haskell REPL:
+  ```bash
+  runghc "challenges/Algorithmic/RPN Calculator/RPN.hs" --repl
+  ```
+
 ## Debugging Tips
 - Stack traces help: pass `--trace` to inspect how the operand stack evolves after each token.
 - For richer exploration, `rpn_visualizer.py` can animate the stack with ASCII
