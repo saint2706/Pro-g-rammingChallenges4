@@ -114,3 +114,22 @@ def test_config_show_outputs_json(
     parsed = json.loads(captured.out)
     assert "data.txt" in parsed
     assert parsed["data.txt"]["revisions"]
+
+
+def test_rapid_commits_have_unique_revision_ids(repo_dir: Path) -> None:
+    repo = Repository(repo_dir)
+    repo.init()
+    target = repo_dir / "rapid.txt"
+    target.write_text("base", encoding="utf8")
+
+    seen_ids = set()
+    for idx in range(10):
+        target.write_text(f"content-{idx}", encoding="utf8")
+        revisions = repo.commit([target], message=f"Revision {idx}")
+        revision = revisions[0]
+        assert revision.revision_id not in seen_ids
+        seen_ids.add(revision.revision_id)
+        stored_path = repo.store_dir / "rapid.txt" / revision.revision_id
+        assert stored_path.exists()
+
+    assert len(seen_ids) == 10
