@@ -3,7 +3,7 @@
 ## Problem Statement
 Hide and retrieve UTF-8 text inside the least significant bits of RGB images. The script can embed messages, extract them, or report available capacity while handling escaping for sentinel markers.
 
-## Usage
+## Python CLI Usage
 - Report embedding capacity of an image:
   ```bash
   python steg.py capacity cover.png
@@ -16,6 +16,34 @@ Hide and retrieve UTF-8 text inside the least significant bits of RGB images. Th
   ```bash
   python steg.py extract secret.png
   ```
+
+## Haskell Companion CLI (`Steg.hs`)
+`Steg.hs` mirrors the Python tooling using [JuicyPixels](https://hackage.haskell.org/package/JuicyPixels) for image IO and
+`aeson` for JSON output. Install the dependencies with Cabal or Stack (for example,
+`cabal install --lib JuicyPixels aeson text vector`), then run the script with `runghc`/`stack runghc`:
+
+- Report capacity (text or JSON):
+  ```bash
+  stack runghc --package JuicyPixels --package aeson --package text --package vector \
+    challenges/Algorithmic/Steganography/Steg.hs capacity cover.png --json
+  ```
+- Hide text from `--message`, `--message-file`, or `--stdin`:
+  ```bash
+  runghc challenges/Algorithmic/Steganography/Steg.hs hide cover.png secret.png \
+    --message "Hello" --json
+  ```
+- Extract a hidden payload:
+  ```bash
+  runghc challenges/Algorithmic/Steganography/Steg.hs extract secret.png
+  ```
+- Analyse cover vs stego pairs (JSON metrics + optional exports used by the Python visualiser):
+  ```bash
+  runghc challenges/Algorithmic/Steganography/Steg.hs analyse cover.png secret.png \
+    --json --metrics-out diff.json --export-mask mask.png --export-overlay overlay.png
+  ```
+
+The JSON produced by `analyse` shares the same structure as `steg_visualizer.py`, so the Python visualiser can ingest the
+generated metrics, masks, or overlays without additional conversion.
 
 ## Visualising Stego Differences
 Use `steg_visualizer.py` to inspect how embedding altered the cover image:
