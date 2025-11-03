@@ -8,13 +8,25 @@ Inspect the 512-byte Master Boot Record sector of legacy-partitioned disks, deco
   ```bash
   python mbr.py --file disk.img
   ```
+- Run the Haskell port directly with `runghc` (or compile with `ghc`):
+  ```bash
+  runghc MBR.hs --file disk.img
+  ```
 - Emit JSON suitable for scripts:
   ```bash
   python mbr.py --file disk.img --json
   ```
+- JSON output is also available from the Haskell CLI:
+  ```bash
+  runghc MBR.hs --file disk.img --json
+  ```
 - Create a synthetic demo image and immediately inspect it:
   ```bash
   python mbr.py --create-dummy demo_mbr.bin --json
+  ```
+- The same dummy generator exists in `MBR.hs`, mirroring all relevant flags:
+  ```bash
+  runghc MBR.hs --create-dummy demo_mbr.bin --json --log debug
   ```
 - Render a bar-style visualisation (HTML) for quick inspection:
   ```bash
@@ -22,6 +34,10 @@ Inspect the 512-byte Master Boot Record sector of legacy-partitioned disks, deco
   ```
   The helper also accepts ``--png`` for static images and ``--metadata`` to dump
   the normalised segment description used by the unit tests.
+
+Both implementations share the exact dummy layout and JSON schema, so images
+produced by `MBR.hs` feed directly into `mbr_visualizer.py` (and vice versa)
+without any additional conversion steps.
 
 ## Debugging Tips
 - The MBR signature bytes (`0x55AA`) at offsets 510–511 must be present; the parser will raise an error otherwise.
