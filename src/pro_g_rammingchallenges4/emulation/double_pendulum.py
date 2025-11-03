@@ -211,7 +211,9 @@ def export_csv(
     import csv
 
     cfg = cfg or DoublePendulumConfig()
-    with Path(path).open("w", newline="", encoding="utf-8") as handle:
+    target = Path(path)
+    target.parent.mkdir(parents=True, exist_ok=True)
+    with target.open("w", newline="", encoding="utf-8") as handle:
         fieldnames = ["time", "theta1", "theta2", "omega1", "omega2"]
         if include_energy:
             fieldnames.append("energy")
@@ -242,7 +244,12 @@ def render_matplotlib(
 
     import matplotlib.pyplot as plt
 
-    if not show and save_path is None:
+    save_path_obj: Path | None = None
+    if save_path is not None:
+        save_path_obj = Path(save_path)
+        save_path_obj.parent.mkdir(parents=True, exist_ok=True)
+
+    if not show and save_path_obj is None:
         return
 
     x1, y1, x2, y2 = simulator.trajectory(result)
@@ -284,8 +291,8 @@ def render_matplotlib(
             ax.plot(history_x, history_y, color="tab:red", linewidth=1.0, alpha=0.7)
             plt.pause(0.001)
 
-        if save_path is not None:
-            fig.savefig(save_path)
+        if save_path_obj is not None:
+            fig.savefig(save_path_obj)
         plt.show()
         return
 
@@ -312,8 +319,8 @@ def render_matplotlib(
     )
     ax.plot(history_x, history_y, color="tab:red", linewidth=1.0, alpha=0.7)
 
-    if save_path is not None:
-        fig.savefig(save_path)
+    if save_path_obj is not None:
+        fig.savefig(save_path_obj)
 
     plt.close(fig)
 
@@ -333,6 +340,7 @@ def export_gif(
     import numpy as np
 
     path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
     x1, y1, x2, y2 = simulator.trajectory(result)
 
     fig, ax = plt.subplots(figsize=(4, 4))
@@ -447,9 +455,11 @@ def _cli() -> None:
 
     if args.csv:
         export_csv(result, args.csv, cfg=cfg)
+        print(f"Simulation CSV written to {args.csv}")
 
     if args.gif:
         export_gif(simulator, result, args.gif, trail_length=args.trail)
+        print(f"Animation written to {args.gif}")
 
     render_matplotlib(
         simulator,
