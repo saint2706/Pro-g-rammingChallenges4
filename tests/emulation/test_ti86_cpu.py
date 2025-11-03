@@ -11,9 +11,10 @@ import pytest
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "src"))
 
+import pro_g_rammingchallenges4.emulation.ti86 as ti86_pkg
 from pro_g_rammingchallenges4.emulation.ti86 import Debugger, Memory, TI86, Z80CPU
 
-DATA_PATH = ROOT / "challenges" / "Emulation" / "TI86" / "opcode_truth.json"
+DATA_PATH = Path(ti86_pkg.__file__).with_name("opcode_truth.json")
 
 
 def load_opcode_cases():

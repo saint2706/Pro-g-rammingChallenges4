@@ -556,7 +556,14 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
     parser = build_arg_parser()
     args = parser.parse_args(argv)
     if args.scene is not None:
-        scene = load_scene_file(args.scene)
+        try:
+            scene = load_scene_file(args.scene)
+        except FileNotFoundError as exc:
+            parser.error(f"Scene file not found: {exc}")
+        except json.JSONDecodeError as exc:
+            parser.error(
+                f"Failed to parse scene file '{args.scene}': {exc.msg} (line {exc.lineno} column {exc.colno})"
+            )
         # override with CLI additions
         if args.sphere:
             for text in args.sphere:
@@ -598,6 +605,7 @@ def main(argv: Optional[Sequence[str]] = None) -> None:
         height = args.height
     tracer = RayTracer(width=width, height=height, scene=scene)
     image = tracer.render()
+    args.output.parent.mkdir(parents=True, exist_ok=True)
     image.save(args.output)
     if args.show:
         image.show()

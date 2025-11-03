@@ -3,6 +3,7 @@
 #include <queue>
 #include <algorithm>
 #include <string>
+#include <stdexcept>
 
 // -----------------------------------------------------------------------------
 // Eulerian Graph Classification & Connectedness Checker (Undirected Simple Graph)
