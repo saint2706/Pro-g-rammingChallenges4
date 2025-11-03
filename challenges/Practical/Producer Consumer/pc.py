@@ -25,6 +25,7 @@ from typing import Any, Optional
 # Sentinel used to signal consumers to exit. A unique object so it won't
 # collide with any normal produced value.
 SENTINEL = object()
+STOP_EVENT = threading.Event()
 
 
 @dataclass
@@ -124,20 +125,38 @@ def producer_task(
     idx: int, cfg: Config, stats: Stats, q: "queue.Queue[Any]", log: Logger
 ) -> None:
     for i in range(cfg.items_per_producer):
+        if STOP_EVENT.is_set():
+            return
+
         value = (idx, i)  # tuple: (producer id, sequence)
-        # blocks if queue full
-        q.put(value)
+
+        while True:
+            if STOP_EVENT.is_set():
+                return
+            try:
+                q.put(value, timeout=0.1)
+                break
+            except queue.Full:
+                if STOP_EVENT.is_set():
+                    return
+
         stats.increment_produced()
         log.log(f"P{idx} produced seq={i} size={q.qsize()}")
-        if cfg.prod_delay > 0:
-            time.sleep(cfg.prod_delay)
+        if cfg.prod_delay > 0 and STOP_EVENT.wait(cfg.prod_delay):
+            return
 
 
 def consumer_task(
     idx: int, cfg: Config, stats: Stats, q: "queue.Queue[Any]", log: Logger
 ) -> None:
     while True:
-        item = q.get()  # blocks if empty
+        try:
+            if STOP_EVENT.is_set():
+                item = q.get(timeout=0.1)
+            else:
+                item = q.get()
+        except queue.Empty:
+            continue
         if item is SENTINEL:  # termination signal
             q.task_done()
             log.log(f"C{idx} received sentinel -> exit")
@@ -146,11 +165,12 @@ def consumer_task(
         prod_id, seq = item  # unpack tuple produced
         log.log(f"C{idx} consumed P{prod_id} seq={seq} size={q.qsize()}")
         if cfg.cons_delay > 0:
-            time.sleep(cfg.cons_delay)
+            STOP_EVENT.wait(cfg.cons_delay)
         q.task_done()
 
 
 def main(argv: Optional[list[str]] = None) -> int:
+    STOP_EVENT.clear()
     cfg = parse_args(argv)
     stats = Stats()
     log = Logger(enabled=not cfg.quiet, timestamps=cfg.timestamps)
@@ -175,31 +195,70 @@ def main(argv: Optional[list[str]] = None) -> int:
         threads.append(t)
         t.start()
 
-    # Wait for all producers to finish then inject one sentinel per consumer.
-    for t in threads[: cfg.producers]:
-        t.join()
-    for _ in range(cfg.consumers):
-        q.put(SENTINEL)
+    try:
+        # Wait for all producers to finish then inject one sentinel per consumer.
+        for t in threads[: cfg.producers]:
+            t.join()
+        for _ in range(cfg.consumers):
+            q.put(SENTINEL)
 
-    # Wait until queue tasks complete then wait for consumers to exit
-    q.join()  # ensures all non-sentinel tasks processed
-    for t in threads[cfg.producers :]:
-        t.join()
+        # Wait until queue tasks complete then wait for consumers to exit
+        q.join()  # ensures all non-sentinel tasks processed
+        for t in threads[cfg.producers :]:
+            t.join()
 
-    elapsed = (time.perf_counter() - start) * 1000
-    expected = cfg.producers * cfg.items_per_producer
-    ok = (stats.produced == expected) and (stats.consumed == expected)
+        elapsed = (time.perf_counter() - start) * 1000
+        expected = cfg.producers * cfg.items_per_producer
+        ok = (stats.produced == expected) and (stats.consumed == expected)
 
-    print("\nSummary:")
-    print(f"  Producers:           {cfg.producers} (each {cfg.items_per_producer})")
-    print(f"  Consumers:           {cfg.consumers}")
-    print(f"  Buffer capacity:     {cfg.capacity}")
-    print(f"  Produced total:      {stats.produced}")
-    print(f"  Consumed total:      {stats.consumed}")
-    print(f"  Elapsed (ms):        {elapsed:.2f}")
-    print(f"  Success:             {ok}")
+        print("\nSummary:")
+        print(f"  Producers:           {cfg.producers} (each {cfg.items_per_producer})")
+        print(f"  Consumers:           {cfg.consumers}")
+        print(f"  Buffer capacity:     {cfg.capacity}")
+        print(f"  Produced total:      {stats.produced}")
+        print(f"  Consumed total:      {stats.consumed}")
+        print(f"  Elapsed (ms):        {elapsed:.2f}")
+        print(f"  Success:             {ok}")
 
-    return 0 if ok else 1
+        return 0 if ok else 1
+    except KeyboardInterrupt:
+        STOP_EVENT.set()
+
+        # Ensure all producers terminate.
+        for t in threads[: cfg.producers]:
+            while t.is_alive():
+                try:
+                    t.join()
+                except KeyboardInterrupt:
+                    continue
+
+        # Wake consumers so they can observe the sentinel and exit.
+        for _ in range(cfg.consumers):
+            while True:
+                try:
+                    q.put(SENTINEL, timeout=0.1)
+                    break
+                except queue.Full:
+                    time.sleep(0.01)
+
+        # Allow outstanding work to settle and consumers to stop.
+        while True:
+            try:
+                q.join()
+                break
+            except KeyboardInterrupt:
+                continue
+
+        for t in threads[cfg.producers :]:
+            while t.is_alive():
+                try:
+                    t.join()
+                except KeyboardInterrupt:
+                    continue
+
+        return 130
+    finally:
+        STOP_EVENT.clear()
 
 
 if __name__ == "__main__":  # pragma: no cover - manual execution path
