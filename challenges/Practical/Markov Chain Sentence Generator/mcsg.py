@@ -23,10 +23,10 @@ import os
 import random
 import re
 import sys
-from collections import defaultdict, deque
+from collections import defaultdict
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Deque, Dict, Iterable, List, Optional, Sequence, Tuple
+from typing import Dict, List, Optional, Sequence, Tuple
 
 # ----------------------------- Configuration ----------------------------- #
 
@@ -62,6 +62,8 @@ class MarkovGenerator:
         self.lower = lower
         self.model: Dict[Tuple[str, ...], List[str]] = defaultdict(list)
         self._start_states: List[Tuple[str, ...]] = []
+        self._start_fragments: List[Tuple[str, ...]] = []
+        self._start_tokens: List[str] = []
         self._token_count: int = 0
 
     TOKEN_SPLIT_RE = re.compile(r"\s+")
@@ -88,20 +90,36 @@ class MarkovGenerator:
         """Build the Markov model from a given source text."""
         tokens, boundaries = self._tokenize_with_boundaries(text)
         self._token_count = len(tokens)
+        self.model.clear()
+        self._start_states.clear()
+        self._start_fragments.clear()
+        self._start_tokens.clear()
         if len(tokens) <= self.state_size:
             print(
                 "Warning: Source text is too short for the given state size.",
                 file=sys.stderr,
             )
             return
-        state: Deque[str] = deque(tokens[: self.state_size], maxlen=self.state_size)
-        self._start_states.append(tuple(state))
-        for idx, next_word in enumerate(tokens[self.state_size :], start=self.state_size):
-            current_state = tuple(state)
-            self.model[current_state].append(next_word)
-            state.append(next_word)
-            if boundaries[idx - 1]:
-                self._start_states.append(tuple(state))
+        n_tokens = len(tokens)
+        sentence_starts = [0]
+        sentence_starts.extend(
+            idx
+            for idx in range(1, n_tokens)
+            if boundaries[idx - 1]
+        )
+        for start_idx in sentence_starts:
+            if start_idx >= n_tokens:
+                continue
+            self._start_tokens.append(tokens[start_idx])
+            window = tuple(tokens[start_idx : start_idx + self.state_size])
+            if len(window) == self.state_size:
+                self._start_states.append(window)
+            elif window:
+                self._start_fragments.append(window)
+        for i in range(n_tokens - self.state_size):
+            state = tuple(tokens[i : i + self.state_size])
+            next_word = tokens[i + self.state_size]
+            self.model[state].append(next_word)
 
     # ---------------- Generation ---------------- #
     def generate(self, length: int, start_key: Optional[str] = None) -> str:
