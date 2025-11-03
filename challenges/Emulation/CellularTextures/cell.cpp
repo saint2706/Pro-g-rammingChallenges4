@@ -40,9 +40,12 @@
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>
+#include <filesystem>
 #include <limits>
 #include <memory>
 #include <random>
+#include <string>
+#include <system_error>
 #include <vector>
 
 #include <emmintrin.h> // SSE2 intrinsics
@@ -93,7 +96,7 @@ public:
 };
 
 // Minimal uncompressed top-left origin grayscale TGA writer (8 bpp)
-static bool saveImageTGA(const char *filename, const Image &img)
+static bool saveImageTGA(const std::filesystem::path &filename, const Image &img)
 {
   unsigned char header[18] = {
       0,             // 0x00: no ident struct
@@ -113,7 +116,22 @@ static bool saveImageTGA(const char *filename, const Image &img)
   header[0x0e] = img.SizeY & 0xff;
   header[0x0f] = (img.SizeY >> 8) & 0xff;
 
-  std::unique_ptr<FILE, decltype(&std::fclose)> file(std::fopen(filename, "wb"), &std::fclose);
+  namespace fs = std::filesystem;
+
+  if (!filename.empty())
+  {
+    const fs::path parentDir = filename.parent_path();
+    if (!parentDir.empty())
+    {
+      std::error_code ec;
+      fs::create_directories(parentDir, ec);
+      if (ec)
+        return false;
+    }
+  }
+
+  const std::string filePath = filename.string();
+  std::unique_ptr<FILE, decltype(&std::fclose)> file(std::fopen(filePath.c_str(), "wb"), &std::fclose);
   if (!file)
     return false;
 
@@ -827,7 +845,10 @@ int main()
   }
 
   // Output final image (only last benchmark result retained in buffer)
-  saveImageTGA("challenges\Emulation\\Easy\\CellularTextures\\test.tga", img);
+  namespace fs = std::filesystem;
+  const fs::path outputPath = fs::path("challenges") / "Emulation" / "CellularTextures" / "test.tga";
+
+  saveImageTGA(outputPath, img);
 
   return 0;
 }
