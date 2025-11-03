@@ -39,7 +39,7 @@ trickier flag logic.
 ## Testing strategy
 
 Unit tests in `tests/emulation/test_ti86_cpu.py` load scenarios from
-`opcode_truth.json`. Each scenario records the initial register file, the program
+`src/pro_g_rammingchallenges4/emulation/ti86/opcode_truth.json`. Each scenario records the initial register file, the program
 bytes to execute, and the expected register/memory state after one or more
 instructions. The values mirror the canonical tables from Sean Young's “The Z80
 Instruction Set” documentation and have been simplified for brevity.

@@ -201,5 +201,8 @@ Homepage = "https://github.com/saintwithataint/Pro-g-rammingChallenges4"
 [tool.setuptools]
 package-dir = {"" = "src"}
 
+[tool.setuptools.package-data]
+"pro_g_rammingchallenges4.emulation.ti86" = ["opcode_truth.json"]
+
 [tool.setuptools.packages.find]
 where = ["src"]

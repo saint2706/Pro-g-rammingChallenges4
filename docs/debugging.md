@@ -100,7 +100,7 @@ This guide documents the automated tests that ship with the repository and provi
 
 **Dataset & dependency prerequisites**
 
-- Ensure binary fixtures remain accessible: `challenges/Emulation/TI86/opcode_truth.json` for TI-86 and `challenges/Emulation/FFTSpectrum/test_tone.wav` for the FFT analyzer. 【F:tests/emulation/test_ti86_cpu.py†L11-L16】【F:tests/test_fft_spectrum.py†L1-L14】
+- Ensure binary fixtures remain accessible: `src/pro_g_rammingchallenges4/emulation/ti86/opcode_truth.json` for TI-86 and `challenges/Emulation/FFTSpectrum/test_tone.wav` for the FFT analyzer. 【F:tests/emulation/test_ti86_cpu.py†L11-L16】【F:tests/test_fft_spectrum.py†L1-L14】
 - Numerical solvers depend on `numpy`/`pytest`; install `.[emulation]` extras if available to pull consistent versions.
 
 **Targeted pytest commands**
