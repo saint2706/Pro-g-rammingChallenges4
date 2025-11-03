@@ -116,6 +116,7 @@ def complement_image(input_path: Path, output_path: Path, keep_alpha: bool) -> S
         max_after = (int(xa_arr[0]), int(xa_arr[1]), int(xa_arr[2]))
         mean_after = (float(ava_arr[0]), float(ava_arr[1]), float(ava_arr[2]))
 
+        output_path.parent.mkdir(parents=True, exist_ok=True)
         out_img = Image.fromarray(comp, mode="RGB")
         if alpha is not None:
             out_img.putalpha(alpha)
@@ -150,6 +151,8 @@ def build_output_path(
     if out_file is not None:
         return out_file
     target_dir = dest_dir if dest_dir else src.parent
+    if dest_dir:
+        dest_dir.mkdir(parents=True, exist_ok=True)
     return target_dir / f"{src.stem}{suffix}{src.suffix}"
 
 
