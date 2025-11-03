@@ -20,7 +20,10 @@ SRC_PATH = ROOT / "src"
 if str(SRC_PATH) not in sys.path:
     sys.path.insert(0, str(SRC_PATH))
 
+from pro_g_rammingchallenges4.emulation import ti86 as ti86_pkg
 from pro_g_rammingchallenges4.emulation.ti86 import TI86, Memory, Z80CPU
+
+TRUTH_PATH = Path(ti86_pkg.__file__).with_name("opcode_truth.json")
 
 
 def _load_rom_bytes(path: Path) -> bytes:
@@ -111,8 +114,7 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     if args.verify_truth:
-        truth_path = ROOT / "challenges" / "Emulation" / "TI86" / "opcode_truth.json"
-        with truth_path.open("r", encoding="utf-8") as handle:
+        with TRUTH_PATH.open("r", encoding="utf-8") as handle:
             cases = json.load(handle)
         try:
             _run_truth_cases(cases)
