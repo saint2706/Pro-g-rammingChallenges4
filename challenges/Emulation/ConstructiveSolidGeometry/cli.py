@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import os
+import sys
 from typing import Tuple
 
 from . import SDF, Bounds, box, cylinder, export_mesh, mesh_from_sdf, plot_mesh, sphere
@@ -112,7 +113,11 @@ def main(argv: list[str] | None = None) -> None:
     primitive_b = parse_primitive(args.primitive_b)
     scene = build_scene(args.operation, primitive_a, primitive_b)
     bounds = parse_bounds(args.bounds)
-    mesh = mesh_from_sdf(scene, bounds=bounds, resolution=args.resolution)
+    try:
+        mesh = mesh_from_sdf(scene, bounds=bounds, resolution=args.resolution)
+    except ValueError as exc:
+        print(str(exc))
+        sys.exit(1)
 
     print(
         f"Vertices: {len(mesh.vertices)} | Faces: {len(mesh.faces)} | Volume: {mesh.volume:.4f}"
