@@ -16,16 +16,12 @@ import math
 import os
 import sys
 from dataclasses import dataclass
-from typing import Optional
+from typing import Any, Optional
 
-try:  # dependency guard
-    from vpython import scene, box, rate, vector  # type: ignore
-except ImportError as e:  # pragma: no cover - environment dependent
-    print(
-        "Error: The 'vpython' library is required to run this script.", file=sys.stderr
-    )
-    print("Install with: pip install vpython", file=sys.stderr)
-    raise SystemExit(1)
+scene: Any | None = None
+box: Any | None = None
+rate: Any | None = None
+vector: Any | None = None
 
 DEFAULT_ROT_SPEED = 0.005  # radians per frame at 50 fps (~0.25 rad/sec)
 
@@ -56,6 +52,29 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def setup_scene() -> None:
+    global scene, box, rate, vector
+
+    if scene is None or box is None or rate is None or vector is None:
+        try:  # dependency guard
+            import vpython
+        except ImportError:  # pragma: no cover - environment dependent
+            print(
+                "Error: The 'vpython' library is required to run this script.",
+                file=sys.stderr,
+            )
+            print("Install with: pip install vpython", file=sys.stderr)
+            raise SystemExit(1)
+
+        scene = vpython.scene  # type: ignore[attr-defined]
+        box = vpython.box  # type: ignore[attr-defined]
+        rate = vpython.rate  # type: ignore[attr-defined]
+        vector = vpython.vector  # type: ignore[attr-defined]
+
+    assert scene is not None
+    assert box is not None
+    assert rate is not None
+    assert vector is not None
+
     scene.title = "Spinny Cube"
     scene.range = 2
     scene.caption = (
