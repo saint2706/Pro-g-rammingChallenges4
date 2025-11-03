@@ -16,6 +16,12 @@ Print the integers from 1 through *n*, substituting `Fizz` for multiples of 3, `
   ```bash
   gcc fizzbuzz.c -o fizzbuzz && ./fizzbuzz 20
   ```
+- Build the Haskell version (parity with the Python CLI, requires GHC):
+  ```bash
+  ghc -O2 FizzBuzz.hs -o fizzbuzz-hs
+  ./fizzbuzz-hs --limit 30 --rule 3:Fizz --rule 5:Buzz --format json
+  ```
+  You can also execute it without compiling using `runghc FizzBuzz.hs --limit 30 --format csv`.
 - Execute the test suite:
   ```bash
   pytest test_fizzbuzz.py
@@ -38,6 +44,7 @@ Print the integers from 1 through *n*, substituting `Fizz` for multiples of 3, `
 - The Python version exposes reusable functions (`fizzbuzz_sequence`) used by the tests.
 - Both implementations accept custom start/stop ranges and divisor pairs.
 - Command-line flags provide optional JSON/CSV output for integration with other tools.
+- The Haskell CLI mirrors the Python options for limit selection, rule overrides, number suppression, and JSON/CSV/plain emitters so existing automations can switch languages without changing flags.
 
 ## Further Reading
 - ["Why Can't Programmers.. Program?" by Jeff Atwood](https://blog.codinghorror.com/why-cant-programmers-program/)
