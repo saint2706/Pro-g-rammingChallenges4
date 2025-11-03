@@ -13,6 +13,17 @@ Compute \(\pi\) to thousands of decimal places using the Gauss–Legendre iterat
   python pi.py 1000
   ```
   The script prints \(\pi\) with the requested number of digits and reports the elapsed time.
+- Build the standalone Haskell executable with GHC (or `stack ghci -- Pi.hs` if you prefer a
+  project workflow):
+  ```bash
+  ghc -O2 Pi.hs -o pi-hs
+  ```
+- Run the Haskell solver with a digit target and optional verbose logging that mirrors the
+  Python progress output:
+  ```bash
+  ./pi-hs --digits 1000
+  ./pi-hs --digits 250 --verbose
+  ```
 
 ## Visualizing Convergence
 - Plot the Gauss–Legendre convergence curve and export it as HTML:
