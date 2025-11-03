@@ -22,10 +22,14 @@ import shlex
 import signal
 import ssl
 import sys
+import threading
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
 from typing import List, Optional, Sequence
+
+
+_STDIN_STOP = object()
 
 __all__ = ["IRCClient", "IRCConfig", "main"]
 
@@ -235,19 +239,74 @@ class IRCClient:
 
     async def _fallback_input_loop(self) -> None:
         loop = asyncio.get_running_loop()
-        while not self.stop_requested.is_set():
+        queue: asyncio.Queue[object] = asyncio.Queue()
+        stop_signal = threading.Event()
+
+        def thread_safe_put(value: object) -> None:
             try:
-                line = await loop.run_in_executor(None, sys.stdin.readline)
-            except asyncio.CancelledError:
-                break
+                loop.call_soon_threadsafe(queue.put_nowait, value)
+            except RuntimeError:
+                # Event loop already closed; nothing else to notify.
+                pass
+
+        def pump_stdin() -> None:
+            try:
+                while not stop_signal.is_set():
+                    line = sys.stdin.readline()
+                    if line == "":
+                        thread_safe_put(None)
+                        break
+                    thread_safe_put(line)
             except Exception as exc:  # noqa: BLE001
-                raise ConnectionError(f"stdin error: {exc!s}") from exc
+                thread_safe_put(exc)
+            finally:
+                thread_safe_put(_STDIN_STOP)
 
-            if line == "":
-                await self.quit("EOF on stdin")
-                return
+        thread = threading.Thread(
+            target=pump_stdin, name="irc-stdin-pump", daemon=True
+        )
+        thread.start()
 
-            await self._process_user_line(line.rstrip("\r\n"))
+        try:
+            while not self.stop_requested.is_set():
+                reader_task = asyncio.create_task(queue.get())
+                stop_task = asyncio.create_task(self.stop_requested.wait())
+                done, pending = await asyncio.wait(
+                    {reader_task, stop_task},
+                    return_when=asyncio.FIRST_COMPLETED,
+                )
+
+                if stop_task in done:
+                    reader_task.cancel()
+                    with contextlib.suppress(asyncio.CancelledError):
+                        await reader_task
+                    break
+
+                stop_task.cancel()
+                with contextlib.suppress(asyncio.CancelledError):
+                    await stop_task
+
+                for task in pending:
+                    task.cancel()
+                    with contextlib.suppress(asyncio.CancelledError):
+                        await task
+
+                item = reader_task.result()
+
+                if item is _STDIN_STOP:
+                    break
+                if isinstance(item, Exception):  # pragma: no cover - defensive
+                    raise ConnectionError(f"stdin error: {item!s}") from item
+                if item is None:
+                    await self.quit("EOF on stdin")
+                    break
+
+                await self._process_user_line(str(item).rstrip("\r\n"))
+        finally:
+            stop_signal.set()
+            # Ensure any pending consumer wakes immediately.
+            queue.put_nowait(_STDIN_STOP)
+            thread.join(timeout=0.1)
 
     async def _process_user_line(self, line: str) -> None:
         if not line:
