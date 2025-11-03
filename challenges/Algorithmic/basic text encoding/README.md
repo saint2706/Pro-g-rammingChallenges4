@@ -31,6 +31,39 @@ Convert text between human-readable strings and binary/hexadecimal byte represen
   and ASCII comparison metadata that can be consumed by unit tests or other
   tooling.
 
+### Haskell CLI parity
+
+The repository also ships a Haskell reimplementation of the converter with the
+same focus on reversible conversions and visualisation-friendly output.
+
+1. Build the executable using `ghc` (installed with the Glasgow Haskell Compiler):
+   ```bash
+   cd "challenges/Algorithmic/basic text encoding"
+   ghc -O2 Encoding.hs -o encoding
+   ```
+   Alternatively, run it without compiling:
+   ```bash
+   runghc "challenges/Algorithmic/basic text encoding/Encoding.hs" --help
+   ```
+2. Run commands mirroring the Python toolset:
+   ```bash
+   ./encoding --mode hex --text "Hello" --encoding utf-8
+   ./encoding --mode bin --text "Hello" --encoding utf-16
+   ./encoding --mode hex2text --text "48 65 6c 6c 6f" --encoding ascii
+   ./encoding --interactive
+   ```
+3. Produce structured summaries (matching the JSON schema produced by
+   `encoding_visualizer.py`) or terminal visualisations:
+   ```bash
+   ./encoding --mode hex --text "Hello" --json -
+   ./encoding --mode bin --text "Hello" --visualize
+   ```
+
+The Haskell CLI exposes the same conversion modes (`hex`, `bin`, `hex2text`,
+`bin2text`), respects the encoding options (`utf-8`, `utf-16`, `utf-16le`,
+`utf-16be`, `ascii`), supports interactive prompts, and emits JSON summaries with
+ASCII comparisons to stay feature-aligned with the Python utilities.
+
 ## Debugging Tips
 - Verify reversible conversions by piping the output back into the script's reverse mode (if available) or using Python's built-in `bytes.fromhex` to confirm byte values.
 - Enable verbose logging to inspect encoding steps:
