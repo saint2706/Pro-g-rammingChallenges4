@@ -211,9 +211,9 @@ def export_csv(
     import csv
 
     cfg = cfg or DoublePendulumConfig()
-    target = Path(path)
-    target.parent.mkdir(parents=True, exist_ok=True)
-    with target.open("w", newline="", encoding="utf-8") as handle:
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", newline="", encoding="utf-8") as handle:
         fieldnames = ["time", "theta1", "theta2", "omega1", "omega2"]
         if include_energy:
             fieldnames.append("energy")
