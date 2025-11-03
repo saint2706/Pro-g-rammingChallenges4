@@ -24,6 +24,16 @@ Select one or more names uniformly or with optional weights from a list, support
   draws when seeded, and can save matplotlib pie/bar charts for quick sanity
   checks.
 
+### Haskell CLI
+
+- Draw weighted samples with deterministic seeding:
+  ```bash
+  runghc RNP.hs --file names.txt --count 4 --with-replacement --seed 99 --json --stats
+  ```
+  The Haskell script mirrors the Python defaults, emits the same JSON payload, and
+  optionally embeds a `statistics` object containing the names, raw weights, and
+  normalized probabilities for downstream visualizers.
+
 ## Debugging Tips
 - If no `names.txt` exists, the script can create one automatically—verify contents before running weighted draws.
 - Test suite command:
@@ -37,6 +47,10 @@ Select one or more names uniformly or with optional weights from a list, support
 - Dataclass configuration validates requested counts against the number of available names when sampling without replacement.
 - Supports `name,weight` lines for weighted random selection (fallback to weight 1 when omitted).
 - Uses Python's `random.Random` seeded instance to keep deterministic runs isolated from global state.
+- The Haskell implementation (`RNP.hs`) consumes the exact same data files as the
+  Python version. Mixed-weight inputs (some names with explicit weights and others
+  without) are normalized identically, ensuring compatible statistics for
+  `rnp_visualizer.py` or any JSON-based tooling.
 
 ## Further Reading
 - [Ross, *Probability Models for Computer Science*, Chapter 3: Discrete Distributions](https://www.pearson.com/en-us/subject-catalog/p/probability-models-for-computer-science/P200000004495)
