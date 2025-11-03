@@ -17,6 +17,33 @@ Given a weighted graph with non-negative edge costs, compute the shortest-path d
   python dijkstra_visualizer.py --source A
   ```
 
+### Haskell command-line solver
+
+The repository now includes a standalone Haskell CLI (`Dijkstra.hs`) that mirrors the Python implementation's behaviour. You can run it with `runghc` (ships with GHC) without compiling, or build an executable with `ghc Dijkstra.hs`.
+
+```bash
+# Run against the bundled example graph
+runghc Dijkstra.hs --source A
+
+# Load a custom graph (JSON or adjacency list) and emit a trace
+runghc Dijkstra.hs --graph my_graph.txt --source S --trace
+
+# Turn on verbose logging and export a JSON summary of every step
+runghc Dijkstra.hs --graph weighted.json --source Start --verbose --json summary.json
+```
+
+Supported flags:
+
+| Flag | Description |
+| --- | --- |
+| `--graph FILE` | Parse a custom graph. Supports compact JSON (`{"A": {"B": 2}}`) or adjacency text (`A: B(2), C(4)`). |
+| `--source NODE` | Choose one or more starting nodes. Omit to use the first node found in the graph. |
+| `--trace` | Print each generator-style step (initialisation, relaxations, completion). |
+| `--verbose` | Emit progress information and file handling details to stderr. |
+| `--json FILE` | Persist a machine-readable summary containing distances, predecessors, frontier snapshots, and the visit order. |
+
+The JSON file produced by `--json` pairs naturally with the Python visualiser—load the same graph file in `dijkstra_visualizer.py` and the animation will match the recorded Haskell trace exactly. The summary also includes the reconstructed shortest paths, making it handy for regression tests or comparing two different implementations.
+
 ## Debugging Tips
 - Start with the bundled `example_graph`—the shortest distance from `A` to `E` should be `7`.
 - Use the generator mode (`--step`) to inspect queue operations if results look off; each yielded step describes relaxations and frontier changes.
