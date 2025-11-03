@@ -97,9 +97,9 @@ def _resume_metadata_path(target: Path) -> Path:
 
 
 class ResumeState:
-    """Track per-part completion for multi-threaded resume support."""
+    """Track per-part completion and offsets for multi-threaded resume support."""
 
-    def __init__(self, target: Path, size: int, parts: Dict[str, bool]):
+    def __init__(self, target: Path, size: int, parts: Dict[str, Dict[str, Any]]):
         self.target = target
         self.size = size
         self.meta_path = _resume_metadata_path(target)
@@ -119,52 +119,102 @@ class ResumeState:
     def initialize(
         cls, target: Path, size: int, parts: List[Tuple[int, int]]
     ) -> "ResumeState":
-        existing: Dict[str, bool] = {}
+        existing: Dict[str, Dict[str, Any]] = {}
         meta_path = _resume_metadata_path(target)
         if meta_path.exists():
             try:
                 with open(meta_path, "r", encoding="utf-8") as fh:
                     data = json.load(fh)
                 if data.get("size") == size:
-                    existing = {k: bool(v) for k, v in data.get("parts", {}).items()}
+                    for key, value in data.get("parts", {}).items():
+                        start, end = cls._parse_key(key)
+                        length = max(0, end - start + 1)
+                        if isinstance(value, dict):
+                            part_entry = {
+                                "done": bool(value.get("done", False)),
+                                "offset": int(value.get("offset", 0) or 0),
+                            }
+                        else:
+                            part_entry = {"done": bool(value), "offset": 0}
+                        if part_entry["offset"] < 0:
+                            part_entry["offset"] = 0
+                        elif part_entry["offset"] > length:
+                            part_entry["offset"] = length
+                        existing[key] = part_entry
             except (OSError, ValueError, TypeError):
                 existing = {}
 
         for part in parts:
-            existing.setdefault(cls._key(part), False)
+            existing.setdefault(cls._key(part), {"done": False, "offset": 0})
 
         state = cls(target, size, existing)
         state._flush()
         return state
 
     def is_complete(self, part: Tuple[int, int]) -> bool:
-        return self._parts.get(self._key(part), False)
+        entry = self._parts.get(self._key(part))
+        return bool(entry and entry.get("done"))
+
+    def get_offset(self, part: Tuple[int, int]) -> int:
+        entry = self._parts.get(self._key(part))
+        if not entry:
+            return 0
+        offset = int(entry.get("offset", 0) or 0)
+        start, end = part
+        length = max(0, end - start + 1)
+        if offset < 0:
+            return 0
+        return min(offset, length)
+
+    def update_offset(self, part: Tuple[int, int], offset: int) -> None:
+        key = self._key(part)
+        start, end = part
+        length = max(0, end - start + 1)
+        clamped = max(0, min(offset, length))
+        with self._lock:
+            entry = self._parts.setdefault(key, {"done": False, "offset": 0})
+            entry["offset"] = clamped
+            entry["done"] = False
+            self._flush()
 
     def mark_complete(self, part: Tuple[int, int]) -> None:
         key = self._key(part)
         with self._lock:
-            self._parts[key] = True
+            entry = self._parts.setdefault(key, {"done": False, "offset": 0})
+            entry["done"] = True
+            entry["offset"] = 0
             self._flush()
 
     def completed_bytes(self) -> int:
         total = 0
-        for key, done in self._parts.items():
-            if not done:
-                continue
+        for key, entry in self._parts.items():
             start, end = self._parse_key(key)
-            total += end - start + 1
+            length = end - start + 1
+            if entry.get("done"):
+                total += length
+            else:
+                offset = int(entry.get("offset", 0) or 0)
+                if offset > 0:
+                    total += min(offset, length)
         return total
 
     def sync_with_file(self) -> None:
         existing_size = self.target.stat().st_size if self.target.exists() else 0
         changed = False
-        for key, done in list(self._parts.items()):
-            if not done:
-                continue
-            _, end = self._parse_key(key)
-            if end >= existing_size:
-                self._parts[key] = False
-                changed = True
+        for key, entry in list(self._parts.items()):
+            start, end = self._parse_key(key)
+            length = end - start + 1
+            if entry.get("done"):
+                if end >= existing_size:
+                    entry["done"] = False
+                    entry["offset"] = max(0, min(existing_size - start, length))
+                    changed = True
+            else:
+                desired = max(0, min(existing_size - start, length))
+                current_offset = int(entry.get("offset", 0) or 0)
+                if current_offset != desired:
+                    entry["offset"] = desired
+                    changed = True
         if changed:
             self._flush()
 
@@ -269,10 +319,24 @@ def download_part(
     resume_state: Optional[ResumeState] = None,
 ) -> int:
     start, end = part
-    headers = {"Range": f"bytes={start}-{end}", "User-Agent": cfg.user_agent}
+    part_length = end - start + 1
+    resume_offset = 0
+    if resume_state:
+        if resume_state.is_complete(part):
+            return 0
+        resume_offset = resume_state.get_offset(part)
     attempt = 0
     downloaded = 0
     while attempt <= retries:
+        current_start = start + resume_offset
+        if current_start > end:
+            if resume_state:
+                resume_state.mark_complete(part)
+            return downloaded
+        headers = {
+            "Range": f"bytes={current_start}-{end}",
+            "User-Agent": cfg.user_agent,
+        }
         try:
             with session.get(
                 cfg.url,
@@ -284,13 +348,18 @@ def download_part(
                 r.raise_for_status()
                 # Write segment at position
                 with open(file_path, "r+b") as f:
-                    f.seek(start)
+                    f.seek(current_start)
                     for chunk in r.iter_content(chunk_size=cfg.chunk_size):
                         if not chunk:
                             continue
                         f.write(chunk)
                         downloaded += len(chunk)
                         pbar.update(len(chunk))
+                        if resume_state:
+                            resume_offset = min(
+                                resume_offset + len(chunk), part_length
+                            )
+                            resume_state.update_offset(part, resume_offset)
                 if resume_state:
                     resume_state.mark_complete(part)
                 return downloaded
@@ -302,6 +371,8 @@ def download_part(
                     file=sys.stderr,
                 )
                 return downloaded
+            if resume_state:
+                resume_offset = resume_state.get_offset(part)
             backoff_sleep(cfg.backoff, attempt)
     return downloaded
 
