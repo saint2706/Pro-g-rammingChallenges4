@@ -130,8 +130,9 @@ def solve_command(args: argparse.Namespace) -> int:
             "time_of_flight": float(args.time_of_flight),
             "mu": args.mu,
         }
+        args.json.parent.mkdir(parents=True, exist_ok=True)
         args.json.write_text(json.dumps(payload, indent=2))
-        print(f"Solution written to {args.json}")
+        print(f"Solution JSON written to {args.json}")
 
     if args.plot:
         _plot_transfer(r1, result.v1, args.mu, float(args.time_of_flight), args.samples)
