@@ -4,6 +4,7 @@
 Plot prime numbers on an integer lattice arranged in a spiral, revealing diagonal structures in their distribution. The script builds an \(n \times n\) grid marking prime coordinates and can render or export the visualization.
 
 ## Usage
+### Python CLI
 - Display a default 101×101 spiral:
   ```bash
   python ulam.py --size 101
@@ -17,6 +18,29 @@ Plot prime numbers on an integer lattice arranged in a spiral, revealing diagona
   python ulam.py --size 201 --json --no-show
   ```
 
+### Haskell CLI (headless renderer + metadata)
+- Install dependencies (one-time) with Cabal:
+  ```bash
+  cabal install --lib aeson JuicyPixels optparse-applicative vector
+  ```
+  > Prefer managing dependencies via a `cabal.project`/`stack.yaml` when integrating into a larger build.
+- Compile the executable:
+  ```bash
+  ghc -O2 Ulam.hs -o ulam-hs
+  ```
+- Generate a 151×151 spiral and write the PNG to disk:
+  ```bash
+  ./ulam-hs --size 151 --save ulam_151.png
+  ```
+- Emit JSON metadata only (no image output):
+  ```bash
+  ./ulam-hs --size 201 --json
+  ```
+- Combine JSON metadata with image export:
+  ```bash
+  ./ulam-hs --size 301 --json --save ulam_301.png
+  ```
+
 ## Debugging Tips
 - Odd sizes (101, 201, …) keep the center aligned; even sizes shift the origin—use small sizes like 7 or 9 to verify orientation by hand.
 - Compare the prime sieve output against a trusted library (e.g., `sympy.isprime`) when adjusting algorithms.
@@ -26,6 +50,7 @@ Plot prime numbers on an integer lattice arranged in a spiral, revealing diagona
 - Employs a NumPy-based Sieve of Eratosthenes to precompute primality up to \(n^2\).
 - Walks a discrete spiral (right, up, left, down) incrementing step lengths to assign integers to grid coordinates.
 - Optional plotting uses matplotlib with configurable colormaps and figure sizes, while JSON mode reports density statistics.
+- The Haskell implementation mirrors the CLI (size/json/save) features and relies on JuicyPixels for PNG output plus `aeson` for JSON serialization.
 
 ## Further Reading
 - [Ulam, "A Visual Display of Some Properties of the Distribution of Primes" (SIAM Review, 1964)](https://doi.org/10.1137/1006065)
