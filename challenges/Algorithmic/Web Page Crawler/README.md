@@ -17,6 +17,20 @@ Perform a breadth-first crawl starting from a seed URL, collecting hyperlinks up
   python wpc.py https://example.com --depth 2 --edges links.txt
   ```
 
+### Haskell crawler (`Crawler.hs`)
+- Run the breadth-first crawler with JSON output (requires GHC plus packages `http-conduit`, `tagsoup`, `aeson`, and `optparse-applicative`; `bytestring`/`containers` ship with GHC):
+  ```bash
+  stack runghc Crawler.hs \
+    --package http-conduit --package tagsoup --package aeson --package optparse-applicative \
+    -- https://example.com --depth 1 --json
+  ```
+  With `cabal-install`, install the dependencies once (`cabal install http-conduit tagsoup aeson optparse-applicative`) and invoke `runghc Crawler.hs ...`.
+- Respect robots.txt while rate limiting and exporting edges for the Python visualizer:
+  ```bash
+  runghc Crawler.hs https://example.com --robots --rate 0.5 --edges links.tsv --json
+  ```
+  The JSON summary mirrors `wpc.py`, and the tab-separated edge list (`src<TAB>dst`) feeds directly into `crawler_visualizer.py --edges links.tsv` or `build_graph_from_source`.
+
 ## Visualization
 - Generate an interactive crawl map (requires `networkx` + `plotly`):
   ```bash
@@ -51,9 +65,9 @@ Perform a breadth-first crawl starting from a seed URL, collecting hyperlinks up
 - Network failures surface as categorized error messages in the JSON output; inspect these to tune timeouts or rate limits.
 
 ## Implementation Notes
-- Dataclass-based configuration normalizes URLs, enforces argument constraints, and captures rate limiting/timeouts.
-- Core crawler uses a deque for BFS ordering and tracks visited URLs to prevent cycles; optional edge export writes `src -> dst` pairs.
-- Relies on `requests` for HTTP fetching and BeautifulSoup for HTML parsing while filtering by content type/size.
+- Dataclass-based configuration (Python) and `optparse-applicative` parsing (Haskell) normalize URLs, enforce argument constraints, and capture rate limiting/timeouts.
+- Core crawlers use queues for BFS ordering and track visited URLs to prevent cycles; optional edge export writes `src -> dst` pairs consumed by the shared visualizer tooling.
+- Python fetches pages via `requests` + BeautifulSoup; Haskell uses `http-conduit` for HTTP, TagSoup for HTML parsing, and emits equivalent JSON/edge data.
 
 ## Further Reading
 - [Norvig & Russell, *Artificial Intelligence: A Modern Approach*, Section 3.5 (Graph Search)](https://aima.cs.berkeley.edu/)
