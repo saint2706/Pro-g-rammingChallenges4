@@ -12,6 +12,15 @@ Fit a line \(y = mx + b\) to observed data by minimizing the sum of squared resi
   ```bash
   python lsf.py --x 0 1 2 3 --y 1.1 2.9 4.2 6.0 --json
   ```
+- Compile the Haskell variant (requires GHC):
+  ```bash
+  ghc -O2 LSF.hs -o lsf-hs
+  ./lsf-hs --points 50 --noise 5 --seed 4 --json summary.json --csv summary.csv --plot-data plot.dat --plot-script plot.gnuplot
+  ```
+- Supply manual coordinates to the Haskell CLI (space-separated values after each flag):
+  ```bash
+  ./lsf-hs --x 0 1 2 3 --y 1.1 2.9 4.2 6.0 --csv manual.csv
+  ```
 - Compile the C sample (requires a C compiler):
   ```bash
   gcc lsf.c -lm -o lsf && ./lsf data.txt
@@ -28,6 +37,7 @@ Fit a line \(y = mx + b\) to observed data by minimizing the sum of squared resi
 
 ## Implementation Notes
 - The Python version leverages NumPy for vectorized sums and optionally matplotlib for visualization.
+- The Haskell binary mirrors the CLI ergonomics of the Python script, supporting synthetic datasets, manual coordinate entry, and optional JSON/CSV summaries alongside gnuplot-friendly data dumps.
 - Dataclass-backed configuration simplifies reproducible synthetic datasets.
 - Error handling guards against degenerate inputs (empty arrays, vertical lines).
 
