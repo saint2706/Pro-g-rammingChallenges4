@@ -43,6 +43,9 @@ def _to_float32(samples: np.ndarray) -> np.ndarray:
         return samples.astype(np.float32, copy=False)
     if np.issubdtype(samples.dtype, np.integer):
         info = np.iinfo(samples.dtype)
+        if np.issubdtype(samples.dtype, np.unsignedinteger):
+            midpoint = (info.max + 1) / 2.0
+            return (samples.astype(np.float32) - midpoint) / midpoint
         return samples.astype(np.float32) / max(abs(info.min), info.max)
     return samples.astype(np.float32)
 
@@ -79,7 +82,7 @@ class WavStream:
             with wave.open(self.path, "rb") as wav_file:
                 channels = wav_file.getnchannels()
                 width = wav_file.getsampwidth()
-                dtype = {1: np.int8, 2: np.int16, 4: np.int32}.get(width)
+                dtype = {1: np.uint8, 2: np.int16, 4: np.int32}.get(width)
                 if dtype is None:
                     raise ValueError(f"Unsupported sample width: {width} bytes")
                 framerate = wav_file.getframerate()
