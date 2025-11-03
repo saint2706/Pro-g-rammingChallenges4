@@ -4,6 +4,8 @@
 Generate high-precision approximations of \(\pi\) via the Chudnovsky series, a rapidly converging formula that adds roughly 14 digits of accuracy per iteration. The module lets you script or run a CLI to produce thousands of digits and optionally verify them against reference data.
 
 ## Usage
+
+### Python CLI
 - Run with sensible defaults:
   ```bash
   python DigitPi.py
@@ -17,6 +19,28 @@ Generate high-precision approximations of \(\pi\) via the Chudnovsky series, a r
   python DigitPi.py --precision 1000 --verify-file pi_test.txt
   ```
 
+### Haskell CLI
+- Compile the executable (requires GHC):
+  ```bash
+  ghc -O2 DigitPi.hs -o digitpi
+  ```
+- Compute digits with explicit iteration and precision controls:
+  ```bash
+  ./digitpi --iterations 8 --precision 200
+  ```
+- Stream per-iteration updates while solving:
+  ```bash
+  ./digitpi --iterations 8 --precision 200 --progress
+  ```
+- Verify against the built-in table (default 50 digits) or a custom reference:
+  ```bash
+  ./digitpi --iterations 8 --precision 200 --verify-digits 75 --verify-file pi_test.txt
+  ```
+- Disable verification entirely when benchmarking raw performance:
+  ```bash
+  ./digitpi --iterations 8 --precision 200 --no-verify
+  ```
+
 ## Visualizing Convergence
 - Animate the iteration-by-iteration error curve with Plotly:
   ```bash
@@ -26,7 +50,7 @@ Generate high-precision approximations of \(\pi\) via the Chudnovsky series, a r
   ```bash
   python pi_visualizer.py --algorithm chudnovsky --iterations 8 --headless --json-summary chudnovsky.json
   ```
-- The visualizer reuses `generate_chudnovsky_convergence` so you can also access the structured steps directly:
+- The visualizer reuses `generate_chudnovsky_convergence` so you can also access the structured steps directly (or use the Haskell CLI for pure terminal output):
   ```python
   >>> from DigitPi import generate_chudnovsky_convergence
   >>> steps = list(generate_chudnovsky_convergence(5))
