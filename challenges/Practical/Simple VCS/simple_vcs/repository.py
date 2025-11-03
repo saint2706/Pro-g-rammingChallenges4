@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import shutil
 import time
+import uuid
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Dict, List, Optional
@@ -180,10 +181,7 @@ class Repository:
                 raise RuntimeError(
                     f"File '{relative}' is locked and cannot be committed."
                 )
-            revision_id = (
-                time.strftime("%Y%m%d%H%M%S", time.gmtime())
-                + f"-{int(time.time() * 1000) % 1000:03d}"
-            )
+            revision_id = uuid.uuid4().hex
             storage_path = self._store_revision_path(relative, revision_id)
             shutil.copy2(absolute, storage_path)
             revision = Revision(
