@@ -20,7 +20,13 @@ import math
 from pathlib import Path
 from typing import Tuple
 
-import pygame
+try:  # pragma: no cover - import guard for optional dependency
+    import pygame
+except ModuleNotFoundError as exc:  # pragma: no cover - defer failure to runtime
+    pygame = None  # type: ignore[assignment]
+    _PYGAME_IMPORT_ERROR = exc
+else:
+    _PYGAME_IMPORT_ERROR = None
 
 from pro_g_rammingchallenges4.nbody import Body, NBodySimulation
 
@@ -30,7 +36,17 @@ INFO_COLOR = (200, 200, 210)
 DEFAULT_SPAWN_MASS = 20.0
 MASS_STEP = 1.2
 VELOCITY_SCALE = 0.1
-FONT_PATH = str(Path(pygame.font.get_default_font()))
+
+
+def _require_pygame() -> None:
+    """Ensure :mod:`pygame` is available before running the demo."""
+
+    if pygame is not None:
+        return
+    raise RuntimeError(
+        "The N-Body simulator requires the optional 'pygame' package. "
+        "Install it with 'pip install pygame' to run the interactive demo."
+    ) from _PYGAME_IMPORT_ERROR
 
 
 def _draw_body(surface: pygame.Surface, body: Body) -> None:
@@ -86,11 +102,15 @@ def _draw_overlay(
 
 
 def main() -> None:
+    _require_pygame()
+    assert pygame is not None  # Narrow type for static type checkers
+
     pygame.init()
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
     pygame.display.set_caption("N-Body Simulator")
     clock = pygame.time.Clock()
-    font = pygame.font.Font(FONT_PATH, 18)
+    font_path = str(Path(pygame.font.get_default_font()))
+    font = pygame.font.Font(font_path, 18)
 
     sim = NBodySimulation(
         gravitational_constant=1000.0, softening=4.0, max_trail_length=600
