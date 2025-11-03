@@ -85,8 +85,7 @@ def colorize(text: str, color: str | None) -> str:
     return f"{code}{text}{ANSI_RESET}"
 
 
-def get_current_time_digits() -> Tuple[int, int, int, int, int, int]:
-    now = time.localtime()
+def get_current_time_digits(now: time.struct_time) -> Tuple[int, int, int, int, int, int]:
     h, m, s = now.tm_hour, now.tm_min, now.tm_sec
     return *divmod(h, 10), *divmod(m, 10), *divmod(s, 10)
 
@@ -102,7 +101,8 @@ def format_hour_digits(hour24: int, twelve_hour: bool) -> Tuple[int, int]:
 
 
 def render(cfg: Config, colon_visible: bool) -> str:
-    h1, h2, m1, m2, s1, s2 = get_current_time_digits()
+    now = time.localtime()
+    h1, h2, m1, m2, s1, s2 = get_current_time_digits(now)
     h1, h2 = format_hour_digits(h1 * 10 + h2, cfg.twelve_hour)
     colon = COLON_ON if colon_visible else COLON_OFF if cfg.blink_colon else COLON_ON
 
@@ -121,7 +121,6 @@ def render(cfg: Config, colon_visible: bool) -> str:
         lines.append("".join(p[i] for p in pieces))
 
     # Add textual time for quick copy/paste
-    now = time.localtime()
     hour_display = (now.tm_hour % 12 or 12) if cfg.twelve_hour else now.tm_hour
     suffix = (
         " AM"
