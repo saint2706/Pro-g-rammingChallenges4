@@ -59,7 +59,6 @@ class GraphingCalculator:
         self.function_entry = tk.Text(fn_frame, width=50, height=3)
         self.function_entry.pack(side=tk.LEFT, expand=True, fill=tk.X)
         self.function_entry.bind("<Control-Return>", lambda e: self.plot_functions())
-        self.function_entry.bind("<Return>", lambda e: self.plot_functions())
 
         btn_frame = ttk.Frame(fn_frame)
         btn_frame.pack(side=tk.LEFT, padx=6)
