@@ -18,6 +18,26 @@ Analyze the distribution of characters in a Unicode text sample, reporting frequ
   python charcount_visualizer.py sample.txt
   ```
 
+### Haskell command-line tool
+- Run the cross-platform executable directly with `runghc` or a compiled binary:
+  ```bash
+  runghc CharCount.hs --file input.txt
+  ```
+- Stream from standard input (helpful for Unix pipelines):
+  ```bash
+  cat input.txt | runghc CharCount.hs --format text
+  ```
+- Export structured results for downstream processing:
+  ```bash
+  runghc CharCount.hs --file input.txt --format json --output results.json
+  runghc CharCount.hs --text "Hello 🌍" --csv
+  ```
+  The JSON payload mirrors the `TextStatistics` schema emitted by `charcount.py`,
+  so existing tooling (for example the Plotly visualizer) can deserialize the
+  same fields for comparative analysis or dashboard overlays.
+  CSV output lists every character with its raw frequency and percentage share,
+  making it easy to import into spreadsheets or BI dashboards.
+
 ## Debugging Tips
 - Short inputs such as `AAAaa!!` are helpful sanity checks—case-insensitive mode should treat `A` and `a` as the same symbol.
 - Enable debug logging to inspect intermediate category tallies:
