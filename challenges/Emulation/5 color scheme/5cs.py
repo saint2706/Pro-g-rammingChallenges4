@@ -115,7 +115,9 @@ def extract_colors(pixels: np.ndarray, k: int) -> np.ndarray:
     """
     if k <= 0:
         raise ValueError("num_colors must be > 0")
-    kmeans = KMeans(n_clusters=k, n_init="auto", random_state=42)
+    # Use an explicit integer for ``n_init`` for compatibility with older scikit-learn versions
+    # where the string value "auto" is not supported.
+    kmeans = KMeans(n_clusters=k, n_init=10, random_state=42)
     kmeans.fit(pixels)
     return kmeans.cluster_centers_.astype(np.uint8)
 
