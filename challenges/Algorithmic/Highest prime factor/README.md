@@ -4,6 +4,8 @@
 For a given positive integer \(n \ge 2\), determine its largest prime factor using optimized trial division. The utility accepts single values, batch inputs, or streamed data from stdin.
 
 ## Usage
+
+### Python
 - Compute factors for one or more integers:
   ```bash
   python HighPF.py 13195 600851475143
@@ -16,6 +18,28 @@ For a given positive integer \(n \ge 2\), determine its largest prime factor usi
   ```bash
   echo 9876543210 | python HighPF.py --stdin
   ```
+
+### Haskell
+- Run without compiling via `runghc`:
+  ```bash
+  runghc HighPF.hs 13195 600851475143
+  ```
+- Enable JSON output and per-input timing:
+  ```bash
+  runghc HighPF.hs --json --timing 42 97 10
+  ```
+- Stream additional values from stdin or include batch files containing whitespace/comma separated integers:
+  ```bash
+  echo 9876543210 | runghc HighPF.hs --stdin
+  runghc HighPF.hs --batch samples.txt 600851475143
+  ```
+- (Optional) build a binary for repeated use:
+  ```bash
+  ghc -O2 HighPF.hs -o highpf
+  ./highpf --json 600851475143
+  ```
+
+Both CLIs share identical validation rules and output formats so you can mix and match them within scripts or cross-check results between Python and Haskell runs.
 
 ## Debugging Tips
 - Known examples: `600851475143` should return `6857`, while prime inputs should simply echo themselves.
