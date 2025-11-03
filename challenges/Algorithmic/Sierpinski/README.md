@@ -4,6 +4,7 @@
 Generate an ASCII rendering of the discrete Sierpinski triangle where lattice points satisfy `(x & y) == 0`. The script provides CLI controls for size, character choice, JSON metadata, and optional file output.
 
 ## Usage
+### Python
 - Render the default pattern:
   ```bash
   python triangle.py
@@ -16,6 +17,22 @@ Generate an ASCII rendering of the discrete Sierpinski triangle where lattice po
   ```bash
   python triangle.py --size 32 --json --save tri.txt
   ```
+
+### Haskell
+- Compile the executable (or use `runghc` for a one-off run):
+  ```bash
+  ghc -O2 Sierpinski.hs -o sierpinski
+  ./sierpinski
+  ```
+- Generate a higher resolution triangle with a custom glyph:
+  ```bash
+  ./sierpinski --size 32 --char '#'
+  ```
+- Emit JSON metadata identical to the Python script (and optionally persist it):
+  ```bash
+  ./sierpinski --size 32 --json --save tri.json
+  ```
+Both CLIs share feature parity—size/character controls, optional JSON emission, and file output follow the same semantics so downstream tooling can swap between implementations without changes.
 
 ## Debugging Tips
 - Sizes that are powers of two produce the classic triangular outline; non-powers still work but will look skewed—use this to verify validation messaging.
