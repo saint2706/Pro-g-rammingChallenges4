@@ -19,6 +19,9 @@ Notes:
     (spiral arms: step lengths repeating twice and incrementing: 1,1,2,2,3,3,...)
   * Primes trace striking diagonal and radial patterns, hinting at underlying
     structure in their distribution.
+  * For even ``size`` values the starting coordinate is nudged inward to
+    ``size//2 - 1`` so the spiral begins inside the central 2×2 block rather
+    than stepping out of bounds immediately.
 """
 
 from __future__ import annotations
@@ -73,8 +76,11 @@ def generate_ulam_spiral(size: int) -> np.ndarray:
 
     grid = np.zeros((size, size), dtype=np.uint8)
 
-    # Start at center (for even sizes this is the lower-left of the central 2x2)
-    x = y = size // 2
+    # Start at the center; even sizes offset into the central 2x2 block
+    center = size // 2
+    if size % 2 == 0:
+        center -= 1
+    x = y = center
     # Spiral parameters
     directions: List[Tuple[int, int]] = [(1, 0), (0, -1), (-1, 0), (0, 1)]  # R, U, L, D
     dir_index = 0
