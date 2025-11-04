@@ -32,6 +32,10 @@ import numpy as np
 DEFAULT_ASCII_CHARS: List[str] = ["#", "?", "%", ".", "S", "+", "*", ":", ",", "@"]
 
 
+class ImageOpenError(RuntimeError):
+    """Raised when an input image cannot be opened."""
+
+
 @dataclass(slots=True)
 class Config:
     input_path: Path
@@ -151,16 +155,17 @@ def convert(cfg: Config, image_source: Optional[IO[bytes]] = None) -> dict:
         except (OSError, ValueError):
             pass
 
-    opener = (
-        Image.open(image_source)
-        if image_source is not None
-        else Image.open(cfg.input_path)
-    )
+    opener_source = image_source if image_source is not None else cfg.input_path
     input_label = (
         getattr(image_source, "name", None)
         if image_source is not None
         else str(cfg.input_path)
-    )
+    ) or str(cfg.input_path)
+
+    try:
+        opener = Image.open(opener_source)
+    except (OSError, UnidentifiedImageError) as exc:
+        raise ImageOpenError(f"Failed to open image '{input_label}': {exc}") from exc
     cm = opener if hasattr(opener, "__enter__") else nullcontext(opener)
     with cm as img:
         orig_size = img.size
@@ -213,11 +218,8 @@ def main(argv: Optional[list[str]] = None) -> int:
         return 0
     except FileNotFoundError:
         print(f"Error: Input file not found.", file=sys.stderr)
-    except UnidentifiedImageError:
-        print(
-            "Error: Cannot identify image file (unsupported or corrupt).",
-            file=sys.stderr,
-        )
+    except ImageOpenError as e:
+        print(f"Error: {e}", file=sys.stderr)
     except ValueError as e:
         print(f"Argument error: {e}", file=sys.stderr)
     except Exception as e:

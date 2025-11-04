@@ -264,6 +264,8 @@ def interactive_mode() -> None:
     print("=" * 60)
     print()
 
+    current_encoding = "utf-8"
+
     while True:
         try:
             print("Available operations:")
@@ -271,7 +273,7 @@ def interactive_mode() -> None:
             print("2. Text to Binary")
             print("3. Hexadecimal to Text")
             print("4. Binary to Text")
-            print("5. Change encoding (current: utf-8)")
+            print(f"5. Change encoding (current: {current_encoding})")
             print("6. Exit")
             print()
 
@@ -299,16 +301,16 @@ def interactive_mode() -> None:
 
                 try:
                     if choice == "1":
-                        result = text_to_hex(text_input)
+                        result = text_to_hex(text_input, encoding=current_encoding)
                         print(f"\nHexadecimal:\n{format_output(result)}")
                     elif choice == "2":
-                        result = text_to_bin(text_input)
+                        result = text_to_bin(text_input, encoding=current_encoding)
                         print(f"\nBinary:\n{format_output(result)}")
                     elif choice == "3":
-                        result = hex_to_text(text_input)
+                        result = hex_to_text(text_input, encoding=current_encoding)
                         print(f"\nDecoded text: {result}")
                     elif choice == "4":
-                        result = bin_to_text(text_input)
+                        result = bin_to_text(text_input, encoding=current_encoding)
                         print(f"\nDecoded text: {result}")
 
                 except (ValueError, TypeError, UnicodeError) as e:

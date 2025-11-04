@@ -6,6 +6,8 @@ import sys
 from pathlib import Path
 from typing import Iterable, List
 
+import pytest
+
 try:  # pragma: no cover - fallback for minimal environments
     import requests  # type: ignore
 except ModuleNotFoundError:  # pragma: no cover
@@ -192,3 +194,18 @@ def test_resume_state_skips_previously_downloaded_bytes(tmp_path):
         final_metadata = json.load(fh)
     assert final_metadata["parts"][f"{part[0]}-{part[1]}"]["offset"] == 0
     assert final_metadata["parts"][f"{part[0]}-{part[1]}"]["done"] is True
+
+
+def test_resume_state_invalid_utf8_metadata(tmp_path):
+    module = load_dmanager_module()
+    ResumeState = module.ResumeState
+
+    target = tmp_path / "partial.bin"
+    target.write_bytes(b"\x00" * 10)
+    meta_path = target.with_name(target.name + ".resume.json")
+    meta_path.write_bytes("résumé".encode("latin-1"))
+
+    with pytest.raises(ValueError) as excinfo:
+        ResumeState.initialize(target, 10, [(0, 9)])
+
+    assert "not valid UTF-8" in str(excinfo.value)

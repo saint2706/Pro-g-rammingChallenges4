@@ -277,6 +277,16 @@ def dijkstra(
 
         # Explore neighbors of the current node
         for neighbor, weight in graph[current_node].items():
+            # Skip neighbors that are not defined in the graph/distances
+            if neighbor not in graph or neighbor not in distances:
+                if config.enable_logging:
+                    logger.warning(
+                        "Skipping undefined neighbor '%s' referenced from '%s'",
+                        neighbor,
+                        current_node,
+                    )
+                continue
+
             # Skip already visited neighbors
             if neighbor in visited_nodes:
                 continue

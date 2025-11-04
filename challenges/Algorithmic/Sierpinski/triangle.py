@@ -27,7 +27,7 @@ import json
 import math
 import sys
 from dataclasses import dataclass
-from typing import Iterable, List, Optional, Sequence
+from typing import List, Optional, Sequence, Tuple
 
 
 @dataclass(slots=True)
@@ -50,13 +50,14 @@ class TriangleConfig:
         return (self.size & (self.size - 1)) == 0
 
 
-def generate_sierpinski_lines(size: int, char: str = "*") -> List[str]:
+def generate_sierpinski_lines(size: int, char: str = "*") -> Tuple[List[str], int]:
     """Generate lines for a Sierpinski triangle of given size.
 
-    Returns a list of strings (each line without trailing spaces) suitable
-    for printing or further processing.
+    Returns a tuple of the generated lines (without trailing spaces) and the
+    number of positions where the drawing character was placed.
     """
     lines: List[str] = []
+    drawn_count = 0
     for y in range(size):
         calc_y = size - 1 - y  # invert for upright orientation
         line_chars: List[str] = []
@@ -64,16 +65,18 @@ def generate_sierpinski_lines(size: int, char: str = "*") -> List[str]:
         line_chars.append(" " * y)
         for x in range(size - y):
             if (x & calc_y) == 0:
+                drawn_count += 1
                 line_chars.append(char)
                 line_chars.append(" ")  # spacing for visual proportion
             else:
                 line_chars.append("  ")
         lines.append("".join(line_chars).rstrip())
-    return lines
+    return lines, drawn_count
 
 
 def generate_sierpinski(size: int, char: str = "*") -> str:
-    return "\n".join(generate_sierpinski_lines(size, char))
+    lines, _ = generate_sierpinski_lines(size, char)
+    return "\n".join(lines)
 
 
 def build_arg_parser() -> argparse.ArgumentParser:
@@ -104,11 +107,11 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         print(f"Error: {e}", file=sys.stderr)
         return 1
 
-    lines = generate_sierpinski_lines(cfg.size, cfg.char)
+    lines, drawn_count = generate_sierpinski_lines(cfg.size, cfg.char)
     output_text = "\n".join(lines)
 
     if cfg.json_output:
-        total_cells = sum(len(line.replace(" ", "")) for line in lines)
+        total_cells = drawn_count
         payload = {
             "size": cfg.size,
             "char": cfg.char,

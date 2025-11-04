@@ -42,7 +42,7 @@ Plot prime numbers on an integer lattice arranged in a spiral, revealing diagona
   ```
 
 ## Debugging Tips
-- Odd sizes (101, 201, …) keep the center aligned; even sizes shift the origin—use small sizes like 7 or 9 to verify orientation by hand.
+- Odd sizes (101, 201, …) keep the center aligned; even sizes offset the start to `size//2 - 1` so the first steps remain inside the grid—use small sizes like 4 or 6 to verify orientation by hand.
 - Compare the prime sieve output against a trusted library (e.g., `sympy.isprime`) when adjusting algorithms.
 - If matplotlib is unavailable, the script will skip rendering; install `matplotlib` or pass `--no-show` to silence warnings.
 

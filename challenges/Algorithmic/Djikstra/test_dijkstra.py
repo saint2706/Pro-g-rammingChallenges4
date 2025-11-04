@@ -78,6 +78,21 @@ class TestDijkstraAlgorithm(unittest.TestCase):
 
         self.assertEqual(distances, expected)
 
+    def test_edges_to_undefined_nodes_are_skipped(self):
+        """Ensure edges referencing undefined nodes are ignored without crashing."""
+        graph = {
+            "A": {"B": 1, "Z": 5},
+            "B": {},
+        }
+
+        config = DijkstraConfiguration(enable_logging=False, validate_graph=False)
+
+        distances = dijkstra(graph, "A", config=config)
+
+        self.assertEqual(distances["A"], 0)
+        self.assertEqual(distances["B"], 1)
+        self.assertNotIn("Z", distances)
+
     def test_single_node_graph(self):
         """Test graph with single node."""
         single_graph = {"A": {}}

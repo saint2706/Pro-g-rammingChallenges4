@@ -123,12 +123,14 @@ def evaluate_rpn(
                     raise RPNError(f"Unary operator '{token}' requires one operand")
                 x = stack.pop()
                 func = unary_funcs[token]
-                if token in {"sin", "cos", "tan"}:
-                    x = apply_trig(x, lambda z: z)  # convert degrees if needed
-                    # after conversion apply original function
-                    stack.append(func(x))
-                else:
-                    stack.append(func(x))
+                try:
+                    if token in {"sin", "cos", "tan"}:
+                        result = apply_trig(x, func)
+                    else:
+                        result = func(x)
+                except (ValueError, OverflowError) as exc:
+                    raise RPNError(f"Error evaluating {token}: {exc}") from exc
+                stack.append(result)
             # binary op
             elif token in bin_ops:
                 if len(stack) < 2:
