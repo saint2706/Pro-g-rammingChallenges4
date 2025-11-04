@@ -260,6 +260,10 @@ def create_dummy_mbr_file(filepath: str, *, overwrite: bool = False) -> None:
         raise FileExistsError(
             f"File '{filepath}' already exists. Pass --force to overwrite."
         )
+
+    directory = os.path.dirname(filepath)
+    if directory:
+        os.makedirs(directory, exist_ok=True)
     mbr = bytearray(MBR_SIZE)
 
     # Helper to build a partition entry; CHS fields left zero for simplicity.

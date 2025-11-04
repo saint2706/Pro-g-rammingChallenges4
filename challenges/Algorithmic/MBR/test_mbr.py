@@ -46,6 +46,12 @@ class TestMBRParser(unittest.TestCase):
             self.assertEqual(2, len(data["partitions"]))
             self.assertEqual("0x0c", data["partitions"][0]["type_code"])
 
+    def test_creates_parent_directories(self):
+        with tempfile.TemporaryDirectory() as td:
+            nested_path = os.path.join(td, "nested", "dir", "dummy.bin")
+            mbr.create_dummy_mbr_file(nested_path, overwrite=True)
+            self.assertTrue(os.path.isfile(nested_path))
+
     def test_invalid_size_raises(self):
         with self.assertRaises(ValueError):
             mbr.parse_mbr(b"not512")
