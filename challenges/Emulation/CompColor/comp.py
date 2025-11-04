@@ -1,30 +1,30 @@
 """comp.py — Complementary Color Image Transformer
 =================================================
-Transforms an image (or batch of images) into their *complementary* variant
-using a luminance-preserving inversion technique:
+Transforms an image into its *complementary* variant using a
+luminance-preserving inversion technique.
+
+This script processes images by applying a complementary color transformation
+that preserves the luminance of the original pixels. The formula used is:
 
     new_channel = min(R,G,B) + max(R,G,B) - original_channel
 
-Unlike a naive 255-R style invert, this method mirrors each channel around the
-midpoint defined by that pixel's local (min+max). This can produce more
-harmonious complements in certain graphic workflows.
+Unlike a naive inversion, this method produces more harmonious complements.
 
-Features added in this refactor:
- - Batch processing of a directory (optional recursion)
- - Optional preservation/restoration of alpha channel
- - JSON summary with per-image statistics (mean, min, max before/after)
- - Safe overwrite behavior unless --force specified
- - Deterministic exit codes and structured main() routine
+Features:
+ - Batch processing of directories with optional recursion.
+ - Preservation of the alpha channel for images with transparency.
+ - Generation of a JSON summary with per-image statistics.
+ - Safe overwrite behavior to prevent accidental data loss.
 
 Examples:
-    # Single file
-    python comp.py input.jpg output.jpg --json
+    # Process a single file.
+    python comp.py --single input.jpg output.jpg --json
 
-    # Batch (writes *_comp suffix by default)
+    # Process a directory of images.
     python comp.py --batch images/ --recursive --suffix _comp --json summary.json
 
-    # Keep alpha channel (e.g. PNGs with transparency)
-    python comp.py logo.png logo_comp.png --keep-alpha
+    # Preserve the alpha channel of a PNG.
+    python comp.py --single logo.png logo_comp.png --keep-alpha
 """
 
 from __future__ import annotations
@@ -45,6 +45,18 @@ from PIL import Image, UnidentifiedImageError
 
 @dataclass(slots=True)
 class Stats:
+    """Stores statistics about the color transformation of an image.
+
+    Attributes:
+        mean_before: The mean RGB values before the transformation.
+        mean_after: The mean RGB values after the transformation.
+        min_before: The minimum RGB values before the transformation.
+        max_before: The maximum RGB values before the transformation.
+        min_after: The minimum RGB values after the transformation.
+        max_after: The maximum RGB values after the transformation.
+        path_in: The path to the input image.
+        path_out: The path to the output image.
+    """
     mean_before: Tuple[float, float, float]
     mean_after: Tuple[float, float, float]
     min_before: Tuple[int, int, int]
@@ -59,12 +71,15 @@ class Stats:
 
 
 def _compute_complement(data: np.ndarray) -> np.ndarray:
-    """Vectorized complementary color transform.
+    """Computes the complementary color of an image using a vectorized approach.
 
-    Uses int16 intermediate to avoid uint8 wrap during (lo+hi)-data.
-    Expects array shape (H,W,3) with dtype uint8 or int16-compatible.
-    Returns uint8 array of same shape.
+    Args:
+        data: A NumPy array representing the image data.
+
+    Returns:
+        A NumPy array of the transformed image.
     """
+    # Use int16 to avoid overflow during the calculation.
     in_data = data.astype(np.int16, copy=False)
     lo = np.amin(in_data, axis=2, keepdims=True)
     hi = np.amax(in_data, axis=2, keepdims=True)
@@ -73,16 +88,19 @@ def _compute_complement(data: np.ndarray) -> np.ndarray:
 
 
 def complement_image(input_path: Path, output_path: Path, keep_alpha: bool) -> Stats:
-    """Process a single image and write complementary result.
+    """Processes a single image and saves the complementary result.
 
     Args:
-        input_path: Source image path.
-        output_path: Destination path.
-        keep_alpha: If True, preserve original alpha channel.
+        input_path: The path to the source image.
+        output_path: The path to save the transformed image.
+        keep_alpha: Whether to preserve the alpha channel.
+
     Returns:
-        Stats object with before/after channel statistics.
+        A Stats object with before and after color statistics.
+
     Raises:
-        FileNotFoundError, UnidentifiedImageError, RuntimeError on failure.
+        FileNotFoundError: If the input file does not exist.
+        UnidentifiedImageError: If the input file is not a valid image.
     """
     if not input_path.exists():
         raise FileNotFoundError(f"Input file not found: {input_path}")
@@ -91,30 +109,24 @@ def complement_image(input_path: Path, output_path: Path, keep_alpha: bool) -> S
         mode = img.mode
         alpha = None
 
-        if keep_alpha and ("A" in mode):  # Extract alpha for RGBA / LA / etc.
+        if keep_alpha and ("A" in mode):
+            # Preserve the alpha channel if it exists.
             alpha = img.getchannel("A")
 
-        # Normalize to RGB for processing
         rgb_img = img.convert("RGB")
         arr = np.asarray(rgb_img, dtype=np.uint8)
 
-        # Gather pre-stats
-        mb_arr = np.min(arr, axis=(0, 1))
-        xb_arr = np.max(arr, axis=(0, 1))
-        avb_arr = np.mean(arr, axis=(0, 1))
-        min_before = (int(mb_arr[0]), int(mb_arr[1]), int(mb_arr[2]))
-        max_before = (int(xb_arr[0]), int(xb_arr[1]), int(xb_arr[2]))
-        mean_before = (float(avb_arr[0]), float(avb_arr[1]), float(avb_arr[2]))
+        # Gather statistics before the transformation.
+        min_before = tuple(np.min(arr, axis=(0, 1)))
+        max_before = tuple(np.max(arr, axis=(0, 1)))
+        mean_before = tuple(np.mean(arr, axis=(0, 1)))
 
         comp = _compute_complement(arr)
 
-        # Gather post-stats
-        ma_arr = np.min(comp, axis=(0, 1))
-        xa_arr = np.max(comp, axis=(0, 1))
-        ava_arr = np.mean(comp, axis=(0, 1))
-        min_after = (int(ma_arr[0]), int(ma_arr[1]), int(ma_arr[2]))
-        max_after = (int(xa_arr[0]), int(xa_arr[1]), int(xa_arr[2]))
-        mean_after = (float(ava_arr[0]), float(ava_arr[1]), float(ava_arr[2]))
+        # Gather statistics after the transformation.
+        min_after = tuple(np.min(comp, axis=(0, 1)))
+        max_after = tuple(np.max(comp, axis=(0, 1)))
+        mean_after = tuple(np.mean(comp, axis=(0, 1)))
 
         output_path.parent.mkdir(parents=True, exist_ok=True)
         out_img = Image.fromarray(comp, mode="RGB")
@@ -138,6 +150,15 @@ def complement_image(input_path: Path, output_path: Path, keep_alpha: bool) -> S
 
 
 def iter_image_files(root: Path, recursive: bool) -> List[Path]:
+    """Finds all image files in a directory.
+
+    Args:
+        root: The directory to search.
+        recursive: Whether to search subdirectories.
+
+    Returns:
+        A list of paths to the found image files.
+    """
     exts = {".png", ".jpg", ".jpeg", ".bmp", ".tiff", ".gif"}
     if root.is_file():
         return [root] if root.suffix.lower() in exts else []
@@ -148,6 +169,17 @@ def iter_image_files(root: Path, recursive: bool) -> List[Path]:
 def build_output_path(
     src: Path, dest_dir: Path | None, suffix: str, out_file: Path | None
 ) -> Path:
+    """Constructs the output path for a transformed image.
+
+    Args:
+        src: The path to the source image.
+        dest_dir: The destination directory for batch processing.
+        suffix: The suffix to add to the filename in batch mode.
+        out_file: The specified output file for single-image mode.
+
+    Returns:
+        The constructed output path.
+    """
     if out_file is not None:
         return out_file
     target_dir = dest_dir if dest_dir else src.parent
@@ -160,6 +192,11 @@ def build_output_path(
 
 
 def build_parser() -> argparse.ArgumentParser:
+    """Builds the command-line argument parser.
+
+    Returns:
+        An ArgumentParser instance.
+    """
     p = argparse.ArgumentParser(
         description="Generate complementary color images (single or batch).",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
@@ -197,6 +234,14 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def stats_to_dict(s: Stats) -> Dict[str, object]:
+    """Converts a Stats object to a dictionary.
+
+    Args:
+        s: The Stats object to convert.
+
+    Returns:
+        A dictionary representation of the Stats object.
+    """
     return {
         "input": s.path_in,
         "output": s.path_out,
@@ -210,6 +255,14 @@ def stats_to_dict(s: Stats) -> Dict[str, object]:
 
 
 def main(argv: List[str] | None = None) -> int:
+    """The main entry point for the script.
+
+    Args:
+        argv: A list of command-line arguments.
+
+    Returns:
+        An integer exit code (0 for success).
+    """
     parser = build_parser()
     args = parser.parse_args(argv)
 
@@ -220,18 +273,14 @@ def main(argv: List[str] | None = None) -> int:
 
     try:
         if args.single:
-            src = Path(args.single[0])
-            dst = Path(args.single[1])
+            src, dst = Path(args.single[0]), Path(args.single[1])
             if dst.exists() and not force:
-                print(
-                    f"Refusing to overwrite existing file: {dst} (use --force)",
-                    file=sys.stderr,
-                )
+                print(f"Refusing to overwrite: {dst} (use --force)", file=sys.stderr)
                 return 2
             stat = complement_image(src, dst, keep_alpha)
             summary.append(stat)
             print(f"Saved: {dst}")
-        else:  # batch mode
+        else:  # Batch mode
             root = Path(args.batch)
             dest_dir = Path(args.dest) if args.dest else None
             files = iter_image_files(root, args.recursive)
@@ -241,42 +290,28 @@ def main(argv: List[str] | None = None) -> int:
             for f in files:
                 out_path = build_output_path(f, dest_dir, args.suffix, None)
                 if out_path.exists() and not force:
-                    print(f"Skip (exists): {out_path}")
+                    print(f"Skipping (exists): {out_path}")
                     continue
                 try:
                     stat = complement_image(f, out_path, keep_alpha)
                     summary.append(stat)
                     print(f"Saved: {out_path}")
-                except UnidentifiedImageError:
-                    print(
-                        f"Warning: Unidentified or corrupt image skipped: {f}",
-                        file=sys.stderr,
-                    )
-                except FileNotFoundError:
-                    print(
-                        f"Warning: File disappeared before processing: {f}",
-                        file=sys.stderr,
-                    )
+                except (UnidentifiedImageError, FileNotFoundError) as e:
+                    print(f"Warning: Skipping {f} ({e})", file=sys.stderr)
 
         if json_path:
             data = [stats_to_dict(s) for s in summary]
             json_path.write_text(json.dumps(data, indent=2), encoding="utf-8")
             print(f"Wrote JSON summary to: {json_path}")
-    except UnidentifiedImageError as e:
-        print(f"Error: Cannot identify image file: {e}", file=sys.stderr)
-        return 1
-    except FileNotFoundError as e:
+    except (UnidentifiedImageError, FileNotFoundError, Exception) as e:
         print(f"Error: {e}", file=sys.stderr)
         return 1
     except KeyboardInterrupt:
         print("\nInterrupted by user.")
         return 130
-    except Exception as e:
-        print(f"Unexpected error: {e}", file=sys.stderr)
-        return 1
 
     return 0
 
 
-if __name__ == "__main__":  # pragma: no cover
+if __name__ == "__main__":
     raise SystemExit(main())

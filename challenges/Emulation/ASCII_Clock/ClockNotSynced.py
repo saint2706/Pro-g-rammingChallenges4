@@ -1,19 +1,22 @@
 """ClockNotSynced.py — Simulated ASCII Clock (Minute Ticker)
 ===========================================================
-Simulates a full 24-hour clock (HH:MM) without using the system time; instead it
-advances one minute per real-time interval (default: 1 second). This is a
-teaching example showing:
+Simulates a full 24-hour clock (HH:MM) without using the system time.
+Instead, it advances one minute per real-time interval (default: 1 second).
 
- - Basic ASCII art rendering
- - Simple time arithmetic (minutes -> hours, minutes)
- - CLI argument parsing & configuration patterns
- - Cross-platform terminal clearing
+This script serves as a teaching example to demonstrate:
+ - Basic ASCII art rendering from component pieces.
+ - Simple time arithmetic for simulating a clock.
+ - Command-line argument parsing with `argparse`.
+ - Cross-platform terminal clearing for clean animations.
 
-You can speed up the simulation, change the display mode (12/24 hour), and
-optionally colorize the digits.
+You can control the simulation speed, start time, duration, and display
+format (12/24 hour) through command-line arguments.
 
 Examples:
+    # Run the clock faster in 12-hour format.
     python ClockNotSynced.py --speed 0.05 --twelve-hour
+
+    # Start at 1:45 PM, run for 120 minutes, and color the output cyan.
     python ClockNotSynced.py --start 13:45 --duration 120 --color cyan
 
 Press Ctrl+C to exit early.
@@ -30,11 +33,11 @@ from typing import List, Tuple
 
 # --------------------------- ASCII Digit Definitions --------------------------- #
 
-# 3-character wide components; keeps layout consistent
+# Define 3-character wide components for building ASCII digits.
 EMPTY_PART = " " * 3
 TOP = " _ "
 MIDDLE = "|_|"
-BOTTOM = "|_|"  # (Not used distinctly but kept for clarity / extension)
+BOTTOM = "|_|"  # Kept for clarity, though not distinct from MIDDLE.
 PIPE_MIDDLE = "| |"
 PIPE_LEFT = "|  "
 PIPE_RIGHT = "  |"
@@ -42,7 +45,7 @@ MIDDLE_LEFT = "|_ "
 MIDDLE_RIGHT = " _|"
 COLON_DOT = "."
 
-# Each digit maps to 3 lines representing a 7-segment inspired look (compact).
+# Each digit is defined as a list of three strings, representing its top, middle, and bottom rows.
 DIGIT_ART: List[List[str]] = [
     [TOP, PIPE_MIDDLE, MIDDLE],  # 0
     [EMPTY_PART, PIPE_RIGHT, PIPE_RIGHT],  # 1
@@ -74,7 +77,6 @@ class Config:
         color: Optional ANSI color name.
         no_clear: If True, don't clear between frames (useful for logging/testing).
     """
-
     speed: float = 1.0
     start_minutes: int = 0
     duration: int | None = None
@@ -100,22 +102,33 @@ ANSI_RESET = "\033[0m"
 
 
 def clear_screen(enabled: bool = True) -> None:
-    """Clear the terminal screen cross-platform (unless disabled)."""
+    """Clear the terminal screen in a cross-platform way.
+
+    Args:
+        enabled: If False, the function does nothing.
+    """
     if not enabled:
         return
-    # Use ANSI if possible, fallback to system call
     if os.name != "nt":
-        # ANSI clear: ESC[2J = clear screen, ESC[H = move cursor home
+        # For Unix-like systems, use ANSI escape codes.
         sys.stdout.write("\033[2J\033[H")
         sys.stdout.flush()
     else:
+        # For Windows, use the 'cls' command.
         os.system("cls")
 
 
 def parse_time_string(ts: str) -> int:
-    """Parse a HH:MM string into total minutes from midnight.
+    """Parse an "HH:MM" string into total minutes from midnight.
 
-    Raises ValueError if invalid.
+    Args:
+        ts: The time string to parse (e.g., "13:45").
+
+    Returns:
+        The total number of minutes from midnight.
+
+    Raises:
+        ValueError: If the time string is in an invalid format.
     """
     try:
         parts = ts.split(":")
@@ -131,18 +144,35 @@ def parse_time_string(ts: str) -> int:
 
 
 def get_digit_art(digit: int) -> List[str]:
-    """Return three-line ASCII art for a single digit."""
+    """Retrieve the three-line ASCII art for a single digit.
+
+    Args:
+        digit: The integer digit (0-9).
+
+    Returns:
+        A list of three strings representing the ASCII art for the digit.
+    """
     if 0 <= digit <= 9:
         return DIGIT_ART[digit]
     return [EMPTY_PART] * 3
 
 
 def format_hour(hour24: int, twelve_hour: bool) -> Tuple[int, int]:
-    """Return (tens, ones) digits for the hour, possibly in 12-hour mode."""
+    """Convert a 24-hour format hour to its display digits.
+
+    This function handles the conversion to 12-hour format if required.
+
+    Args:
+        hour24: The hour in 24-hour format (0-23).
+        twelve_hour: A boolean indicating whether to use 12-hour format.
+
+    Returns:
+        A tuple containing the tens and ones digits of the hour.
+    """
     if twelve_hour:
         hour = hour24 % 12
         if hour == 0:
-            hour = 12
+            hour = 12  # 12 AM or 12 PM.
     else:
         hour = hour24
     if hour >= 10:
@@ -151,10 +181,20 @@ def format_hour(hour24: int, twelve_hour: bool) -> Tuple[int, int]:
 
 
 def render_time(hour: int, minute: int, cfg: Config) -> str:
-    """Build the multi-line ASCII clock string for given hour/minute."""
+    """Build the multi-line ASCII clock string for a given time.
+
+    Args:
+        hour: The hour to display.
+        minute: The minute to display.
+        cfg: The runtime configuration.
+
+    Returns:
+        A string containing the rendered ASCII clock.
+    """
     h1, h2 = format_hour(hour, cfg.twelve_hour)
     m1, m2 = divmod(minute, 10) if minute > 9 else (0, minute)
 
+    # Assemble the ASCII art pieces for the clock face.
     parts = [
         get_digit_art(h1),
         get_digit_art(h2),
@@ -166,7 +206,7 @@ def render_time(hour: int, minute: int, cfg: Config) -> str:
     for i in range(3):
         lines.append(" ".join(p[i] for p in parts))
 
-    # Optionally append AM/PM indicator for 12-hour format
+    # Add an AM/PM indicator if in 12-hour mode.
     if cfg.twelve_hour:
         am_pm = "AM" if hour < 12 else "PM"
         lines.append(am_pm.center(len(lines[0])))
@@ -174,6 +214,15 @@ def render_time(hour: int, minute: int, cfg: Config) -> str:
 
 
 def colorize(text: str, color: str | None) -> str:
+    """Apply ANSI color codes to the given text.
+
+    Args:
+        text: The text to colorize.
+        color: The name of the color to apply.
+
+    Returns:
+        The colorized text string.
+    """
     if not color:
         return text
     code = ANSI_COLORS.get(color.lower())
@@ -186,20 +235,25 @@ def colorize(text: str, color: str | None) -> str:
 
 
 def run(cfg: Config) -> None:
-    """Run the simulated clock according to configuration."""
+    """Run the simulated clock according to the configuration.
+
+    Args:
+        cfg: The runtime configuration.
+    """
     total_minutes = (
         cfg.duration if cfg.duration is not None else (24 * 60 - cfg.start_minutes)
     )
     end_minute = cfg.start_minutes + total_minutes
 
     try:
+        # Loop through each minute of the simulation.
         for current in range(cfg.start_minutes, end_minute):
             hour = current // 60 % 24
             minute = current % 60
             clear_screen(not cfg.no_clear)
             ascii_time = render_time(hour, minute, cfg)
             print(colorize(ascii_time, cfg.color))
-            # Sleep real time proportionally to speed factor
+            # The sleep interval determines the speed of the simulation.
             time.sleep(cfg.speed)
     except KeyboardInterrupt:
         print("\nClock simulation stopped by user.")
@@ -210,6 +264,11 @@ def run(cfg: Config) -> None:
 
 
 def build_parser() -> argparse.ArgumentParser:
+    """Build the command-line argument parser.
+
+    Returns:
+        An `argparse.ArgumentParser` instance.
+    """
     p = argparse.ArgumentParser(description="Simulated (unsynced) ASCII clock")
     p.add_argument(
         "--speed",
@@ -242,6 +301,14 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def main(argv: List[str] | None = None) -> int:
+    """The main entry point for the script.
+
+    Args:
+        argv: A list of command-line arguments.
+
+    Returns:
+        An integer exit code.
+    """
     parser = build_parser()
     args = parser.parse_args(argv)
     try:

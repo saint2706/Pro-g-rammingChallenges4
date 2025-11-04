@@ -1,132 +1,126 @@
 /*
-  cube.css – 3D cube face styling
-  Modernized: CSS custom properties, reduced duplication, accessible defaults, 
-  and motion reduction support. The JavaScript canvas animation has replaced the
-  pure CSS rotating cube for primary rendering, but these styles remain for the
-  original DOM-based cube (if used) and as a reference.
+  cube.css – 3D cube face styling for the web-based demo.
+
+  This stylesheet is not directly used by the canvas-based demo, but is kept
+  as a reference for the original CSS-only implementation.
 */
 
 :root {
-    --cube-size: 300px;
-    --cube-bg: #678f9c;
-    --shadow-color: rgba(0, 0, 0, 0.7);
-    --anim-duration: 20s;
+  /* Define CSS custom properties for easy customization. */
+  --cube-size: 300px;
+  --cube-bg: #678f9c;
+  --shadow-color: rgba(0, 0, 0, 0.7);
+  --anim-duration: 20s;
 }
 
 .space {
-    /* 3D perspective container */
-    width: var(--cube-size);
-    height: var(--cube-size);
-    margin-left: 120px;
-    perspective: 1600px;
-    perspective-origin: 50% -240px;
-    position: relative;
+  /* This container establishes the 3D perspective for its children. */
+  width: var(--cube-size);
+  height: var(--cube-size);
+  margin-left: 120px;
+  perspective: 1600px;
+  perspective-origin: 50% -240px;
+  position: relative;
 }
 
 figure {
-    /* cube faces */
-    display: block;
-    position: absolute;
-    width: var(--cube-size);
-    height: var(--cube-size);
-    background: var(--cube-bg);
-    transform-origin: 50% 50% 0;
-    backface-visibility: hidden;
+  /* Base style for the cube faces. */
+  display: block;
+  position: absolute;
+  width: var(--cube-size);
+  height: var(--cube-size);
+  background: var(--cube-bg);
+  transform-origin: 50% 50% 0;
+  backface-visibility: hidden;
 }
 
 .cube {
-    /* container for faces */
-    transform-style: preserve-3d;
-    animation: rotate var(--anim-duration) linear infinite;
+  /* This is the container for the cube's faces. */
+  transform-style: preserve-3d;
+  animation: rotate var(--anim-duration) linear infinite;
 }
 
-/* Individual face transforms (half depth = size/2 => 150px) */
+/* Position and rotate each face to form the cube. */
 .front {
-    transform: translateZ(calc(var(--cube-size) / 2));
+  transform: translateZ(calc(var(--cube-size) / 2));
 }
 
 .back {
-    transform: rotateY(180deg) translateZ(calc(var(--cube-size) / 2));
+  transform: rotateY(180deg) translateZ(calc(var(--cube-size) / 2));
 }
 
 .top {
-    transform: rotateX(90deg) translateZ(calc(var(--cube-size) / 2));
+  transform: rotateX(90deg) translateZ(calc(var(--cube-size) / 2));
 }
 
 .bottom {
-    transform: rotateX(-90deg) translateZ(calc(var(--cube-size) / 2));
+  transform: rotateX(-90deg) translateZ(calc(var(--cube-size) / 2));
 }
 
 .left {
-    transform: rotateY(-90deg) translateZ(calc(var(--cube-size) / 2));
+  transform: rotateY(-90deg) translateZ(calc(var(--cube-size) / 2));
 }
 
 .right {
-    transform: rotateY(90deg) translateZ(calc(var(--cube-size) / 2));
+  transform: rotateY(90deg) translateZ(calc(var(--cube-size) / 2));
 }
 
 .bottom {
-    /* subtle drop shadow */
-    box-shadow: 0 10px 100px var(--shadow-color), 1px 5px 50px var(--shadow-color);
-    background: transparent;
+  /* Add a subtle drop shadow to the bottom face. */
+  box-shadow: 0 10px 100px var(--shadow-color), 1px 5px 50px var(--shadow-color);
+  background: transparent;
 }
 
-/* Shading pseudo-elements (optional aesthetics) */
+/* Optional shading for a more realistic look. */
 figure::before,
 figure::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    opacity: 0;
-    pointer-events: none;
-    background: radial-gradient(circle at top left, rgba(0, 0, 0, 0.5), #000);
-    mix-blend-mode: multiply;
-    animation: faceShade 10s linear infinite;
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at top left, rgba(0, 0, 0, 0.5), #000);
+  mix-blend-mode: multiply;
+  animation: faceShade 10s linear infinite;
 }
 
-/* Only animate shading on front face for subtlety */
 .front::before,
 .front::after {
-    opacity: 0;
-    animation: faceShade 10s linear infinite;
+  opacity: 0;
+  animation: faceShade 10s linear infinite;
 }
 
 @keyframes faceShade {
-
-    0%,
-    2% {
-        opacity: 0;
-    }
-
-    25%,
-    35% {
-        opacity: 0.8;
-    }
-
-    50%,
-    100% {
-        opacity: 0;
-    }
+  0%, 2% {
+    opacity: 0;
+  }
+  25%, 35% {
+    opacity: 0.8;
+  }
+  50%, 100% {
+    opacity: 0;
+  }
 }
 
+/* Keyframe animation for the cube's rotation. */
 @keyframes rotate {
-    to {
-        transform: rotateY(360deg);
-    }
+  to {
+    transform: rotateY(360deg);
+  }
 }
 
-/* Reduced-motion users get a static cube */
+/* Media query to disable animations for users who prefer reduced motion. */
 @media (prefers-reduced-motion: reduce) {
-    .cube {
-        animation: none;
-    }
+  .cube {
+    animation: none;
+  }
 
-    figure::before,
-    figure::after {
-        animation: none;
-    }
+  figure::before,
+  figure::after {
+    animation: none;
+  }
 }
 
 .content {
-    padding: 20px;
+  padding: 20px;
 }

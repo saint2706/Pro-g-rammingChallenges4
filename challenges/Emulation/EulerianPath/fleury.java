@@ -1,3 +1,10 @@
+/**
+ * @file fleury.java
+ * @brief An implementation of Fleury's algorithm for finding an Eulerian path.
+ *
+ * This file contains a Java implementation of Fleury's algorithm, which finds
+ * an Eulerian path or circuit in a graph.
+ */
 package Emulation.EulerianPath;
 
 import java.util.ArrayList;
@@ -5,28 +12,32 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Implementation of Fleury's Algorithm to produce an Eulerian trail (or circuit) in an undirected
- * graph if one exists.
+ * Implements Fleury's Algorithm to find an Eulerian trail or circuit in an
+ * undirected graph.
  *
  * <p>Algorithm overview:
- *
  * <ol>
- *   <li>Choose a starting vertex: if graph has 0 or 2 vertices of odd degree, start at an
- *       odd-degree vertex (trail case) otherwise any vertex with edges (circuit case).
- *   <li>At each step pick the next edge that is NOT a bridge unless it is the only remaining edge.
- *   <li>Remove the edge and move to the adjacent vertex, recording traversal.
+ *   <li>Verify that the graph has an Eulerian path (at most two vertices with odd degree).</li>
+ *   <li>Choose a starting vertex.</li>
+ *   <li>At each step, choose an edge that is not a bridge unless there is no other choice.</li>
+ *   <li>Remove the chosen edge and move to the next vertex.</li>
+ *   <li>Repeat until all edges have been traversed.</li>
  * </ol>
  *
- * Complexity is O(E^2) in the worst case because each bridge test can be O(E), and we perform one
- * for (almost) each edge. For large graphs consider Hierholzer's algorithm instead.
+ * <p>The complexity of this implementation is O(E^2), where E is the number of edges.
  */
-public class Fleury {
+public class fleury {
   private final int vertexCount;
-  private final List<Integer>[] adj; // adjacency lists (undirected, simple graph)
+  private final List<Integer>[] adj;
 
+  /**
+   * Constructs a graph with a given number of vertices.
+   *
+   * @param vertexCount The number of vertices in the graph.
+   */
   @SuppressWarnings("unchecked")
-  public Fleury(int vertexCount) {
-    if (vertexCount <= 0) throw new IllegalArgumentException("vertexCount must be positive");
+  public fleury(int vertexCount) {
+    if (vertexCount <= 0) throw new IllegalArgumentException("Vertex count must be positive.");
     this.vertexCount = vertexCount;
     this.adj = new ArrayList[vertexCount];
     for (int i = 0; i < vertexCount; i++) {
@@ -34,33 +45,46 @@ public class Fleury {
     }
   }
 
-  /** Add an undirected edge between u and v. */
+  /**
+   * Adds an undirected edge between two vertices.
+   *
+   * @param u The first vertex.
+   * @param v The second vertex.
+   */
   public void addEdge(int u, int v) {
     validateVertex(u);
     validateVertex(v);
-    if (u == v)
-      throw new IllegalArgumentException("Self loops not supported in this simple implementation");
+    if (u == v) throw new IllegalArgumentException("Self-loops are not supported.");
     adj[u].add(v);
     adj[v].add(u);
   }
 
-  /** Remove a single undirected edge between u and v (one incidence). */
+  /**
+   * Removes an undirected edge between two vertices.
+   *
+   * @param u The first vertex.
+   * @param v The second vertex.
+   */
   private void removeEdge(int u, int v) {
-    adj[u].remove((Integer) v);
-    adj[v].remove((Integer) u);
+    adj[u].remove(Integer.valueOf(v));
+    adj[v].remove(Integer.valueOf(u));
   }
 
+  /**
+   * Validates that a vertex is within the valid range.
+   *
+   * @param v The vertex to validate.
+   */
   private void validateVertex(int v) {
     if (v < 0 || v >= vertexCount) {
-      throw new IllegalArgumentException("Vertex out of range: " + v);
+      throw new IllegalArgumentException("Vertex " + v + " is out of bounds.");
     }
   }
 
   /**
-   * Compute an Eulerian trail or circuit using Fleury's algorithm.
+   * Computes an Eulerian trail or circuit using Fleury's algorithm.
    *
-   * @return list of vertices in visitation order (length edges+1) or empty list if graph
-   *     disconnected or no trail exists.
+   * @return A list of vertices in the order of the trail, or an empty list if none exists.
    */
   public List<Integer> eulerTrail() {
     if (!isGraphConnectedIgnoringIsolated()) {
@@ -69,16 +93,15 @@ public class Fleury {
     int oddCount = 0;
     int start = 0;
     for (int v = 0; v < vertexCount; v++) {
-      if (adj[v].size() % 2 == 1) {
+      if (adj[v].size() % 2 != 0) {
         oddCount++;
-        start = v; // last seen odd; first is fine
+        start = v;
       }
     }
-    if (!(oddCount == 0 || oddCount == 2)) {
-      return Collections.emptyList(); // no Eulerian trail/circuit
+    if (oddCount > 2) {
+      return Collections.emptyList();
     }
     if (oddCount == 0) {
-      // choose any vertex with edges
       for (int v = 0; v < vertexCount; v++) {
         if (!adj[v].isEmpty()) {
           start = v;
@@ -91,48 +114,79 @@ public class Fleury {
     return path;
   }
 
+  /**
+   * A recursive helper function to find the Eulerian path.
+   *
+   * @param u The current vertex.
+   * @param path The list to store the path.
+   */
   private void fleuryDFS(int u, List<Integer> path) {
-    for (int i = 0; i < adj[u].size(); ) { // manual index so we handle removal
+    for (int i = 0; i < adj[u].size(); ) {
       int v = adj[u].get(i);
       if (isValidNextEdge(u, v)) {
         removeEdge(u, v);
         path.add(u);
         fleuryDFS(v, path);
       } else {
-        i++; // try next edge
+        i++;
       }
     }
     if (path.isEmpty() || path.get(path.size() - 1) != u) {
-      path.add(u); // ensure last vertex appended
+      path.add(u);
     }
   }
 
-  /** Edge validity test: an edge is valid if it's the only one left or NOT a bridge. */
+  /**
+   * Checks if an edge is a valid next edge to traverse.
+   * An edge is valid if it's not a bridge, unless it's the only edge left.
+   *
+   * @param u The current vertex.
+   * @param v The next vertex.
+   * @return True if the edge is a valid next edge, false otherwise.
+   */
   private boolean isValidNextEdge(int u, int v) {
-    if (adj[u].size() == 1) return true; // only choice
+    if (adj[u].size() == 1) return true;
     int countBefore = reachableVertexCount(u);
     removeEdge(u, v);
     int countAfter = reachableVertexCount(u);
-    // restore
     addEdge(u, v);
-    // if removing the edge reduces reachable vertices, it was a bridge
-    return countAfter == countBefore;
+    return countAfter >= countBefore;
   }
 
+  /**
+   * Counts the number of reachable vertices from a starting vertex.
+   *
+   * @param start The starting vertex.
+   * @return The number of reachable vertices.
+   */
   private int reachableVertexCount(int start) {
     boolean[] visited = new boolean[vertexCount];
     return dfsCount(start, visited);
   }
 
+  /**
+   * A recursive helper for counting reachable vertices.
+   *
+   * @param v The current vertex.
+   * @param visited An array to keep track of visited vertices.
+   * @return The number of reachable vertices.
+   */
   private int dfsCount(int v, boolean[] visited) {
     visited[v] = true;
-    int c = 1;
+    int count = 1;
     for (int w : adj[v]) {
-      if (!visited[w]) c += dfsCount(w, visited);
+      if (!visited[w]) {
+        count += dfsCount(w, visited);
+      }
     }
-    return c;
+    return count;
   }
 
+  /**
+   * Checks if the graph is connected, ignoring isolated vertices.
+   *
+   * @return True if the graph is connected, false otherwise.
+   */
   private boolean isGraphConnectedIgnoringIsolated() {
     boolean[] visited = new boolean[vertexCount];
     int start = -1;
@@ -142,7 +196,7 @@ public class Fleury {
         break;
       }
     }
-    if (start == -1) return true; // no edges
+    if (start == -1) return true;
     dfsCount(start, visited);
     for (int v = 0; v < vertexCount; v++) {
       if (!adj[v].isEmpty() && !visited[v]) return false;
@@ -150,10 +204,13 @@ public class Fleury {
     return true;
   }
 
+  /**
+   * The main method for demonstrating the Fleury's algorithm implementation.
+   *
+   * @param args Command-line arguments (not used).
+   */
   public static void main(String[] args) {
-    // Example similar to original but corrected (original code added edge with
-    // vertex 5 on a size-5 graph)
-    Fleury g = new Fleury(6);
+    fleury g = new fleury(6);
     g.addEdge(0, 1);
     g.addEdge(2, 0);
     g.addEdge(1, 2);
@@ -163,7 +220,7 @@ public class Fleury {
 
     List<Integer> trail = g.eulerTrail();
     if (trail.isEmpty()) {
-      System.out.println("No Eulerian trail/circuit.");
+      System.out.println("No Eulerian trail/circuit found.");
     } else {
       System.out.println("Eulerian traversal: " + trail);
     }

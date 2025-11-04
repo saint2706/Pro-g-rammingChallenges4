@@ -1,4 +1,9 @@
-"""Command line interface for the CHIP-8 emulator."""
+"""Command line interface for the CHIP-8 emulator.
+
+This module provides the main entry point for running the Chip-8 emulator.
+It handles command-line argument parsing, ROM selection, and the main
+emulator loop.
+"""
 
 from __future__ import annotations
 
@@ -17,12 +22,28 @@ ROM_DIRECTORY = Path(__file__).resolve().parent / "roms"
 
 
 def iter_roms(directory: Path) -> Iterable[Path]:
+    """Iterates over the ROM files in a given directory.
+
+    Args:
+        directory: The directory to search for ROM files.
+
+    Returns:
+        An iterable of Path objects for the found ROMs.
+    """
     if not directory.exists():
         return []
     return sorted(path for path in directory.iterdir() if path.is_file())
 
 
 def choose_rom(directory: Path) -> Optional[Path]:
+    """Prompts the user to choose a ROM from a directory.
+
+    Args:
+        directory: The directory containing the ROMs.
+
+    Returns:
+        The Path object for the selected ROM, or None if no selection is made.
+    """
     roms = list(iter_roms(directory))
     if not roms:
         print("No ROMs found in", directory)
@@ -34,13 +55,18 @@ def choose_rom(directory: Path) -> Optional[Path]:
         selection = int(input("Select ROM number: "))
     except (ValueError, EOFError):
         return None
-    if selection < 1 or selection > len(roms):
+    if not 1 <= selection <= len(roms):
         print("Invalid selection")
         return None
     return roms[selection - 1]
 
 
 def build_parser() -> argparse.ArgumentParser:
+    """Builds the command-line argument parser.
+
+    Returns:
+        An ArgumentParser instance for the emulator.
+    """
     parser = argparse.ArgumentParser(description="Minimal CHIP-8 emulator")
     parser.add_argument(
         "rom", nargs="?", help="ROM path or name inside the roms directory"
@@ -71,6 +97,19 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def resolve_rom(path_or_name: Optional[str], directory: Path) -> Optional[Path]:
+    """Resolves the path to a ROM file.
+
+    If a path is provided, it will be used. If a name is provided, it will be
+    searched for in the specified ROM directory. If no path or name is given,
+    the user will be prompted to choose a ROM.
+
+    Args:
+        path_or_name: The path or name of the ROM.
+        directory: The directory to search for the ROM in.
+
+    Returns:
+        The Path object for the resolved ROM, or None if it cannot be found.
+    """
     if path_or_name is None:
         return choose_rom(directory)
     candidate = Path(path_or_name)
@@ -86,6 +125,15 @@ def resolve_rom(path_or_name: Optional[str], directory: Path) -> Optional[Path]:
 def create_input_and_display(
     backend: str, scale: int
 ) -> tuple[DisplayBuffer, Optional[object], Keypad]:
+    """Creates the display and input driver for the specified backend.
+
+    Args:
+        backend: The name of the backend to use ("pygame", "curses", or "headless").
+        scale: The display scale factor for the Pygame backend.
+
+    Returns:
+        A tuple containing the display buffer, input driver, and keypad.
+    """
     keypad = Keypad()
     if backend == "pygame":
         display = create_display("pygame", scale=scale)
@@ -93,7 +141,7 @@ def create_input_and_display(
     elif backend == "curses":
         display = create_display("curses")
         assert isinstance(display, CursesDisplay)
-        input_driver = CursesInput(keypad, display._screen)  # type: ignore[attr-defined]
+        input_driver = CursesInput(keypad, display._screen)
     else:
         display = create_display("headless")
         input_driver = None
@@ -101,6 +149,17 @@ def create_input_and_display(
 
 
 def main(argv: Optional[list[str]] = None) -> int:
+    """The main function for the emulator.
+
+    This function initializes the emulator components, loads the ROM, and runs
+    the main execution loop.
+
+    Args:
+        argv: A list of command-line arguments.
+
+    Returns:
+        An integer exit code (0 for success, 1 for failure).
+    """
     parser = build_parser()
     args = parser.parse_args(argv)
 
@@ -125,24 +184,21 @@ def main(argv: Optional[list[str]] = None) -> int:
     executed_frames = 0
 
     try:
+        # Main emulator loop.
         while True:
             start = time.perf_counter()
 
             opcode = cpu.step()
             if opcode == 0x0000 and cpu.waiting_register is not None:
-                # waiting for key press; avoid busy loop
+                # If the CPU is waiting for a key press, sleep to avoid a busy loop.
                 time.sleep(0.005)
 
             if input_driver is not None:
-                if isinstance(
-                    input_driver, PygameInput
-                ):  # pragma: no cover - interactive
+                if isinstance(input_driver, PygameInput):
                     input_driver.process_events()
                     if input_driver.quit_requested:
                         break
-                elif isinstance(
-                    input_driver, CursesInput
-                ):  # pragma: no cover - interactive
+                elif isinstance(input_driver, CursesInput):
                     if input_driver.process_events():
                         break
 

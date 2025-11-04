@@ -1,3 +1,12 @@
+/**
+ * @file naive.cpp
+ * @brief A naive implementation for classifying Eulerian graphs.
+ *
+ * This file contains a C++ implementation that checks if a graph has an
+ * Eulerian path or circuit. It does so by checking the connectivity of the
+ * graph and the degree of its vertices.
+ */
+
 #include <iostream>
 #include <vector>
 #include <queue>
@@ -5,28 +14,17 @@
 #include <string>
 #include <stdexcept>
 
-// -----------------------------------------------------------------------------
-// Eulerian Graph Classification & Connectedness Checker (Undirected Simple Graph)
-// -----------------------------------------------------------------------------
-// Modernized version of the original naive implementation.
-// Improvements:
-//  * Uses std::vector instead of manual dynamic arrays (RAII safety)
-//  * Adds enum class EulerianType for clearer return semantics
-//  * Explicit connectivity ignoring isolated vertices
-//  * Clear comments and function responsibilities
-//  * Avoids 'using namespace std;' to prevent namespace pollution
-//  * Provides utility to print classification results
-//  * Maintains O(V + E) complexity for connectivity/degree checks
-//
-// Eulerian definitions:
-//  * Eulerian Circuit: All vertices have even degree and the graph is connected (ignoring isolated vertices)
-//  * Eulerian Trail (Semi-Eulerian): Exactly 2 vertices have odd degree and the graph is connected
-//  * Not Eulerian: Otherwise.
-// ----------------------------------------------------------------------------/
-
+/**
+ * @class Graph
+ * @brief Represents an undirected graph and provides methods for Eulerian classification.
+ */
 class Graph
 {
 public:
+  /**
+   * @enum EulerianType
+   * @brief An enumeration for the different types of Eulerian classifications.
+   */
   enum class EulerianType
   {
     NotEulerian = 0,
@@ -34,24 +32,37 @@ public:
     Circuit = 2
   };
 
+  /**
+   * @brief Constructs a graph with a given number of vertices.
+   * @param vertices The number of vertices in the graph.
+   */
   explicit Graph(int vertices) : V(vertices), adj(vertices)
   {
     if (vertices <= 0)
       throw std::invalid_argument("Vertex count must be positive");
   }
 
+  /**
+   * @brief Adds an undirected edge between two vertices.
+   * @param u The first vertex.
+   * @param v The second vertex.
+   */
   void addEdge(int u, int v)
   {
     validateVertex(u);
     validateVertex(v);
     if (u == v)
     {
-      throw std::invalid_argument("Self-loops not supported in this simple model");
+      throw std::invalid_argument("Self-loops are not supported");
     }
     adj[u].push_back(v);
     adj[v].push_back(u);
   }
 
+  /**
+   * @brief Classifies the graph as Eulerian, Semi-Eulerian, or not Eulerian.
+   * @return The EulerianType of the graph.
+   */
   EulerianType classify() const
   {
     if (!isConnectedIgnoringIsolated())
@@ -59,7 +70,7 @@ public:
     int odd = 0;
     for (int v = 0; v < V; ++v)
     {
-      if (adj[v].size() % 2 == 1)
+      if (adj[v].size() % 2 != 0)
         ++odd;
     }
     if (odd == 0)
@@ -69,6 +80,11 @@ public:
     return EulerianType::NotEulerian;
   }
 
+  /**
+   * @brief Converts an EulerianType to a string.
+   * @param t The EulerianType to convert.
+   * @return A string representation of the EulerianType.
+   */
   static std::string toString(EulerianType t)
   {
     switch (t)
@@ -87,15 +103,22 @@ private:
   int V;
   std::vector<std::vector<int>> adj;
 
+  /**
+   * @brief Validates that a vertex is within the valid range.
+   * @param v The vertex to validate.
+   */
   void validateVertex(int v) const
   {
     if (v < 0 || v >= V)
       throw std::out_of_range("Vertex out of range");
   }
 
+  /**
+   * @brief Checks if the graph is connected, ignoring isolated vertices.
+   * @return True if the graph is connected, false otherwise.
+   */
   bool isConnectedIgnoringIsolated() const
   {
-    // Find a start vertex with non-zero degree
     int start = -1;
     for (int v = 0; v < V; ++v)
     {
@@ -106,7 +129,7 @@ private:
       }
     }
     if (start == -1)
-      return true; // no edges => trivially Eulerian
+      return true; // A graph with no edges is considered connected.
 
     std::vector<bool> visited(V, false);
     dfs(start, visited);
@@ -118,6 +141,11 @@ private:
     return true;
   }
 
+  /**
+   * @brief A recursive helper for the depth-first search.
+   * @param v The current vertex.
+   * @param visited A vector to keep track of visited vertices.
+   */
   void dfs(int v, std::vector<bool> &visited) const
   {
     visited[v] = true;
@@ -129,44 +157,47 @@ private:
   }
 };
 
-// ------------------------------- Demo -------------------------------- //
-
+/**
+ * @brief A helper function to test and print the classification of a graph.
+ * @param g The graph to test.
+ */
 static void test(const Graph &g)
 {
   std::cout << Graph::toString(g.classify()) << '\n';
 }
 
+/**
+ * @brief The main entry point for the program.
+ * @return 0 on success.
+ */
 int main()
 {
-  {
-    Graph g(6);
-    g.addEdge(0, 1);
-    g.addEdge(2, 0);
-    g.addEdge(1, 2);
-    g.addEdge(3, 0);
-    g.addEdge(4, 3);
-    g.addEdge(5, 0);
-    test(g);
-  }
+  // Example 1: A graph with an Eulerian trail.
+  Graph g1(6);
+  g1.addEdge(0, 1);
+  g1.addEdge(2, 0);
+  g1.addEdge(1, 2);
+  g1.addEdge(3, 0);
+  g1.addEdge(4, 3);
+  g1.addEdge(5, 0);
+  test(g1);
 
-  {
-    Graph g(5);
-    g.addEdge(0, 1);
-    g.addEdge(2, 0);
-    g.addEdge(2, 1);
-    g.addEdge(3, 0);
-    g.addEdge(4, 3);
-    g.addEdge(0, 4);
-    test(g);
-  }
+  // Example 2: A graph that is not Eulerian.
+  Graph g2(5);
+  g2.addEdge(0, 1);
+  g2.addEdge(2, 0);
+  g2.addEdge(2, 1);
+  g2.addEdge(3, 0);
+  g2.addEdge(4, 3);
+  g2.addEdge(0, 4);
+  test(g2);
 
-  {
-    Graph g(3);
-    g.addEdge(0, 1);
-    g.addEdge(1, 2);
-    g.addEdge(2, 0);
-    test(g);
-  }
+  // Example 3: A graph with an Eulerian circuit.
+  Graph g3(3);
+  g3.addEdge(0, 1);
+  g3.addEdge(1, 2);
+  g3.addEdge(2, 0);
+  test(g3);
 
   return 0;
 }

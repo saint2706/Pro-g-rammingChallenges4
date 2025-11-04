@@ -1,50 +1,44 @@
 /**
  * spinny.js – Modern spinning cube (Canvas)
- * Enhancements:
- *  - Immutable base geometry (original cube retained; transformations applied to copies)
- *  - Simple 3D rotation matrices (YX order) producing smoother, consistent motion
- *  - UI bindings: speed slider, pause toggle, autoresize, reset button, keyboard shortcuts
- *  - Respects prefers-reduced-motion (starts paused & reduces update rate)
- *  - Responsive canvas resizing with debounced handler
- *  - Clear separation of state, rendering, and animation loop
+ * This script provides an interactive 3D spinning cube rendered on an HTML5 canvas.
+ * It includes controls for speed, pausing, and resizing, and respects the user's
+ * preference for reduced motion.
  */
 
 class SpinningCube {
     /**
-     * @param {HTMLCanvasElement} canvas
+     * @param {HTMLCanvasElement} canvas The canvas element to render on.
      * @param {object} [options]
-     * @param {number} [options.baseSpeed=1] Base speed multiplier.
-     * @param {boolean} [options.autoresize=true] Whether to auto-fit canvas to window.
+     * @param {number} [options.baseSpeed=1] The base speed multiplier for rotation.
+     * @param {boolean} [options.autoresize=true] Whether to automatically resize the canvas.
      */
     constructor(canvas, { baseSpeed = 1, autoresize = true } = {}) {
-        if (!(canvas instanceof HTMLCanvasElement)) throw new Error('Canvas element required');
+        if (!(canvas instanceof HTMLCanvasElement)) throw new Error('A valid canvas element is required.');
         this.canvas = canvas;
         this.ctx = canvas.getContext('2d');
-        if (!this.ctx) throw new Error('2D context not supported');
+        if (!this.ctx) throw new Error('2D rendering context is not supported.');
 
         this.baseSpeed = baseSpeed;
-        this.speedFactor = 1; // live user-controlled speed
+        this.speedFactor = 1;
         this.isPaused = false;
         this.autoresize = autoresize;
         this.frameId = null;
 
-        // Geometry (unit cube corners)
+        // The 8 vertices of a unit cube.
         this.baseNodes = [
             [-1, -1, -1], [-1, -1, 1], [-1, 1, -1], [-1, 1, 1],
             [1, -1, -1], [1, -1, 1], [1, 1, -1], [1, 1, 1],
         ];
+        // The 12 edges connecting the vertices.
         this.edges = [
-            [0, 1], [1, 3], [3, 2], [2, 0], [4, 5], [5, 7], [7, 6], [6, 4], [0, 4], [1, 5], [2, 6], [3, 7]
+            [0, 1], [1, 3], [3, 2], [2, 0], [4, 5], [5, 7], [7, 6], [6, 4],
+            [0, 4], [1, 5], [2, 6], [3, 7]
         ];
 
-        // Render scaling (dynamic based on viewport)
         this.scale = 200;
-
-        // Rotation state (accumulated angles)
         this.angleX = Math.PI / 4;
         this.angleY = Math.atan(Math.sqrt(2));
 
-        // Motion preferences
         this.prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         if (this.prefersReducedMotion) this.isPaused = true;
 
@@ -53,7 +47,7 @@ class SpinningCube {
     }
 
     _installResizeListener() {
-        let timeout = null;
+        let timeout;
         window.addEventListener('resize', () => {
             if (!this.autoresize) return;
             clearTimeout(timeout);
@@ -64,7 +58,7 @@ class SpinningCube {
     resize() {
         this.canvas.width = window.innerWidth;
         this.canvas.height = window.innerHeight;
-        this.scale = Math.min(this.canvas.width, this.canvas.height) * 0.3; // keep cube visible
+        this.scale = Math.min(this.canvas.width, this.canvas.height) * 0.3;
         this.draw();
     }
 
@@ -74,23 +68,22 @@ class SpinningCube {
     reset() { this.angleX = Math.PI / 4; this.angleY = Math.atan(Math.sqrt(2)); this.draw(); }
     setAutoresize(v) { this.autoresize = v; }
 
-    /** Compute rotated & scaled 2D projection (orthographic) */
+    /** Computes the 2D projection of the rotated 3D cube. */
     _transformedNodes() {
         const sinX = Math.sin(this.angleX), cosX = Math.cos(this.angleX);
         const sinY = Math.sin(this.angleY), cosY = Math.cos(this.angleY);
         const nodes2d = [];
         for (const [x0, y0, z0] of this.baseNodes) {
-            // Rotate around X: (y,z)
+            // Rotate around the X-axis, then the Y-axis.
             let y1 = y0 * cosX - z0 * sinX;
             let z1 = z0 * cosX + y0 * sinX;
-            // Rotate around Y: (x,z)
             let x2 = x0 * cosY + z1 * sinY;
-            let z2 = -x0 * sinY + z1 * cosY; // z2 unused (no depth sort)
             nodes2d.push([x2 * this.scale, y1 * this.scale]);
         }
         return nodes2d;
     }
 
+    /** Draws the cube on the canvas. */
     draw() {
         const ctx = this.ctx;
         ctx.save();
@@ -101,29 +94,28 @@ class SpinningCube {
         const pts = this._transformedNodes();
         ctx.beginPath();
         for (const [a, b] of this.edges) {
-            const p1 = pts[a], p2 = pts[b];
-            ctx.moveTo(p1[0], p1[1]);
-            ctx.lineTo(p2[0], p2[1]);
+            ctx.moveTo(pts[a][0], pts[a][1]);
+            ctx.lineTo(pts[b][0], pts[b][1]);
         }
         ctx.stroke();
         ctx.restore();
     }
 
     _step(dt) {
-        // dt in seconds; rotate proportionally
         const speed = this.baseSpeed * this.speedFactor;
         this.angleX += dt * speed * 0.9;
         this.angleY += dt * speed * 1.2;
     }
 
     _loop(timestamp) {
-        if (this.isPaused) { this.frameId = null; return; }
-        if (this.lastTime == null) this.lastTime = timestamp;
-        const dtMs = timestamp - this.lastTime;
+        if (this.isPaused) {
+            this.frameId = null;
+            return;
+        }
+        const dt = (timestamp - (this.lastTime || timestamp)) / 1000;
         this.lastTime = timestamp;
-        const dt = dtMs / 1000;
-        // Limit update rate for reduced motion users
-        if (!this.prefersReducedMotion || dtMs > 250) {
+
+        if (!this.prefersReducedMotion || dt > 0.25) {
             this._step(dt);
             this.draw();
         }
@@ -131,16 +123,18 @@ class SpinningCube {
     }
 
     animate() {
-        if (this.frameId == null && !this.isPaused) this.frameId = requestAnimationFrame(t => this._loop(t));
+        if (this.frameId === null && !this.isPaused) {
+            this.frameId = requestAnimationFrame(t => this._loop(t));
+        }
     }
 }
 
-// -------------------- UI Wiring -------------------- //
+// --- UI Wiring ---
 
 function init() {
     const canvas = document.getElementById('cubeCanvas');
-    if (!canvas) throw new Error('Canvas #cubeCanvas missing');
-    const cube = new SpinningCube(canvas, { baseSpeed: 1 });
+    if (!canvas) throw new Error('Canvas with ID #cubeCanvas not found.');
+    const cube = new SpinningCube(canvas);
 
     const speedInput = document.getElementById('speed');
     const pauseInput = document.getElementById('pause');
@@ -153,23 +147,36 @@ function init() {
     }
     updateStatus();
 
-    speedInput?.addEventListener('input', () => {
-        const factor = Number(speedInput.value) / 100; // slider 0-300 -> 0-3.0
-        cube.setSpeedFactor(factor);
+    speedInput?.addEventListener('input', () => cube.setSpeedFactor(Number(speedInput.value) / 100));
+    pauseInput?.addEventListener('change', () => {
+        cube.pause(pauseInput.checked);
+        updateStatus();
     });
-    pauseInput?.addEventListener('change', () => { cube.pause(pauseInput.checked); updateStatus(); });
     autoresizeInput?.addEventListener('change', () => cube.setAutoresize(autoresizeInput.checked));
-    resetBtn?.addEventListener('click', () => { cube.reset(); });
+    resetBtn?.addEventListener('click', () => cube.reset());
 
     document.addEventListener('keydown', (e) => {
-        if (e.key === ' ') { cube.togglePause(); pauseInput.checked = cube.isPaused; updateStatus(); }
-        else if (e.key === 'r' || e.key === 'R') { cube.reset(); }
-        else if (e.key === 'Escape') { cube.pause(true); pauseInput.checked = true; updateStatus(); }
+        if (e.key === ' ') {
+            cube.togglePause();
+            pauseInput.checked = cube.isPaused;
+            updateStatus();
+        } else if (e.key.toLowerCase() === 'r') {
+            cube.reset();
+        } else if (e.key === 'Escape') {
+            cube.pause(true);
+            pauseInput.checked = true;
+            updateStatus();
+        }
     });
 
     if (!cube.isPaused) cube.animate();
 }
 
 window.addEventListener('DOMContentLoaded', () => {
-    try { init(); } catch (err) { console.error(err); alert(err.message); }
+    try {
+        init();
+    } catch (err) {
+        console.error(err);
+        alert(err.message);
+    }
 });

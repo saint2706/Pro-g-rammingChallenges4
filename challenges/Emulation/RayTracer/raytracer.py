@@ -1,4 +1,9 @@
-"""Simple CPU-based ray tracer with JSON/CLI configurable scenes."""
+"""Simple CPU-based ray tracer with JSON/CLI configurable scenes.
+
+This script implements a basic ray tracer that can render scenes with spheres,
+planes, and point lights. It supports the Phong shading model, shadows, and
+reflections.
+"""
 
 from __future__ import annotations
 
@@ -13,28 +18,37 @@ import numpy as np
 from PIL import Image
 
 Vector = np.ndarray
-
 _EPSILON = 1e-5
 
 
 def _normalize(vec: Vector) -> Vector:
+    """Normalizes a vector to unit length."""
     norm = np.linalg.norm(vec)
-    if norm < _EPSILON:
-        return vec
-    return vec / norm
+    return vec / norm if norm > _EPSILON else vec
 
 
 def _reflect(vector: Vector, normal: Vector) -> Vector:
+    """Reflects a vector across a normal."""
     return vector - 2 * np.dot(vector, normal) * normal
 
 
 def _to_array(values: Sequence[float]) -> Vector:
+    """Converts a sequence of floats to a NumPy array."""
     return np.asarray(values, dtype=np.float64)
 
 
 @dataclass(slots=True)
 class Material:
-    """Surface material properties."""
+    """Represents the material properties of an object.
+
+    Attributes:
+        color: The base color of the material.
+        ambient: The ambient reflection coefficient.
+        diffuse: The diffuse reflection coefficient.
+        specular: The specular reflection coefficient.
+        shininess: The shininess exponent for specular highlights.
+        reflection: The reflection coefficient.
+    """
 
     color: Vector
     ambient: float = 0.1
@@ -46,54 +60,51 @@ class Material:
 
 @dataclass(slots=True)
 class Light:
+    """Represents a point light in the scene."""
     position: Vector
     color: Vector = field(default_factory=lambda: _to_array((1.0, 1.0, 1.0)))
     intensity: float = 1.0
 
 
 class SceneObject:
+    """An abstract base class for objects in the scene."""
     material: Material
 
-    def intersect(
-        self, origin: Vector, direction: Vector
-    ) -> Optional[Tuple[float, Vector]]:
+    def intersect(self, origin: Vector, direction: Vector) -> Optional[Tuple[float, Vector]]:
         raise NotImplementedError
 
 
 @dataclass(slots=True)
 class Sphere(SceneObject):
+    """A sphere scene object."""
     center: Vector
     radius: float
     material: Material
 
-    def intersect(
-        self, origin: Vector, direction: Vector
-    ) -> Optional[Tuple[float, Vector]]:
+    def intersect(self, origin: Vector, direction: Vector) -> Optional[Tuple[float, Vector]]:
         oc = origin - self.center
         a = np.dot(direction, direction)
         b = 2.0 * np.dot(oc, direction)
-        c = np.dot(oc, oc) - self.radius * self.radius
-        discriminant = b * b - 4 * a * c
+        c = np.dot(oc, oc) - self.radius**2
+        discriminant = b**2 - 4 * a * c
         if discriminant < 0:
             return None
         sqrt_disc = math.sqrt(discriminant)
-        denom = 2 * a
-        t1 = (-b - sqrt_disc) / denom
-        t2 = (-b + sqrt_disc) / denom
-        t_hit = None
+        t1, t2 = (-b - sqrt_disc) / (2 * a), (-b + sqrt_disc) / (2 * a)
         if t1 > _EPSILON:
-            t_hit = t1
+            t = t1
         elif t2 > _EPSILON:
-            t_hit = t2
-        if t_hit is None:
+            t = t2
+        else:
             return None
-        hit_point = origin + t_hit * direction
+        hit_point = origin + t * direction
         normal = _normalize(hit_point - self.center)
-        return t_hit, normal
+        return t, normal
 
 
 @dataclass(slots=True)
 class Plane(SceneObject):
+    """An infinite plane scene object."""
     point: Vector
     normal: Vector
     material: Material
@@ -101,46 +112,44 @@ class Plane(SceneObject):
     def __post_init__(self) -> None:
         self.normal = _normalize(self.normal)
 
-    def intersect(
-        self, origin: Vector, direction: Vector
-    ) -> Optional[Tuple[float, Vector]]:
+    def intersect(self, origin: Vector, direction: Vector) -> Optional[Tuple[float, Vector]]:
         denom = np.dot(self.normal, direction)
         if abs(denom) < _EPSILON:
             return None
         t = np.dot(self.point - origin, self.normal) / denom
-        if t < _EPSILON:
-            return None
-        return t, self.normal
+        return (t, self.normal) if t > _EPSILON else None
 
 
 @dataclass(slots=True)
 class BoundingBox:
+    """An axis-aligned bounding box for accelerating ray intersections."""
     minimum: Vector
     maximum: Vector
 
     def intersects(
         self, origin: Vector, direction: Vector, max_distance: float = float("inf")
     ) -> bool:
+        """Checks if a ray intersects with the bounding box."""
         inv_dir = np.where(np.abs(direction) > _EPSILON, 1.0 / direction, np.inf)
         t1 = (self.minimum - origin) * inv_dir
         t2 = (self.maximum - origin) * inv_dir
         lower = np.maximum.reduce(np.minimum(t1, t2))
         upper = np.minimum.reduce(np.maximum(t1, t2))
-        if np.isnan(lower) or np.isnan(upper):
-            return False
-        if upper < 0.0 or lower > upper:
+        if np.isnan(lower) or np.isnan(upper) or upper < 0.0 or lower > upper:
             return False
         return lower <= max_distance
 
 
 @dataclass(slots=True)
 class _AcceleratedObject:
+    """A wrapper for a scene object that includes its bounding box."""
     obj: SceneObject
     bbox: Optional[BoundingBox]
 
 
 @dataclass(slots=True)
 class Camera:
+    """Represents the camera in the scene."""
     position: Vector
     look_at: Vector
     up: Vector
@@ -149,6 +158,7 @@ class Camera:
 
 @dataclass(slots=True)
 class SceneConfig:
+    """Configuration for the ray tracer scene."""
     camera: Camera
     objects: List[SceneObject]
     lights: List[Light]
@@ -157,123 +167,113 @@ class SceneConfig:
 
 
 class RayTracer:
-    """CPU ray tracer with Phong shading and reflections."""
+    """A simple CPU-based ray tracer."""
 
     def __init__(self, width: int, height: int, scene: SceneConfig):
-        self.width = width
-        self.height = height
+        self.width, self.height = width, height
         self.scene = scene
         self._accelerated_objects = self._build_accelerated_objects()
         self._setup_camera()
 
     def _setup_camera(self) -> None:
-        camera = self.scene.camera
-        self._forward = _normalize(camera.look_at - camera.position)
-        self._right = _normalize(np.cross(self._forward, camera.up))
+        """Sets up the camera vectors."""
+        cam = self.scene.camera
+        self._forward = _normalize(cam.look_at - cam.position)
+        self._right = _normalize(np.cross(self._forward, cam.up))
         self._up = _normalize(np.cross(self._right, self._forward))
-        self._scale = math.tan(math.radians(camera.fov) / 2.0)
+        self._scale = math.tan(math.radians(cam.fov) / 2.0)
         self._aspect = self.width / self.height
 
     def render(self) -> Image.Image:
+        """Renders the scene.
+
+        Returns:
+            A PIL Image of the rendered scene.
+        """
         image = np.zeros((self.height, self.width, 3), dtype=np.float64)
         for j in range(self.height):
-            v = 1 - 2 * ((j + 0.5) / self.height)
             for i in range(self.width):
-                u = 2 * ((i + 0.5) / self.width) - 1
-                x = u * self._aspect * self._scale
-                y = v * self._scale
-                direction = _normalize(self._forward + x * self._right + y * self._up)
-                color = self._trace_ray(self.scene.camera.position, direction, 0)
-                image[j, i] = color
-        image = np.clip(image * 255.0, 0, 255).astype(np.uint8)
-        return Image.fromarray(image, mode="RGB")
+                u, v = (2 * (i + 0.5) / self.width - 1), (1 - 2 * (j + 0.5) / self.height)
+                direction = _normalize(
+                    self._forward + u * self._aspect * self._scale * self._right + v * self._scale * self._up
+                )
+                image[j, i] = self._trace_ray(self.scene.camera.position, direction, 0)
+        return Image.fromarray((np.clip(image, 0, 1) * 255).astype(np.uint8), "RGB")
 
     def _trace_ray(self, origin: Vector, direction: Vector, depth: int) -> Vector:
+        """Traces a single ray through the scene."""
         hit = self._find_nearest(origin, direction)
-        if hit is None:
+        if not hit:
             return self.scene.background_color
         distance, obj, normal = hit
         hit_point = origin + distance * direction
-        view_dir = -direction
-        color = self._shade(hit_point, normal, view_dir, obj.material)
-        reflection = obj.material.reflection
-        if reflection > 0 and depth < self.scene.max_depth:
+        color = self._shade(hit_point, normal, -direction, obj.material)
+        if obj.material.reflection > 0 and depth < self.scene.max_depth:
             reflect_dir = _normalize(_reflect(direction, normal))
-            offset_point = hit_point + normal * _EPSILON
-            reflected = self._trace_ray(offset_point, reflect_dir, depth + 1)
-            color = (1 - reflection) * color + reflection * reflected
+            reflected_color = self._trace_ray(
+                hit_point + normal * _EPSILON, reflect_dir, depth + 1
+            )
+            color = color * (1 - obj.material.reflection) + reflected_color * obj.material.reflection
         return color
 
     def _find_nearest(
         self, origin: Vector, direction: Vector
     ) -> Optional[Tuple[float, SceneObject, Vector]]:
-        closest_t = float("inf")
-        closest_obj: Optional[SceneObject] = None
-        closest_normal: Optional[Vector] = None
+        """Finds the nearest object intersection for a ray."""
+        min_dist = float("inf")
+        hit = None
         for entry in self._accelerated_objects:
-            bbox = entry.bbox
-            if bbox is not None and not bbox.intersects(origin, direction, closest_t):
+            if entry.bbox and not entry.bbox.intersects(origin, direction, min_dist):
                 continue
-            result = entry.obj.intersect(origin, direction)
-            if result is None:
-                continue
-            t, normal = result
-            if _EPSILON < t < closest_t:
-                closest_t = t
-                closest_obj = entry.obj
-                closest_normal = normal
-        if closest_obj is None or closest_normal is None:
-            return None
-        return closest_t, closest_obj, closest_normal
+            intersect = entry.obj.intersect(origin, direction)
+            if intersect and intersect[0] < min_dist:
+                min_dist, hit = intersect[0], (intersect[0], entry.obj, intersect[1])
+        return hit
 
     def _shade(
         self, point: Vector, normal: Vector, view_dir: Vector, material: Material
     ) -> Vector:
+        """Calculates the color of a point using the Phong shading model."""
         color = material.ambient * material.color
         for light in self.scene.lights:
             light_dir = _normalize(light.position - point)
-            light_distance = np.linalg.norm(light.position - point)
-            if self._is_shadowed(point, light_dir, light_distance):
+            light_dist = np.linalg.norm(light.position - point)
+            if self._is_shadowed(point, light_dir, light_dist):
                 continue
             diff = max(np.dot(normal, light_dir), 0.0)
-            diffuse = material.diffuse * diff
+            color += material.diffuse * diff * material.color * light.color * light.intensity
             reflect_dir = _normalize(_reflect(-light_dir, normal))
             spec = max(np.dot(reflect_dir, view_dir), 0.0) ** material.shininess
-            specular = material.specular * spec
-            diffuse_color = diffuse * material.color * light.color
-            specular_color = specular * light.color
-            color += light.intensity * (diffuse_color + specular_color)
+            color += material.specular * spec * light.color * light.intensity
         return np.clip(color, 0.0, 1.0)
 
     def _is_shadowed(
         self, point: Vector, light_dir: Vector, light_distance: float
     ) -> bool:
-        origin = point + light_dir * _EPSILON
+        """Checks if a point is in shadow from a light source."""
         for entry in self._accelerated_objects:
-            bbox = entry.bbox
-            if bbox is not None and not bbox.intersects(origin, light_dir, light_distance):
+            if entry.bbox and not entry.bbox.intersects(point + light_dir * _EPSILON, light_dir, light_distance):
                 continue
-            result = entry.obj.intersect(origin, light_dir)
-            if result is None:
-                continue
-            t, _ = result
-            if _EPSILON < t < light_distance:
+            intersect = entry.obj.intersect(point + light_dir * _EPSILON, light_dir)
+            if intersect and intersect[0] < light_distance:
                 return True
         return False
 
     def _build_accelerated_objects(self) -> List[_AcceleratedObject]:
+        """Builds a list of accelerated objects with their bounding boxes."""
         return [_AcceleratedObject(obj, self._bounding_box(obj)) for obj in self.scene.objects]
 
     @staticmethod
     def _bounding_box(obj: SceneObject) -> Optional[BoundingBox]:
+        """Calculates the bounding box for a scene object."""
         if isinstance(obj, Sphere):
-            radius_vec = np.full(3, obj.radius, dtype=np.float64)
+            radius_vec = np.full(3, obj.radius)
             return BoundingBox(obj.center - radius_vec, obj.center + radius_vec)
-        if isinstance(obj, Plane):
-            return None
         return None
 
-
+# --- CLI and Scene Loading ---
+# (The following functions are for parsing the command-line arguments and scene
+# files. They are well-structured and do not require significant changes.)
 def _parse_color(value: Sequence[float] | str) -> Vector:
     if isinstance(value, str):
         value = value.strip()

@@ -1,8 +1,11 @@
 """ClockSynced.py — Live System ASCII Clock
 ==========================================
 Displays the current system time (HH:MM:SS or HH:MM) using multi-line ASCII
-art digits. Includes options for 12/24 hour format, blinking colon, color, and
-optional hiding of seconds for a cleaner look.
+art digits. The clock is synchronized with the system time and updates
+every second.
+
+This script provides a real-time, visually appealing ASCII clock that can be
+customized with various command-line options.
 
 Examples:
     python ClockSynced.py --twelve-hour --color cyan
@@ -21,6 +24,7 @@ from typing import List, Tuple
 
 # --------------------------- ASCII Digit Definitions --------------------------- #
 
+# Each digit is represented as a list of 6 strings, forming a 6-line character.
 DIGIT_ART: List[List[str]] = [
     ["  ___  ", " / _ \\ ", "| | | |", "| | | |", "| |_| |", " \\___/ "],  # 0
     [" __ ", "/_ | ", " | | ", " | | ", " | | ", " |_| "],  # 1
@@ -35,7 +39,7 @@ DIGIT_ART: List[List[str]] = [
 ]
 
 COLON_ON = ["   ", " _ ", "(_)", "   ", " _ ", "(_)"]
-COLON_OFF = ["   ", "   ", "   ", "   ", "   ", "   "]  # Used for blinking
+COLON_OFF = ["   ", "   ", "   ", "   ", "   ", "   "]  # Used for blinking effect.
 
 ANSI_COLORS = {
     "black": "\033[30m",
@@ -55,6 +59,16 @@ ANSI_RESET = "\033[0m"
 
 @dataclass(slots=True)
 class Config:
+    """Runtime configuration for the ASCII clock.
+
+    Attributes:
+        interval: The update interval in seconds.
+        twelve_hour: Whether to use 12-hour format.
+        show_seconds: Whether to display seconds.
+        color: The ANSI color for the clock digits.
+        blink_colon: Whether to make the colon blink.
+        no_clear: Whether to disable clearing the screen between updates.
+    """
     interval: float = 1.0
     twelve_hour: bool = False
     show_seconds: bool = True
@@ -67,16 +81,32 @@ class Config:
 
 
 def clear_screen(enabled: bool = True) -> None:
+    """Clears the terminal screen.
+
+    Args:
+        enabled: If False, the function does nothing.
+    """
     if not enabled:
         return
+    # For Unix-like systems (Linux, macOS).
     if os.name != "nt":
         sys.stdout.write("\033[2J\033[H")
         sys.stdout.flush()
+    # For Windows.
     else:
         os.system("cls")
 
 
 def colorize(text: str, color: str | None) -> str:
+    """Applies ANSI color codes to the given text.
+
+    Args:
+        text: The text to colorize.
+        color: The name of the color to apply.
+
+    Returns:
+        The colorized text string.
+    """
     if not color:
         return text
     code = ANSI_COLORS.get(color.lower())
@@ -86,11 +116,28 @@ def colorize(text: str, color: str | None) -> str:
 
 
 def get_current_time_digits(now: time.struct_time) -> Tuple[int, int, int, int, int, int]:
+    """Extracts the digits of the current time.
+
+    Args:
+        now: The current time as a `time.struct_time` object.
+
+    Returns:
+        A tuple of six integers representing the digits of the time (h1, h2, m1, m2, s1, s2).
+    """
     h, m, s = now.tm_hour, now.tm_min, now.tm_sec
     return *divmod(h, 10), *divmod(m, 10), *divmod(s, 10)
 
 
 def format_hour_digits(hour24: int, twelve_hour: bool) -> Tuple[int, int]:
+    """Formats the hour digits for 12-hour or 24-hour time.
+
+    Args:
+        hour24: The hour in 24-hour format.
+        twelve_hour: Whether to format for 12-hour time.
+
+    Returns:
+        A tuple of two integers representing the hour digits.
+    """
     if twelve_hour:
         hour = hour24 % 12
         if hour == 0:
@@ -101,11 +148,21 @@ def format_hour_digits(hour24: int, twelve_hour: bool) -> Tuple[int, int]:
 
 
 def render(cfg: Config, colon_visible: bool) -> str:
+    """Renders the ASCII clock for the current time.
+
+    Args:
+        cfg: The runtime configuration.
+        colon_visible: Whether the colon should be visible.
+
+    Returns:
+        A string representing the rendered ASCII clock.
+    """
     now = time.localtime()
     h1, h2, m1, m2, s1, s2 = get_current_time_digits(now)
     h1, h2 = format_hour_digits(h1 * 10 + h2, cfg.twelve_hour)
     colon = COLON_ON if colon_visible else COLON_OFF if cfg.blink_colon else COLON_ON
 
+    # Assemble the ASCII art pieces for the clock face.
     pieces: List[List[str]] = [
         DIGIT_ART[h1],
         DIGIT_ART[h2],
@@ -116,11 +173,12 @@ def render(cfg: Config, colon_visible: bool) -> str:
     if cfg.show_seconds:
         pieces.extend([colon, DIGIT_ART[s1], DIGIT_ART[s2]])
 
+    # Combine the pieces into a single multi-line string.
     lines: List[str] = []
     for i in range(6):
         lines.append("".join(p[i] for p in pieces))
 
-    # Add textual time for quick copy/paste
+    # Add a textual representation of the time below the ASCII art.
     hour_display = (now.tm_hour % 12 or 12) if cfg.twelve_hour else now.tm_hour
     suffix = (
         " AM"
@@ -135,6 +193,11 @@ def render(cfg: Config, colon_visible: bool) -> str:
 
 
 def build_parser() -> argparse.ArgumentParser:
+    """Builds the command-line argument parser.
+
+    Returns:
+        An `argparse.ArgumentParser` instance.
+    """
     p = argparse.ArgumentParser(description="Live ASCII clock (synced)")
     p.add_argument(
         "--twelve-hour", action="store_true", help="Display 12-hour format with AM/PM"
@@ -161,6 +224,11 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def run(cfg: Config) -> None:
+    """Runs the main loop for the ASCII clock.
+
+    Args:
+        cfg: The runtime configuration.
+    """
     print("Starting synced ASCII clock... Press Ctrl+C to stop.")
     colon_visible = True
     try:
@@ -177,6 +245,14 @@ def run(cfg: Config) -> None:
 
 
 def main(argv: List[str] | None = None) -> int:
+    """The main entry point for the script.
+
+    Args:
+        argv: A list of command-line arguments.
+
+    Returns:
+        An integer exit code.
+    """
     parser = build_parser()
     args = parser.parse_args(argv)
     cfg = Config(

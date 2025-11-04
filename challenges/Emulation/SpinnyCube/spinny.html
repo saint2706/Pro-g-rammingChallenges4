@@ -6,8 +6,10 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<meta name="description" content="Spinning wireframe cube demonstration (Canvas + JS)" />
 	<title>Spinning Cube Demo</title>
+	<!-- Link to the external stylesheet -->
 	<link rel="stylesheet" href="cube.css" />
 	<style>
+		/* Basic styling for the page */
 		:root {
 			color-scheme: dark light;
 		}
@@ -72,6 +74,7 @@
 			pointer-events: none;
 		}
 
+		/* Respect user's preference for reduced motion */
 		@media (prefers-reduced-motion: reduce) {
 			canvas {
 				background: #111;
@@ -81,6 +84,7 @@
 </head>
 
 <body>
+	<!-- Header with controls for the animation -->
 	<header>
 		<div id="controls" role="group" aria-label="Cube animation controls">
 			<label title="Rotation speed multiplier"><span>Speed:</span><input id="speed" type="range" min="0" max="300"
@@ -92,8 +96,11 @@
 			<span id="status" aria-live="polite"></span>
 		</div>
 	</header>
+	<!-- The canvas element where the cube will be rendered -->
 	<canvas id="cubeCanvas" aria-label="Animated spinning cube" role="img"></canvas>
+	<!-- Footer with control hints -->
 	<footer>Press R to reset · Esc to pause · Respects prefers-reduced-motion.</footer>
+	<!-- Link to the JavaScript file that contains the rendering logic -->
 	<script src="spinny.js" defer></script>
 </body>
 
