@@ -168,8 +168,6 @@ def generate_gauss_legendre_convergence(
 
         while True:
             iteration_count += 1
-            a_current = a
-
             a_next = (a + b) / 2
             b_next = (a * b).sqrt()
             t_next = t - p * (a - a_next) ** 2
@@ -189,7 +187,7 @@ def generate_gauss_legendre_convergence(
             if a == previous_a:
                 break
 
-            previous_a = a_current
+            previous_a = a
 
             if iteration_count > 50:
                 logging.warning(
