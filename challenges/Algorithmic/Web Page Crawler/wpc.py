@@ -150,7 +150,7 @@ class WebCrawler:
                 continue
             absolute = urljoin(base_url, href_val)
             parsed = urlparse(absolute)
-            clean = parsed._replace(fragment="", params="", query="").geturl()
+            clean = parsed._replace(fragment="").geturl()
             if self._accept_link(clean):
                 yield clean
 
