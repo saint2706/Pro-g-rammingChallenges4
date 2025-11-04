@@ -183,7 +183,7 @@ class MarkovGUI:
                 self.copy_button.config(state=tk.NORMAL)
 
             self.master.after(0, update_ui)
-        except Exception as e:
+        except Exception:
             self.master.after(
                 0, lambda: messagebox.showerror("Error", f"An error occurred: {e}")
             )

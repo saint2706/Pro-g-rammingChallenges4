@@ -1,4 +1,5 @@
 """Unit tests for the cipher visualization helper."""
+
 from __future__ import annotations
 
 import json
@@ -6,10 +7,7 @@ import sys
 from pathlib import Path
 
 VISUALIZER_DIR = (
-    Path(__file__).resolve().parents[1]
-    / "challenges"
-    / "Algorithmic"
-    / "Caesar Cipher"
+    Path(__file__).resolve().parents[1] / "challenges" / "Algorithmic" / "Caesar Cipher"
 )
 if str(VISUALIZER_DIR) not in sys.path:
     sys.path.insert(0, str(VISUALIZER_DIR))
@@ -82,5 +80,3 @@ def test_rot13_mapping_is_involutive() -> None:
     permutation = data["mapping"]["permutation"]
     for letter in cv.ALPHABET:
         assert permutation[permutation[letter]] == letter
-
-

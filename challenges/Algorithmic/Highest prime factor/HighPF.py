@@ -22,7 +22,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import math
 import sys
 import time
 from dataclasses import dataclass
@@ -172,7 +171,7 @@ def render_results(results: Sequence[FactorResult], as_json: bool) -> str:
     for r in results:
         base = f"{r.value}: {r.highest_prime_factor}"
         if r.elapsed_seconds is not None:
-            base += f" (elapsed {r.elapsed_seconds*1000:.3f} ms)"
+            base += f" (elapsed {r.elapsed_seconds * 1000:.3f} ms)"
         lines.append(base)
     return "\n".join(lines)
 

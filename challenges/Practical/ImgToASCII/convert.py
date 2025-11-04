@@ -217,7 +217,7 @@ def main(argv: Optional[list[str]] = None) -> int:
                 print(f"Warning: Could not write JSON summary: {e}", file=sys.stderr)
         return 0
     except FileNotFoundError:
-        print(f"Error: Input file not found.", file=sys.stderr)
+        print("Error: Input file not found.", file=sys.stderr)
     except ImageOpenError as e:
         print(f"Error: {e}", file=sys.stderr)
     except ValueError as e:

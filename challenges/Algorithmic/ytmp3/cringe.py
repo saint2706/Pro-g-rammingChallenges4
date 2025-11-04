@@ -215,7 +215,9 @@ def main(argv: Optional[List[str]] = None) -> int:
     try:
         urls = cfg.all_urls()
         if not urls:
-            raise ValueError("No URLs to download after filtering blank/comment-only lines")
+            raise ValueError(
+                "No URLs to download after filtering blank/comment-only lines"
+            )
         summary = batch_download(cfg, urls)
     except ValueError as e:
         parser.error(str(e))

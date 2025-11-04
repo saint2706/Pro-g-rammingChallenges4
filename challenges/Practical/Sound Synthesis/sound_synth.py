@@ -6,7 +6,7 @@ import json
 import math
 import pathlib
 from dataclasses import dataclass, field
-from typing import Callable, Dict, Iterable, List, Optional, Tuple
+from typing import Dict, Iterable, List, Optional, Tuple
 
 import numpy as np
 

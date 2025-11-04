@@ -17,7 +17,7 @@ import argparse
 import json
 import sys
 from dataclasses import dataclass
-from typing import Dict, Generator, Iterable, Iterator, List, Optional
+from typing import Dict, Iterable, Iterator, List, Optional
 
 
 Move = str

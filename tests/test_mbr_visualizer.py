@@ -59,7 +59,9 @@ def test_dummy_layout_matches_expected_ratios():
     assert part2["start_ratio"] == pytest.approx(1_002_048 / total)
     assert part2["end_ratio"] == pytest.approx(total / total)
 
-    assert sum(segment["length_ratio"] for segment in metadata["segments"]) == pytest.approx(1.0)
+    assert sum(
+        segment["length_ratio"] for segment in metadata["segments"]
+    ) == pytest.approx(1.0)
 
 
 def test_segments_include_internal_gap_and_ordering():

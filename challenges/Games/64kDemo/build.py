@@ -55,7 +55,9 @@ def bundle_js(entry: Path) -> str:
             return result
         except FileNotFoundError:
             continue
-        except subprocess.CalledProcessError as exc:  # pragma: no cover - surfaced to CLI
+        except (
+            subprocess.CalledProcessError
+        ) as exc:  # pragma: no cover - surfaced to CLI
             outfile.unlink(missing_ok=True)
             raise BuildError(exc.stderr or "esbuild failed to bundle the entry point")
 

@@ -25,7 +25,7 @@ import logging
 import os
 import sys
 from pathlib import Path
-from typing import IO, Iterable, Iterator, List, Optional, Sequence, Tuple, Union
+from typing import IO, Iterator, List, Optional, Sequence, Tuple, Union
 
 try:
     from PIL import Image, ImageOps, PngImagePlugin, UnidentifiedImageError

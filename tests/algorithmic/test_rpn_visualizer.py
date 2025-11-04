@@ -67,4 +67,6 @@ def test_json_roundtrip_preserves_stack(tmp_path: Path):
 
     assert loaded_expression == expression
     assert pytest.approx(loaded_result, rel=1e-12) == result
-    assert [snap.stack for snap in loaded_snapshots] == [snap.stack for snap in snapshots]
+    assert [snap.stack for snap in loaded_snapshots] == [
+        snap.stack for snap in snapshots
+    ]

@@ -2,11 +2,10 @@
 
 from __future__ import annotations
 
-from typing import Iterable
 
 import tcod.console
 
-from .entity import Entity, RenderOrder
+from .entity import Entity
 from .message_log import MessageLog
 
 

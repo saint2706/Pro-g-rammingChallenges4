@@ -117,7 +117,9 @@ def test_convert_image_invalid_bytes(tmp_path: Path) -> None:
     bad_source = io.BytesIO(b"not an image")
     bad_source.name = "broken.png"
 
-    with pytest.raises(MODULE.ImageOpenError, match="Failed to open image 'broken.png'"):
+    with pytest.raises(
+        MODULE.ImageOpenError, match="Failed to open image 'broken.png'"
+    ):
         MODULE.convert_image(
             bad_source,
             target_format="png",

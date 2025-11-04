@@ -36,7 +36,7 @@ from __future__ import annotations
 import argparse
 import sys
 from dataclasses import dataclass
-from typing import Callable, Iterable, List, Optional
+from typing import Callable, Iterable, Optional
 
 import cv2
 import numpy as np

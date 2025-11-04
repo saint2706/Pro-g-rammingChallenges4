@@ -50,12 +50,15 @@ def _load_pyplot(headless: bool):
         import matplotlib
 
         if headless and "matplotlib.pyplot" not in sys.modules:
-            matplotlib.use("Agg")  # pragma: no cover - backend selection is env-specific
+            matplotlib.use(
+                "Agg"
+            )  # pragma: no cover - backend selection is env-specific
         return importlib.import_module("matplotlib.pyplot")
     except Exception as exc:  # pragma: no cover - propagated to user
         raise RuntimeError(
             "matplotlib is required for plotting. Install it or use --no-plot/--json."
         ) from exc
+
 
 # Optional dependency handling: we do not import librosa at module import time
 # for faster CLI help and to allow JSON-only operations that may not require it.

@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import json
 import unittest
-from typing import List
 
 import fizzbuzz as fb
 import fizzbuzz_visualizer as viz
@@ -90,7 +89,9 @@ class TestFizzBuzzVisualizer(unittest.TestCase):
         emitted_values = [entry.value for entry in entries if entry.emitted]
         self.assertEqual(emitted_values, [2, 3, 4, 6])
         emitted_outputs = [entry.output for entry in entries if entry.emitted]
-        self.assertEqual(emitted_outputs, list(fb.fizzbuzz_stream(6, rules, include_numbers=False)))
+        self.assertEqual(
+            emitted_outputs, list(fb.fizzbuzz_stream(6, rules, include_numbers=False))
+        )
 
         combined = entries[5]
         self.assertEqual(combined.value, 6)

@@ -19,7 +19,6 @@ Design Notes:
 
 from __future__ import annotations
 
-import tempfile
 import tkinter as tk
 from pathlib import Path
 from tkinter import colorchooser, filedialog, messagebox
@@ -61,9 +60,9 @@ class PaintApp:
         self.start_y: int | None = None
         self.last_x: int | None = None  # for freehand chaining
         self.last_y: int | None = None
-        self.current_stroke_ids: List[int] = (
-            []
-        )  # ids composing the active freehand stroke
+        self.current_stroke_ids: List[
+            int
+        ] = []  # ids composing the active freehand stroke
         self.history: List[List[int]] = []  # stack of shape/stroke id groups for undo
 
         # Build UI

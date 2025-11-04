@@ -67,7 +67,9 @@ def load_dmanager_module():
         / "Download Manager"
         / "dManager.py"
     )
-    spec = importlib.util.spec_from_file_location("download_manager_module", module_path)
+    spec = importlib.util.spec_from_file_location(
+        "download_manager_module", module_path
+    )
     module = importlib.util.module_from_spec(spec)
     assert spec.loader is not None
     sys.modules[spec.name] = module
@@ -88,7 +90,14 @@ class RecordingSession:
         self._responses = responses
         self.calls: List[dict[str, str]] = []
 
-    def get(self, url: str, headers: dict[str, str], stream: bool, timeout: float, verify: bool):  # noqa: D401 - signature matches requests
+    def get(
+        self,
+        url: str,
+        headers: dict[str, str],
+        stream: bool,
+        timeout: float,
+        verify: bool,
+    ):  # noqa: D401 - signature matches requests
         self.calls.append(headers.copy())
         if not self._responses:
             raise AssertionError("No more responses configured")

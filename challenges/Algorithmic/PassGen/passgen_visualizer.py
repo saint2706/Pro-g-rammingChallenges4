@@ -162,6 +162,7 @@ def ensure_matplotlib(headless: bool = False):
 
     try:
         import matplotlib
+
         if headless:
             matplotlib.use("Agg")
         from matplotlib import pyplot as plt  # type: ignore
@@ -234,7 +235,9 @@ def plot_entropy_gauge(ax, summary: Mapping[str, object]) -> None:
     )
 
 
-def render_plots(summary: Mapping[str, object], save_path: Optional[str], show: bool) -> None:
+def render_plots(
+    summary: Mapping[str, object], save_path: Optional[str], show: bool
+) -> None:
     """Render matplotlib visualisations based on the summary."""
 
     plt = ensure_matplotlib(headless=not show and save_path is not None)

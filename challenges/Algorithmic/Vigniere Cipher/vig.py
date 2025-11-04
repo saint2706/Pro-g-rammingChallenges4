@@ -27,7 +27,7 @@ import argparse
 import json
 import sys
 from dataclasses import dataclass
-from typing import Optional, TextIO
+from typing import Optional
 
 # ------------------------------ Core Logic ------------------------------ #
 

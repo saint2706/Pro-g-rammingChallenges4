@@ -192,7 +192,7 @@ class CPU:
                 self.V[index] = self.memory.read_byte(self.I + index)
             self.I = (self.I + x + 1) & 0xFFFF
         else:
-            raise NotImplementedError(f"Unknown FX opcode: 0xF{ x:X}{nn:02X}")
+            raise NotImplementedError(f"Unknown FX opcode: 0xF{x:X}{nn:02X}")
 
     def tick_timers(self) -> None:
         if self.delay_timer > 0:

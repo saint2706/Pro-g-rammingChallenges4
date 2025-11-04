@@ -84,7 +84,7 @@ def build_config(args: argparse.Namespace) -> MastermindConfig:
 
 def prompt_guess(palette: Sequence[str], peg_count: int) -> List[str]:
     colours_display = ", ".join(
-        f"{idx+1}:{colour}" for idx, colour in enumerate(palette)
+        f"{idx + 1}:{colour}" for idx, colour in enumerate(palette)
     )
     while True:
         raw = input(f"Enter your guess ({peg_count} colours) [{colours_display}]: ")

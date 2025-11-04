@@ -1,4 +1,5 @@
 """Encoding visualization utilities and CLI."""
+
 from __future__ import annotations
 
 import argparse
@@ -87,7 +88,9 @@ def _build_ascii_comparison(text: str, encoding: str) -> Dict[str, Any]:
         "hex_values": ascii_hex_values,
         "binary_values": ascii_binary_values,
         "differences": [],
-        "note": "Input already encoded as ASCII." if encoding.lower() == "ascii" else None,
+        "note": "Input already encoded as ASCII."
+        if encoding.lower() == "ascii"
+        else None,
     }
 
 
@@ -102,8 +105,12 @@ def _merge_differences(
     length = max(len(encoded_bytes), len(ascii_bytes))
     differences = []
     for index in range(length):
-        encoded_byte: Optional[int] = encoded_bytes[index] if index < len(encoded_bytes) else None
-        ascii_byte: Optional[int] = ascii_bytes[index] if index < len(ascii_bytes) else None
+        encoded_byte: Optional[int] = (
+            encoded_bytes[index] if index < len(encoded_bytes) else None
+        )
+        ascii_byte: Optional[int] = (
+            ascii_bytes[index] if index < len(ascii_bytes) else None
+        )
         delta: Optional[int]
         if encoded_byte is None or ascii_byte is None:
             delta = None
@@ -120,7 +127,9 @@ def _merge_differences(
     ascii_comparison["differences"] = differences
 
 
-def generate_visualization_data(text: str, encoding: str = "utf-8") -> VisualizationData:
+def generate_visualization_data(
+    text: str, encoding: str = "utf-8"
+) -> VisualizationData:
     """Create structured data for visualising text encodings."""
     hex_string = text_to_hex(text, encoding=encoding, separator=" ")
     bin_string = text_to_bin(text, encoding=encoding, separator=" ")
@@ -130,8 +139,14 @@ def generate_visualization_data(text: str, encoding: str = "utf-8") -> Visualiza
     byte_values = [int(value, 16) for value in hex_values]
     bit_matrix = _to_bit_matrix(binary_values)
 
-    roundtrip_hex = hex_to_text(hex_string, encoding=encoding, separator=" ") if hex_values else ""
-    roundtrip_bin = bin_to_text(bin_string, encoding=encoding, separator=" ") if binary_values else ""
+    roundtrip_hex = (
+        hex_to_text(hex_string, encoding=encoding, separator=" ") if hex_values else ""
+    )
+    roundtrip_bin = (
+        bin_to_text(bin_string, encoding=encoding, separator=" ")
+        if binary_values
+        else ""
+    )
 
     ascii_comparison = _build_ascii_comparison(text, encoding)
     _merge_differences(byte_values, ascii_comparison)
@@ -200,8 +215,16 @@ def create_visualizations(
         ascii_series = comparison_bytes + [0] * (length - len(comparison_bytes))
         offset_indices = [index + 0.4 for index in range(length)]
 
-        axes[2].bar(range(length), encoded_series, width=0.4, label=data.encoding, color="tab:purple")
-        axes[2].bar(offset_indices, ascii_series, width=0.4, label="ascii", color="tab:orange")
+        axes[2].bar(
+            range(length),
+            encoded_series,
+            width=0.4,
+            label=data.encoding,
+            color="tab:purple",
+        )
+        axes[2].bar(
+            offset_indices, ascii_series, width=0.4, label="ascii", color="tab:orange"
+        )
         axes[2].set_title("Byte comparison with ASCII")
         axes[2].set_xlabel("Byte index")
         axes[2].set_ylabel("Value")

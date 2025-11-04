@@ -30,7 +30,6 @@ import shutil
 import tempfile
 from dataclasses import dataclass
 from pathlib import Path
-import sys
 import tkinter as tk
 from tkinter import filedialog, messagebox
 from typing import Optional
@@ -247,7 +246,9 @@ class AutosaveTextEditor:
         subdir.mkdir(parents=True, exist_ok=True)
         timestamp = dt.datetime.now().strftime("%Y%m%d_%H%M%S")
         suffix = path.suffix
-        backup_name = f"{path.stem}_{timestamp}{suffix}" if suffix else f"{path.stem}_{timestamp}"
+        backup_name = (
+            f"{path.stem}_{timestamp}{suffix}" if suffix else f"{path.stem}_{timestamp}"
+        )
         backup_path = subdir / backup_name
         try:
             shutil.copy2(path, backup_path)

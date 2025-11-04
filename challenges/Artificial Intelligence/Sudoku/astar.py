@@ -45,8 +45,7 @@ class Sudoku:
                 self.board = board
                 return True
             candidates_info = [
-                (self._candidate_count(board, r, c), r, c)
-                for r, c in map(tuple, empty)
+                (self._candidate_count(board, r, c), r, c) for r, c in map(tuple, empty)
             ]
             candidates_info.sort()
             count, r, c = candidates_info[0]

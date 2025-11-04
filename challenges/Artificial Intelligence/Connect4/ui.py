@@ -68,7 +68,11 @@ class Connect4Game:
                     BLACK,
                     (
                         int(c * self.square_size + self.square_size / 2),
-                        int(r * self.square_size + self.square_size / 2 + self.square_size),
+                        int(
+                            r * self.square_size
+                            + self.square_size / 2
+                            + self.square_size
+                        ),
                     ),
                     self.radius,
                 )

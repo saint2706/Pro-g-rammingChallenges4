@@ -19,7 +19,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 import random
 import re
 import sys
@@ -102,11 +101,7 @@ class MarkovGenerator:
             return
         n_tokens = len(tokens)
         sentence_starts = [0]
-        sentence_starts.extend(
-            idx
-            for idx in range(1, n_tokens)
-            if boundaries[idx - 1]
-        )
+        sentence_starts.extend(idx for idx in range(1, n_tokens) if boundaries[idx - 1])
         for start_idx in sentence_starts:
             if start_idx >= n_tokens:
                 continue

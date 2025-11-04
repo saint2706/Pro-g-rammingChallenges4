@@ -36,7 +36,6 @@ from typing import List, Optional, Tuple
 import numpy as np
 
 try:  # Matplotlib is optional for JSON / data-only usage
-    import matplotlib.pyplot as plt  # type: ignore
 
     HAVE_MPL = True
 except Exception:  # pragma: no cover - fallback when matplotlib absent

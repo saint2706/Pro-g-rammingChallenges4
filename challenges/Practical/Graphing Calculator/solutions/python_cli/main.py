@@ -1,4 +1,5 @@
 """Command line graph plotter for mathematical expressions."""
+
 from __future__ import annotations
 
 import argparse
@@ -22,11 +23,20 @@ class PlotConfig:
     @classmethod
     def from_args(cls, argv: Iterable[str] | None = None) -> "PlotConfig":
         parser = argparse.ArgumentParser(description=__doc__)
-        parser.add_argument("expression", help="SymPy-compatible expression in terms of x")
-        parser.add_argument("--xmin", type=float, default=-10.0, help="Minimum x value (default: -10)")
-        parser.add_argument("--xmax", type=float, default=10.0, help="Maximum x value (default: 10)")
         parser.add_argument(
-            "--points", type=int, default=500, help="Number of sampling points across the range"
+            "expression", help="SymPy-compatible expression in terms of x"
+        )
+        parser.add_argument(
+            "--xmin", type=float, default=-10.0, help="Minimum x value (default: -10)"
+        )
+        parser.add_argument(
+            "--xmax", type=float, default=10.0, help="Maximum x value (default: 10)"
+        )
+        parser.add_argument(
+            "--points",
+            type=int,
+            default=500,
+            help="Number of sampling points across the range",
         )
         parser.add_argument(
             "--outfile",

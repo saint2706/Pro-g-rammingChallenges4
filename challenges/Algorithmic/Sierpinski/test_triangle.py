@@ -26,9 +26,7 @@ def test_json_output(capsys):
     assert rc == 0
     captured = capsys.readouterr()
     payload = json.loads(captured.out)
-    assert payload["non_space_chars"] == pytest.approx(
-        payload["density"] * (8 * 8)
-    )
+    assert payload["non_space_chars"] == pytest.approx(payload["density"] * (8 * 8))
 
 
 def test_custom_char():

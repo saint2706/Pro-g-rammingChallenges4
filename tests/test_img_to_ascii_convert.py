@@ -7,7 +7,9 @@ from pathlib import Path
 
 import pytest
 
-MODULE_PATH = Path(__file__).resolve().parents[1] / "challenges/Practical/ImgToASCII/convert.py"
+MODULE_PATH = (
+    Path(__file__).resolve().parents[1] / "challenges/Practical/ImgToASCII/convert.py"
+)
 MODULE_NAME = "img_to_ascii_convert"
 SPEC = importlib.util.spec_from_file_location(MODULE_NAME, MODULE_PATH)
 MODULE = importlib.util.module_from_spec(SPEC)

@@ -176,9 +176,9 @@ class SeamCarvingGUI:
                 self.gui_queue.put(("status", f"Removing {axis} seams {done}/{total}"))
 
             # self.original_image_path is ensured non-None earlier; narrow type for type-checkers
-            assert (
-                self.original_image_path is not None
-            ), "original_image_path unexpectedly None"
+            assert self.original_image_path is not None, (
+                "original_image_path unexpectedly None"
+            )
             carver = SeamCarver(
                 self.original_image_path, CarveConfig(progress=progress)
             )

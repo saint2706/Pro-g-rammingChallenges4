@@ -148,9 +148,7 @@ class ReLU(Layer):
         self.mask = x > 0
         return x * self.mask
 
-    def backward(
-        self, grad: Array, learning_rate: float
-    ) -> Array:  # noqa: ARG002 - interface requires parameter
+    def backward(self, grad: Array, learning_rate: float) -> Array:  # noqa: ARG002 - interface requires parameter
         assert self.mask is not None
         return grad * self.mask
 
@@ -172,9 +170,7 @@ class MaxPool2D(Layer):
         self._mask_windows = windows == pooled[..., None, None]
         return pooled
 
-    def backward(
-        self, grad: Array, learning_rate: float
-    ) -> Array:  # noqa: ARG002 - interface requires parameter
+    def backward(self, grad: Array, learning_rate: float) -> Array:  # noqa: ARG002 - interface requires parameter
         assert self._mask_windows is not None and self._input_shape is not None
         n, c, h, w = self._input_shape
         dx = np.zeros((n, c, h, w), dtype=grad.dtype)
@@ -194,9 +190,7 @@ class Flatten(Layer):
         self._shape = x.shape
         return x.reshape(x.shape[0], -1)
 
-    def backward(
-        self, grad: Array, learning_rate: float
-    ) -> Array:  # noqa: ARG002 - interface requires parameter
+    def backward(self, grad: Array, learning_rate: float) -> Array:  # noqa: ARG002 - interface requires parameter
         assert self._shape is not None
         return grad.reshape(self._shape)
 

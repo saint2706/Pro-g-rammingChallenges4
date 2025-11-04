@@ -31,7 +31,14 @@ from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from io import BytesIO
 from pathlib import Path
-from typing import Dict, Iterable, List, MutableMapping, Optional, Sequence, Tuple, Union
+from typing import (
+    Dict,
+    List,
+    MutableMapping,
+    Optional,
+    Sequence,
+    Union,
+)
 
 import matplotlib
 
@@ -147,8 +154,12 @@ def compute_metrics(summary: SummaryLike) -> Dict[str, object]:
             except (TypeError, ValueError):
                 bitrate_value = None
 
-        start = _parse_timestamp(item.get("started_at") if isinstance(item, dict) else None)  # type: ignore[arg-type]
-        end = _parse_timestamp(item.get("finished_at") if isinstance(item, dict) else None)  # type: ignore[arg-type]
+        start = _parse_timestamp(
+            item.get("started_at") if isinstance(item, dict) else None
+        )  # type: ignore[arg-type]
+        end = _parse_timestamp(
+            item.get("finished_at") if isinstance(item, dict) else None
+        )  # type: ignore[arg-type]
 
         if start is None:
             if current is None:
@@ -159,7 +170,11 @@ def compute_metrics(summary: SummaryLike) -> Dict[str, object]:
         if end is None:
             duration_seconds = item.get("duration") if isinstance(item, dict) else None  # type: ignore[arg-type]
             try:
-                seconds = float(duration_seconds) if duration_seconds is not None else default_increment.total_seconds()
+                seconds = (
+                    float(duration_seconds)
+                    if duration_seconds is not None
+                    else default_increment.total_seconds()
+                )
             except (TypeError, ValueError):
                 seconds = default_increment.total_seconds()
             end = start + timedelta(seconds=seconds)
@@ -340,12 +355,20 @@ def export_visualisation(
 
 def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Visualise ytmp3 batch results")
-    parser.add_argument("summary", help="Path to JSON output from cringe.batch_download")
-    parser.add_argument("--output-dir", default="visualiser_output", help="Directory to write reports to")
+    parser.add_argument(
+        "summary", help="Path to JSON output from cringe.batch_download"
+    )
+    parser.add_argument(
+        "--output-dir",
+        default="visualiser_output",
+        help="Directory to write reports to",
+    )
     parser.add_argument("--prefix", default="ytmp3", help="Prefix for output filenames")
     parser.add_argument("--no-png", action="store_true", help="Skip writing PNG files")
     parser.add_argument("--no-html", action="store_true", help="Skip writing HTML file")
-    parser.add_argument("--no-metrics", action="store_true", help="Skip writing metrics JSON")
+    parser.add_argument(
+        "--no-metrics", action="store_true", help="Skip writing metrics JSON"
+    )
     return parser
 
 
@@ -365,4 +388,3 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
 
 if __name__ == "__main__":  # pragma: no cover - CLI glue
     raise SystemExit(main())
-
