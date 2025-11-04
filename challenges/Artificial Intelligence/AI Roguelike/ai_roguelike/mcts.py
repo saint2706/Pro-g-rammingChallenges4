@@ -12,7 +12,13 @@ from .environment import Action, RoguelikeEnvironment
 
 @dataclass
 class ActionEvaluation:
-    """Aggregated statistics for an action explored by MCTS."""
+    """Aggregated statistics for an action explored by MCTS.
+
+    Attributes:
+        action: The action being evaluated.
+        visits: The number of times the action was visited during MCTS.
+        total_reward: The cumulative reward from all rollouts starting with this action.
+    """
 
     action: Action
     visits: int
@@ -20,10 +26,17 @@ class ActionEvaluation:
 
     @property
     def mean_reward(self) -> float:
+        """Calculates the mean reward for the action."""
         return self.total_reward / self.visits if self.visits else 0.0
 
 
 class _TreeNode:
+    """A node in the Monte Carlo search tree.
+
+    Each node represents a state in the game and stores statistics about
+    the actions taken from that state.
+    """
+
     __slots__ = (
         "env",
         "parent",
@@ -42,6 +55,13 @@ class _TreeNode:
         parent: Optional["_TreeNode"] = None,
         action: Optional[Action] = None,
     ) -> None:
+        """Initializes a new tree node.
+
+        Args:
+            env: The environment state corresponding to this node.
+            parent: The parent node in the tree.
+            action: The action that led to this node from the parent.
+        """
         self.env = env
         self.parent = parent
         self.action = action
@@ -52,9 +72,11 @@ class _TreeNode:
         self.terminal = env.is_terminal
 
     def is_fully_expanded(self) -> bool:
+        """Checks if the node has been fully expanded."""
         return not self.untried_actions
 
     def best_child(self, exploration_weight: float) -> "_TreeNode":
+        """Selects the best child node using the UCT formula."""
         if not self.children:
             raise RuntimeError("best_child called on a leaf node with no children")
         log_parent = math.log(self.visits) if self.visits > 0 else 0.0
@@ -63,6 +85,7 @@ class _TreeNode:
         for child in self.children:
             if child.visits == 0:
                 return child
+            # UCT formula: exploitation + exploration
             exploit = child.total_reward / child.visits
             explore = math.sqrt(log_parent / child.visits) if child.visits else 0.0
             score = exploit + exploration_weight * explore
@@ -72,6 +95,7 @@ class _TreeNode:
         return best
 
     def expand(self, rng: random.Random) -> "_TreeNode":
+        """Expands the node by creating a new child node."""
         if not self.untried_actions:
             raise RuntimeError("expand called on fully expanded node")
         index = (
@@ -87,6 +111,7 @@ class _TreeNode:
         return child
 
     def backpropagate(self, reward: float) -> None:
+        """Backpropagates the reward up the tree."""
         node: Optional[_TreeNode] = self
         while node is not None:
             node.visits += 1
@@ -105,6 +130,14 @@ class MCTSAgent:
         exploration_weight: float = 1.4,
         rng: Optional[random.Random] = None,
     ) -> None:
+        """Initializes the MCTS agent.
+
+        Args:
+            iterations: The number of MCTS iterations to run per turn.
+            rollout_depth: The depth of each random rollout.
+            exploration_weight: The exploration constant for the UCT formula.
+            rng: An optional random number generator.
+        """
         self.iterations = iterations
         self.rollout_depth = rollout_depth
         self.exploration_weight = exploration_weight
@@ -113,7 +146,15 @@ class MCTSAgent:
     def choose_action(
         self, env: RoguelikeEnvironment
     ) -> Tuple[Action, Sequence[ActionEvaluation]]:
-        """Return the next action and statistics about explored actions."""
+        """Return the next action and statistics about explored actions.
+
+        Args:
+            env: The current environment state.
+
+        Returns:
+            A tuple containing the best action and a sequence of
+            ActionEvaluation objects for all explored actions.
+        """
 
         if env.is_terminal:
             raise RuntimeError("Environment is terminal; no actions available")
@@ -135,6 +176,7 @@ class MCTSAgent:
         if not root.children:
             raise RuntimeError("Planner failed to explore any actions")
 
+        # Select the best action based on the number of visits.
         best_child = max(root.children, key=lambda child: child.visits)
         evaluations = tuple(
             ActionEvaluation(
@@ -150,6 +192,14 @@ class MCTSAgent:
     # Internal helpers
     # ------------------------------------------------------------------
     def _rollout(self, node: _TreeNode) -> float:
+        """Performs a random rollout from the given node.
+
+        Args:
+            node: The node to start the rollout from.
+
+        Returns:
+            The total reward from the rollout.
+        """
         if node.terminal:
             return 0.0
         rollout_env = node.env.clone()

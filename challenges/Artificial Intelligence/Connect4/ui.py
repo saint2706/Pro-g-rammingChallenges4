@@ -24,6 +24,12 @@ from c4 import (
 
 @dataclass
 class Connect4UIConfig:
+    """Configuration for the Connect 4 UI.
+
+    Attributes:
+        square_size: The size of each square in the grid.
+        window_caption: The caption for the game window.
+    """
     square_size: int = 100
     window_caption: str = "Connect 4 - AI Challenge"
 
@@ -32,6 +38,11 @@ class Connect4Game:
     """Handle rendering, input, and turn management for Connect 4."""
 
     def __init__(self, config: Connect4UIConfig | None = None):
+        """Initializes the Connect 4 game.
+
+        Args:
+            config: An optional configuration object for the UI.
+        """
         pygame.init()
         self.config = config or Connect4UIConfig()
         self.square_size = self.config.square_size
@@ -53,6 +64,7 @@ class Connect4Game:
 
         for c in range(COLUMN_COUNT):
             for r in range(ROW_COUNT):
+                # Draw the board squares
                 pygame.draw.rect(
                     self.screen,
                     BLUE,
@@ -63,6 +75,7 @@ class Connect4Game:
                         self.square_size,
                     ),
                 )
+                # Draw the empty slots
                 pygame.draw.circle(
                     self.screen,
                     BLACK,
@@ -73,6 +86,7 @@ class Connect4Game:
                     self.radius,
                 )
 
+        # Draw the pieces
         for c in range(COLUMN_COUNT):
             for r in range(ROW_COUNT):
                 piece = self.board.board[r][c]
@@ -94,7 +108,11 @@ class Connect4Game:
         pygame.display.update()
 
     def handle_player_move(self, posx: int) -> None:
-        """Handle the human player's move triggered by mouse input."""
+        """Handle the human player's move triggered by mouse input.
+
+        Args:
+            posx: The x-coordinate of the mouse click.
+        """
 
         col = posx // self.square_size
         if self.board.is_valid_location(col):
@@ -114,15 +132,22 @@ class Connect4Game:
                 self.switch_turn()
 
     def switch_turn(self) -> None:
+        """Switches the turn between the player and the AI."""
         self.turn = (self.turn + 1) % 2
 
     def end_game(self, message: str) -> None:
+        """Ends the game and displays a message.
+
+        Args:
+            message: The message to display at the end of the game.
+        """
         color = RED if "You" in message else YELLOW
         label = self.font.render(message, True, color)
         self.screen.blit(label, (40, 10))
         self.game_over = True
 
     def run(self) -> None:
+        """Runs the main game loop."""
         while not self.game_over:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -130,6 +155,7 @@ class Connect4Game:
                     sys.exit()
 
                 if event.type == pygame.MOUSEMOTION:
+                    # Draw the player's piece at the top of the screen
                     pygame.draw.rect(
                         self.screen, BLACK, (0, 0, self.width, self.square_size)
                     )
@@ -157,6 +183,7 @@ class Connect4Game:
 
 
 def main() -> None:
+    """The main entry point for the game."""
     game = Connect4Game()
     game.run()
 

@@ -18,18 +18,21 @@ ActivationCache = Tuple[np.ndarray, np.ndarray]
 
 
 def _relu(z: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+    """ReLU activation function and its derivative."""
     activated = np.maximum(0.0, z)
     derivative = (z > 0).astype(z.dtype)
     return activated, derivative
 
 
 def _tanh(z: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+    """Tanh activation function and its derivative."""
     activated = np.tanh(z)
     derivative = 1.0 - activated**2
     return activated, derivative
 
 
 def _sigmoid(z: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+    """Sigmoid activation function and its derivative."""
     activated = 1.0 / (1.0 + np.exp(-z))
     derivative = activated * (1.0 - activated)
     return activated, derivative
@@ -44,7 +47,15 @@ _ACTIVATIONS = {
 
 @dataclass
 class TrainingHistory:
-    """Container holding metrics captured during :meth:`MLP.fit`."""
+    """Container holding metrics captured during :meth:`MLP.fit`.
+
+    Attributes:
+        loss: A list of training loss values for each epoch.
+        accuracy: A list of training accuracy values for each epoch.
+        val_loss: A list of validation loss values for each epoch.
+        val_accuracy: A list of validation accuracy values for each epoch.
+        grad_norm: A list of gradient norms for each epoch.
+    """
 
     loss: List[float]
     accuracy: List[float]
@@ -56,20 +67,14 @@ class TrainingHistory:
 class MLP:
     """Configurable multilayer perceptron.
 
-    Parameters
-    ----------
-    layer_sizes:
-        Sequence describing the network structure including the input and
-        output dimensions.  Example: ``[784, 128, 64, 10]``.
-    hidden_activation:
-        Activation function for hidden layers (``relu``, ``tanh`` or
-        ``sigmoid``).
-    learning_rate:
-        Step size for gradient descent.
-    l2:
-        Optional L2 regularisation coefficient.
-    seed:
-        Optional random seed to make weight initialisation deterministic.
+    Args:
+        layer_sizes: Sequence describing the network structure including the
+            input and output dimensions. Example: ``[784, 128, 64, 10]``.
+        hidden_activation: Activation function for hidden layers (``relu``,
+            ``tanh`` or ``sigmoid``).
+        learning_rate: Step size for gradient descent.
+        l2: Optional L2 regularisation coefficient.
+        seed: Optional random seed to make weight initialisation deterministic.
     """
 
     def __init__(
@@ -101,14 +106,17 @@ class MLP:
     # Initialisation and serialization
     # ------------------------------------------------------------------
     def _initialise_parameters(self) -> None:
+        """Initializes the weights and biases of the network."""
         self.weights.clear()
         self.biases.clear()
         for fan_in, fan_out in zip(self.layer_sizes[:-1], self.layer_sizes[1:]):
+            # He initialization for ReLU
             limit = np.sqrt(6.0 / (fan_in + fan_out))
             self.weights.append(self.rng.uniform(-limit, limit, size=(fan_in, fan_out)))
             self.biases.append(np.zeros((1, fan_out)))
 
     def to_dict(self) -> Dict[str, np.ndarray]:
+        """Converts the model's parameters to a dictionary."""
         data: Dict[str, np.ndarray] = {
             "layer_sizes": np.array(self.layer_sizes, dtype=np.int64),
         }
@@ -118,6 +126,7 @@ class MLP:
         return data
 
     def save(self, path: str | "os.PathLike[str]") -> None:
+        """Saves the model's parameters to a compressed NumPy file."""
         np.savez_compressed(path, **self.to_dict())
 
     @classmethod
@@ -129,6 +138,7 @@ class MLP:
         learning_rate: float = 0.01,
         l2: float = 0.0,
     ) -> "MLP":
+        """Loads a model from a compressed NumPy file."""
         data = np.load(path, allow_pickle=False)
         layer_sizes = data["layer_sizes"].tolist()
         network = cls(
@@ -146,6 +156,15 @@ class MLP:
     # Core API
     # ------------------------------------------------------------------
     def forward(self, X: np.ndarray) -> Tuple[np.ndarray, List[ActivationCache]]:
+        """Performs the forward pass of the network.
+
+        Args:
+            X: The input data.
+
+        Returns:
+            A tuple containing the output probabilities and a list of
+            activation caches for backpropagation.
+        """
         activations: List[ActivationCache] = []
         a = X
         for idx, (w, b) in enumerate(zip(self.weights, self.biases)):
@@ -161,17 +180,21 @@ class MLP:
         return a, activations
 
     def predict_proba(self, X: np.ndarray) -> np.ndarray:
+        """Predicts class probabilities for the input data."""
         probs, _ = self.forward(X)
         return probs
 
     def predict(self, X: np.ndarray) -> np.ndarray:
+        """Predicts class labels for the input data."""
         return np.argmax(self.predict_proba(X), axis=1)
 
     def score(self, X: np.ndarray, y: np.ndarray) -> float:
+        """Calculates the mean accuracy on the given data and labels."""
         return float(np.mean(self.predict(X) == y))
 
     # ------------------------------------------------------------------
     def _one_hot(self, y: np.ndarray) -> np.ndarray:
+        """Converts a vector of labels to a one-hot encoded matrix."""
         n_classes = self.layer_sizes[-1]
         one_hot = np.zeros((y.shape[0], n_classes), dtype=np.float64)
         one_hot[np.arange(y.shape[0]), y.astype(int)] = 1.0
@@ -183,13 +206,16 @@ class MLP:
         y: np.ndarray,
         activations: List[ActivationCache],
     ) -> Tuple[List[np.ndarray], List[np.ndarray]]:
+        """Performs the backward pass and calculates gradients."""
         grads_w = [np.zeros_like(w) for w in self.weights]
         grads_b = [np.zeros_like(b) for b in self.biases]
 
+        # Calculate the initial delta at the output layer
         one_hot = self._one_hot(y)
         probs = activations[-1][0]
         delta = (probs - one_hot) / X.shape[0]
 
+        # Backpropagate the error
         for layer in reversed(range(len(self.weights))):
             a_prev = X if layer == 0 else activations[layer - 1][0]
             grads_w[layer] = a_prev.T @ delta + self.l2 * self.weights[layer]
@@ -205,14 +231,17 @@ class MLP:
         grads_w: Sequence[np.ndarray],
         grads_b: Sequence[np.ndarray],
     ) -> None:
+        """Updates the model's parameters using gradient descent."""
         for idx, (gw, gb) in enumerate(zip(grads_w, grads_b)):
             self.weights[idx] -= self.learning_rate * gw
             self.biases[idx] -= self.learning_rate * gb
 
     def _loss(self, probs: np.ndarray, y: np.ndarray) -> float:
+        """Calculates the cross-entropy loss."""
         one_hot = self._one_hot(y)
         eps = 1e-12
         loss = -np.sum(one_hot * np.log(probs + eps)) / y.shape[0]
+        # Add L2 regularization
         if self.l2:
             loss += (self.l2 / 2.0) * sum(np.sum(w**2) for w in self.weights)
         return float(loss)
@@ -228,6 +257,21 @@ class MLP:
         shuffle: bool = True,
         verbose: bool = False,
     ) -> TrainingHistory:
+        """Trains the model on the given data.
+
+        Args:
+            X: The training data.
+            y: The training labels.
+            epochs: The number of epochs to train for.
+            batch_size: The size of the mini-batches.
+            validation_data: Optional validation data to evaluate the model on
+                after each epoch.
+            shuffle: Whether to shuffle the data before each epoch.
+            verbose: Whether to print training progress.
+
+        Returns:
+            A TrainingHistory object containing the training metrics.
+        """
         if X.shape[0] != y.shape[0]:
             raise ValueError("X and y must contain the same number of samples")
         n_samples = X.shape[0]
@@ -244,6 +288,7 @@ class MLP:
             else:
                 indices = np.arange(n_samples)
 
+            # Mini-batch gradient descent
             for start in range(0, n_samples, batch_size):
                 end = start + batch_size
                 batch_idx = indices[start:end]
@@ -261,6 +306,7 @@ class MLP:
                 grad_norm_sum += grad_norm
                 batches += 1
 
+            # Calculate and store metrics for the epoch
             train_probs, _ = self.forward(X_source)
             train_loss = self._loss(train_probs, y_source)
             train_acc = float(np.mean(np.argmax(train_probs, axis=1) == y_source))
@@ -297,6 +343,15 @@ class MLP:
         return history
 
     def evaluate(self, X: np.ndarray, y: np.ndarray) -> Tuple[float, float]:
+        """Evaluates the model on the given data.
+
+        Args:
+            X: The input data.
+            y: The ground truth labels.
+
+        Returns:
+            A tuple containing the loss and accuracy.
+        """
         probs, _ = self.forward(X)
         loss = self._loss(probs, y)
         acc = float(np.mean(np.argmax(probs, axis=1) == y))

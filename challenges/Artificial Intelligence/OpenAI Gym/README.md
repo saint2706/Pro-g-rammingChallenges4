@@ -71,3 +71,17 @@ policy = module_globals["cartpole_balance_policy"]()
 ```
 
 The pytest suite exercises this controller to ensure the environment remains stable without committing large binary checkpoints to the repository.
+
+## Code Structure
+
+- **`train.py`**: This is the main script for training and evaluating reinforcement learning agents. It uses Stable Baselines3's DQN implementation and supports command-line arguments for configuring the training process.
+  - `make_env`: A factory function for creating Gymnasium environments with deterministic seeding.
+  - `set_global_seeds`: A utility function for setting random seeds for reproducibility.
+  - `build_parser`: A function that builds the command-line argument parser.
+  - `build_model`: A function that creates a DQN model with a specific architecture.
+  - `train`: The main training loop, which includes setting up callbacks for checkpointing and evaluation.
+  - `evaluate`: A function for evaluating a trained model.
+- **`policies.py`**: This module contains a simple, deterministic heuristic policy for the CartPole-v1 environment. This is used for quick regression tests without needing to train a full model.
+  - `StatelessPolicy`: A protocol defining the interface for simple policies.
+  - `CartPoleHeuristic`: A lightweight controller for CartPole-v1 that uses the pole's angle and angular velocity to decide which action to take.
+  - `cartpole_balance_policy`: A factory function that returns an instance of the `CartPoleHeuristic`.

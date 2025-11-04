@@ -88,3 +88,10 @@ Add `--limit` to run on a subset of the test set for quick sanity checks.
 3. Evaluate the saved weights with the evaluation script.
 
 Regression tests cover tensor shape correctness for the forward pass and confirm that a brief training session on a synthetic dataset reduces the loss, guarding against regressions in the manual backpropagation routines.
+
+## Code Structure
+
+- **`cnn.py`**: This is the core of the project, containing the implementation of the CNN and all its layers (Conv2D, ReLU, MaxPool2D, Flatten, Dense). It also includes the SoftmaxCrossEntropy loss function and the `im2col` and `col2im` utility functions.
+- **`data.py`**: This module provides the `load_mnist` function, which handles downloading, caching, and loading the MNIST dataset.
+- **`train.py`**: This script uses the components from `cnn.py` and `data.py` to train the CNN on the MNIST dataset. It includes argument parsing for hyperparameters, data preparation, the training loop, and model saving.
+- **`evaluate.py`**: This script evaluates a trained model on the MNIST test set. It loads the model weights and computes the test accuracy.

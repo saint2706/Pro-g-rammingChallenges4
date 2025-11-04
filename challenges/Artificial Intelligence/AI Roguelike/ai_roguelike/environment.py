@@ -29,9 +29,10 @@ from challenges.Games.Roguelike.main import new_game
 class Action:
     """High-level intent for the agent.
 
-    ``dx`` and ``dy`` map onto the player's attempted movement vector.
-    ``name`` is used purely for logging/visualisation and keeps CLI output
-    readable without additional lookups.
+    Attributes:
+        name: A human-readable name for the action (e.g., "north", "wait").
+        dx: The change in the x-coordinate.
+        dy: The change in the y-coordinate.
     """
 
     name: str
@@ -53,9 +54,19 @@ ALL_ACTIONS: Tuple[Action, ...] = (
 
 
 class RoguelikeEnvironment:
-    """Mutable game wrapper tailored for automated agents."""
+    """Mutable game wrapper tailored for automated agents.
+
+    This class provides a simplified interface to the underlying roguelike engine,
+    making it easier to implement and test AI agents.
+    """
 
     def __init__(self, engine, *, turn: int = 0) -> None:
+        """Initializes the environment.
+
+        Args:
+            engine: The underlying game engine.
+            turn: The starting turn number.
+        """
         self.engine = engine
         self.turn = turn
         self._terminal_cache: Optional[bool] = None
@@ -72,6 +83,13 @@ class RoguelikeEnvironment:
         ``challenges.Games.Roguelike`` relies on Python's global PRNG during dungeon
         generation.  For deterministic tests/experiments ``seed`` can be
         supplied to seed both :mod:`random` and :mod:`numpy.random`.
+
+        Args:
+            config: The game configuration.
+            seed: An optional random seed for reproducibility.
+
+        Returns:
+            A new RoguelikeEnvironment instance.
         """
 
         if seed is not None:
@@ -91,7 +109,19 @@ class RoguelikeEnvironment:
         max_monsters_per_room: int = 2,
         max_items_per_room: int = 1,
     ) -> "RoguelikeEnvironment":
-        """Return a compact dungeon suitable for automated smoke-tests."""
+        """Return a compact dungeon suitable for automated smoke-tests.
+
+        Args:
+            seed: An optional random seed for reproducibility.
+            map_width: The width of the map.
+            map_height: The height of the map.
+            max_rooms: The maximum number of rooms in the dungeon.
+            max_monsters_per_room: The maximum number of monsters per room.
+            max_items_per_room: The maximum number of items per room.
+
+        Returns:
+            A new RoguelikeEnvironment instance with a sample dungeon.
+        """
 
         config = GameConfig(
             map_width=map_width,
@@ -122,6 +152,7 @@ class RoguelikeEnvironment:
         player = self.engine.player
         game_map = self.engine.game_map
         for action in ALL_ACTIONS:
+            # The "wait" action is always available.
             if action.dx == 0 and action.dy == 0:
                 actions.append(action)
                 continue
@@ -153,8 +184,12 @@ class RoguelikeEnvironment:
     def step(self, action: Action) -> Tuple[float, bool]:
         """Apply ``action`` in-place.
 
-        Returns a reward signal derived from the heuristic evaluation change and
-        a boolean indicating whether the game reached a terminal state.
+        Args:
+            action: The action to apply.
+
+        Returns:
+            A tuple containing the reward and a boolean indicating whether
+            the game has reached a terminal state.
         """
 
         if self.is_terminal:
@@ -178,6 +213,10 @@ class RoguelikeEnvironment:
     # ------------------------------------------------------------------
     @property
     def is_terminal(self) -> bool:
+        """Checks if the environment is in a terminal state.
+
+        A state is terminal if the player is dead or all hostiles have been defeated.
+        """
         if self._terminal_cache is None:
             player_alive = getattr(self.engine.player, "is_alive", False)
             hostile_count, _ = self._hostile_stats()
@@ -191,6 +230,9 @@ class RoguelikeEnvironment:
         elimination of hostiles.  It is intentionally heuristic – the goal is
         to give the planner a smooth landscape to optimise over, not to be a
         perfect value function.
+
+        Returns:
+            The heuristic value of the current state.
         """
 
         player = self.engine.player
@@ -210,7 +252,11 @@ class RoguelikeEnvironment:
         )
 
     def summary(self) -> dict:
-        """Return lightweight telemetry for logging or dashboards."""
+        """Return lightweight telemetry for logging or dashboards.
+
+        Returns:
+            A dictionary containing summary information about the environment.
+        """
 
         hostile_count, hostile_hp = self._hostile_stats()
         player = self.engine.player
@@ -225,7 +271,14 @@ class RoguelikeEnvironment:
     # Rendering helpers
     # ------------------------------------------------------------------
     def to_ascii(self, *, reveal: bool = False) -> str:
-        """Render the dungeon as ASCII for logging/debugging."""
+        """Render the dungeon as ASCII for logging/debugging.
+
+        Args:
+            reveal: Whether to reveal the entire map, including unexplored areas.
+
+        Returns:
+            An ASCII representation of the dungeon.
+        """
 
         return render_ascii(self.engine, reveal=reveal)
 
@@ -233,9 +286,11 @@ class RoguelikeEnvironment:
     # Internal utilities
     # ------------------------------------------------------------------
     def _apply_action(self, action: Action) -> None:
+        """Applies the given action to the game engine."""
         self.engine.handle_player_movement(action.dx, action.dy)
 
     def _hostile_stats(self) -> Tuple[int, int]:
+        """Calculates the number and total HP of hostile entities."""
         count = 0
         total_hp = 0
         for entity in self.engine.game_map.entities:
@@ -252,20 +307,43 @@ class RoguelikeEnvironment:
 def create_environment(
     config: Optional[GameConfig] = None, *, seed: Optional[int] = None
 ) -> RoguelikeEnvironment:
-    """Factory helper mirroring :meth:`RoguelikeEnvironment.from_config`."""
+    """Factory helper mirroring :meth:`RoguelikeEnvironment.from_config`.
+
+    Args:
+        config: The game configuration.
+        seed: An optional random seed for reproducibility.
+
+    Returns:
+        A new RoguelikeEnvironment instance.
+    """
 
     config = config or GameConfig()
     return RoguelikeEnvironment.from_config(config, seed=seed)
 
 
 def create_sample_environment(*, seed: Optional[int] = None) -> RoguelikeEnvironment:
-    """Return a deterministic small dungeon used by the CLI and tests."""
+    """Return a deterministic small dungeon used by the CLI and tests.
+
+    Args:
+        seed: An optional random seed for reproducibility.
+
+    Returns:
+        A new RoguelikeEnvironment instance with a sample dungeon.
+    """
 
     return RoguelikeEnvironment.sample(seed=seed)
 
 
 def render_ascii(engine, *, reveal: bool = False) -> str:
-    """Return a text-mode representation of ``engine``'s dungeon state."""
+    """Return a text-mode representation of ``engine``'s dungeon state.
+
+    Args:
+        engine: The game engine.
+        reveal: Whether to reveal the entire map, including unexplored areas.
+
+    Returns:
+        An ASCII representation of the dungeon.
+    """
 
     game_map = engine.game_map
     width, height = game_map.tiles.shape

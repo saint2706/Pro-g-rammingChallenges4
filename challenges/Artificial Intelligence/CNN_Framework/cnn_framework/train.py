@@ -17,7 +17,20 @@ from .utils import evaluate, get_device, save_checkpoint
 
 @dataclass
 class TrainConfig:
-    """Configuration for training the MNIST CNN."""
+    """Configuration for training the MNIST CNN.
+
+    Attributes:
+        data_dir: Directory for storing the MNIST dataset.
+        batch_size: Number of samples per batch.
+        epochs: Number of training epochs.
+        learning_rate: Optimizer learning rate.
+        num_workers: Number of worker processes for data loading.
+        checkpoint_path: Path for saving the trained model.
+        prefer_gpu: Whether to prefer GPU for training.
+        train_limit: Optional limit on the number of training samples.
+        eval_limit: Optional limit on the number of evaluation samples.
+        max_steps_per_epoch: Optional limit on the number of steps per epoch.
+    """
 
     data_dir: Path
     batch_size: int = 64
@@ -32,9 +45,17 @@ class TrainConfig:
 
 
 def train_model(config: TrainConfig) -> Dict[str, float]:
-    """Train the MNIST CNN according to ``config`` and return evaluation metrics."""
+    """Train the MNIST CNN according to ``config`` and return evaluation metrics.
+
+    Args:
+        config: The training configuration.
+
+    Returns:
+        A dictionary containing the final evaluation metrics.
+    """
 
     device = get_device(prefer_gpu=config.prefer_gpu)
+    # Create data loaders
     train_loader, eval_loader = create_data_loaders(
         data_dir=config.data_dir,
         batch_size=config.batch_size,
@@ -43,10 +64,12 @@ def train_model(config: TrainConfig) -> Dict[str, float]:
         eval_limit=config.eval_limit,
     )
 
+    # Initialize model, optimizer, and loss function
     model = MNISTConvNet().to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=config.learning_rate)
     loss_fn: nn.Module = nn.CrossEntropyLoss()
 
+    # Evaluate the model before training
     initial_metrics = evaluate(model, eval_loader, device=device, loss_fn=loss_fn)
     if config.epochs <= 0:
         print(
@@ -60,6 +83,7 @@ def train_model(config: TrainConfig) -> Dict[str, float]:
         )
         return initial_metrics
 
+    # Training loop
     metrics: Dict[str, float] = initial_metrics
     for epoch in range(1, config.epochs + 1):
         model.train()
@@ -69,6 +93,7 @@ def train_model(config: TrainConfig) -> Dict[str, float]:
             inputs = inputs.to(device)
             targets = targets.to(device)
 
+            # Forward and backward passes
             optimizer.zero_grad()
             outputs = model(inputs)
             loss = loss_fn(outputs, targets)
@@ -83,12 +108,14 @@ def train_model(config: TrainConfig) -> Dict[str, float]:
             ):
                 break
 
+        # Evaluate the model after each epoch
         metrics = evaluate(model, eval_loader, device=device, loss_fn=loss_fn)
         print(
             f"Epoch {epoch}/{config.epochs}: train_loss={running_loss / max(step, 1):.4f} "
             f"eval_loss={metrics['loss']:.4f} eval_acc={metrics['accuracy']:.4f}"
         )
 
+    # Save the final model checkpoint
     save_checkpoint(
         model,
         config.checkpoint_path,
@@ -99,6 +126,7 @@ def train_model(config: TrainConfig) -> Dict[str, float]:
 
 
 def _parse_args(argv: Optional[list[str]] = None) -> TrainConfig:
+    """Parses command-line arguments for the training script."""
     parser = argparse.ArgumentParser(
         description="Train a convolutional network on MNIST."
     )
@@ -152,6 +180,14 @@ def _parse_args(argv: Optional[list[str]] = None) -> TrainConfig:
 
 
 def main(argv: Optional[list[str]] = None) -> Dict[str, float]:
+    """Main entry point for the training script.
+
+    Args:
+        argv: Optional list of command-line arguments.
+
+    Returns:
+        A dictionary containing the final evaluation metrics.
+    """
     config = _parse_args(argv)
     metrics = train_model(config)
     print("Final evaluation:", metrics)

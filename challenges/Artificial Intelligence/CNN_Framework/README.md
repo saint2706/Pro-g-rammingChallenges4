@@ -77,3 +77,12 @@ CNN_Framework/
 
 The top-level `train.py` and `evaluate.py` wrappers proxy to the package entry points so that IDEs and command lines can run
 the scripts from the project root without manual `PYTHONPATH` juggling.
+
+## Code Structure
+
+- **`cnn_framework/data.py`**: This module contains the `create_data_loaders` function, which handles downloading, transforming, and loading the MNIST dataset.
+- **`cnn_framework/model.py`**: This module defines the `MNISTConvNet` class, which is a simple convolutional neural network tailored for the MNIST dataset.
+- **`cnn_framework/train.py`**: This module contains the training loop, command-line argument parsing, and the main entry point for training the model.
+- **`cnn_framework/evaluate.py`**: This module contains the evaluation logic, command-line argument parsing, and the main entry point for evaluating a trained model.
+- **`cnn_framework/utils.py`**: This module provides utility functions for device selection, accuracy calculation, and model checkpointing.
+- **`train.py` and `evaluate.py`**: These top-level scripts are thin wrappers that allow running the training and evaluation scripts from the project root without modifying the `PYTHONPATH`.

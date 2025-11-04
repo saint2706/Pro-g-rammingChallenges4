@@ -23,6 +23,7 @@ Array = np.ndarray
 
 
 def parse_args() -> argparse.Namespace:
+    """Parses command-line arguments for the evaluation script."""
     parser = argparse.ArgumentParser(description="Evaluate a saved NumPy CNN on MNIST.")
     parser.add_argument(
         "--model", type=str, required=True, help="Path to the saved weights (.npz)"
@@ -43,14 +44,18 @@ def parse_args() -> argparse.Namespace:
 
 
 def main() -> None:
+    """Main entry point for the evaluation script."""
     args = parse_args()
+    # Load the test data
     _, _, x_test, y_test = load_mnist(args.data_dir)
     if args.limit is not None:
         x_test = x_test[: args.limit]
         y_test = y_test[: args.limit]
 
+    # Initialize the model and load the trained weights
     model = SimpleCNN()
     model.load(args.model)
+    # Evaluate the model on the test set
     accuracy = model.accuracy(x_test, y_test)
     print(f"Test accuracy: {accuracy:.4f}")
 
