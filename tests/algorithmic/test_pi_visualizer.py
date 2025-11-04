@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import decimal
 import importlib.util
 import json
 import logging
@@ -72,6 +73,22 @@ def test_visualizer_summary_and_export(tmp_path: Path):
     assert payload["algorithm"] == "chudnovsky"
     assert payload["steps"]
     assert payload["steps"][0]["iteration"] == 0
+
+
+def test_compute_pi_restores_context_precision():
+    module = _load_module(
+        "digitpi_module_context", ROOT / "challenges/Algorithmic/Digits of Pi/DigitPi.py"
+    )
+
+    context = decimal.getcontext()
+    original_precision = context.prec
+    context.prec = original_precision + 5
+
+    try:
+        module.compute_pi(1)
+        assert context.prec == original_precision + 5
+    finally:
+        context.prec = original_precision
 
 
 @pytest.mark.parametrize(

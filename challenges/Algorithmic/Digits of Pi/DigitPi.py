@@ -223,9 +223,14 @@ def compute_pi(
     else:
         final_precision = estimated_digits
 
-    # Apply final precision
-    decimal.getcontext().prec = final_precision
-    final_pi = +pi_result  # The + operator applies current context precision
+    # Apply final precision while preserving the caller's context precision
+    context = decimal.getcontext()
+    previous_precision = context.prec
+    context.prec = final_precision
+    try:
+        final_pi = +pi_result  # The + operator applies current context precision
+    finally:
+        context.prec = previous_precision
 
     logger.info(f"Pi computed to {final_precision} decimal places")
     return final_pi
