@@ -141,7 +141,7 @@ def resolve_input(cfg: CLIConfig) -> str:
         try:
             with open(cfg.file, "r", encoding="utf-8") as f:
                 return f.read()
-        except OSError as e:
+        except (OSError, UnicodeDecodeError) as e:
             raise ValueError(f"File read error: {e}")
     if cfg.stdin:
         return sys.stdin.read()
