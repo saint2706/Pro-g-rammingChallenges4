@@ -17,7 +17,7 @@ import sys
 import tkinter as tk
 from pathlib import Path
 from tkinter import filedialog, messagebox
-from typing import Dict, Optional
+from typing import Dict
 
 try:
     from pdftag import (
@@ -231,7 +231,7 @@ class PdfTaggerGUI:
                 messagebox.showwarning("JSON", f"Could not write JSON summary:\n{e}")
         if not summary.get("success"):
             messagebox.showerror(
-                "Error", f"Update failed:\n{summary.get('error','Unknown error')}"
+                "Error", f"Update failed:\n{summary.get('error', 'Unknown error')}"
             )
             self._set_status("Update failed")
             return

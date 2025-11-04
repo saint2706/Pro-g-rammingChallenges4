@@ -530,9 +530,7 @@ Animation Speeds:
 
 Note: This visualization requires 'dijkstra.py' in the same directory.
       Example graph has nodes: {nodes}
-        """.format(
-            nodes=", ".join(sorted(example_graph.keys()))
-        ),
+        """.format(nodes=", ".join(sorted(example_graph.keys()))),
     )
 
     # Core visualization arguments

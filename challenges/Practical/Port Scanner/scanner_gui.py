@@ -30,7 +30,7 @@ try:
         resolve_services,
         COMMON_PORTS_RANKED,
     )
-except ImportError as e:  # pragma: no cover
+except ImportError:  # pragma: no cover
     print("Error: 'scanner.py' (modernized) not found.", file=sys.stderr)
     sys.exit(1)
 

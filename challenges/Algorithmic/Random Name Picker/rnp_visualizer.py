@@ -132,9 +132,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="Visualize random name picker probabilities and simulations",
     )
-    parser.add_argument(
-        "-f", "--file", default="names.txt", help="Path to names file"
-    )
+    parser.add_argument("-f", "--file", default="names.txt", help="Path to names file")
     parser.add_argument(
         "-c",
         "--count",

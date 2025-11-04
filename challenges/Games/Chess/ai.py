@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Callable, Dict, List, Optional, Tuple
+from typing import Callable, Dict, Optional, Tuple
 
-from .board import BLACK, WHITE, Board
+from .board import WHITE, Board
 from .move import Move
 
 

@@ -283,8 +283,7 @@ def create_dummy_mbr_file(filepath: str, *, overwrite: bool = False) -> None:
 
     mbr[PARTITION_TABLE_OFFSET : PARTITION_TABLE_OFFSET + PARTITION_ENTRY_SIZE] = part1
     mbr[
-        PARTITION_TABLE_OFFSET
-        + PARTITION_ENTRY_SIZE : PARTITION_TABLE_OFFSET
+        PARTITION_TABLE_OFFSET + PARTITION_ENTRY_SIZE : PARTITION_TABLE_OFFSET
         + 2 * PARTITION_ENTRY_SIZE
     ] = part2
     mbr[MBR_SIGNATURE_OFFSET : MBR_SIGNATURE_OFFSET + 2] = struct.pack(

@@ -39,7 +39,7 @@ import time
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
-from typing import Iterator, Optional, Union
+from typing import Iterator, Optional
 
 
 class OutputFormat(Enum):
@@ -380,9 +380,9 @@ def save_pi_to_file(
     """
     try:
         with open(file_path, "w", encoding="utf-8") as f:
-            f.write(f"Pi Computation Results\n")
-            f.write(f"=====================\n\n")
-            f.write(f"Algorithm: Chudnovsky Algorithm\n")
+            f.write("Pi Computation Results\n")
+            f.write("=====================\n\n")
+            f.write("Algorithm: Chudnovsky Algorithm\n")
             f.write(f"Iterations: {config.iterations}\n")
             f.write(
                 f"Estimated Precision: {estimate_precision(config.iterations)} digits\n"
@@ -400,7 +400,7 @@ def save_pi_to_file(
             else:
                 f.write(" (WARNING: May contain errors)\n\n")
 
-            f.write(f"Pi Value:\n")
+            f.write("Pi Value:\n")
             formatted_pi = format_pi_output(
                 pi_value, config.output_format, config.precision
             )
@@ -559,7 +559,7 @@ def main() -> None:
         print("\n" + "=" * 70)
         print("Pi Computation Results")
         print("=" * 70)
-        print(f"Algorithm: Chudnovsky Algorithm")
+        print("Algorithm: Chudnovsky Algorithm")
         print(f"Iterations: {args.iterations}")
         print(f"Computation Time: {computation_time:.3f} seconds")
         print(f"Estimated Precision: {estimate_precision(args.iterations)} digits")

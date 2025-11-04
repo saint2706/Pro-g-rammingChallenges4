@@ -1,4 +1,5 @@
 """Tests for the Markov Chain Sentence Generator practical challenge."""
+
 from __future__ import annotations
 
 import importlib.util

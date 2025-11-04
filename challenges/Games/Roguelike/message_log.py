@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections import deque
 from dataclasses import dataclass
-from typing import Deque, Iterable, List, Tuple
+from typing import Deque, List, Tuple
 
 Colour = Tuple[int, int, int]
 

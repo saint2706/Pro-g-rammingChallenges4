@@ -1,12 +1,9 @@
-import os
-from pathlib import Path
 from steg import (
     create_dummy_image,
     hide_message_in_image,
     extract_message_from_image,
     open_image,
     main as steg_main,
-    image_capacity_chars,
 )
 
 

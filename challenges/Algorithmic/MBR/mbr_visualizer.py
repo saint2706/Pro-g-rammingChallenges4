@@ -64,7 +64,9 @@ class SegmentDescriptor:
         }
 
 
-def _normalise_segments(partitions: Iterable[mbr.PartitionEntry]) -> List[SegmentDescriptor]:
+def _normalise_segments(
+    partitions: Iterable[mbr.PartitionEntry],
+) -> List[SegmentDescriptor]:
     """Convert partition entries into gap/partition descriptors.
 
     The returned descriptors are sorted by their ``start_lba`` and each entry
@@ -147,9 +149,7 @@ def _normalise_segments(partitions: Iterable[mbr.PartitionEntry]) -> List[Segmen
     return segments
 
 
-def describe_mbr(
-    raw: bytes, *, sector_bytes: int = mbr.SECTOR_BYTES_DEFAULT
-) -> dict:
+def describe_mbr(raw: bytes, *, sector_bytes: int = mbr.SECTOR_BYTES_DEFAULT) -> dict:
     """Parse raw MBR bytes and return serialisable layout metadata."""
 
     result = mbr.parse_mbr(raw, sector_bytes=sector_bytes)
@@ -366,4 +366,3 @@ __all__ = ["SegmentDescriptor", "describe_mbr", "visualise_mbr"]
 
 if __name__ == "__main__":  # pragma: no cover - CLI passthrough
     raise SystemExit(_main())
-

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Synchronize requirements.txt with pyproject optional dependencies."""
+
 from __future__ import annotations
 
 import argparse

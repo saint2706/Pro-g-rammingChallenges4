@@ -40,7 +40,6 @@ Performance notes:
 from __future__ import annotations
 
 import argparse
-import sys
 import time
 from dataclasses import dataclass
 from pathlib import Path
@@ -63,6 +62,7 @@ import pygame
 # -----------------------------
 # Pattern Library
 # -----------------------------
+
 
 def _parse_pattern(art: str) -> np.ndarray:
     lines = [line for line in dedent(art).splitlines() if line.strip()]
@@ -95,7 +95,6 @@ PATTERNS: Dict[str, np.ndarray] = {
         """
     ),
 }
-
 
 
 # -----------------------------

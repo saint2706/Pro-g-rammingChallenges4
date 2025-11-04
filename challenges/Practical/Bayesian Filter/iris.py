@@ -95,7 +95,6 @@ def load_dataset(cfg: Config) -> Tuple[pd.DataFrame, pd.Series, List[str]]:
         if cfg.verbose:
             print("Loading built-in Iris dataset ...")
         # Use mapping access to avoid static analyzer confusion over Bunch attribute types
-    from typing import Any as _Any  # local import to limit scope
 
     iris_bunch = load_iris()  # dataset Bunch
     bunch_any = iris_bunch  # type: _Any

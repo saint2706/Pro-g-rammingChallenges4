@@ -23,17 +23,15 @@ Date: 2025
 Version: 2.0
 """
 
-import collections
 import json
 import logging
 import math
-import string
 import sys
 import unicodedata
 from collections import Counter
 from dataclasses import dataclass, asdict
 from enum import Enum
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Optional, Tuple
 
 
 class CharacterCategory(Enum):
@@ -644,7 +642,7 @@ def _run_interactive_mode() -> None:
                 elif choice == "4":
                     categories = analyze_character_categories(text)
                     total = len(text)
-                    print(f"\n=== CHARACTER CATEGORIES ===")
+                    print("\n=== CHARACTER CATEGORIES ===")
                     print(f"Total characters: {total:,}")
                     for category, count in categories.items():
                         percentage = (count / total) * 100

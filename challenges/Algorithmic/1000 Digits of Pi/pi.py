@@ -268,7 +268,7 @@ def format_pi_output(pi_string: str, format_type: str = "formatted") -> str:
     elif format_type == "scientific":
         # Convert to scientific notation for very long numbers
         if len(pi_string) > 50:
-            return f"{pi_string[:20]}...e+0 ({len(pi_string)-2} decimal places)"
+            return f"{pi_string[:20]}...e+0 ({len(pi_string) - 2} decimal places)"
         return pi_string
     else:  # formatted
         # Break into readable chunks for better readability
@@ -383,10 +383,10 @@ def main() -> None:
             calculation_time = time.perf_counter() - start_time
 
             # Display results
-            print(f"\n{'='*60}")
+            print(f"\n{'=' * 60}")
             print(f"Pi calculated to {num_digits:,} decimal places:")
             print(f"Calculation time: {calculation_time:.3f} seconds")
-            print(f"{'='*60}")
+            print(f"{'=' * 60}")
 
             formatted_output = format_pi_output(pi_result, args.format)
             print(f"\n{formatted_output}")

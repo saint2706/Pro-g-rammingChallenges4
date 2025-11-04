@@ -31,7 +31,9 @@ def load_mnist(
         Optional directory where the dataset is cached.
     """
 
-    cache_dir = Path(data_home).expanduser() if data_home is not None else DEFAULT_DATA_HOME
+    cache_dir = (
+        Path(data_home).expanduser() if data_home is not None else DEFAULT_DATA_HOME
+    )
     cache_dir.mkdir(parents=True, exist_ok=True)
 
     mnist = fetch_openml(

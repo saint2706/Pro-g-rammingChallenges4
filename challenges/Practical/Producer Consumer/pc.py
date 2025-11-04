@@ -44,7 +44,9 @@ class Config:
 class Stats:
     produced: int = 0
     consumed: int = 0
-    _lock: threading.Lock = field(default_factory=threading.Lock, init=False, repr=False)
+    _lock: threading.Lock = field(
+        default_factory=threading.Lock, init=False, repr=False
+    )
 
     def increment_produced(self) -> None:
         with self._lock:

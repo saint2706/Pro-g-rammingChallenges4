@@ -21,7 +21,9 @@ import affine  # type: ignore  # noqa: E402
 
 
 @pytest.mark.parametrize("bad_b", [-1, 26, 99])
-def test_cli_rejects_out_of_range_key_b(bad_b: int, capsys: pytest.CaptureFixture[str]) -> None:
+def test_cli_rejects_out_of_range_key_b(
+    bad_b: int, capsys: pytest.CaptureFixture[str]
+) -> None:
     exit_code = affine.main(
         [
             "--mode",

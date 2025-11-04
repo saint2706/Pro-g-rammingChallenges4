@@ -277,9 +277,9 @@ def main(argv: List[str] | None = None) -> int:
     print("Dominant Colors (RGB):")
     for i, color in enumerate(colors):
         if cfg.hex_output:
-            print(f" {i+1:>2}. {tuple(int(c) for c in color)}  {rgb_to_hex(color)}")
+            print(f" {i + 1:>2}. {tuple(int(c) for c in color)}  {rgb_to_hex(color)}")
         else:
-            print(f" {i+1:>2}. {tuple(int(c) for c in color)}")
+            print(f" {i + 1:>2}. {tuple(int(c) for c in color)}")
 
     if cfg.json_output:
         print("\nJSON Summary:")

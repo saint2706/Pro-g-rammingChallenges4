@@ -23,7 +23,7 @@ import argparse
 import json
 import sys
 from dataclasses import dataclass, asdict
-from typing import Iterable, List, Optional, Sequence
+from typing import List, Optional, Sequence
 
 import pandas as pd
 import plotly.graph_objects as go

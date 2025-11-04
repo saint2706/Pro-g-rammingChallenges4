@@ -9,7 +9,6 @@ Features:
 - Optimized for readability and maintainability
 """
 
-import os
 import random
 import sys
 import time
@@ -83,9 +82,7 @@ class SimonGame:
 
         # Load images and scale as needed
         def load_scaled(name: str, size: Tuple[int, int]) -> pygame.Surface:
-            return pygame.transform.scale(
-                pygame.image.load(str(img_path / name)), size
-            )
+            return pygame.transform.scale(pygame.image.load(str(img_path / name)), size)
 
         self.images: Dict[str, pygame.Surface] = {
             "logo": pygame.transform.scale(icon_img, (300, 300)),

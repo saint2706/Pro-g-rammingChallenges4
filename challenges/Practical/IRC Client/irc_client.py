@@ -262,9 +262,7 @@ class IRCClient:
             finally:
                 thread_safe_put(_STDIN_STOP)
 
-        thread = threading.Thread(
-            target=pump_stdin, name="irc-stdin-pump", daemon=True
-        )
+        thread = threading.Thread(target=pump_stdin, name="irc-stdin-pump", daemon=True)
         thread.start()
 
         try:

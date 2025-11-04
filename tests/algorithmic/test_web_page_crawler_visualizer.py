@@ -75,7 +75,9 @@ def test_metadata_consistency_from_crawler(tmp_path):
 
 def test_edges_only_requires_root():
     edges = [["https://example.com", "https://example.com/blog"]]
-    graph, metadata = module.build_graph_from_source(edges, root_url="https://example.com")
+    graph, metadata = module.build_graph_from_source(
+        edges, root_url="https://example.com"
+    )
     assert metadata.root == "https://example.com"
     assert graph.number_of_edges() == 1
 

@@ -20,13 +20,12 @@ from __future__ import annotations
 import argparse
 import json
 import math
-import os
 import random
 import sys
 import time
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Iterable, List, Sequence, Tuple
+from typing import List, Sequence, Tuple
 
 import matplotlib.pyplot as plt
 import numpy as np

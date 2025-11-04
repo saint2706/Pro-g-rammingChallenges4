@@ -36,7 +36,10 @@ except ImportError:  # pragma: no cover
     colour = None  # type: ignore
 
 try:  # pragma: no cover - plotting helpers only available with colour-science
-    from colour.plotting import colour_style as _colour_style, plot_image as _colour_plot_image  # type: ignore
+    from colour.plotting import (
+        colour_style as _colour_style,
+        plot_image as _colour_plot_image,
+    )  # type: ignore
 except ImportError:  # pragma: no cover
     _colour_style = None
     _colour_plot_image = None

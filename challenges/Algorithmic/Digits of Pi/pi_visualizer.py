@@ -22,6 +22,7 @@ except ModuleNotFoundError:  # pragma: no cover - exercised in CI without Plotly
 SCRIPT_DIR = Path(__file__).resolve().parent
 PARENT_DIR = SCRIPT_DIR.parent
 
+
 def _ensure_sys_path(path: Path) -> None:
     if str(path) not in sys.path:
         sys.path.insert(0, str(path))
@@ -44,9 +45,7 @@ if spec is None or spec.loader is None:
 _pi_gauss_module = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(_pi_gauss_module)
 
-REFERENCE_PI = decimal.Decimal(
-    "3.14159265358979323846264338327950288419716939937510"
-)
+REFERENCE_PI = decimal.Decimal("3.14159265358979323846264338327950288419716939937510")
 
 
 @dataclass
@@ -231,12 +230,18 @@ def build_figure(data: Iterable[ConvergenceDatum], *, title: str):
                         {
                             "label": "Play",
                             "method": "animate",
-                            "args": [None, {"frame": {"duration": 400, "redraw": False}}],
+                            "args": [
+                                None,
+                                {"frame": {"duration": 400, "redraw": False}},
+                            ],
                         },
                         {
                             "label": "Pause",
                             "method": "animate",
-                            "args": [[None], {"frame": {"duration": 0}, "mode": "immediate"}],
+                            "args": [
+                                [None],
+                                {"frame": {"duration": 0}, "mode": "immediate"},
+                            ],
                         },
                     ],
                 }
@@ -245,7 +250,10 @@ def build_figure(data: Iterable[ConvergenceDatum], *, title: str):
                 {
                     "steps": [
                         {
-                            "args": [[frame.name], {"mode": "immediate", "frame": {"duration": 0}}],
+                            "args": [
+                                [frame.name],
+                                {"mode": "immediate", "frame": {"duration": 0}},
+                            ],
                             "label": frame.name,
                             "method": "animate",
                         }
@@ -328,15 +336,11 @@ def main(argv: Optional[Iterable[str]] = None) -> int:
     args = parse_arguments(argv)
 
     if args.algorithm == "chudnovsky":
-        convergence = get_convergence_data(
-            args.algorithm, iterations=args.iterations
-        )
+        convergence = get_convergence_data(args.algorithm, iterations=args.iterations)
         final_value = str(DigitPi.compute_pi(args.iterations))
         title = f"Chudnovsky convergence ({args.iterations} iterations)"
     else:
-        convergence = get_convergence_data(
-            args.algorithm, digits=args.digits
-        )
+        convergence = get_convergence_data(args.algorithm, digits=args.digits)
         final_value = _pi_gauss_module.calculate_pi_gauss_legendre(args.digits)
         title = f"Gauss-Legendre convergence ({args.digits} digits)"
 

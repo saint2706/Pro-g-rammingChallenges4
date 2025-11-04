@@ -81,10 +81,23 @@ def plot_regression(
     span = x_max - x_min if x_max > x_min else 1.0
     line_x = np.array([x_min - 0.05 * span, x_max + 0.05 * span])
     line_y = m * line_x + b
-    plt.plot(line_x, line_y, color="tab:red", linewidth=2, label=f"Regression Line y={m:.2f}x+{b:.2f}")  # type: ignore[attr-defined]
+    plt.plot(
+        line_x,
+        line_y,
+        color="tab:red",
+        linewidth=2,
+        label=f"Regression Line y={m:.2f}x+{b:.2f}",
+    )  # type: ignore[attr-defined]
     for i in range(x.size):
         label = "Error (Residuals)" if i == 0 else ""
-        plt.plot([x[i], x[i]], [y[i], m * x[i] + b], color="green", linestyle="--", linewidth=1, label=label)  # type: ignore[attr-defined]
+        plt.plot(
+            [x[i], x[i]],
+            [y[i], m * x[i] + b],
+            color="green",
+            linestyle="--",
+            linewidth=1,
+            label=label,
+        )  # type: ignore[attr-defined]
     plt.title("Least Squares Linear Regression", fontsize=15)  # type: ignore[attr-defined]
     plt.xlabel("X Values")  # type: ignore[attr-defined]
     plt.ylabel("Y Values")  # type: ignore[attr-defined]

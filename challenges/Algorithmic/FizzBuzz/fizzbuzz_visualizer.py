@@ -27,7 +27,9 @@ from typing import Iterable, Iterator, List, Sequence, TYPE_CHECKING
 
 try:  # pragma: no cover - optional dependency for headless environments
     import matplotlib.pyplot as plt
-except ModuleNotFoundError:  # pragma: no cover - optional dependency for headless environments
+except (
+    ModuleNotFoundError
+):  # pragma: no cover - optional dependency for headless environments
     plt = None  # type: ignore[assignment]
 
 if TYPE_CHECKING:  # pragma: no cover - typing helper
@@ -162,7 +164,9 @@ def render_stacked_bar_chart(
     bottoms = [0] * len(emitted_entries)
 
     for label in seen_labels:
-        heights = [1 if label in entry.applied_rules else 0 for entry in emitted_entries]
+        heights = [
+            1 if label in entry.applied_rules else 0 for entry in emitted_entries
+        ]
         if any(heights):
             ax.bar(
                 values,
@@ -177,7 +181,9 @@ def render_stacked_bar_chart(
             bottoms = [b + h for b, h in zip(bottoms, heights)]
 
     if include_numbers:
-        numbers_heights = [1 if not entry.applied_rules else 0 for entry in emitted_entries]
+        numbers_heights = [
+            1 if not entry.applied_rules else 0 for entry in emitted_entries
+        ]
         if any(numbers_heights):
             ax.bar(
                 values,
@@ -268,7 +274,9 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser = _build_parser()
     args = parser.parse_args(argv)
 
-    rules: Sequence[fizzbuzz.FizzBuzzRule] | None = tuple(args.rule) if args.rule else None
+    rules: Sequence[fizzbuzz.FizzBuzzRule] | None = (
+        tuple(args.rule) if args.rule else None
+    )
 
     try:
         entries = generate_rule_metadata(

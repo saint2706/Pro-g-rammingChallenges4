@@ -47,9 +47,9 @@ def test_cpu_against_known_good_cases(case):
     if "post_memory" in case:
         for addr_str, value in case["post_memory"].items():
             addr = int(addr_str)
-            assert (
-                memory.read_byte(addr) == value
-            ), f"{case['name']} memory[{addr:#04x}]"
+            assert memory.read_byte(addr) == value, (
+                f"{case['name']} memory[{addr:#04x}]"
+            )
 
 
 def test_memory_map_distinguishes_rom_and_ram():

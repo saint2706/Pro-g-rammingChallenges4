@@ -4,6 +4,7 @@
 This file glues together the TextBuffer, configuration, and curses UI
 into a modal editor similar to Vim/Emacs hybrids.
 """
+
 from __future__ import annotations
 
 import argparse
