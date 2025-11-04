@@ -68,3 +68,18 @@ def test_invalid_hex_chunk_alignment():
 def test_text_to_base_requires_string():
     with pytest.raises(TypeError):
         module.text_to_hex(123)  # type: ignore[arg-type]
+
+
+def test_interactive_mode_updates_current_encoding(monkeypatch, capsys):
+    inputs = iter(["5", "ascii", "1", "é", "6"])
+
+    monkeypatch.setattr("builtins.input", lambda prompt="": next(inputs))
+
+    module.interactive_mode()
+
+    captured = capsys.readouterr()
+
+    assert "Change encoding (current: utf-8)" in captured.out
+    assert "Encoding changed to: ascii" in captured.out
+    assert "Change encoding (current: ascii)" in captured.out
+    assert "'ascii' codec can't encode" in captured.out
