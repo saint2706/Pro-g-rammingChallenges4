@@ -23,7 +23,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import List, Optional, Tuple
 
@@ -66,6 +66,7 @@ class DownloadConfig:
     json_out: bool = False
     overwrite: bool = False
     quiet: bool = False
+    _all_urls_cache: Optional[List[str]] = field(default=None, init=False, repr=False)
 
     def validate(self) -> None:
         if not self.urls and not self.url_file:
@@ -77,14 +78,16 @@ class DownloadConfig:
         self.out_dir.mkdir(parents=True, exist_ok=True)
 
     def all_urls(self) -> List[str]:
-        urls = list(self.urls)
-        if self.url_file:
-            with self.url_file.open("r", encoding="utf-8") as f:
-                for line in f:
-                    line = line.strip()
-                    if line and not line.startswith("#"):
-                        urls.append(line)
-        return urls
+        if self._all_urls_cache is None:
+            urls = list(self.urls)
+            if self.url_file:
+                with self.url_file.open("r", encoding="utf-8") as f:
+                    for line in f:
+                        line = line.strip()
+                        if line and not line.startswith("#"):
+                            urls.append(line)
+            self._all_urls_cache = urls
+        return list(self._all_urls_cache)
 
 
 # ------------------------------ Download Logic ------------------------------ #
@@ -123,11 +126,15 @@ def download_one(url: str, cfg: DownloadConfig) -> Tuple[str, bool, Optional[str
         return url, False, f"Unexpected:{e}"  # captured for JSON summary
 
 
-def batch_download(cfg: DownloadConfig) -> dict:
+def batch_download(cfg: DownloadConfig, urls: Optional[List[str]] = None) -> dict:
+    collected_urls = list(cfg.all_urls() if urls is None else urls)
+    if not collected_urls:
+        raise ValueError("No URLs to download after filtering blank/comment-only lines")
+
     results = []
     success = 0
     total = 0
-    for url in cfg.all_urls():
+    for url in collected_urls:
         total += 1
         if not cfg.quiet:
             print(f"Downloading: {url}")
@@ -205,7 +212,13 @@ def main(argv: Optional[List[str]] = None) -> int:
     except ValueError as e:
         parser.error(str(e))
 
-    summary = batch_download(cfg)
+    try:
+        urls = cfg.all_urls()
+        if not urls:
+            raise ValueError("No URLs to download after filtering blank/comment-only lines")
+        summary = batch_download(cfg, urls)
+    except ValueError as e:
+        parser.error(str(e))
     if cfg.json_out:
         print(json.dumps(summary, indent=2))
     else:
