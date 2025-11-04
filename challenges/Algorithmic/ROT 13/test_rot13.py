@@ -28,6 +28,17 @@ class TestROT13(unittest.TestCase):
             rot13.main(["--file", src])  # prints, but we only ensure no error
             self.assertEqual(rot13.rot13("abcXYZ"), "nopKLM")
 
+    def test_invalid_utf8_file(self):
+        with tempfile.NamedTemporaryFile(delete=False) as tmp:
+            tmp.write(b"\xff\xfe\xff")
+            tmp_path = tmp.name
+        try:
+            cfg = rot13.CLIConfig(file=tmp_path)
+            with self.assertRaises(ValueError):
+                rot13.resolve_input(cfg)
+        finally:
+            os.remove(tmp_path)
+
 
 if __name__ == "__main__":  # pragma: no cover
     unittest.main()
