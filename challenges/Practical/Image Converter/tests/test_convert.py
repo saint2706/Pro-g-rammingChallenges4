@@ -111,3 +111,15 @@ def test_batch_convert_file_like(tmp_path: Path) -> None:
     assert output_path.exists()
     with Image.open(output_path) as converted:
         assert converted.format == "JPEG"
+
+
+def test_convert_image_invalid_bytes(tmp_path: Path) -> None:
+    bad_source = io.BytesIO(b"not an image")
+    bad_source.name = "broken.png"
+
+    with pytest.raises(MODULE.ImageOpenError, match="Failed to open image 'broken.png'"):
+        MODULE.convert_image(
+            bad_source,
+            target_format="png",
+            output_path=tmp_path / "output.png",
+        )
