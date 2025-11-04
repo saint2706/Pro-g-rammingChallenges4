@@ -28,13 +28,18 @@ from pathlib import Path
 from typing import IO, Iterable, Iterator, List, Optional, Sequence, Tuple, Union
 
 try:
-    from PIL import Image, ImageOps, PngImagePlugin
+    from PIL import Image, ImageOps, PngImagePlugin, UnidentifiedImageError
 except ImportError as exc:  # pragma: no cover - dependency missing
     raise SystemExit(
         "Pillow is required for the image converter. Install it with ``pip install Pillow``."
     ) from exc
 
 LOGGER = logging.getLogger(__name__)
+
+
+class ImageOpenError(RuntimeError):
+    """Raised when an input image cannot be opened."""
+
 
 SUPPORTED_EXPORT_FORMATS = {
     "JPEG": (".jpg", ".jpeg"),
@@ -282,7 +287,17 @@ def convert_image(
     else:
         destination = output_path  # type: ignore[assignment]
 
-    with Image.open(image_source) as img:
+    try:
+        opener = Image.open(image_source)
+    except (OSError, UnidentifiedImageError) as exc:
+        label: Union[str, Path]
+        if resolved_input_path is not None:
+            label = resolved_input_path
+        else:
+            label = getattr(image_source, "name", None) or "provided input"
+        raise ImageOpenError(f"Failed to open image '{label}': {exc}") from exc
+
+    with opener as img:
         img = ImageOps.exif_transpose(img)
         info: dict = {}
         exif_bytes: Optional[bytes] = None
