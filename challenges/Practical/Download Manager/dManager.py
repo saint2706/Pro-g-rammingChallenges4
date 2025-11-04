@@ -125,6 +125,16 @@ class ResumeState:
             try:
                 with open(meta_path, "r", encoding="utf-8") as fh:
                     data = json.load(fh)
+            except UnicodeDecodeError as exc:
+                raise ValueError(
+                    (
+                        f"Resume metadata file '{meta_path}' is not valid UTF-8. "
+                        "Delete the file and retry the download."
+                    )
+                ) from exc
+            except (OSError, ValueError, TypeError):
+                existing = {}
+            else:
                 if data.get("size") == size:
                     for key, value in data.get("parts", {}).items():
                         start, end = cls._parse_key(key)
@@ -141,8 +151,6 @@ class ResumeState:
                         elif part_entry["offset"] > length:
                             part_entry["offset"] = length
                         existing[key] = part_entry
-            except (OSError, ValueError, TypeError):
-                existing = {}
 
         for part in parts:
             existing.setdefault(cls._key(part), {"done": False, "offset": 0})
