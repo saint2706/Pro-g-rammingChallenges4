@@ -39,6 +39,14 @@ class TestRPNEvaluator(unittest.TestCase):
         with self.assertRaises(rpn.RPNError):
             self.eval("3 0 /")
 
+    def test_error_sqrt_negative(self):
+        with self.assertRaises(rpn.RPNError):
+            self.eval("-1 sqrt")
+
+    def test_error_log_zero(self):
+        with self.assertRaises(rpn.RPNError):
+            self.eval("0 log")
+
     def test_malformed(self):
         with self.assertRaises(rpn.RPNError):
             self.eval("1 2 + 3")
