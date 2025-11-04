@@ -39,7 +39,7 @@ Analyze the distribution of characters in a Unicode text sample, reporting frequ
   making it easy to import into spreadsheets or BI dashboards.
 
 ## Debugging Tips
-- Short inputs such as `AAAaa!!` are helpful sanity checks—case-insensitive mode should treat `A` and `a` as the same symbol.
+- Short inputs such as `AAAaa!!` are helpful sanity checks—case-insensitive mode uses Unicode casefolding so `A` and `a` (or `ß` and `ss`) resolve to the same symbols.
 - Enable debug logging to inspect intermediate category tallies:
   ```bash
   python charcount.py --log DEBUG "Hello"

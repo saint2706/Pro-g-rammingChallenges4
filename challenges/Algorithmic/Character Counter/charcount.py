@@ -112,7 +112,7 @@ def get_char_counts(text: str, case_sensitive: bool = True) -> Counter[str]:
 
     Args:
         text: The input string to analyze (supports Unicode)
-        case_sensitive: If False, converts text to lowercase before counting
+        case_sensitive: If False, applies Unicode casefolding before counting
 
     Returns:
         A Counter object mapping each character to its frequency
@@ -125,6 +125,8 @@ def get_char_counts(text: str, case_sensitive: bool = True) -> Counter[str]:
         Counter({'l': 2, 'H': 1, 'e': 1, 'o': 1})
         >>> get_char_counts("Hello", case_sensitive=False)
         Counter({'l': 2, 'h': 1, 'e': 1, 'o': 1})
+        >>> get_char_counts("Straße", case_sensitive=False)
+        Counter({'s': 3, 't': 1, 'r': 1, 'a': 1, 'e': 1})
         >>> get_char_counts("Hello 🌍!")  # Unicode support
         Counter({'l': 2, 'H': 1, 'e': 1, 'o': 1, ' ': 1, '🌍': 1, '!': 1})
     """
@@ -135,7 +137,7 @@ def get_char_counts(text: str, case_sensitive: bool = True) -> Counter[str]:
         return Counter()
 
     # Apply case transformation if requested
-    processed_text = text.lower() if not case_sensitive else text
+    processed_text = text.casefold() if not case_sensitive else text
 
     return Counter(processed_text)
 
