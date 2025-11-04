@@ -44,6 +44,11 @@ Compute \(\pi\) to thousands of decimal places using the Gauss–Legendre iterat
   ```
 - There are no automated tests for this module, but you can compare the output against published references (e.g., `mpmath.mp.pi` in a Python shell) to validate additional digits.
 
+## How It Works
+The Python script `pi.py` calculates Pi to a specified number of decimal places using the Gauss-Legendre algorithm, which is a very fast iterative method. The `calculate_pi_gauss_legendre` function implements this algorithm using Python's `decimal` module to handle high-precision arithmetic.
+
+The script can be run from the command line, and you can specify the number of digits you want to calculate. It also includes an interactive mode if you run it without any arguments.
+
 ## Implementation Notes
 - Uses Python's `decimal` module with an adaptive safety margin to keep intermediate precision stable.
 - Implements the quadratic-converging Gauss–Legendre iteration, doubling the number of correct digits on each pass.

@@ -2,7 +2,7 @@
 
 from math import radians
 
-from pro_g_rammingchallenges4.emulation.double_pendulum import (
+from challenges.Emulation.double_pendulum import (
     DoublePendulumConfig,
     DoublePendulumSimulator,
     compute_total_energy,

@@ -1,4 +1,5 @@
 """Aggregated challenge categories for Pro-g-ramming Challenges."""
+
 from __future__ import annotations
 
 from importlib import import_module
@@ -16,4 +17,3 @@ def load_category(name: str) -> ModuleType:
     imports categories by their legacy names (e.g. ``Practical``).
     """
     return import_module(f"{__name__}.{name}")
-

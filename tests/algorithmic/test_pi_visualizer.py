@@ -53,9 +53,7 @@ def test_visualizer_summary_and_export(tmp_path: Path):
     )
 
     data = visualizer.get_convergence_data("chudnovsky", iterations=3)
-    assert data and all(
-        isinstance(step, visualizer.ConvergenceDatum) for step in data
-    )
+    assert data and all(isinstance(step, visualizer.ConvergenceDatum) for step in data)
 
     if visualizer.PLOTLY_AVAILABLE:
         figure = visualizer.build_figure(data, title="Test")
@@ -77,7 +75,8 @@ def test_visualizer_summary_and_export(tmp_path: Path):
 
 def test_compute_pi_restores_context_precision():
     module = _load_module(
-        "digitpi_module_context", ROOT / "challenges/Algorithmic/Digits of Pi/DigitPi.py"
+        "digitpi_module_context",
+        ROOT / "challenges/Algorithmic/Digits of Pi/DigitPi.py",
     )
 
     context = decimal.getcontext()

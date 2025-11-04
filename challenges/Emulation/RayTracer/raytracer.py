@@ -251,7 +251,9 @@ class RayTracer:
         origin = point + light_dir * _EPSILON
         for entry in self._accelerated_objects:
             bbox = entry.bbox
-            if bbox is not None and not bbox.intersects(origin, light_dir, light_distance):
+            if bbox is not None and not bbox.intersects(
+                origin, light_dir, light_distance
+            ):
                 continue
             result = entry.obj.intersect(origin, light_dir)
             if result is None:
@@ -262,7 +264,10 @@ class RayTracer:
         return False
 
     def _build_accelerated_objects(self) -> List[_AcceleratedObject]:
-        return [_AcceleratedObject(obj, self._bounding_box(obj)) for obj in self.scene.objects]
+        return [
+            _AcceleratedObject(obj, self._bounding_box(obj))
+            for obj in self.scene.objects
+        ]
 
     @staticmethod
     def _bounding_box(obj: SceneObject) -> Optional[BoundingBox]:

@@ -16,7 +16,7 @@ import argparse
 import json
 import sys
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Sequence
+from typing import Optional, Sequence
 
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
@@ -24,7 +24,7 @@ from matplotlib.animation import FuncAnimation
 
 try:  # Attempt numpy import early
     import numpy as np  # type: ignore
-except Exception as e:  # pragma: no cover - environment dependent
+except Exception:  # pragma: no cover - environment dependent
     print(
         "Warning: numpy unavailable; colormap gradients may fail. Install with: pip install numpy",
         file=sys.stderr,
@@ -119,7 +119,7 @@ class HanoiVisualizer:
             for i, disk_num in enumerate(disks_on_peg):
                 self._draw_disk(disk_num, peg_name, i)
         title = self.ax.set_title(
-            f"Hanoi | Disks: {self.cfg.disks} | Frame: {frame_num}/{len(self.steps)-1}",
+            f"Hanoi | Disks: {self.cfg.disks} | Frame: {frame_num}/{len(self.steps) - 1}",
             fontsize=14,
         )
         artists.append(title)

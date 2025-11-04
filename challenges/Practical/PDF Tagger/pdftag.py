@@ -24,15 +24,13 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 import sys
 from dataclasses import dataclass, asdict
 from pathlib import Path
-from typing import Dict, Optional, Any, Protocol, runtime_checkable, Union
+from typing import Dict, Optional, Any, Protocol, runtime_checkable
 
 # ---------------- Dependency Handling ---------------- #
 try:  # Preferred modern library
-    import pypdf  # type: ignore
     from pypdf import PdfReader, PdfWriter
 
     PYPDF_AVAILABLE = True
@@ -41,7 +39,6 @@ except Exception:  # pragma: no cover - fallback path
     PYPDF_AVAILABLE = False
     try:
         from PyPDF3 import PdfFileReader as PdfReader, PdfFileWriter as PdfWriter  # type: ignore
-        from PyPDF3.errors import PdfReadError  # type: ignore
 
         PYPDF3_AVAILABLE = True
     except Exception:

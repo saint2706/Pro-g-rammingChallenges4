@@ -1,8 +1,7 @@
 """Minimal command-line runner for the TI-86 emulator core.
 
 This module bridges the research artefacts in :mod:`challenges/Emulation/TI86` with the
-fully functional CPU, memory and peripheral skeleton implemented under
-``src/pro_g_rammingchallenges4/emulation/ti86``.  It supports loading ROMs,
+fully functional CPU, memory and peripheral skeleton. It supports loading ROMs,
 single-stepping through instructions, and validating the opcode truth table
 documented alongside the research notes.
 """
@@ -11,19 +10,15 @@ from __future__ import annotations
 
 import argparse
 import json
-import sys
 from pathlib import Path
 from typing import Iterable
 
-ROOT = Path(__file__).resolve().parents[2]
-SRC_PATH = ROOT / "src"
-if str(SRC_PATH) not in sys.path:
-    sys.path.insert(0, str(SRC_PATH))
+from .core import TI86
+from .cpu import Z80CPU
+from .memory import Memory
 
-from pro_g_rammingchallenges4.emulation import ti86 as ti86_pkg
-from pro_g_rammingchallenges4.emulation.ti86 import TI86, Memory, Z80CPU
 
-TRUTH_PATH = Path(ti86_pkg.__file__).with_name("opcode_truth.json")
+TRUTH_PATH = Path(__file__).with_name("opcode_truth.json")
 
 
 def _load_rom_bytes(path: Path) -> bytes:

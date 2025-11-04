@@ -7,7 +7,9 @@ from pathlib import Path
 
 import pytest
 
-matplotlib = pytest.importorskip("matplotlib", reason="Matplotlib required for Graphing Calculator UI")
+matplotlib = pytest.importorskip(
+    "matplotlib", reason="Matplotlib required for Graphing Calculator UI"
+)
 matplotlib.use("Agg", force=True)
 
 
@@ -75,4 +77,3 @@ def test_text_widget_allows_multiline_before_plot():
     assert calls == ["plot"]
 
     root.destroy()
-

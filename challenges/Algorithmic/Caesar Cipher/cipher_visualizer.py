@@ -14,6 +14,7 @@ Supported ciphers
 * Affine (with optional brute-force search)
 * Atbash
 """
+
 from __future__ import annotations
 
 import argparse
@@ -113,7 +114,9 @@ def _frequency_profile(text: str) -> Dict[str, List[float]]:
 
 def _mapping_for_caesar(cfg: VisualizationConfig) -> Dict[str, str]:
     shift = cfg.shift if cfg.mode == "encrypt" else -cfg.shift
-    return {letter: caesar_cipher(letter, shift, cfg.alphabet_type) for letter in ALPHABET}
+    return {
+        letter: caesar_cipher(letter, shift, cfg.alphabet_type) for letter in ALPHABET
+    }
 
 
 def _mapping_for_rot13() -> Dict[str, str]:
@@ -131,7 +134,8 @@ def _mapping_for_vigenere(cfg: VisualizationConfig) -> List[Dict[str, str]]:
         if cfg.mode == "decrypt":
             shift = (-shift) % 26
         mapping = {
-            letter: chr((ord(letter) - ord("A") + shift) % 26 + ord("A")) for letter in ALPHABET
+            letter: chr((ord(letter) - ord("A") + shift) % 26 + ord("A"))
+            for letter in ALPHABET
         }
         mappings.append(mapping)
     return mappings
@@ -351,7 +355,9 @@ def _parse_args(argv: Optional[List[str]] = None) -> argparse.Namespace:
     )
     parser.add_argument("--output-json", help="Path to write JSON data payload")
     parser.add_argument("--output-html", help="Write Plotly figure to HTML file")
-    parser.add_argument("--output-svg", help="Write Plotly figure to SVG (requires kaleido)")
+    parser.add_argument(
+        "--output-svg", help="Write Plotly figure to SVG (requires kaleido)"
+    )
     parser.add_argument(
         "--show",
         action="store_true",
@@ -401,7 +407,10 @@ def main(argv: Optional[List[str]] = None) -> int:
 
     if not args.no_plot:
         if go is None or make_subplots is None:
-            print("Warning: Plotly not installed; skipping figure generation", file=sys.stderr)
+            print(
+                "Warning: Plotly not installed; skipping figure generation",
+                file=sys.stderr,
+            )
         else:
             fig = build_plotly_figure(data)
             if args.output_html:

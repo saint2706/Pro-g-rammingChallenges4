@@ -502,7 +502,7 @@ class MissileCommandGame:
 
     def draw_hud(self) -> None:
         ammo_text = " | ".join(
-            f"Base {idx+1}: {base.ammo}" for idx, base in enumerate(self.bases)
+            f"Base {idx + 1}: {base.ammo}" for idx, base in enumerate(self.bases)
         )
         hud_lines = [
             f"Level {self.level}",

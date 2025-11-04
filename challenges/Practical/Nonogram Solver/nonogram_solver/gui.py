@@ -102,7 +102,7 @@ class NonogramApp(tk.Tk):
             for c in range(self.puzzle.width):
                 if self.board[r][c] == UNKNOWN and solution[r][c] != UNKNOWN:
                     self.board[r][c] = solution[r][c]
-                    self.status_var.set(f"Hint applied at row {r+1}, column {c+1}")
+                    self.status_var.set(f"Hint applied at row {r + 1}, column {c + 1}")
                     self._redraw()
                     return
         self.status_var.set("Board already matches the solution")

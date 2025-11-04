@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, replace
-from typing import Dict, Iterable, List, Optional, Tuple
+from typing import Iterable, List, Optional, Tuple
 
 from .move import Move, Square
 

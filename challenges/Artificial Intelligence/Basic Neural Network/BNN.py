@@ -280,7 +280,11 @@ def main():
     )
 
     def progress(epoch: int, loss: float) -> None:
-        if epoch == 1 or epoch % max(args.log_interval, 1) == 0 or epoch == config.epochs:
+        if (
+            epoch == 1
+            or epoch % max(args.log_interval, 1) == 0
+            or epoch == config.epochs
+        ):
             logging.info("Epoch %d, loss %.4f", epoch, loss)
 
     error_history = nn.train(progress_callback=progress)

@@ -212,7 +212,7 @@ def run_tests():
     result = runner.run(suite)
 
     # Summary
-    print(f"\n📊 Test Results:")
+    print("\n📊 Test Results:")
     print(f"  Tests run: {result.testsRun}")
     print(f"  Failures: {len(result.failures)}")
     print(f"  Errors: {len(result.errors)}")

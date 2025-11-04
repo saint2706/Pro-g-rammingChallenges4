@@ -23,7 +23,6 @@ Version: 2.0
 import sys
 import argparse
 import logging
-from typing import Optional, Union, Literal
 from enum import Enum
 
 
@@ -89,7 +88,9 @@ def _decode_from_base(
         tokens = [token for token in data_string.split(separator) if token]
     else:
         if len(data_string) % width != 0:
-            raise ValueError("Input length must be a multiple of chunk width when no separator is used")
+            raise ValueError(
+                "Input length must be a multiple of chunk width when no separator is used"
+            )
         tokens = [data_string[i : i + width] for i in range(0, len(data_string), width)]
     try:
         byte_data = bytes(int(token, base) for token in tokens)

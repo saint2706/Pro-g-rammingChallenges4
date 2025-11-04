@@ -134,11 +134,11 @@ class MusicStreamClient:
                         started = True
                         elapsed = time.time() - start_time
                         print(
-                            f"Buffered {buffered_bytes/1024:.0f} KiB in {elapsed:.1f}s. Starting playback..."
+                            f"Buffered {buffered_bytes / 1024:.0f} KiB in {elapsed:.1f}s. Starting playback..."
                         )
                     else:
                         print(
-                            f"Buffering {buffered_bytes/1024:.0f} KiB / {self.buffer_bytes/1024:.0f} KiB",
+                            f"Buffering {buffered_bytes / 1024:.0f} KiB / {self.buffer_bytes / 1024:.0f} KiB",
                             end="\r",
                             flush=True,
                         )
@@ -172,13 +172,13 @@ class MusicStreamClient:
                     continue
                 handle.write(chunk)
                 total += len(chunk)
-                print(f"Downloaded {total/1024:.0f} KiB", end="\r", flush=True)
+                print(f"Downloaded {total / 1024:.0f} KiB", end="\r", flush=True)
             temp_path = Path(handle.name)
         print()
         print(
             textwrap.dedent(
                 f"""
-                Stream saved to {temp_path} ({total/1024:.1f} KiB).
+                Stream saved to {temp_path} ({total / 1024:.1f} KiB).
                 Install FFmpeg for instant playback, or open this file with your preferred media player.
                 """
             ).strip()

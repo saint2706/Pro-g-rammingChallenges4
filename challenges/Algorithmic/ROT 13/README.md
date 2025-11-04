@@ -56,6 +56,11 @@ Apply the ROT13 substitution cipher—a Caesar cipher rotating letters by 13 pos
   They cover ASCII handling, idempotence, and command-line parsing.
 - Enable `--json` to compare structured results when debugging text encoding issues.
 
+## How It Works
+The Python script `rot13.py` implements the ROT13 cipher by pre-computing a translation table that maps each letter of the alphabet to its rotated counterpart. This is a very efficient approach, as the table is created only once. The `rot13` function then uses this table to transform the input text.
+
+The script provides a command-line interface that can read from a string, a file, or standard input. It can also save the output to a file and supports JSON output for scripting purposes. The `test_rot13.py` file contains unit tests to ensure the implementation is correct.
+
 ## Implementation Notes
 - Precomputes a translation table for fast transformations using `str.translate`.
 - Supports multiple input modes (direct string, file, stdin, interactive prompt) and optional JSON output.

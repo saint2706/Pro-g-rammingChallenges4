@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import json
 import random
-import re
 import unittest
 from unittest import mock
 
@@ -67,10 +66,15 @@ class TestVisualizerSummary(unittest.TestCase):
             def shuffle(self, seq):
                 rng.shuffle(seq)
 
-        with mock.patch.object(
-            passgen.secrets, "choice", side_effect=deterministic_choice
-        ), mock.patch.object(
-            passgen.secrets, "SystemRandom", return_value=DeterministicSystemRandom()
+        with (
+            mock.patch.object(
+                passgen.secrets, "choice", side_effect=deterministic_choice
+            ),
+            mock.patch.object(
+                passgen.secrets,
+                "SystemRandom",
+                return_value=DeterministicSystemRandom(),
+            ),
         ):
             summary = passgen_visualizer.summarize_generation(spec, batches=2)
 

@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import Iterable, Optional
 
 from .cpu import CPU
-from .display import CursesDisplay, DisplayBuffer, PygameDisplay, create_display
+from .display import CursesDisplay, DisplayBuffer, create_display
 from .input import CursesInput, Keypad, PygameInput
 from .memory import Memory
 

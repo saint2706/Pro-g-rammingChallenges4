@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any, Dict, List
 
-from .parser import SQLParser, Statement
+from .parser import SQLParser
 from .storage import Column, Database
 
 

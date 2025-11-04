@@ -11,12 +11,7 @@ Solves and animates the Knight's Tour problem on an n x n chessboard using a bac
 optimized with Warnsdorff's rule. Includes a CLI for board size selection and a matplotlib animation.
 """
 
-import numpy as np
-import matplotlib.pyplot as plt
-from matplotlib.animation import FuncAnimation
-import sys
-import argparse
-from typing import Tuple, List, Optional
+from typing import List
 
 
 class KnightTour:
@@ -114,7 +109,9 @@ class KnightTour:
                 x_sorted, y_sorted, _ = zip(*path_sorted)
                 (line,) = ax.plot(x_sorted, y_sorted, color="blue", linewidth=2)
                 artists.append(line)
-            ax.set_title(f"Knight's Tour - Move {frame+1}/{self.n*self.n}", fontsize=16)
+            ax.set_title(
+                f"Knight's Tour - Move {frame + 1}/{self.n * self.n}", fontsize=16
+            )
             # Return the list of artists modified
             return artists
 

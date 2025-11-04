@@ -18,7 +18,7 @@ Future ideas (not implemented yet):
 
 import sys
 import tkinter as tk
-from tkinter import ttk, messagebox
+from tkinter import ttk
 
 try:  # Import conversion functions dynamically
     from radix import to_decimal, from_decimal

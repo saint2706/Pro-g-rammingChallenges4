@@ -8,7 +8,7 @@ import random
 import socket
 from dataclasses import dataclass
 from typing import List, Optional
-from urllib.parse import urlencode, urlparse
+from urllib.parse import urlparse
 
 import requests
 

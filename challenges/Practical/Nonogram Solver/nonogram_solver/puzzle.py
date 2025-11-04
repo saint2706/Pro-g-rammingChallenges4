@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Iterable, List, Optional, Sequence, Tuple
+from typing import List, Optional, Sequence, Tuple
 import json
 
 from PIL import Image, ImageDraw, ImageFont

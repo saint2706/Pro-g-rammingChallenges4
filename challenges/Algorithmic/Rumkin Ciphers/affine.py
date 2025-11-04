@@ -23,7 +23,7 @@ import json
 import math
 import sys
 from dataclasses import dataclass
-from typing import Iterable, List, Optional, Sequence, Tuple
+from typing import List, Optional, Sequence, Tuple
 
 ALPHABET_SIZE = 26
 VALID_A_VALUES = [a for a in range(1, ALPHABET_SIZE) if math.gcd(a, ALPHABET_SIZE) == 1]

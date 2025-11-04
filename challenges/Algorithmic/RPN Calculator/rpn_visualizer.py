@@ -75,7 +75,9 @@ def snapshots_to_json(
     }
 
 
-def snapshots_from_json(payload: dict) -> Tuple[Optional[str], Optional[Number], SnapshotLog]:
+def snapshots_from_json(
+    payload: dict,
+) -> Tuple[Optional[str], Optional[Number], SnapshotLog]:
     """Recreate snapshots, expression and result from *payload*."""
 
     expression = payload.get("expression")
@@ -110,7 +112,12 @@ def render_table(snapshot: StackSnapshot) -> str:
     if not snapshot.stack:
         return f"{header}\n└─ empty"
 
-    lines = [header, "┌──────┬────────────┐", "│ index│ value      │", "├──────┼────────────┤"]
+    lines = [
+        header,
+        "┌──────┬────────────┐",
+        "│ index│ value      │",
+        "├──────┼────────────┤",
+    ]
     for idx, value in enumerate(snapshot.stack):
         lines.append(f"│ {idx:>4} │ {value:>10g} │")
     lines.append("└──────┴────────────┘")
@@ -188,7 +195,9 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Visualise RPN stack evolution")
     parser.add_argument("--expr", help="Evaluate and visualise this expression")
     parser.add_argument("--file", help="Read expression from file")
-    parser.add_argument("--stdin", action="store_true", help="Read expression from stdin")
+    parser.add_argument(
+        "--stdin", action="store_true", help="Read expression from stdin"
+    )
     parser.add_argument("--load", help="Load a previously exported JSON snapshot log")
     parser.add_argument("--export", help="Write the captured log to JSON")
     parser.add_argument(
@@ -197,9 +206,20 @@ def build_arg_parser() -> argparse.ArgumentParser:
         default="bars",
         help="Rendering mode for the stack visualisation",
     )
-    parser.add_argument("--delay", type=float, default=0.6, help="Delay between frames in seconds")
-    parser.add_argument("--no-animate", action="store_true", help="Print frames without clearing the screen")
-    parser.add_argument("--deg", action="store_true", dest="degrees", help="Interpret trig inputs as degrees")
+    parser.add_argument(
+        "--delay", type=float, default=0.6, help="Delay between frames in seconds"
+    )
+    parser.add_argument(
+        "--no-animate",
+        action="store_true",
+        help="Print frames without clearing the screen",
+    )
+    parser.add_argument(
+        "--deg",
+        action="store_true",
+        dest="degrees",
+        help="Interpret trig inputs as degrees",
+    )
     return parser
 
 

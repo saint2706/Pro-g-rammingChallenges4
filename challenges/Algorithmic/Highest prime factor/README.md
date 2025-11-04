@@ -49,6 +49,11 @@ Both CLIs share identical validation rules and output formats so you can mix and
   ```
 - Enable verbose logging (`--verbose`) to observe each factor elimination when diagnosing performance issues on large composites.
 
+## How It Works
+The Python script `HighPF.py` implements an optimized trial division algorithm to find the highest prime factor of a given number. The `highest_prime_factor` function first handles the factors of 2 and 3 separately. Then, it iterates through numbers of the form `6k ± 1` up to the square root of the remaining number, which is an efficient way to check for prime factors.
+
+The script can be run from the command line and accepts multiple numbers as arguments. It also supports reading numbers from standard input and can output the results in JSON format. The `test_highpf.py` file contains unit tests to verify the correctness of the `highest_prime_factor` function.
+
 ## Implementation Notes
 - Strips factors of 2 and 3 before iterating potential factors of the form `6k ± 1` up to \(\sqrt{n}\).
 - Uses Python's arbitrary-precision integers, so runtime—not overflow—limits computation.

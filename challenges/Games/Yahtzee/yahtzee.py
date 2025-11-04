@@ -90,7 +90,7 @@ class Game:
         hand = Hand()
 
         for i in range(2):  # Allow up to two rerolls
-            print(f"\nRoll {i+1}: {hand}")
+            print(f"\nRoll {i + 1}: {hand}")
             wants_to_reroll = self.get_validated_input(
                 "Reroll any dice? (y/n): ", ["y", "n"]
             )
@@ -154,7 +154,7 @@ class Game:
         print(f"In {self.game_count} game(s), you rolled:")
         for hand_type, count in sorted(self.stats.items()):
             percentage = (count / self.game_count) * 100
-            print(f"  - {hand_type+':':<18} {count} time(s) ({percentage:.1f}%)")
+            print(f"  - {hand_type + ':':<18} {count} time(s) ({percentage:.1f}%)")
 
     def run(self) -> None:
         """

@@ -156,10 +156,12 @@ def analyse_image_pair(
     cover_array = [[cover_px[x, y] for x in range(width)] for y in range(height)]
     stego_array = [[stego_px[x, y] for x in range(width)] for y in range(height)]
     metrics, modified_mask = compute_diff_metrics(cover_array, stego_array)
-    metrics.update({
-        "cover_path": str(cover_path),
-        "stego_path": str(stego_path),
-    })
+    metrics.update(
+        {
+            "cover_path": str(cover_path),
+            "stego_path": str(stego_path),
+        }
+    )
     return cover_img, stego_img, metrics, modified_mask
 
 
@@ -175,7 +177,10 @@ def _import_matplotlib(show: bool):
 
         return plt
     except Exception as exc:  # pragma: no cover - depends on runtime env.
-        print(f"Matplotlib unavailable or cannot initialise backend: {exc}", file=sys.stderr)
+        print(
+            f"Matplotlib unavailable or cannot initialise backend: {exc}",
+            file=sys.stderr,
+        )
         return None
 
 
@@ -331,7 +336,9 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             print(f"Heatmap saved to {args.save_heatmap}")
 
     if args.save_histogram:
-        if render_histogram(metrics["bit_planes"]["aggregate"], args.save_histogram, show=False):
+        if render_histogram(
+            metrics["bit_planes"]["aggregate"], args.save_histogram, show=False
+        ):
             print(f"Histogram saved to {args.save_histogram}")
 
     if args.show:

@@ -10,7 +10,6 @@ import json
 import os
 import tempfile
 import unittest
-from typing import List
 
 import mbr
 

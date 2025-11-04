@@ -32,7 +32,6 @@ import contextlib
 import hashlib
 import json
 import math
-import os
 import random
 import sys
 import threading
@@ -42,7 +41,6 @@ from pathlib import Path
 from typing import Optional, List, Tuple, Dict, Any
 
 import requests
-from requests import Response
 
 try:
     from tqdm import tqdm
@@ -239,6 +237,7 @@ class ResumeState:
         except OSError:
             pass
 
+
 # --------------------------- Utility Functions --------------------------- #
 
 
@@ -364,9 +363,7 @@ def download_part(
                         downloaded += len(chunk)
                         pbar.update(len(chunk))
                         if resume_state:
-                            resume_offset = min(
-                                resume_offset + len(chunk), part_length
-                            )
+                            resume_offset = min(resume_offset + len(chunk), part_length)
                             resume_state.update_offset(part, resume_offset)
                 if resume_state:
                     resume_state.mark_complete(part)
@@ -516,7 +513,9 @@ def download(cfg: Config) -> Result:
             resumed = True
         downloaded = initial_bytes
         parts_to_download = [
-            part for part in parts if not resume_state or not resume_state.is_complete(part)
+            part
+            for part in parts
+            if not resume_state or not resume_state.is_complete(part)
         ]
         # Prepare file
         mode = "r+b" if cfg.output.exists() else "wb"

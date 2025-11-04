@@ -52,7 +52,12 @@ class MandelbrotConfig:
 
     def compute_bounds(self) -> Tuple[float, float, float, float]:
         if None not in (self.x_min, self.x_max, self.y_min, self.y_max):
-            return float(self.x_min), float(self.x_max), float(self.y_min), float(self.y_max)  # type: ignore[arg-type]
+            return (
+                float(self.x_min),
+                float(self.x_max),
+                float(self.y_min),
+                float(self.y_max),
+            )  # type: ignore[arg-type]
         # Derive bounds from center & scale keeping aspect ratio
         aspect = self.height / self.width
         half_w = self.scale / 2.0

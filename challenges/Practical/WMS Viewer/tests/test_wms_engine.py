@@ -1,4 +1,3 @@
-import io
 import tempfile
 import unittest
 from pathlib import Path
@@ -10,7 +9,6 @@ from wms_engine import (
     MapViewState,
     Projection,
     ServerConfig,
-    ViewConfig,
     WMSCache,
     WMSClient,
     load_config,

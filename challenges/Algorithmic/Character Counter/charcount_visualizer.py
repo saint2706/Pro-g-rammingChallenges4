@@ -28,7 +28,7 @@ import argparse
 import logging
 import sys
 from pathlib import Path
-from typing import Counter, Dict, List, Optional, Tuple, Union
+from typing import List, Optional, Tuple
 from enum import Enum
 from dataclasses import dataclass
 

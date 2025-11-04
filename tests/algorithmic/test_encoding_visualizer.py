@@ -54,7 +54,9 @@ def test_generate_visualization_data_non_ascii(text, hex_values):
 
 
 def test_utf16_visualization_metadata():
-    data = visualizer.generate_visualization_data("Hi", encoding="utf-16").to_json_dict()
+    data = visualizer.generate_visualization_data(
+        "Hi", encoding="utf-16"
+    ).to_json_dict()
 
     assert data["metadata"]["byte_count"] == len(data["byte_values"])
     assert all(len(row) == 8 for row in data["bit_matrix"])

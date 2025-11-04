@@ -10,7 +10,9 @@ except ImportError:  # pragma: no cover - exercised when Pillow missing.
     Image = None
 
 
-PROJECT_DIR = Path(__file__).resolve().parents[2] / "challenges" / "Algorithmic" / "Steganography"
+PROJECT_DIR = (
+    Path(__file__).resolve().parents[2] / "challenges" / "Algorithmic" / "Steganography"
+)
 if str(PROJECT_DIR) not in sys.path:
     sys.path.insert(0, str(PROJECT_DIR))
 

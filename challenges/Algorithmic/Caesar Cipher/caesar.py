@@ -32,7 +32,7 @@ import string
 import sys
 from collections import Counter
 from enum import Enum
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Tuple, Union
 
 
 class CipherMode(Enum):
@@ -84,7 +84,9 @@ ENGLISH_FREQUENCY = {
 
 
 PRINTABLE_CHARS: str = string.printable[:95]
-PRINTABLE_INDEX: Dict[str, int] = {char: idx for idx, char in enumerate(PRINTABLE_CHARS)}
+PRINTABLE_INDEX: Dict[str, int] = {
+    char: idx for idx, char in enumerate(PRINTABLE_CHARS)
+}
 
 
 def setup_logging(level: str = "INFO") -> None:
@@ -398,7 +400,7 @@ def interactive_mode() -> None:
                         print("\nPerforming brute force attack...")
                         results = brute_force_crack(text_input)
 
-                        print(f"\nTop 5 most likely decryptions:")
+                        print("\nTop 5 most likely decryptions:")
                         print(f"{'Shift':<6} {'Fitness':<10} {'Decrypted Text'}")
                         print("-" * 60)
 
@@ -411,7 +413,7 @@ def interactive_mode() -> None:
 
                     elif choice == "4":  # Analyze
                         analysis = analyze_text(text_input)
-                        print(f"\n--- Text Analysis ---")
+                        print("\n--- Text Analysis ---")
                         print(f"Total characters: {analysis['total_characters']}")
                         print(f"Total letters: {analysis['total_letters']}")
                         print(

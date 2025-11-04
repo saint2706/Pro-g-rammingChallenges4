@@ -8,7 +8,6 @@ If librosa is not installed the test will be skipped.
 from __future__ import annotations
 
 import unittest
-import numpy as np
 
 import mv
 

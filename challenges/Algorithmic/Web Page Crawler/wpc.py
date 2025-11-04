@@ -190,10 +190,14 @@ class WebCrawler:
         sleep_for = 0.0
         now = time.time()
         if self.cfg.rate_limit > 0:
-            sleep_for = max(sleep_for, self.cfg.rate_limit - (now - self._last_global_request))
+            sleep_for = max(
+                sleep_for, self.cfg.rate_limit - (now - self._last_global_request)
+            )
         if self.cfg.per_host_delay > 0:
             host = urlparse(url).netloc
-            host_wait = self.cfg.per_host_delay - (now - self._last_host_request.get(host, 0.0))
+            host_wait = self.cfg.per_host_delay - (
+                now - self._last_host_request.get(host, 0.0)
+            )
             sleep_for = max(sleep_for, host_wait)
         if sleep_for > 0:
             time.sleep(max(0.0, sleep_for))
@@ -214,7 +218,9 @@ class WebCrawler:
         }
         try:
             self.cfg.state_path.parent.mkdir(parents=True, exist_ok=True)
-            self.cfg.state_path.write_text(json.dumps(state, indent=2), encoding="utf-8")
+            self.cfg.state_path.write_text(
+                json.dumps(state, indent=2), encoding="utf-8"
+            )
         except OSError as exc:
             self.errors.setdefault("__state__", str(exc))
 

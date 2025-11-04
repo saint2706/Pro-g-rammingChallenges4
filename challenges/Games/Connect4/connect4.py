@@ -1,7 +1,7 @@
 """Pygame implementation of the Connect 4 board game."""
 
 from dataclasses import dataclass
-from typing import Deque, Iterable, List, Optional, Tuple
+from typing import Deque, Iterable, Optional, Tuple
 
 import numpy as np
 import pygame
@@ -65,9 +65,7 @@ class Board:
 
     def __init__(self, config: Connect4Config) -> None:
         self.config = config
-        self.board: np.ndarray = np.zeros(
-            (config.rows, config.columns), dtype=int
-        )
+        self.board: np.ndarray = np.zeros((config.rows, config.columns), dtype=int)
 
     def drop_piece(self, row: int, col: int, piece: int) -> None:
         """Place a piece in the board at the given row and column."""

@@ -1,4 +1,4 @@
-from affine import affine_cipher, main as affine_main, VALID_A_VALUES
+from affine import affine_cipher, main as affine_main
 
 import pytest
 

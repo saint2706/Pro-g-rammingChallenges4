@@ -1,5 +1,3 @@
-import pandas as pd
-from pathlib import Path
 from stock import main as stock_main
 
 CSV_CONTENT = """Date,Open,High,Low,Close,Volume

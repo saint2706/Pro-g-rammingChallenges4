@@ -1,10 +1,22 @@
 """Utilities to visualize and analyze crawler output."""
+
 from __future__ import annotations
 
 import json
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple, Union, Protocol
+from typing import (
+    Any,
+    Dict,
+    Iterable,
+    List,
+    Mapping,
+    Optional,
+    Sequence,
+    Tuple,
+    Union,
+    Protocol,
+)
 
 import networkx as nx
 import plotly.graph_objects as go
@@ -165,9 +177,15 @@ def _normalize_source(
         start_url = getattr(cfg, "start_url", None)
         root = start_url or root_url
         if root is None:
-            raise ValueError("Crawler configuration must expose a start_url or provide root_url")
+            raise ValueError(
+                "Crawler configuration must expose a start_url or provide root_url"
+            )
         raw_errors = getattr(crawler, "errors", {})
-        errors = {k: v for k, v in raw_errors.items() if isinstance(k, str) and isinstance(v, str)}
+        errors = {
+            k: v
+            for k, v in raw_errors.items()
+            if isinstance(k, str) and isinstance(v, str)
+        }
         return edges, root, errors
 
     if isinstance(source, (str, Path)):
@@ -180,7 +198,9 @@ def _normalize_source(
         edges = _normalize_edges(edges_data)
         root = payload.get("start_url") or payload.get("root") or root_url
         if root is None:
-            raise ValueError("Serialized crawl data requires a 'start_url'/'root' or root_url")
+            raise ValueError(
+                "Serialized crawl data requires a 'start_url'/'root' or root_url"
+            )
         raw_errors = payload.get("errors", {})
         errors = {
             str(k): str(v)
@@ -223,7 +243,9 @@ def _build_metadata(
         depth_map = nx.single_source_shortest_path_length(graph, root)
     except nx.NetworkXError:
         try:
-            depth_map = nx.single_source_shortest_path_length(graph.to_undirected(), root)
+            depth_map = nx.single_source_shortest_path_length(
+                graph.to_undirected(), root
+            )
         except nx.NetworkXError:
             depth_map = {root: 0}
 
@@ -250,10 +272,7 @@ def _build_metadata(
             }
         )
 
-    link_dicts = [
-        {"source": src, "target": dst}
-        for src, dst in edges
-    ]
+    link_dicts = [{"source": src, "target": dst} for src, dst in edges]
 
     metadata = CrawlGraphMetadata(
         root=root,
@@ -278,4 +297,3 @@ class CrawlerLike(Protocol):  # type: ignore[misc]
     edges: Sequence[Edge]
     errors: Mapping[str, str]
     cfg: Any
-

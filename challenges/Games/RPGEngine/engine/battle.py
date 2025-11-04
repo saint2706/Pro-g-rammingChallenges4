@@ -3,11 +3,11 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Dict, List, Tuple
+from typing import Dict, List
 
 import pygame
 
-from .constants import FONT_NAME, SCREEN_HEIGHT, SCREEN_WIDTH
+from .constants import FONT_NAME, SCREEN_HEIGHT
 from .entity import Entity, Item, Stats
 
 

@@ -85,7 +85,9 @@ def colorize(text: str, color: str | None) -> str:
     return f"{code}{text}{ANSI_RESET}"
 
 
-def get_current_time_digits(now: time.struct_time) -> Tuple[int, int, int, int, int, int]:
+def get_current_time_digits(
+    now: time.struct_time,
+) -> Tuple[int, int, int, int, int, int]:
     h, m, s = now.tm_hour, now.tm_min, now.tm_sec
     return *divmod(h, 10), *divmod(m, 10), *divmod(s, 10)
 

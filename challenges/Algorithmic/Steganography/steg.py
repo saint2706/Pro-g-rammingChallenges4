@@ -31,7 +31,7 @@ import json
 import sys
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Iterable, Optional, Sequence
+from typing import Optional, Sequence
 
 try:
     from PIL import Image
@@ -92,7 +92,9 @@ def image_capacity_chars(
 
 def _ensure_pillow() -> None:
     if Image is None:  # pragma: no cover - triggered only when Pillow missing.
-        raise RuntimeError("Pillow is required for image operations. Install it via 'pip install pillow'.")
+        raise RuntimeError(
+            "Pillow is required for image operations. Install it via 'pip install pillow'."
+        )
 
 
 def open_image(path: str) -> Image.Image:

@@ -46,6 +46,11 @@ Plot prime numbers on an integer lattice arranged in a spiral, revealing diagona
 - Compare the prime sieve output against a trusted library (e.g., `sympy.isprime`) when adjusting algorithms.
 - If matplotlib is unavailable, the script will skip rendering; install `matplotlib` or pass `--no-show` to silence warnings.
 
+## How It Works
+The Python script `ulam.py` generates an Ulam spiral by first creating a grid of numbers in a spiral pattern and then using the Sieve of Eratosthenes to identify which of those numbers are prime. The `generate_ulam_spiral` function creates the spiral, and the `sieve_of_eratosthenes` function efficiently finds all prime numbers up to the maximum number in the spiral.
+
+The script uses `matplotlib` to create a visual representation of the spiral, with prime numbers colored differently from composite numbers. The command-line interface allows you to customize the size of the spiral, the color map, and the output format (image or JSON).
+
 ## Implementation Notes
 - Employs a NumPy-based Sieve of Eratosthenes to precompute primality up to \(n^2\).
 - Walks a discrete spiral (right, up, left, down) incrementing step lengths to assign integers to grid coordinates.
