@@ -53,7 +53,17 @@ _ROT13_TABLE = str.maketrans(_INPUT, _OUTPUT)
 
 
 def rot13(text: str) -> str:
-    """Return ROT13 transform of text (letters rotated, others unchanged)."""
+    """Applies the ROT13 cipher to a given string.
+
+    This function rotates the letters in the input string by 13 places,
+    while leaving non-alphabetic characters unchanged.
+
+    Args:
+        text: The string to be transformed.
+
+    Returns:
+        The ROT13 transformed string.
+    """
     return text.translate(_ROT13_TABLE)
 
 
@@ -77,6 +87,23 @@ def build_arg_parser() -> argparse.ArgumentParser:
 
 
 def resolve_input(cfg: CLIConfig) -> str:
+    """Resolves the input text from the command-line configuration.
+
+    This function determines the source of the input text based on the
+    provided configuration. It supports input from a string, a file,
+    or standard input. If no input source is specified, it falls back
+    to an interactive prompt.
+
+    Args:
+        cfg: The command-line configuration object.
+
+    Returns:
+        The input text from the resolved source.
+
+    Raises:
+        ValueError: If more than one input source is specified, or if
+                    there is an error reading from the specified source.
+    """
     sources = [bool(cfg.text), bool(cfg.file), cfg.stdin]
     if sum(sources) > 1:
         raise ValueError("Specify only one of --text / --file / --stdin")

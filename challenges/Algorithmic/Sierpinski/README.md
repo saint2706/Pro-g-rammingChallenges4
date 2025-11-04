@@ -43,6 +43,11 @@ Both CLIs share feature parity—size/character controls, optional JSON emission
   They check generation symmetry and metadata fields.
 - Print the generated lines via `generate_sierpinski_lines` in a Python REPL to inspect edge cases without CLI formatting.
 
+## How It Works
+The Python script `triangle.py` generates a Sierpinski triangle using a bitwise AND operation. The core of the algorithm is the `generate_sierpinski_lines` function, which iterates through each point (x, y) of a grid and checks if `(x & y) == 0`. If this condition is true, the point is part of the triangle and is drawn using the specified character.
+
+The script includes a command-line interface for setting the size of the triangle and the character to use. It also supports JSON output for providing metadata about the generated triangle. The `test_triangle.py` file contains unit tests to verify the correctness of the generation logic.
+
 ## Implementation Notes
 - Uses bitwise masking to determine inclusion, avoiding recursion or heavy computation.
 - Dataclass configuration enforces valid size/character inputs and reports whether the chosen size is a power of two.

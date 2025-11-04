@@ -26,7 +26,19 @@ Move = str
 def towers_of_hanoi(
     disks: int, source: str, target: str, auxiliary: str
 ) -> Iterator[Move]:
-    """Recursive generator yielding textual moves."""
+    """Generates the sequence of moves to solve the Towers of Hanoi puzzle.
+
+    This function uses a recursive approach to generate the moves.
+
+    Args:
+        disks: The number of disks to move.
+        source: The name of the source peg.
+        target: The name of the target peg.
+        auxiliary: The name of the auxiliary peg.
+
+    Yields:
+        A string representing the next move in the sequence.
+    """
     if disks > 0:
         yield from towers_of_hanoi(disks - 1, source, auxiliary, target)
         yield f"Move disk {disks} from {source} to {target}"
@@ -36,11 +48,19 @@ def towers_of_hanoi(
 def towers_of_hanoi_iterative(
     disks: int, source: str, target: str, auxiliary: str
 ) -> Iterator[Move]:
-    """Iterative (stack-based) equivalent of the recursive generator.
+    """Generates the sequence of moves to solve the Towers of Hanoi puzzle.
 
-    Simulates recursion frames as tuples (n, src, tgt, aux, stage). Stage 0 indicates
-    we still need to process children; stage 1 means we should emit the move and then
-    process the second half. This avoids Python recursion depth concerns for larger n.
+    This function uses an iterative approach with an explicit stack to avoid
+    recursion depth issues with a large number of disks.
+
+    Args:
+        disks: The number of disks to move.
+        source: The name of the source peg.
+        target: The name of the target peg.
+        auxiliary: The name of the auxiliary peg.
+
+    Yields:
+        A string representing the next move in the sequence.
     """
     stack: List[tuple[int, str, str, str, int]] = [
         (disks, source, target, auxiliary, 0)
@@ -62,7 +82,20 @@ def towers_of_hanoi_iterative(
 def hanoi_state_generator(
     num_disks: int, source: str, target: str, auxiliary: str
 ) -> Iterator[Dict[str, List[int]]]:
-    """Yield full peg state after each move for visualization."""
+    """Generates the state of the pegs after each move.
+
+    This is useful for creating visualizations of the puzzle.
+
+    Args:
+        num_disks: The number of disks.
+        source: The name of the source peg.
+        target: The name of the target peg.
+        auxiliary: The name of the auxiliary peg.
+
+    Yields:
+        A dictionary representing the state of the pegs, where the keys are
+        the peg names and the values are lists of the disks on each peg.
+    """
     pegs: Dict[str, List[int]] = {
         source: list(range(num_disks, 0, -1)),
         auxiliary: [],

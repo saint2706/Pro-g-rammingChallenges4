@@ -80,16 +80,19 @@ def fizzbuzz_stream(
     *,
     include_numbers: bool = True,
 ) -> Iterator[str]:
-    """Yield the FizzBuzz sequence up to ``limit`` inclusively.
+    """Yields the FizzBuzz sequence up to a given limit.
 
     Args:
-        limit: Upper bound (inclusive). Must be >= 1.
-        rules: Sequence of FizzBuzzRule objects evaluated in order.
-        include_numbers: If False, emit empty lines for non-matching numbers (or skip?)
-                         For clarity we still yield the number unless suppressed.
+        limit: The upper bound of the sequence (inclusive). Must be a positive integer.
+        rules: A sequence of `FizzBuzzRule` objects to apply. Defaults to classic FizzBuzz rules.
+        include_numbers: If `True`, numbers that don't match any rules are yielded as strings.
+                         If `False`, they are skipped.
 
     Yields:
-        String representation for each value from 1..limit according to rules.
+        A string representing the FizzBuzz output for each number in the sequence.
+
+    Raises:
+        ValueError: If `limit` is not a positive integer.
     """
     if limit < 1:
         raise ValueError("Limit must be >= 1")
@@ -133,9 +136,19 @@ OUTPUT_FORMATTERS: dict[str, Callable[[Iterable[str]], str]] = {
 
 
 def parse_rule(spec: str) -> FizzBuzzRule:
-    """Parse a rule specification of the form ``divisor:Label``.
+    """Parses a rule specification from a string.
 
-    Example: ``3:Fizz`` or ``7:Pop``
+    The string should be in the format "divisor:Label", e.g., "3:Fizz".
+
+    Args:
+        spec: The string specification of the rule.
+
+    Returns:
+        A `FizzBuzzRule` object.
+
+    Raises:
+        argparse.ArgumentTypeError: If the spec is not in the correct format
+                                    or the values are invalid.
     """
     if ":" not in spec:
         raise argparse.ArgumentTypeError(
@@ -203,9 +216,21 @@ def run(
     fmt: str = "plain",
     include_numbers: bool = True,
 ) -> str:
-    """Run FizzBuzz and return formatted result as a single string.
+    """Runs the FizzBuzz generator and returns the formatted result.
 
-    This function is import-friendly and can be used in tests.
+    This function is designed to be easily imported and used in other modules.
+
+    Args:
+        limit: The upper bound for the FizzBuzz sequence.
+        rules: A sequence of `FizzBuzzRule` objects. Defaults to the classic rules.
+        fmt: The output format. Can be "plain", "json", or "csv".
+        include_numbers: Whether to include numbers that don't match any rules.
+
+    Returns:
+        A string containing the formatted FizzBuzz sequence.
+
+    Raises:
+        ValueError: If an unsupported format is specified.
     """
     if rules is None:
         chosen_rules = DEFAULT_RULES

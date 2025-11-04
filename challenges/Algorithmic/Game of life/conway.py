@@ -181,7 +181,14 @@ class NeighborCalculator:
 
 
 class GameOfLife:
-    """Main Game of Life engine with rendering & interaction."""
+    """Manages the Game of Life simulation, rendering, and user interaction.
+
+    Attributes:
+        config: An object containing the game's configuration settings.
+        generation: The current generation number of the simulation.
+        paused: A boolean indicating whether the simulation is paused.
+        theme: The current color theme for the game display.
+    """
 
     def __init__(self, config: GameConfig):
         self.config = config
@@ -255,6 +262,7 @@ class GameOfLife:
     # Simulation update
     # -----------------------------
     def step(self) -> None:
+        """Advances the simulation by one generation."""
         counts = self.neighbor_calc.counts(self.grid)
         born = (self.grid == 0) & (counts == 3)
         survive = (self.grid == 1) & ((counts == 2) | (counts == 3))
@@ -263,6 +271,7 @@ class GameOfLife:
         self.generation += 1
 
     def update(self) -> None:
+        """Updates the simulation state if it is not paused."""
         if not self.paused:
             self.step()
 
@@ -270,12 +279,17 @@ class GameOfLife:
     # Rendering
     # -----------------------------
     def draw(self) -> None:
+        """Draws the current state of the game grid to the screen."""
         if self.config.headless:
             return
+        # Fill the background
         self.screen.fill(self.theme.background)  # type: ignore[attr-defined]
-        # Vectorized extraction of live cells
+
+        # Get the coordinates of all live cells
         live_rows, live_cols = np.nonzero(self.grid)
         cs = self.config.cell_size
+
+        # Draw a rectangle for each live cell
         for r, c in zip(live_rows.tolist(), live_cols.tolist()):
             pygame.draw.rect(self.screen, self.theme.cell, (c * cs, r * cs, cs, cs))  # type: ignore[arg-type]
 
@@ -283,6 +297,8 @@ class GameOfLife:
             self._draw_gridlines()
         if self.config.show_overlay:
             self._draw_overlay()
+
+        # Update the full display Surface to the screen
         pygame.display.flip()
 
     def _draw_gridlines(self) -> None:

@@ -50,6 +50,11 @@ Encrypt, decrypt, and analyze substitution ciphers where each alphabetic charact
 - Run the script with `--verbose` (logging set to `INFO`) to see alphabet normalization and scoring decisions.
 - No automated tests ship with this module, but you can add `pytest`-style cases by asserting round trips: `decrypt(encrypt(text, k), k) == text`.
 
+## How It Works
+The Python script `caesar.py` implements the Caesar cipher, a simple substitution cipher where each letter is shifted by a certain number of places. The `caesar_cipher` function performs the encryption and decryption, and it can handle different alphabets (letters only, alphanumeric, and all printable characters).
+
+The script also includes a `brute_force_crack` function that attempts to decrypt a message by trying all possible shifts and scoring the results based on English letter frequencies. The `cipher_visualizer.py` script can be used to create visualizations of the cipher, which can be helpful for understanding how it works.
+
 ## Implementation Notes
 - Supports multiple alphabet presets (letters, alphanumeric, printable) and normalizes case internally.
 - Includes brute-force enumeration and Chi-squared scoring to rank candidate plaintexts.

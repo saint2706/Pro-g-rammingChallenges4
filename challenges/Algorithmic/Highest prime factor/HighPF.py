@@ -30,25 +30,20 @@ from typing import Iterable, List, Sequence
 
 
 def highest_prime_factor(n: int) -> int:
-    """Return the largest prime factor of ``n``.
+    """Returns the largest prime factor of a given integer.
 
-    Uses the common optimization of testing 2, 3 separately then only numbers of the
-    form 6k±1 up to sqrt(remaining). This reduces iteration count roughly by a factor ~3.
+    This function uses an optimized trial division method. It first handles
+    the factors of 2 and 3, and then checks for factors of the form 6k ± 1
+    up to the square root of the remaining number.
 
-    Parameters
-    ----------
-    n : int
-        Integer >= 2.
+    Args:
+        n: An integer greater than 1.
 
-    Returns
-    -------
-    int
-        Largest prime factor.
+    Returns:
+        The largest prime factor of `n`.
 
-    Raises
-    ------
-    ValueError
-        If ``n < 2``.
+    Raises:
+        ValueError: If `n` is less than 2.
     """
     if n < 2:
         raise ValueError("Input must be an integer greater than 1.")
@@ -95,6 +90,15 @@ class FactorResult:
 
 
 def process_numbers(numbers: Sequence[int], timing: bool = False) -> List[FactorResult]:
+    """Processes a sequence of numbers to find their highest prime factors.
+
+    Args:
+        numbers: A sequence of integers to process.
+        timing: If `True`, measures the time taken to process each number.
+
+    Returns:
+        A list of `FactorResult` objects.
+    """
     results: List[FactorResult] = []
     for num in numbers:
         start = time.perf_counter() if timing else None
@@ -107,6 +111,16 @@ def process_numbers(numbers: Sequence[int], timing: bool = False) -> List[Factor
 
 
 def parse_stdin() -> List[int]:
+    """Parses a list of integers from standard input.
+
+    The input can be a single line of space- or comma-separated integers.
+
+    Returns:
+        A list of integers parsed from stdin.
+
+    Raises:
+        ValueError: If any of the tokens in the input cannot be converted to an integer.
+    """
     data = sys.stdin.read().strip()
     if not data:
         return []

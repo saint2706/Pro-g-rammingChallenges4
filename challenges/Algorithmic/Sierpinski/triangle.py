@@ -51,10 +51,19 @@ class TriangleConfig:
 
 
 def generate_sierpinski_lines(size: int, char: str = "*") -> Tuple[List[str], int]:
-    """Generate lines for a Sierpinski triangle of given size.
+    """Generates the lines of a Sierpinski triangle.
 
-    Returns a tuple of the generated lines (without trailing spaces) and the
-    number of positions where the drawing character was placed.
+    This function uses the bitwise property of the Sierpinski triangle,
+    where a point (x, y) is filled if (x & y) == 0.
+
+    Args:
+        size: The size (height) of the triangle.
+        char: The character to use for the filled parts of the triangle.
+
+    Returns:
+        A tuple containing:
+        - A list of strings, where each string is a line of the triangle.
+        - An integer representing the number of characters drawn.
     """
     lines: List[str] = []
     drawn_count = 0
@@ -75,6 +84,15 @@ def generate_sierpinski_lines(size: int, char: str = "*") -> Tuple[List[str], in
 
 
 def generate_sierpinski(size: int, char: str = "*") -> str:
+    """Generates a Sierpinski triangle as a single string.
+
+    Args:
+        size: The size (height) of the triangle.
+        char: The character to use for the filled parts of the triangle.
+
+    Returns:
+        A string representation of the Sierpinski triangle.
+    """
     lines, _ = generate_sierpinski_lines(size, char)
     return "\n".join(lines)
 
