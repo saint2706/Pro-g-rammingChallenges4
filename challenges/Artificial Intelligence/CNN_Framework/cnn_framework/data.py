@@ -12,7 +12,15 @@ from torchvision import datasets, transforms
 def _maybe_limit(
     dataset: datasets.MNIST, limit: Optional[int]
 ) -> datasets.MNIST | Subset[datasets.MNIST]:
-    """Return a subset of ``dataset`` limited to ``limit`` samples if provided."""
+    """Return a subset of ``dataset`` limited to ``limit`` samples if provided.
+
+    Args:
+        dataset: The dataset to limit.
+        limit: The maximum number of samples to include in the subset.
+
+    Returns:
+        The original dataset or a subset of it.
+    """
 
     if limit is None:
         return dataset
@@ -28,21 +36,23 @@ def create_data_loaders(
 ) -> Tuple[DataLoader, DataLoader]:
     """Create MNIST train and evaluation data loaders.
 
-    Parameters
-    ----------
-    data_dir:
-        Directory used for storing the MNIST dataset.
-    batch_size:
-        Number of samples per batch.
-    num_workers:
-        Number of worker processes for data loading.
-    train_limit:
-        Optional limit on the number of training samples.
-    eval_limit:
-        Optional limit on the number of evaluation samples.
+    This function downloads the MNIST dataset if it is not already present,
+    applies standard transformations, and creates data loaders for training
+    and evaluation.
+
+    Args:
+        data_dir: Directory used for storing the MNIST dataset.
+        batch_size: Number of samples per batch.
+        num_workers: Number of worker processes for data loading.
+        train_limit: Optional limit on the number of training samples.
+        eval_limit: Optional limit on the number of evaluation samples.
+
+    Returns:
+        A tuple containing the training and evaluation data loaders.
     """
 
     data_path = Path(data_dir)
+    # Standard transformations for MNIST
     transform = transforms.Compose(
         [
             transforms.ToTensor(),
@@ -50,6 +60,7 @@ def create_data_loaders(
         ]
     )
 
+    # Download and load the training and evaluation datasets
     train_dataset = datasets.MNIST(
         root=str(data_path),
         train=True,
@@ -63,9 +74,11 @@ def create_data_loaders(
         transform=transform,
     )
 
+    # Limit the datasets if requested
     train_dataset = _maybe_limit(train_dataset, train_limit)
     eval_dataset = _maybe_limit(eval_dataset, eval_limit)
 
+    # Create the data loaders
     train_loader = DataLoader(
         train_dataset,
         batch_size=batch_size,

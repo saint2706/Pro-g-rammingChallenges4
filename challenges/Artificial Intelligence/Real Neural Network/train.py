@@ -13,6 +13,14 @@ from mlp import MLP
 
 
 def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
+    """Parses command-line arguments for the training script.
+
+    Args:
+        argv: Optional list of command-line arguments.
+
+    Returns:
+        An ArgumentParser object.
+    """
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--hidden-layers",
@@ -78,8 +86,14 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
 
 
 def main(argv: Sequence[str] | None = None) -> None:
+    """Main entry point for the training script.
+
+    Args:
+        argv: Optional list of command-line arguments.
+    """
     args = parse_args(argv)
 
+    # Load and shuffle the MNIST dataset
     X_train, X_test, y_train, y_test = load_mnist(
         test_size=0.2,
         random_state=args.seed,
@@ -91,6 +105,7 @@ def main(argv: Sequence[str] | None = None) -> None:
     X_train = X_train[permutation]
     y_train = y_train[permutation]
 
+    # Initialize the MLP model
     n_classes = len(np.unique(y_train))
     layer_sizes = [X_train.shape[1], *args.hidden_layers, n_classes]
 
@@ -105,6 +120,7 @@ def main(argv: Sequence[str] | None = None) -> None:
     if not 0.0 <= args.validation_split < 1.0:
         raise ValueError("validation-split must be in the range [0, 1)")
 
+    # Create a validation split if requested
     if args.validation_split:
         split = int((1.0 - args.validation_split) * X_train.shape[0])
         train_X, val_X = X_train[:split], X_train[split:]
@@ -114,6 +130,7 @@ def main(argv: Sequence[str] | None = None) -> None:
         train_X, train_y = X_train, y_train
         validation_data = None
 
+    # Train the model
     history = model.fit(
         train_X,
         train_y,
@@ -124,6 +141,7 @@ def main(argv: Sequence[str] | None = None) -> None:
         verbose=True,
     )
 
+    # Evaluate the model on the training and test sets
     train_loss, train_acc = model.evaluate(train_X, train_y)
     test_loss, test_acc = model.evaluate(X_test, y_test)
 
@@ -131,6 +149,7 @@ def main(argv: Sequence[str] | None = None) -> None:
     print(f"Train loss: {train_loss:.4f} | Train accuracy: {train_acc:.3f}")
     print(f"Test loss:   {test_loss:.4f} | Test accuracy: {test_acc:.3f}")
 
+    # Save the model and training history
     model.save(args.model_out)
     print(f"Model saved to {args.model_out.resolve()}")
 

@@ -77,13 +77,12 @@ model.save(Path("toy_model.npz"))
 The weights are stored in compressed NumPy archives with keys `W0`,
 `b0`, etc., making it easy to inspect or port to other frameworks.
 
-## Files
+## Code Structure
 
-- `mlp.py` – core MLP implementation
-- `data.py` – helper utilities for dataset loading
-- `train.py` – command-line interface for training on MNIST
-- `evaluate.py` – evaluation CLI with confusion matrix reporting
-- `README.md` – this documentation
+- **`mlp.py`**: This is the core of the project, containing the `MLP` class that implements the neural network. It includes methods for forward and backward propagation, training, evaluation, and serialization.
+- **`data.py`**: This module provides the `load_mnist` function for downloading, caching, and loading the MNIST dataset.
+- **`train.py`**: This script provides a command-line interface for training the `MLP` model on the MNIST dataset. It handles argument parsing, data loading, model initialization, and training.
+- **`evaluate.py`**: This script provides a command-line interface for evaluating a trained `MLP` model. It loads a model from a checkpoint and reports its performance on the test set, including a confusion matrix.
 
 ## Notes
 

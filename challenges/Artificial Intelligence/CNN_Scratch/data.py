@@ -20,6 +20,12 @@ MNIST_URLS = {
 
 
 def _download(url: str, dest: Path) -> None:
+    """Downloads a file from a URL to a destination path.
+
+    Args:
+        url: The URL to download from.
+        dest: The destination path to save the file to.
+    """
     dest.parent.mkdir(parents=True, exist_ok=True)
     if dest.exists():
         return
@@ -28,6 +34,14 @@ def _download(url: str, dest: Path) -> None:
 
 
 def _load_images(path: Path) -> np.ndarray:
+    """Loads MNIST images from a gzipped file.
+
+    Args:
+        path: The path to the gzipped image file.
+
+    Returns:
+        A NumPy array of images.
+    """
     with gzip.open(path, "rb") as fh:
         magic, num, rows, cols = struct.unpack(">IIII", fh.read(16))
         if magic != 2051:
@@ -38,6 +52,14 @@ def _load_images(path: Path) -> np.ndarray:
 
 
 def _load_labels(path: Path) -> np.ndarray:
+    """Loads MNIST labels from a gzipped file.
+
+    Args:
+        path: The path to the gzipped label file.
+
+    Returns:
+        A NumPy array of labels.
+    """
     with gzip.open(path, "rb") as fh:
         magic, num = struct.unpack(">II", fh.read(8))
         if magic != 2049:
@@ -49,19 +71,31 @@ def _load_labels(path: Path) -> np.ndarray:
 def load_mnist(
     data_dir: str | os.PathLike[str], normalize: bool = True
 ) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
-    """Download (if necessary) and load the MNIST dataset."""
+    """Download (if necessary) and load the MNIST dataset.
+
+    Args:
+        data_dir: The directory to download and cache the dataset in.
+        normalize: Whether to normalize the image data to the range [0, 1].
+
+    Returns:
+        A tuple containing the training images, training labels, test images,
+        and test labels.
+    """
     data_path = Path(data_dir)
     data_path.mkdir(parents=True, exist_ok=True)
 
+    # Download the dataset files
     for key, url in MNIST_URLS.items():
         filename = data_path / f"{key}.gz"
         _download(url, filename)
 
+    # Load the dataset files
     x_train = _load_images(data_path / "train_images.gz")
     y_train = _load_labels(data_path / "train_labels.gz")
     x_test = _load_images(data_path / "test_images.gz")
     y_test = _load_labels(data_path / "test_labels.gz")
 
+    # Reshape and normalize the image data
     x_train = x_train.reshape(-1, 1, 28, 28).astype(np.float32)
     x_test = x_test.reshape(-1, 1, 28, 28).astype(np.float32)
 

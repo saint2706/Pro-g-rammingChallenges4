@@ -25,6 +25,7 @@ Array = np.ndarray
 
 
 def parse_args() -> argparse.Namespace:
+    """Parses command-line arguments for the training script."""
     parser = argparse.ArgumentParser(description="Train a NumPy CNN on MNIST.")
     parser.add_argument(
         "--epochs", type=int, default=5, help="Number of training epochs (default: 5)"
@@ -70,11 +71,22 @@ def prepare_data(
     validation_size: int,
     train_limit: int | None,
 ) -> Tuple[Array, Array, Array, Array, Array, Array]:
+    """Loads and prepares the MNIST dataset for training.
+
+    Args:
+        data_dir: The directory to load the data from.
+        validation_size: The number of samples to use for validation.
+        train_limit: An optional limit on the number of training samples.
+
+    Returns:
+        A tuple containing the training, validation, and test data splits.
+    """
     x_train, y_train, x_test, y_test = load_mnist(data_dir)
     if train_limit is not None:
         x_train = x_train[:train_limit]
         y_train = y_train[:train_limit]
 
+    # Create a validation split
     if validation_size > 0:
         x_val = x_train[:validation_size]
         y_val = y_train[:validation_size]
@@ -88,11 +100,14 @@ def prepare_data(
 
 
 def main() -> None:
+    """Main entry point for the training script."""
     args = parse_args()
+    # Load and prepare the data
     x_train, y_train, x_val, y_val, x_test, y_test = prepare_data(
         args.data_dir, args.validation_size, args.train_limit
     )
 
+    # Initialize and train the model
     model = SimpleCNN()
     history = model.fit(
         x_train,
@@ -104,9 +119,11 @@ def main() -> None:
         learning_rate=args.learning_rate,
     )
 
+    # Save the trained model
     Path(os.path.dirname(args.model_out) or ".").mkdir(parents=True, exist_ok=True)
     model.save(args.model_out)
 
+    # Print the final results
     has_validation = x_val is not None and y_val is not None
     if has_validation:
         val_message = f"Validation accuracy: {history.accuracies[-1]:.4f}"

@@ -12,6 +12,14 @@ from .mcts import ActionEvaluation, MCTSAgent
 
 
 def _format_action_stats(stats: Sequence[ActionEvaluation]) -> str:
+    """Formats MCTS action statistics into a readable table.
+
+    Args:
+        stats: A sequence of ActionEvaluation objects.
+
+    Returns:
+        A formatted string table of action statistics.
+    """
     if not stats:
         return "<no actions explored>"
     rows = ["Action       Visits  Mean Reward  Total Reward"]
@@ -23,6 +31,12 @@ def _format_action_stats(stats: Sequence[ActionEvaluation]) -> str:
 
 
 def _log_environment(logger: logging.Logger, env: RoguelikeEnvironment) -> None:
+    """Logs a summary of the environment state.
+
+    Args:
+        logger: The logger instance to use.
+        env: The RoguelikeEnvironment to summarize.
+    """
     summary = env.summary()
     logger.info(
         "Turn %(turn)d | HP=%(player_hp)d | hostiles=%(hostiles)d | hostile HP=%(hostile_hp)d",
@@ -39,9 +53,20 @@ def run_episode(
     seed: int | None,
     visualise: bool,
 ) -> None:
+    """Runs a single episode of the roguelike with an MCTS agent.
+
+    Args:
+        turns: The maximum number of turns in the episode.
+        iterations: The number of MCTS iterations per turn.
+        rollout_depth: The depth of each MCTS rollout.
+        exploration: The exploration constant for the UCT formula.
+        seed: An optional random seed for reproducibility.
+        visualise: Whether to print an ASCII representation of the dungeon.
+    """
     if seed is not None:
         random.seed(seed)
 
+    # Create the environment and agent
     env = create_sample_environment(seed=seed)
     agent = MCTSAgent(
         iterations=iterations,
@@ -56,10 +81,12 @@ def run_episode(
         print(env.to_ascii())
         print()
 
+    # Main game loop
     for turn in range(1, turns + 1):
         if env.is_terminal:
             logger.info("Episode finished early at turn %d", turn - 1)
             break
+        # Choose and apply an action
         action, stats = agent.choose_action(env)
         logger.info("Chosen action: %s", action.name)
         logger.debug("\n%s", _format_action_stats(stats))
@@ -77,6 +104,11 @@ def run_episode(
 
 
 def build_parser() -> argparse.ArgumentParser:
+    """Builds and configures the argument parser for the CLI.
+
+    Returns:
+        An ArgumentParser object.
+    """
     parser = argparse.ArgumentParser(
         description="Headless roguelike runner powered by a Monte Carlo agent.",
     )
@@ -115,6 +147,12 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def configure_logging(level: str, *, log_file: str | None) -> None:
+    """Configures logging for the application.
+
+    Args:
+        level: The logging level.
+        log_file: An optional file to write logs to.
+    """
     logging_kwargs: dict = {
         "level": getattr(logging, level.upper(), logging.INFO),
         "format": "%(asctime)s | %(name)s | %(levelname)s | %(message)s",
@@ -128,6 +166,11 @@ def configure_logging(level: str, *, log_file: str | None) -> None:
 
 
 def main(argv: Sequence[str] | None = None) -> None:
+    """Main entry point for the command-line interface.
+
+    Args:
+        argv: Optional sequence of command-line arguments.
+    """
     parser = build_parser()
     args = parser.parse_args(argv)
     configure_logging(args.log_level, log_file=args.log_file)

@@ -68,6 +68,7 @@ Example output (truncated for brevity):
 
 ## Development
 
+### Automated Tests
 Automated smoke tests ensure the planner can advance several turns without triggering
 errors:
 
@@ -78,6 +79,14 @@ pytest tests/test_ai_roguelike_smoke.py
 The tests load a small dungeon via `create_sample_environment`, run the agent for a few
 turns, and assert that the player remains alive or the run terminates cleanly.
 
+### Code Structure
+- **`cli.py`**: The command-line interface for running the agent. It handles argument parsing, logging configuration, and episode execution.
+- **`environment.py`**: A headless wrapper around the roguelike engine. It provides a simplified API for agent interaction, including action space definition, state evaluation, and ASCII rendering.
+- **`mcts.py`**: The Monte Carlo Tree Search planner. It contains the logic for the MCTS algorithm, including tree node representation, selection, expansion, simulation, and backpropagation.
+
+### Customization and Extension
 Feel free to tune the heuristics in `environment.py` or swap in a different planner.  The
 `RoguelikeEnvironment` exposes a small action space and deterministic seeding helpers that
-make it easy to prototype reinforcement learning agents or search-based controllers.
+make it easy to prototype reinforcement learning agents or search-based controllers. The main components to modify are:
+- **`RoguelikeEnvironment.evaluate()`**: The heuristic function that guides the MCTS agent. Modifying this function will change the agent's behavior.
+- **`MCTSAgent`**: The MCTS planner. You can replace this with your own planner, as long as it conforms to the same `choose_action` interface.

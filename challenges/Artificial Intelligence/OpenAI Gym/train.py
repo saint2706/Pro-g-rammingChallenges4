@@ -48,7 +48,15 @@ PRESETS: Dict[str, Dict[str, object]] = {
 
 
 def make_env(env_id: str, seed: int) -> Callable[[], gym.Env]:
-    """Construct a Gymnasium environment factory with deterministic seeding."""
+    """Construct a Gymnasium environment factory with deterministic seeding.
+
+    Args:
+        env_id: The ID of the Gymnasium environment.
+        seed: The random seed for the environment.
+
+    Returns:
+        A function that creates and returns a Gymnasium environment.
+    """
 
     def _init() -> gym.Env:
         env = gym.make(env_id)
@@ -61,7 +69,11 @@ def make_env(env_id: str, seed: int) -> Callable[[], gym.Env]:
 
 
 def set_global_seeds(seed: int) -> None:
-    """Set seeds for Python, NumPy, and PyTorch RNGs."""
+    """Set seeds for Python, NumPy, and PyTorch RNGs.
+
+    Args:
+        seed: The random seed to use.
+    """
 
     random.seed(seed)
     np.random.seed(seed)
@@ -71,6 +83,11 @@ def set_global_seeds(seed: int) -> None:
 
 
 def build_parser() -> argparse.ArgumentParser:
+    """Builds and configures the argument parser for the script.
+
+    Returns:
+        An ArgumentParser object.
+    """
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
         "--mode",
@@ -164,7 +181,15 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def build_model(env: DummyVecEnv, args: argparse.Namespace) -> DQN:
-    """Instantiate a DQN model configured for classic control tasks."""
+    """Instantiate a DQN model configured for classic control tasks.
+
+    Args:
+        env: The vectorized environment to train on.
+        args: The command-line arguments.
+
+    Returns:
+        A DQN model.
+    """
 
     return DQN(
         "MlpPolicy",
@@ -182,19 +207,26 @@ def build_model(env: DummyVecEnv, args: argparse.Namespace) -> DQN:
 
 
 def train(args: argparse.Namespace) -> None:
-    """Train a DQN agent with periodic checkpointing and evaluation."""
+    """Train a DQN agent with periodic checkpointing and evaluation.
+
+    Args:
+        args: The command-line arguments.
+    """
 
     set_global_seeds(args.seed)
 
+    # Create the training and evaluation environments
     env = DummyVecEnv([make_env(args.env_id, args.seed)])
     eval_env = DummyVecEnv([make_env(args.env_id, args.seed + 1)])
 
+    # Create directories for checkpoints and the final model
     args.checkpoint_dir.mkdir(parents=True, exist_ok=True)
     args.model_path.parent.mkdir(parents=True, exist_ok=True)
     timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
 
     model = build_model(env, args)
 
+    # Set up callbacks for checkpointing and evaluation
     checkpoint_callback = CheckpointCallback(
         save_freq=max(args.eval_frequency, 1),
         save_path=str(args.checkpoint_dir),
@@ -210,12 +242,15 @@ def train(args: argparse.Namespace) -> None:
         deterministic=True,
     )
 
+    # Train the model
     callbacks = CallbackList([checkpoint_callback, eval_callback])
     model.learn(total_timesteps=args.total_timesteps, callback=callbacks)
 
+    # Save the final model
     model.save(str(args.model_path))
     print(f"Model saved to {args.model_path}")
 
+    # Evaluate the final model
     mean_reward, std_reward = evaluate_policy(
         model,
         eval_env,
@@ -228,13 +263,19 @@ def train(args: argparse.Namespace) -> None:
 
 
 def evaluate(args: argparse.Namespace) -> None:
-    """Evaluate a saved policy on the target environment."""
+    """Evaluate a saved policy on the target environment.
+
+    Args:
+        args: The command-line arguments.
+    """
 
     set_global_seeds(args.seed)
 
     env = DummyVecEnv([make_env(args.env_id, args.seed)])
 
+    # Load the trained model
     model = DQN.load(str(args.model_path), env=env)
+    # Evaluate the model
     mean_reward, std_reward = evaluate_policy(
         model,
         env,
@@ -245,9 +286,11 @@ def evaluate(args: argparse.Namespace) -> None:
 
 
 def main() -> None:
+    """Main entry point for the script."""
     parser = build_parser()
     args = parser.parse_args()
 
+    # Apply a preset configuration if specified
     if getattr(args, "preset", None):
         for key, value in PRESETS[args.preset].items():
             setattr(args, key, value)

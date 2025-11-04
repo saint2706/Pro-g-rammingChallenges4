@@ -1,4 +1,10 @@
-# Modern, clean A* Sudoku solver with optional backtracking comparison
+"""A Sudoku solver that uses A* search and backtracking algorithms.
+
+This script provides a Sudoku class that can solve a 9x9 Sudoku puzzle
+using either the A* search algorithm or a traditional backtracking algorithm.
+The A* implementation uses a heuristic based on the number of empty cells
+and the number of possible candidates for each empty cell.
+"""
 import argparse
 import numpy as np
 import heapq
@@ -6,7 +12,22 @@ from typing import List, Optional, Tuple
 
 
 class Sudoku:
+    """A class to represent and solve a Sudoku puzzle.
+
+    Attributes:
+        board: A 9x9 NumPy array representing the Sudoku board.
+        original_board: A copy of the initial board state.
+    """
+
     def __init__(self, board: List[List[int]]):
+        """Initializes the Sudoku object.
+
+        Args:
+            board: A 9x9 list of lists representing the Sudoku puzzle.
+
+        Raises:
+            ValueError: If the input board is not a 9x9 grid.
+        """
         if not all(len(row) == 9 for row in board) or len(board) != 9:
             raise ValueError("Input board must be a 9x9 grid.")
         self.board = np.array(board)
@@ -15,10 +36,30 @@ class Sudoku:
     def astar_solve(self) -> bool:
         """
         Solve the Sudoku puzzle using the A* search algorithm.
-        Returns True if solved, False otherwise. Modifies the board in-place.
+
+        This method uses a priority queue to explore the most promising
+        board states first. The priority is determined by the cost function
+        f(n) = g(n) + h(n), where g(n) is the number of moves made so far,
+        and h(n) is a heuristic estimate of the remaining cost.
+
+        Returns:
+            True if a solution is found, False otherwise. The board is
+            modified in-place.
         """
 
         def heuristic(board: np.ndarray) -> tuple[int, int]:
+            """The heuristic function for the A* search.
+
+            The heuristic is a tuple of two values:
+            1. The number of empty cells.
+            2. The sum of the number of candidates for each empty cell.
+
+            Args:
+                board: The current state of the board.
+
+            Returns:
+                A tuple containing the two heuristic values.
+            """
             empties = np.argwhere(board == 0)
             if empties.size == 0:
                 return (0, 0)
@@ -29,6 +70,7 @@ class Sudoku:
 
         g = 0
         h_empty, h_candidates = heuristic(self.board)
+        # The priority queue stores tuples of (priority, h_empty, h_candidates, g, counter, board)
         start = (g + h_empty, h_empty, h_candidates, g, 0, self.board.copy())
         heap: list[tuple[int, int, int, int, int, np.ndarray]] = [start]
         visited: set[bytes] = set()
@@ -44,6 +86,7 @@ class Sudoku:
             if empty.size == 0:
                 self.board = board
                 return True
+            # Find the empty cell with the fewest candidates
             candidates_info = [
                 (self._candidate_count(board, r, c), r, c) for r, c in map(tuple, empty)
             ]
@@ -52,6 +95,7 @@ class Sudoku:
             if count == 0:
                 continue
 
+            # Explore the next possible moves
             for num in self._candidates(board, r, c):
                 new_board = board.copy()
                 new_board[r, c] = num
@@ -73,7 +117,9 @@ class Sudoku:
     def solve(self) -> bool:
         """
         Solves the Sudoku puzzle using recursive backtracking.
+
         This method modifies the board in-place.
+
         Returns:
             True if a solution is found, False otherwise.
         """
@@ -98,6 +144,7 @@ class Sudoku:
 
     @staticmethod
     def _candidates(board: np.ndarray, row: int, col: int) -> List[int]:
+        """Finds the possible candidates for a given cell."""
         if board[row, col] != 0:
             return []
         row_vals = board[row, :]
@@ -111,14 +158,17 @@ class Sudoku:
 
     @classmethod
     def _candidate_count(cls, board: np.ndarray, row: int, col: int) -> int:
+        """Counts the number of possible candidates for a given cell."""
         return len(cls._candidates(board, row, col))
 
     def is_valid_move(self, num: int, pos: Tuple[int, int]) -> bool:
+        """Checks if a move is valid."""
         return num in self._candidates(self.board, *pos)
 
     def find_empty_cell(self) -> Optional[Tuple[int, int]]:
         """
         Finds the first empty cell (with value 0) in the Sudoku board.
+
         Returns:
             A tuple (row, col) if an empty cell is found, or None if the board is full.
         """
@@ -128,6 +178,7 @@ class Sudoku:
         return tuple(empty[0])
 
     def display(self):
+        """Prints the Sudoku board to the console."""
         for i in range(9):
             if i % 3 == 0 and i != 0:
                 print("- - - - - - - - - - -")
@@ -139,6 +190,7 @@ class Sudoku:
 
 
 def main():
+    """The main entry point for the Sudoku solver script."""
     parser = argparse.ArgumentParser(
         description="Sudoku Solver using A* search (main) with optional backtracking comparison. "
         "Input file should contain 9 lines of 9 digits (0 for empty)."
@@ -154,6 +206,7 @@ def main():
     )
     args = parser.parse_args()
 
+    # Load the puzzle from a file
     with open(args.file, "r") as f:
         lines = [line.strip() for line in f if line.strip()]
     board = [[int(ch) if ch.isdigit() else 0 for ch in line] for line in lines]
@@ -161,6 +214,7 @@ def main():
     print("Input Puzzle:")
     sudoku.display()
 
+    # Solve with A*
     print("\nSolving with A* search...")
     solved = sudoku.astar_solve()
     if solved:
@@ -169,6 +223,7 @@ def main():
     else:
         print("A* could not solve the puzzle.")
 
+    # Optionally, solve with backtracking for comparison
     if args.compare:
         print("\nSolving with recursive backtracking...")
         sudoku_bt = Sudoku(board)
