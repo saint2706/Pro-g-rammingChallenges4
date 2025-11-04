@@ -63,3 +63,14 @@ def test_utf16_visualization_metadata():
 
     ascii_differences = data["comparisons"]["differences"]
     assert len(ascii_differences) == max(len(data["byte_values"]), 2)
+
+
+def test_create_visualizations_saves_to_nested_path(tmp_path):
+    pytest.importorskip("matplotlib")
+
+    save_path = tmp_path / "plots" / "output.png"
+    data = visualizer.generate_visualization_data("Hi", encoding="utf-8")
+
+    visualizer.create_visualizations(data, show=False, save_path=save_path)
+
+    assert save_path.exists()
