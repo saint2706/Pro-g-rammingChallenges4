@@ -214,6 +214,8 @@ def create_visualizations(
     plt.tight_layout()
 
     if save_path is not None:
+        save_path = Path(save_path)
+        save_path.parent.mkdir(parents=True, exist_ok=True)
         fig.savefig(save_path, dpi=300)
     if show:
         plt.show()
