@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import logging
 from pathlib import Path
 
 import pytest
@@ -91,3 +92,18 @@ def test_get_convergence_data_variants(algorithm: str, kwargs: dict[str, int]):
         assert isinstance(step.iteration, int)
         assert step.digits >= 0
         assert step.elapsed >= 0
+
+
+def test_gauss_legendre_converges_without_warning(caplog):
+    module = _load_module(
+        "gauss_legendre_module_test",
+        ROOT / "challenges/Algorithmic/1000 Digits of Pi/pi.py",
+    )
+
+    caplog.set_level(logging.WARNING)
+
+    steps = list(module.generate_gauss_legendre_convergence(5))
+    assert steps[-1].iteration < 50
+    assert not any(
+        "did not converge" in record.getMessage() for record in caplog.records
+    )
