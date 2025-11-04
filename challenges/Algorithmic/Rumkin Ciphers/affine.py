@@ -103,6 +103,8 @@ class CLIConfig:
             raise ValueError("-a and -b keys required unless --bruteforce used")
         if self.a not in VALID_A_VALUES:
             raise ValueError(f"Key a must be in {VALID_A_VALUES}")
+        if not (0 <= self.b < ALPHABET_SIZE):
+            raise ValueError(f"Key b must satisfy 0 <= b < {ALPHABET_SIZE}")
         if self.mode not in {"encrypt", "decrypt"}:
             raise ValueError("mode must be encrypt or decrypt")
 
