@@ -83,6 +83,9 @@ def load_dataframe(cfg: ChartConfig) -> pd.DataFrame:
             rename_map[col] = base
     if rename_map:
         df = df.rename(columns=rename_map)
+    # Ensure chronological order for downstream calculations while preserving
+    # the original relative ordering of rows with identical timestamps.
+    df = df.sort_values(REQUIRED_DATE, kind="mergesort").reset_index(drop=True)
     return df
 
 
