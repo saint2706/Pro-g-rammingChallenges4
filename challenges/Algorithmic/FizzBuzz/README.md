@@ -40,6 +40,11 @@ Print the integers from 1 through *n*, substituting `Fizz` for multiples of 3, `
   ```
 - When modifying the logic, re-run `pytest` to confirm that edge cases (such as custom divisors via `--rule`) still pass.
 
+## How it Works
+The Python implementation (`fizzbuzz.py`) uses a rule engine that makes it easy to extend. Each rule is a pair of a divisor and a string, like `(3, "Fizz")`. The script iterates through numbers from 1 to the limit, and for each number, it checks which rules apply. If any rules apply, it concatenates their strings; otherwise, it just uses the number itself.
+
+The `fizzbuzz_visualizer.py` script uses `matplotlib` to create a visual representation of the FizzBuzz sequence, which can be helpful for understanding the patterns. The `test_fizzbuzz.py` file contains a suite of tests to ensure the correctness of the implementation.
+
 ## Implementation Notes
 - The Python version exposes reusable functions (`fizzbuzz_sequence`) used by the tests.
 - Both implementations accept custom start/stop ranges and divisor pairs.

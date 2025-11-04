@@ -48,6 +48,13 @@ Simulate Conway's Game of Life on a 2D grid where cells live, die, or are born b
 - Use small grids (e.g., `--width 100 --height 100 --cell-size 5`) to make counting by hand feasible.
 - If evolution seems incorrect, toggle the overlay (`O`) to display FPS and generation counters and verify SciPy/NumPy backend selection logged on startup.
 
+## How It Works
+The Python implementation (`conway.py`) uses `pygame` for rendering and user interaction. The game's state is stored in a NumPy array, where each cell is either alive (1) or dead (0). The core logic is in the `step` method, which calculates the number of neighbors for each cell and applies the rules of the Game of Life to determine the next generation.
+
+To speed up the neighbor calculation, the script uses `scipy.signal.convolve2d` if available, which is significantly faster than manually iterating through each cell. If SciPy is not installed, it falls back to a NumPy-based implementation.
+
+The `Conway.hs` file provides a Haskell implementation of the Game of Life, which can be run in headless mode to simulate the game without a graphical interface.
+
 ## Implementation Notes
 - Relies on NumPy arrays for grid state; optionally leverages SciPy's `convolve2d` for fast neighbour computation.
 - Uses dataclasses to capture configuration and Pygame for rendering and input handling.

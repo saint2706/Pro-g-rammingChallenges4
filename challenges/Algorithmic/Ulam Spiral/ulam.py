@@ -47,9 +47,17 @@ except Exception:  # pragma: no cover - fallback when matplotlib absent
 
 
 def sieve_of_eratosthenes(n: int) -> np.ndarray:
-    """Return boolean array ``is_prime`` of length n+1 using a classic sieve.
+    """Generates a boolean array indicating primality up to `n`.
 
-    Complexity: O(n log log n). For modest sizes (<= 5e6) this is fast in pure NumPy.
+    This function implements the Sieve of Eratosthenes algorithm to efficiently
+    find all prime numbers up to a specified integer.
+
+    Args:
+        n: The upper limit for the sieve.
+
+    Returns:
+        A NumPy boolean array of size `n + 1`, where `is_prime[i]` is `True`
+        if `i` is a prime number, and `False` otherwise.
     """
     if n < 1:
         return np.zeros(n + 1, dtype=bool)
@@ -64,10 +72,19 @@ def sieve_of_eratosthenes(n: int) -> np.ndarray:
 
 
 def generate_ulam_spiral(size: int) -> np.ndarray:
-    """Generate a square ``size x size`` binary array for the Ulam spiral.
+    """Generates a square binary array representing the Ulam spiral.
 
-    ``1`` indicates a prime number, ``0`` otherwise. The integer 1 (center) is
-    not prime so center may be zero if size > 1.
+    In the generated grid, a value of 1 indicates a prime number, and 0
+    indicates a composite number. The spiral starts with 1 at the center.
+
+    Args:
+        size: The side length of the square grid.
+
+    Returns:
+        A NumPy array of shape (`size`, `size`) representing the Ulam spiral.
+
+    Raises:
+        ValueError: If `size` is less than 1.
     """
     if size < 1:
         raise ValueError("size must be >= 1")
@@ -132,6 +149,15 @@ class SpiralConfig:
 
 
 def plot_ulam(grid: np.ndarray, cfg: SpiralConfig) -> None:
+    """Plots the Ulam spiral using Matplotlib.
+
+    Args:
+        grid: The NumPy array representing the Ulam spiral.
+        cfg: The configuration object for the plot.
+
+    Raises:
+        RuntimeError: If Matplotlib is not installed.
+    """
     if not HAVE_MPL:
         raise RuntimeError("matplotlib not available; cannot plot (install matplotlib)")
     import matplotlib.pyplot as plt  # local import for clarity

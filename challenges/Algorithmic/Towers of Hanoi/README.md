@@ -52,6 +52,11 @@ Solve the Towers of Hanoi puzzle for \(n\) disks, producing the minimal sequence
   They validate recursive and iterative generators plus state tracking.
 - Enable `--trace` to print intermediate peg configurations when diagnosing move ordering issues. In Haskell, these traces go to `stderr`, keeping JSON or move output clean on `stdout`.
 
+## How It Works
+The Python script `ToH.py` provides both recursive and iterative solutions to the Towers of Hanoi puzzle. The `towers_of_hanoi` function uses recursion to generate the sequence of moves, which is the classic and most straightforward approach. The `towers_of_hanoi_iterative` function uses a stack to simulate the recursion, which can be useful for a very large number of disks to avoid Python's recursion depth limit.
+
+The `ToH_visualizer.py` script uses `matplotlib` to create an animated visualization of the puzzle, making it easy to see how the solution works. The `test_toh.py` file contains unit tests for both the recursive and iterative solvers.
+
 ## Implementation Notes
 - Provides both recursive (`towers_of_hanoi`) and stack-based iterative generators for educational comparison.
 - `hanoi_state_generator` yields peg contents after each move for integration with visualizers.
