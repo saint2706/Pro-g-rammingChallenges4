@@ -207,7 +207,10 @@ def run(
 
     This function is import-friendly and can be used in tests.
     """
-    chosen_rules = tuple(rules) if rules else DEFAULT_RULES
+    if rules is None:
+        chosen_rules = DEFAULT_RULES
+    else:
+        chosen_rules = tuple(rules)
     if fmt not in OUTPUT_FORMATTERS:
         raise ValueError(f"Unsupported format: {fmt}")
     stream = fizzbuzz_stream(limit, chosen_rules, include_numbers=include_numbers)
